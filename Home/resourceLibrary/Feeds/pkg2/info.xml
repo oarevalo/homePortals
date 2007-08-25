@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog package="pkg2">
+	<feeds>
+		<feed id="Raymond Camden" href="http://www.coldfusionjedi.com/rss.cfm" />
+	</feeds>
+</catalog>

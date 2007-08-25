@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/Home//pageLoader.xsl"?>
+<Page>
+	<layout>
+		<location class="column_small" name="left" type="column"/>
+		<location class="column" name="right" type="column"/>
+	</layout>		
+
+	<modules />
+
+</Page>

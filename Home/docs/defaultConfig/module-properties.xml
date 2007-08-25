@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<moduleProperties>
+    <module name="RSSReader/RSSReader">
+        <property name="cacheDir" value="/RSSReaderCache" />
+    </module>
+
+    <module name="EditBox/editBox">
+        <property name="useTinyMCE" value="false" />
+    </module>
+
+    <module name="flickrFeed/flickrFeed">
+        <property name="API_Key" value="a0e8cd15fc50b77bb8821c13fa112819" />
+    </module>
+	    
+</moduleProperties>

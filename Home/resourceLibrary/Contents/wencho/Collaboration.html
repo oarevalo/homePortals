@@ -1,0 +1,99 @@
+<h1>
+  HomePortals As A Collaboration Site
+</h1>
+<br/>
+<span style="FONT-WEIGHT:bold">Purpose</span>:<br/>
+Discuss how HomePortals can be used (and/or extended or modifed) by a group of
+people to collaborate on a common project.<br/>
+<br/>
+<span style="FONT-WEIGHT:bold">Problem:</span><br style="FONT-WEIGHT:bold"/>
+When several people have to work on a common project they usually have a set of
+common resources related to the project at hand. These resources include:<br/>
+<div style="MARGIN-LEFT:40px">
+  <ul>
+    <li>
+      Text documents
+      <li>
+        Tasks lists
+        <li>
+          Calendars &amp; Appointments
+          <li>
+            Images
+            <li>
+              Links to related sites (i.e. company websites, blogs, etc)
+              <li>
+                Files (i.e. Word, Excel, Powerpoint documents)
+  </ul>
+</div>
+<br/>
+Group members require a way of sharing these common resources and information
+about the project. When the group is geographically dispersed, this is usually
+handled by each member communicating in person, phone, or email. Also, some of
+the common resources may be stored on one or more agreed websites where all
+group members can get to them.&nbsp;<br/>
+<br/>
+Although having all resources stored in a centralized location may be a more
+desirable situation, there may be reasons why this is not possible or practical:<br/>
+<div style="MARGIN-LEFT:40px">
+  1. Some resources are better suited for certain sites (i.e. flickr for storing
+  pictures, del.icio.us for storing links, etc) than other,<br/>
+  2. Group members may already be using a particular site and it would be too
+  cumbersome to replicate that data or move it to another site.<br/>
+</div>
+<br/>
+<span style="FONT-WEIGHT:bold">HomePortals
+Solution:</span><br style="FONT-WEIGHT:bold"/>
+HomePortals offers a unique alternative for groups of people working on a common
+project. The characteristics of HomePortals provides an environment in which
+team members can collaborate and have a centralized place from where they can
+access common resources that may reside anywhere on the Internet.<br/>
+<br/>
+The current HomePortals implementation would require that all team members share
+a single account per project, this is because the limitation that HomePortals
+enforces in which only the account owner can modify data files. Other accounts
+would be able to look at the project's data files but not be allowed to make
+changes. However, it would be a desirable trait to have each group member to
+have his/her own HomePortals account, and have read/write access to data from a
+pool of shared content.<br/>
+<br/>
+<span style="BACKGROUND-COLOR:#ffcc33">This would require a change in
+HomePortals to allow a restricted group of people to work on the same data
+files; also there needs to be a way of letting them know what data files are
+available for sharing, as well as information about each file. They need to be
+able to create their own catalog, also this catalog needs to be able to not only
+indicate modules but also data files, along with information about what module
+needs to be used to open it, and information about its purpose, description and
+creation.</span><br/>
+<br/>
+<span style="BACKGROUND-COLOR:#ffcc33">Also when editing the data in shared
+modules there should be some kind of safeguard to avoid users overwriting each
+other. Currently once a module is loaded, its data is copied to the session
+scope and once a change is made, the entire data file is saved (instead of
+saving only the changed data items). This is dangerous in the sense that if user
+A loads the module, then user B loads it too, then user A makes a change while B
+still has the data in memory; A's change is saved, but since B hasn't reload the
+page, the moment B makes a change, then he will "undo" A's change.</span><br/>
+<span style="FONT-WEIGHT:bold"><br/>
+Scenario:</span><br style="FONT-WEIGHT:bold"/>
+Jack and Gill are working on a new project for their company.<br/>
+This project is about a new product called XYZ.<br/>
+Jack and Gill create each their own HomePortals account.<br/>
+Gill creates a new catalog called "ProjectXYZ"<br/>
+Jack subscribes to this catalog<br/>
+Whenever Jack or Gill creates a new module, they publish it to the ProjectXYZ
+catalog so it can be shared with the other<br/>
+Each one creates their pages as they see fit, adding only the modules and data
+files that they need at a given time<br/>
+<br/>
+<br/>
+<span style="FONT-WEIGHT:bold">Required Changes:</span><br/>
+<ul>
+  <li>
+    Shared catalogs
+    <li>
+      Elements published to a catalog must be persistent, regardless of their
+      presence on the publishers site
+</ul>
+<br/>
+<br/>
+<br/>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog package="Internet">
+    <modules>
+        <!-- ********   WebViewer  ************ -->
+        <module access="general" id="WebViewer" name="WebViewer/WebViewer">
+            <description>
+                Use this module to load and display a URL within a HomePortals page.
+            </description>
+            <attributes>
+                <attribute name="URL" required="true" description="This is the URL to display on the viewer" />
+                <attribute name="width" required="true" description="This is the URL to display on the viewer" />
+                <attribute name="height" required="true" description="This is the URL to display on the viewer" />
+            </attributes>
+            <moduleInfo>
+                <authorName>Oscar Arevalo</authorName>
+                <authorEmail>oarevalo@gmail.com</authorEmail>
+                <authorURL>http://www.homeportals.com</authorURL>
+                <screenshot/>
+            </moduleInfo>
+            <api>
+                <methods>
+                    <!--<method name="getURL" description="Retrieves current URL displayed" /> -->
+                    <method name="setURL" description="Sets the URL to display" /> 
+                </methods>
+                <events />
+            </api>
+        </module>	
+    </modules>
+</catalog>

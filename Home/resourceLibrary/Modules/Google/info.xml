@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog package="Internet">
+
+<modules>
+
+	<!-- ********   Google  ************ -->
+	<module access="general" id="Google" name="Google/google">
+		<description>
+			Displays a form to search in Google.
+		</description>
+		<moduleInfo>
+			<authorName>Oscar Arevalo</authorName>
+			<authorEmail>oarevalo@gmail.com</authorEmail>
+			<authorURL>http://www.homeportals.com</authorURL>
+			<screenshot/>
+		</moduleInfo>
+	</module>
+</modules>
+</catalog>

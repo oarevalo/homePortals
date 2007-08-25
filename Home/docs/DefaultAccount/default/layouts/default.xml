@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/Home//pageLoader.xsl"?>
+<Page owner="default">
+	<title>HomePortals Portal Server</title>
+
+	<!-- Define Screen Layout -->
+	<layout>
+		<location class="leftcolumn" name="left" type="column"/>
+		<location class="middlecolumn" name="middle" type="column"/>
+		<location class="rightcolumn" name="right" type="column"/>
+	</layout>
+
+	<!-- Define Modules -->
+	<modules>
+		<module CONTAINER="false" contentID="" id="editBox1" location="middle"
+			name="editBox/editBox"
+			staticContent="" title="Welcome" url=""/>
+		<module id="AccountLogin" location="right"
+			name="Accounts/login" style=""
+			title="Account Login"/>
+		<module id="directory1" location="right"
+			name="Accounts/directory"
+			title="Recent Accounts"/>
+		<module CONTAINER="true" followLink="" id="bookmarks21" location="right"
+			name="Bookmarks2/bookmarks2"
+			title="Bookmarks" url=""/>
+		<module CONTAINER="true" id="rssReader1" location="right"
+			name="RSSReader/RSSReader"
+			rss="http://www.cfempire.com/home/modules/blog/blog.cfc?method=getrss&amp;url=/accounts/wencho/blog.xml"
+			style="" targetID="" title="RSS Reader"/>
+	</modules>
+
+	<stylesheet href="/Home//Skins/silver/silver.css"/>
+	<stylesheet href="/Accounts/default/styles/default.xml.css"/>
+</Page>

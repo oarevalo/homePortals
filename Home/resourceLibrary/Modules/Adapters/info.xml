@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog package="User Interface">
+    <modules>
+        <!-- ********   simpleAdapter  ************ -->
+        <module access="general" id="simpleAdapter" name="Adapters/simpleAdapter">
+            <description>
+                Provides a simple adapter to transform the output of a module's event into the input of another module's method
+            </description>
+            <attributes />
+            <moduleInfo>
+                <authorName>Oscar Arevalo</authorName>
+                <authorEmail>oarevalo@gmail.com</authorEmail>
+                <authorURL>http://www.homeportals.com</authorURL>
+                <screenshot/>
+            </moduleInfo>
+			<api>
+				<methods>
+					<method name="setInput" description="Sets the adapter's input" />
+					<method name="fireOutput" description="Sends the adapter's output" />
+				</methods>
+				<events>
+					<event name="onInputReceived" description="Raised when the adapter's input has been set" />
+					<event name="onOutputFired" description="Raised when the adapter's output has been fired" />
+				</events>
+			</api>
+        </module>	
+
+      </modules>
+</catalog>

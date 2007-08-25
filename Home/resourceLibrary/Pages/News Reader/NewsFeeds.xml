@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml createdOn="Fri, 16 Mar 2007 20:40:04 GMT" owner="xilya">
+	<body>
+		<outline text="Digg" type="link" url="http://www.digg.com/rss/index.xml" />
+		<outline text="TechCrunch" type="link" url="http://feeds.feedburner.com/Techcrunch" />
+		<outline text="CNN Top Stories" type="link" url="http://rss.cnn.com/rss/cnn_topstories.rss" />
+		<outline text="Salon.com" type="link" url="http://www.salon.com/feed/RDF/salon_use.rdf" />
+		<outline text="BBC News" type="link" url="http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml" />
+	</body>
+</opml>
