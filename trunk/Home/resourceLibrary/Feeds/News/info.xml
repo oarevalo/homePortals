@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog><feeds><feed href="http://rss.cnn.com/rss/cnn_topstories.rss" id="CNN">Top Stories from CNN</feed><feed href="http://rss.cnn.com/rss/cnn_us.rss" id="CNN - US">US News From CNN</feed><feed href="http://rss.cnn.com/rss/cnn_world.rss" id="CNN - World">World News From CNN</feed><feed href="http://rss.msnbc.msn.com/id/3032524/device/rss/rss.xml" id="MSNBC - US">US News From MSNBC</feed><feed href="http://rss.msnbc.msn.com/id/3032506/device/rss/rss.xml" id="MSNBC - World">World News From MSNBC</feed></feeds></catalog>

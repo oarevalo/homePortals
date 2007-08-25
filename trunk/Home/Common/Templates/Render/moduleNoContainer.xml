@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<renderTemplate>
+	<div id="$MODULE_ID$">
+		<div id="$MODULE_ID$_BodyRegion" style="$MODULE_STYLE$">
+			$MODULE_CONTENT$
+		</div>
+	</div>
+</renderTemplate>
+	
