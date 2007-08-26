@@ -137,16 +137,10 @@
 		<cfreturn this />
 	</cffunction>
 
-	<cffunction name="toXML" hint="Returns the xml representation of this resource" access="public" output="false" returntype="xml">
-		<!--- TODO: Implement Method --->
-		<cfreturn />
-	</cffunction>
-
 	<cffunction name="getMemento" hint="returns a structure with instance data" access="public" output="false" returntype="struct">
 		<cfreturn duplicate(variables.instance) />
 	</cffunction>
 	
-
 	<cffunction name="getName" access="public" output="false" returntype="string">
 		<cfreturn variables.instance.Name />
 	</cffunction>

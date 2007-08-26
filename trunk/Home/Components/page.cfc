@@ -183,16 +183,16 @@
 	<!---------------------------------------->	
 	<cffunction name="addModule" access="public" returntype="string" output="False"
 				hint="Adds a module to the page">
-		<cfargument name="moduleID" type="string" required="true">
+		<cfargument name="moduleResourceBean" type="resourceBean" required="true">
 		<cfargument name="locationID" type="string" required="yes">
-		<cfargument name="oCatalog" type="catalog" required="yes">
 		<cfargument name="customAttributes" type="struct" required="no" default="#structNew()#">
 
 		<cfscript>
-			var oResourceBean = 0;
+			var oResourceBean = arguments.moduleResourceBean;
 			var tmpNode = 0;
 			var nodeIndex = 0;
 			var aNodeID = 0;
+			var moduleID = oResourceBean.getID();
 			var newModuleID = 0;
 			var aAttr = 0;
 			var i = 0;
@@ -205,24 +205,20 @@
 			var keepLooping = true;
 			var aTemp = arrayNew(1);
 			
-			// get node info from catalog	
-			oResourceBean = oCatalog.getResourceNode("module", arguments.moduleID);		
-			if(isSimpleValue(oResourceBean)) throw("The given module was not found on the catalog","homePortals.page.moduleNotFound");
-
 			// insert new node in document
 			tmpNode = variables.xmlDoc.Page.modules;
 			nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
 			tmpNode.xmlChildren[nodeIndex] = xmlElemNew(variables.xmlDoc,"module");				
 			
-			// create an id for the new module based on the catalog id
+			// create an id for the new module based on the resource id 
 			aNodeID = xmlSearch(xmlDoc,"//module[@name='" & oResourceBean.getName() & "']");
 			
 			moduleIndex = ArrayLen(aNodeID)+1;
 			keepLooping = true;
 			while(keepLooping) {
-				aTemp = xmlSearch(xmlDoc,"//module[@id='#arguments.moduleID##moduleIndex#']");
+				aTemp = xmlSearch(xmlDoc,"//module[@id='#moduleID##moduleIndex#']");
 				if(arrayLen(aTemp) eq 0) {
-					newModuleID = arguments.moduleID & moduleIndex;
+					newModuleID = moduleID & moduleIndex;
 					keepLooping = false;
 				}
 				moduleIndex = moduleIndex + 1;
@@ -242,7 +238,7 @@
 			tmpNode.xmlChildren[nodeIndex].xmlAttributes["name"] = oResourceBean.getName();
 			tmpNode.xmlChildren[nodeIndex].xmlAttributes["title"] = newModuleID;
 			
-			// add default properties from catalog
+			// add default properties from resourceBean
 			aTemp = oResourceBean.getAttributes();
 			for(i=1; i lte ArrayLen(aTemp); i=i+1) {
 				thisAttr = aTemp[i]; 
