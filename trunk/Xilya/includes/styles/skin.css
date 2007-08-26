@@ -1,0 +1,260 @@
+
+
+/* ************ Page Structure ************* */
+
+html{
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 11px;
+}
+body{
+	color: #333;
+	background:  url("/xilya/includes/images/bg.gif");
+}
+
+
+/* start IE stuff */
+/* if you need this to validate you need to use "if IE" statement in HTML */
+* html body
+	{
+	overflow-y: hidden;
+	}
+
+/* end IE stuff */	
+	
+#h_footer
+	{
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	width: 100%;
+	height: 20px;
+	z-index:999;
+}
+
+
+
+
+/*
+body{
+	color: #333;
+	background:  url("/xilya/includes/images/bg.gif");
+	height: 100%;
+}
+
+#h_main {
+	position: relative;
+	min-height: 100%;
+}
+
+* html #h_main {
+	height: 100%;
+}
+
+#h_footer {
+	position: relative;
+	margin: -1.9em auto 0 auto;
+	z-index:10;
+}
+*/
+/* A CSS hack that only applies to IE -- specifies a different height for the footer */
+/*
+* html #h_footer {
+	margin-top: -1em;
+}
+*/
+
+
+
+#h_body_main {
+	padding-left:210px;
+	margin-left:-210px;
+	#padding:0px;
+	#margin:0px;
+	width:100%;
+}
+
+
+
+
+
+/************************************** */
+
+
+
+/************  Layout Sections  ********/
+
+.column { 
+	min-width:100px;
+}
+.column_small {
+	width:250px !important;
+}
+.row {
+	min-height:50px;
+	margin-left:210px;
+}
+.column_third {
+	width:33%;
+}
+.header {
+	padding:0px;
+	margin:5px;
+	border:0px;
+}
+.layoutSectionHolder {
+	font-size:1px;
+	border:1px dotted white;
+	height:1px;
+	#height:10px;	
+}
+/************************************** */ 
+
+	
+
+
+/***********   Module Containers ********/
+
+.Section {
+	margin: 5px;
+	border : 0px;
+	background-color: #fff;
+	z-index: 1;
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 11px;	
+	position:relative;
+	width:95%;
+	border-bottom:1px solid #ebebeb;
+}
+.SectionTitle {
+	background-color:#ebebeb;
+	color: #000;
+	border-top:1px dashed #ccc;
+	border-bottom:1px dashed #ccc;
+}
+.SectionTitleLabel {
+	font-size:10px !important;
+	font-weight:bold;
+	font-family:verdana;
+	
+}
+.SectionToolbar {
+	border:1px solid silver;
+	background-color:#fefcd8;
+	margin:0px;
+	color:#993300;
+	margin-top:10px;
+	padding:2px;
+	font-size:12px;
+}
+.SectionToolbar a {
+	color:#333333 !important;
+	font-weight:bold;
+	font-size:10px;
+}
+/************************************** */
+
+
+
+
+/******** Site map & side panel ************ */
+
+#navMenu {
+	margin:0px;	
+	font-family:Arial, Helvetica, sans-serif;
+	background-image:url("/xilya/includes/images/bgtop.jpg");
+	background-color: #000;
+	margin-top: 0px;
+	border:0px;
+	color:#fff;
+	height:60px;
+}
+#navMenuTitles {
+	background-color: #333;
+	border-top:1px solid white; 
+	border-bottom:1px solid black; 
+	padding-top:3px;
+	padding-bottom:3px;
+	color:#fff;
+}
+#siteMapTitle {
+	font-size:16px;
+	font-family:arial;
+	font-weight:bold;
+	font-variant:small-caps;
+	margin:0px;
+	padding:0px;
+	color:#fff;
+	padding-left:10px;	
+}
+#pageTitle {
+	font-size:13px;
+	font-family:verdana;
+	font-weight:normal;
+	font-style: italic;
+	color:#fff;
+}	
+#pageFooter {
+	background-color: #333;
+	border-top:1px solid white; 
+	border-bottom:1px solid black; 
+	padding-top:3px;
+	padding-bottom:3px;
+	color:#fff;
+	text-align:center;
+	font-size:10px;
+}
+
+#sidePanel {
+	width:200px;
+	border-right:1px solid #3a5164;
+	background-color:#ccc;
+	background-color:#999;
+	float:left;
+	border-top:1px solid white;
+	color:#333;
+	height:100%;
+	z-index:100000;
+}
+#sidePanel a {
+	color:#333;
+	font-weight:normal;
+}
+
+.sidePanelDivider {
+	border-top:1px solid #3a5164;
+	border-bottom:1px solid white;
+}
+.sidePanelSectionTitle {
+	font-weight:bold;
+	padding:5px;
+	background-color:#999;
+	color:#333;
+	/*border-bottom:1px solid #ebebeb;*/
+}
+.sidePanelSectionTitle a,
+.sidePanelSectionTitle a:link {
+	text-decoration:none;
+	display:block;
+	font-weight:bold;
+	color:#333 !important;
+}
+.sidePanelSectionTitle a:hover {
+	text-decoration:underline;
+}
+.sidePanelSectionContent {
+	padding:10px;
+	padding-top:5px;
+	background-color:#e5e5e5;
+	border-top:1px solid #fff;
+}
+
+.inlineTextbox {
+	border:0px;
+	font-size:11px;
+	width:120px;
+}
+.inlineForm {
+	margin:0px;
+	padding:0px;
+	display:inline;
+}
