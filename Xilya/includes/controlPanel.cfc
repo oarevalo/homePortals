@@ -735,7 +735,7 @@
 				// create the bean for the new resource
 				oResourceBean = createObject("component","Home.Components.resourceBean").init();	
 				oResourceBean.setID(arguments.id);
-				oResourceBean.setHREF(arguments.rssURL);
+				oResourceBean.setHREF();
 				oResourceBean.setOwner(siteOwner);
 				oResourceBean.setAccessType(arguments.access); 
 				oResourceBean.setDescription(arguments.description); 
