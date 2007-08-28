@@ -169,6 +169,11 @@
 			var j = 0;
 			var stResourceBean = structNew();
 			var resTypeGroup = "";
+			var oResourceLibrary = 0;
+
+			// create an instance of the resourceLibrary object
+			oResourceLibrary = createObject("component","resourceLibrary");
+			oResourceLibrary.init(variables.resourcesRoot);
 
 			// get all resources on the current package
 			aResources = oResourceLibrary.getResourcesInPackage(arguments.resourceType, arguments.packageName);
