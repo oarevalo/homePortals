@@ -41,16 +41,11 @@
 		<cfargument name="description" type="string" required="true" hint="resource description">
 		<cfargument name="body" type="string" required="true" hint="resource body">
 		
-        <cfset var xmlDoc = 0>
-        <cfset var xmlNode = 0>
+        <cfset var oResourceBean = 0>
  		<cfset var oHP = application.homePortals>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = "content">
-		<cfset var folder = "">
-		<cfset var packageDir = "">
 		<cfset var siteOwner = "">
-		<cfset var href = "">
-		<cfset var fixedContentID = "">
 				
 		<cfscript>
 				if(arguments.contentID eq "" and arguments.newContentID eq "") throw("The content name cannot be empty.");
@@ -67,80 +62,23 @@
 				// remove any invalid characters from the id
 				arguments.newContentID = reReplace(arguments.newContentID, "[^A-Za-z0-9_ ]", "_", "ALL");
 
-				// this is the directory where the resources of this type for this account will be stored
-				packageDir = resourceLibraryPath & "/" & resourceType & "s" & "/" & siteOwner;
-
-				// set the proper href for the given path based on the ID
-				href = resourceLibraryPath & "/" & resourceType & "s/" & siteOwner & "/" & arguments.newContentID & ".html";					
+				// create the bean for the new resource
+				oResourceBean = createObject("component","Home.Components.resourceBean").init();	
+				oResourceBean.setID(arguments.newContentID);
+				oResourceBean.setHREF();
+				oResourceBean.setOwner(siteOwner);
+				oResourceBean.setAccessType(arguments.access); 
+				oResourceBean.setDescription(arguments.description); 
+				oResourceBean.setPackage(siteOwner); 
+				oResourceBean.setType(resourceType); 
 				
-				// create a package for the current account on the resource type folder
-				if(Not DirectoryExists(expandPath(packageDir))) {
-					createDir(packageDir);
-				}
-	
-				
-				// check for file descriptor, if doesnt exist, then create one
-				if(fileExists(expandPath(packageDir & "/info.xml"))) {
-					xmlDoc = xmlParse(expandPath(packageDir & "/info.xml"));
-					
-					if(not structKeyExists(xmlDoc.xmlRoot, resourceType & "s")) 
-						arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlElemNew(xmlDoc, resourceType & "s"));
-					
-				} else {
-					// create file descriptor
-					xmlDoc = xmlNew();
-					xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "catalog");
-					arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlElemNew(xmlDoc, resourceType & "s"));
-				}
-				
-				
-				// update the file descriptor
-				if(arguments.contentID eq "") {
-					// this is a new resource
-					xmlNode = xmlElemNew(xmlDoc, resourceType);
-					xmlNode.xmlAttributes["id"] = arguments.newContentID;
-					xmlNode.xmlAttributes["href"] = href;
-					xmlNode.xmlAttributes["owner"] = siteOwner;
-					xmlNode.xmlAttributes["access"] = arguments.access;
-					xmlNode.xmlText = arguments.description;
-					arrayAppend(xmlDoc.xmlRoot[resourceType & "s"].xmlChildren, xmlNode);
-					
-				} else {
-					// this is an existing resource
-					bFound = false;
-					for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resourceType & "s"].xmlChildren);i=i+1) {
-						xmlNode = xmlDoc.xmlRoot[resourceType & "s"].xmlChildren[i];
-						if(xmlNode.xmlAttributes.id eq arguments.contentID) {
-							xmlNode.xmlAttributes["id"] = arguments.contentID;
-							xmlNode.xmlAttributes["href"] = href;
-							xmlNode.xmlAttributes["owner"] = siteOwner;
-							xmlNode.xmlAttributes["access"] = arguments.access;
-							xmlNode.xmlText = arguments.description;
-							bFound = true;
-							break;
-						}
-					}
-					
-					// if resource not found in descriptor, then add it
-					if(Not bFound) {
-						xmlNode = xmlElemNew(xmlDoc, resourceType);
-						xmlNode.xmlAttributes["id"] = arguments.contentID;
-						xmlNode.xmlAttributes["href"] = href;
-						xmlNode.xmlAttributes["owner"] = siteOwner;
-						xmlNode.xmlAttributes["access "] = arguments.access;
-						xmlNode.xmlText = arguments.description;
-						arrayAppend(xmlDoc.xmlRoot[resourceType & "s"].xmlChildren, xmlNode);
-					}
-				}
-				
-				// save resource descriptor file
-				saveFile(packageDir & "/info.xml", toString(xmlDoc));
-				
-				// create or update the file,
-				saveFile(href, arguments.body);
-				
-				oHP.getCatalog().reloadPackage("content",siteOwner);
-				
+				/// add the new resource to the library
+				oResourceLibrary = createObject("component","Home.Components.resourceLibrary").init(resourceLibraryPath);
+				oResourceLibrary.saveResource(oResourceBean, arguments.body);
+			
+				// update catalog
+				oHP.getCatalog().reloadPackage(resourceType,siteOwner);
+						
 				setContentID(arguments.newContentID);
 		</cfscript>
 	</cffunction>
@@ -151,14 +89,12 @@
 	<cffunction name="deleteContent" access="public" returntype="void">
 		<cfargument name="contentID" type="string" required="true" hint="resource id">
 	
-        <cfset var xmlDoc = 0>
-        <cfset var xmlNode = 0>
  		<cfset var oHP = application.homePortals>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = "content">
-		<cfset var packageDir = "">
 		<cfset var siteOwner = "">
-		<cfset var resHref = "">
+		<cfset var oResourceLibrary = 0>
+		<cfset var stUser = structNew()>
 		
 		<cfscript>
 			if(arguments.contentID eq "") throw("The content name cannot be empty.");
@@ -167,38 +103,12 @@
 			stUser = this.controller.getUserInfo();
 			siteOwner = stUser.username;
 
-			// this is the directory where the resources of this type for this account will be stored
-			packageDir = resourceLibraryPath & "/" & resourceType & "s" & "/" & siteOwner;
-		
+			/// remove resource from the library
+			oResourceLibrary = createObject("component","Home.Components.resourceLibrary").init(resourceLibraryPath);
+			oResourceLibrary.deleteResource(arguments.contentID, resourceType, siteOwner);
 
-			// remove from descriptor (if exists)
-			if(fileExists(expandPath(packageDir & "/info.xml"))) {
-				xmlDoc = xmlParse(expandPath(packageDir & "/info.xml"));
-
-				for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resourceType & "s"].xmlChildren);i=i+1) {
-					xmlNode = xmlDoc.xmlRoot[resourceType & "s"].xmlChildren[i];
-					if(xmlNode.xmlAttributes.id eq arguments.contentID) {
-						if(structKeyExists(xmlNode.xmlAttributes, "href"))
-							resHref = xmlNode.xmlAttributes.href;
-					
-						// remove node from document
-						arrayDeleteAt(xmlDoc.xmlRoot[resourceType & "s"].xmlChildren, i);
-						
-						// save modified resource descriptor file
-						saveFile(packageDir & "/info.xml", toString(xmlDoc));				
-									
-						break;
-					}
-				}					
-			}				
-		
-			// remove resource file
-			if(resHref neq "" and left(resHref,4) neq "http" and fileExists(expandPath(resHref))) {
-				removeFile(resHref);			
-			}
-			
 			// remove from catalog
-			oHP.getCatalog().deleteResourceNode("content", arguments.contentID);
+			oHP.getCatalog().deleteResourceNode(resourceType, arguments.contentID);
 			
 			setContentID("");
         </cfscript>
