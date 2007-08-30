@@ -199,8 +199,8 @@
 			
 			<!--- create user space --->
 			<cfset txtDefault = processTemplate(Arguments.Username,'#hpEngineRoot#/Common/AccountTemplates/index.txt')>
-			<cfset txtPublic = processTemplate(Arguments.Username, variables.stConfig.newAccountTemplate)>
-			<cfset txtSite = processTemplate(Arguments.Username, variables.stConfig.siteTemplate)>
+			<cfset txtPublic = processTemplate(Arguments.Username, oAccountsConfigBean.getNewAccountTemplate())>
+			<cfset txtSite = processTemplate(Arguments.Username, oAccountsConfigBean.getSiteTemplate())>
 	
 			<!--- define locations for the default account files --->
 			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#Arguments.Username#/")>
