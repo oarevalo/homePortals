@@ -1,4 +1,4 @@
-<cfparam name="contentID" default="">
+<cfparam name="contentName" default="">
 
 <cfset setControlPanelTitle("Create Custom Content","page_white_text")>
 
@@ -16,7 +16,7 @@
 		<table style="margin:10px;">
 			<tr>
 				<td width="100"><b>Name:</b></td>
-				<td><input type="text" name="id" value="" style="width:300px;"></td>
+				<td><input type="text" name="contentName" value="#contentName#" style="width:300px;"></td>
 			</tr>
 			<tr valign="top">
 				<td><b>Share with:</b></td>

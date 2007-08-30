@@ -11,9 +11,11 @@
 		WHERE owner = <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
 		<cfif searchTerm neq "">
 			 AND (upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> )
+				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
+				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+				)
 		</cfif>
-		ORDER BY package, id
+		ORDER BY package, name, id
 </cfquery>
 
 
@@ -23,9 +25,11 @@
 		WHERE owner <> <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
 		<cfif searchTerm neq "">
 			 AND ( upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  )
+				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+				)
 		</cfif>
-		ORDER BY package, id
+		ORDER BY package, name, id
 </cfquery>
 
 <!---- Styles --->
@@ -109,11 +113,16 @@
 		
 		<table style="margin:0px;width:100%;">
 			<cfoutput query="qryMyFeeds">
+				<cfif qryMyFeeds.name eq "">
+					<cfset tmpName = qryMyFeeds.id>
+				<cfelse>
+					<cfset tmpName = qryMyFeeds.name>
+				</cfif>
 				<tr valign="top" style="border-bottom:1px solid ##f5f5f5">
 					<td style="padding-left:5px;" width="150">
 						<a href="##" 
-							onclick="controlPanel.addFeed('#jsstringFormat(qryMyFeeds.href)#','#jsstringFormat(qryMyFeeds.id)#')" 
-							style="color:##333;">#qryMyFeeds.id#</a>
+							onclick="controlPanel.addFeed('#jsstringFormat(qryMyFeeds.href)#','#jsstringFormat(tmpName)#')" 
+							style="color:##333;">#tmpName#</a>
 					</td>
 					<td style="font-size:10px;color:##666;">
 						<a href="##"
@@ -127,6 +136,9 @@
 					</td>
 				</tr>
 			</cfoutput>
+			<cfif qryMyFeeds.recordCount eq 0>
+				<tr><td colspan="2" align="center"><em>You have not added any feeds yet!</em></td></tr>
+			</cfif>
 			<tr><td colspan="2">&nbsp;</td></tr>
 		</table>
 	</div>
@@ -138,11 +150,16 @@
 		<div <cfif searchTerm eq "">style="display:none;"</cfif> id="cp_feedGroup#qryFeeds.currentRow#"> 
 			<table style="margin:0px;width:100%;">
 				<cfoutput>
+				<cfif qryFeeds.name eq "">
+					<cfset tmpName = qryFeeds.id>
+				<cfelse>
+					<cfset tmpName = qryFeeds.name>
+				</cfif>
 				<tr valign="top" style="border-bottom:1px solid ##f5f5f5">
 					<td style="padding-left:5px;" width="150">
 						<a href="##" 
-							onclick="controlPanel.addFeed('#jsstringFormat(qryFeeds.href)#','#jsstringFormat(qryFeeds.id)#')" 
-							style="color:##333;">#qryFeeds.id#</a>
+							onclick="controlPanel.addFeed('#jsstringFormat(qryFeeds.href)#','#jsstringFormat(tmpName)#')" 
+							style="color:##333;">#tmpName#</a>
 					</td>
 					<td style="font-size:10px;color:##666;">
 						<a href="##"
@@ -163,7 +180,7 @@
 <fieldset id="rd_footer">
 	<legend><strong>Add Custom Feed:</strong></legend>
 	<form name="frm" action="#" method="post" style="margin:0px;padding:0px;">
-		http:// <input type="text" name="xmlUrl" value="" style="width:300px;">
+		<input type="text" name="xmlUrl" value="http://" style="width:300px;">
 		<input type="button" name="btnSave" value="Add Feed" onclick="addCustomFeed(this.form)"><br />
 		<span style="padding-left:50px;font-size:10px;"> <input type="checkbox" name="addToMyFeeds" value="1" checked="checked" /> Save to my feeds</span>
 	</form>

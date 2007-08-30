@@ -1,19 +1,17 @@
-<cfparam name="rssURL" default="">
+<cfparam name="rssURL" default="http://">
 <cfscript>
 	errMessage = "";
-	feedID = "";
+	feedName = "";
 	feedDescription = "";
 	lstInvalidChars = "',<,>,?,\,/,!,@,##,$,%,^,&,*";
 	
 	// get reader service
-	oRSSReaderService = createObject("Component","Home.Modules.RSSReader.RSSReaderService");
+	oRSSReaderService = createObject("Component","Home.resourceLibrary.Modules.RSSReader.RSSReaderService");
 
 	try {
 		feed = oRSSReaderService.getRSS(rssURL);
 		bFeedReadOK = true;
-		feedID = feed.title;
-		feedID = reReplace(feedID, "[^A-Za-z0-9_ ]", "_", "ALL");
-		
+		feedName = feed.title;
 		feedDescription = feed.description;
 		
 	} catch(any e) {
@@ -42,7 +40,7 @@
 			<table>
 				<tr>
 					<td><b>Name:</b></td>
-					<td><input type="text" name="id" value="#feedID#" style="width:300px;"></td>
+					<td><input type="text" name="feedName" value="#feedName#" style="width:300px;"></td>
 				</tr>
 				<tr>
 					<td><b>URL:</b></td>

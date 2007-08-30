@@ -284,7 +284,7 @@ function controlPanelClient() {
 
 
 	function addToMyFeeds(frm) {
-		h_callServer(this.server,"addToMyFeeds","siteMapStatusBar",{rssURL:frm.rssURL.value, id:frm.id.value, access:getRadioButtonValue(frm.access), description:frm.description.value});
+		h_callServer(this.server,"addToMyFeeds","siteMapStatusBar",{rssURL:frm.rssURL.value, feedName:frm.feedName.value, access:getRadioButtonValue(frm.access), description:frm.description.value});
 	}
 
 	function removeFromMyFeeds(id) {
@@ -293,7 +293,7 @@ function controlPanelClient() {
 	}
 
 	function addToMyContent(frm) {
-		h_callServer(this.server,"addToMyContent","siteMapStatusBar",{id:frm.id.value, access:getRadioButtonValue(frm.access), description:frm.description.value, body:frm.body.value});
+		h_callServer(this.server,"addToMyContent","siteMapStatusBar",{contentName:frm.contentName.value, access:getRadioButtonValue(frm.access), description:frm.description.value, body:frm.body.value});
 	}
 
 	function removeFromMyContent(id) {

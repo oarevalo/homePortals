@@ -626,7 +626,7 @@
 	<!---------------------------------------->	
 	<cffunction name="addToMyFeeds" access="public" output="true">
 		<cfargument name="rssURL" type="string" required="true" hint="The URL of the feed">
-		<cfargument name="id" type="string" required="true" hint="resource id">
+		<cfargument name="feedName" type="string" required="true" hint="resource name">
 		<cfargument name="access" type="string" required="true" hint="access type for resource">
 		<cfargument name="description" type="string" required="true" hint="resource description">
 		
@@ -641,13 +641,14 @@
 			<cfscript>
 				validateOwner();
 				if(arguments.rssURL eq "") throw("The feed URL cannot be empty"); 
+				if(arguments.feedName eq "") throw("The feed title cannot be empty"); 
 
-				// remove any invalid characters from the id
-				arguments.id = reReplace(arguments.id, "[^A-Za-z0-9_ ]", "_", "ALL");
-				
+				if(left(arguments.rssURL,4) neq "http") arguments.rssURL = "http://" & arguments.rssURL;
+
 				// create the bean for the new resource
 				oResourceBean = createObject("component","Home.Components.resourceBean").init();	
-				oResourceBean.setID(arguments.id);
+				oResourceBean.setID(createUUID());
+				oResourceBean.setName(arguments.feedName);
 				oResourceBean.setHREF(arguments.rssURL);
 				oResourceBean.setOwner(siteOwner);
 				oResourceBean.setAccessType(arguments.access); 
@@ -711,7 +712,7 @@
 	<!--- addToMyContent		           --->
 	<!---------------------------------------->	
 	<cffunction name="addToMyContent" access="public" output="true">
-		<cfargument name="id" type="string" required="true" hint="resource id">
+		<cfargument name="contentName" type="string" required="true" hint="resource id">
 		<cfargument name="access" type="string" required="true" hint="access type for resource">
 		<cfargument name="description" type="string" required="true" hint="resource description">
 		<cfargument name="body" type="string" required="true" hint="resource body">
@@ -721,20 +722,19 @@
 		<cfset var resourceType = "content">
 		<cfset var siteOwner = variables.oPage.getOwner()>
 		<cfset var oResourceBean = 0>
-		<cfset var oResourceLibrary = 0>		
+		<cfset var oResourceLibrary = 0>	
+		<cfset var id = createUUID()>	
 
 		<cftry>
 			<cfscript>
 				validateOwner();
-				if(arguments.id eq "") throw("The content name cannot be empty"); 
+				if(arguments.contentName eq "") throw("The content name cannot be empty"); 
 				if(arguments.body eq "") throw("The content body cannot be empty"); 
-
-				// remove any invalid characters from the id
-				arguments.id = reReplace(arguments.id, "[^A-Za-z0-9_ ]", "_", "ALL");
 
 				// create the bean for the new resource
 				oResourceBean = createObject("component","Home.Components.resourceBean").init();	
-				oResourceBean.setID(arguments.id);
+				oResourceBean.setID(id);
+				oResourceBean.setName(arguments.contentName);
 				oResourceBean.setOwner(siteOwner);
 				oResourceBean.setAccessType(arguments.access); 
 				oResourceBean.setDescription(arguments.description); 
@@ -749,7 +749,7 @@
 				oHP.getCatalog().reloadPackage(resourceType,siteOwner);
 
 				// add the content to the page
-				addContent(arguments.id);
+				addContent(id);
             </cfscript>
 
 			<cfcatch type="any">
@@ -817,7 +817,7 @@
 				if(arguments.resourceType eq "") throw("The resource type type cannot be empty"); 
 
 				// get resource bean
-				oResourceBean = HP.getCatalog().getResourceNode(arguments.resourceType, arguments.id);
+				oResourceBean = oHP.getCatalog().getResourceNode(arguments.resourceType, arguments.id);
 				oResourceBean.setAccessType(arguments.access); 
 
 				// save changes to library

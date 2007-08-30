@@ -9,7 +9,7 @@
 	SELECT *
 		FROM qryResources
 		WHERE owner = <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
-		ORDER BY package, id
+		ORDER BY package, name, id
 </cfquery>
 
 <!---- Styles --->
@@ -83,8 +83,13 @@
 			<th style="width:50px;border-right:0px;">Private</th>
 		</tr>
 		<cfloop query="qryResources">
+			<cfif qryResources.name eq "">
+				<cfset tmpName = qryResources.id>
+			<cfelse>
+				<cfset tmpName = qryResources.name>
+			</cfif>
 			<tr style="border-bottom:1px solid ##f5f5f5">
-				<td>#qryResources.id#</td>
+				<td>#tmpName#</td>
 				<td align="center"><input type="radio" name="resAccess_#qryResources.currentRow#" value="general" <cfif qryResources.access eq "general">checked</cfif> onclick="controlPanel.setResourceAccess('#resourceType#','#jsStringFormat(qryResources.id)#',this.value)"></td>
 				<td align="center"><input type="radio" name="resAccess_#qryResources.currentRow#" value="friend" <cfif qryResources.access eq "friend">checked</cfif> onclick="controlPanel.setResourceAccess('#resourceType#','#jsStringFormat(qryResources.id)#',this.value)"></td>
 				<td align="center"><input type="radio" name="resAccess_#qryResources.currentRow#" value="owner" <cfif qryResources.access eq "owner">checked</cfif> onclick="controlPanel.setResourceAccess('#resourceType#','#jsStringFormat(qryResources.id)#',this.value)"></td>
