@@ -13,6 +13,7 @@
 	if(contentID neq "") {
 		oResourceBean = application.homePortals.getCatalog().getResourceNode("content",contentID);
 		access = oResourceBean.getAccessType();
+		name = oResourceBean.getName();
 		description = oResourceBean.getDescription();
 		content = "";
 		contentLocation = oResourceBean.getHref();
@@ -20,6 +21,7 @@
 	} else {
 		access = "owner";
 		description = "";
+		name = "";
 		content = "";
 		contentLocation = "";
 		tmpTitle = "Create Content";
@@ -49,13 +51,7 @@
 					<table>
 						<tr>
 							<td width="100"><b>Name:</b></td>
-							<td>
-								<cfif contentID neq "">
-									<input type="text" name="newContentID" value="#contentID#" style="width:300px;" readonly="true">
-								<cfelse>
-									<input type="text" name="newContentID" value="" style="width:300px;">
-								</cfif>
-							</td>
+							<td><input type="text" name="name" value="#name#" style="width:300px;"></td>
 						</tr>
 						<tr>
 							<td><strong>Share with:</strong></td>

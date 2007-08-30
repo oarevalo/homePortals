@@ -23,9 +23,15 @@
 			WHERE UPPER(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#ucase(resourceID)#">
 	</cfquery>
 
+	<cfif qryThisResource.name eq "">
+		<cfset tmpName = qryThisResource.id>
+	<cfelse>
+		<cfset tmpName = qryThisResource.name>
+	</cfif>
+						
 	<cfoutput>
 		<div style="font-size:16px;font-weight:bold;margin-bottom:6px;">
-			#qryThisResource.id#
+			#tmpName#
 		</div>
 		
 		<div style="font-size:10px;">

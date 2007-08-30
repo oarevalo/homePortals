@@ -23,9 +23,11 @@
 		WHERE owner = <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
 		<cfif searchTerm neq "">
 			 AND (upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> )
+				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
+				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
+				)
 		</cfif>
-		ORDER BY package, id
+		ORDER BY package, name, id
 </cfquery>
 
 <cfquery name="qryResources" dbtype="query">
@@ -34,9 +36,11 @@
 		WHERE owner <> <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
 		<cfif searchTerm neq "">
 			 AND ( upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  )
+				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
+				)
 		</cfif>
-		ORDER BY package, id
+		ORDER BY package, name, id
 </cfquery>
 
 
@@ -68,9 +72,14 @@
 			</div>
 			<div id="cp_feedGroup0" style="display:none;margin-left:10px;margin-bottom:8px;">
 				<cfoutput query="qryMyResources">
+					<cfif qryMyresources.name eq "">
+						<cfset tmpName = qryMyResources.id>
+					<cfelse>
+						<cfset tmpName = qryMyResources.name>
+					</cfif>
 					<a href="##" 
 						onclick="#moduleID#.getView('contentInfo','cb_moduleInfo',{resourceID:'#jsstringFormat(qryMyResources.id)#'})" 
-						style="color:##333;">#qryMyResources.id#</a><br>
+						style="color:##333;">#tmpName#</a><br>
 				</cfoutput>
 			</div>
 		
@@ -80,9 +89,14 @@
 				</div>
 				<div style="display:none;margin-left:10px;margin-bottom:8px;" id="cp_feedGroup#qryResources.currentRow#"> 
 					<cfoutput>
+						<cfif qryResources.name eq "">
+							<cfset tmpName = qryResources.id>
+						<cfelse>
+							<cfset tmpName = qryResources.name>
+						</cfif>
 						<a href="##" 
 							onclick="#moduleID#.getView('contentInfo','cb_moduleInfo',{resourceID:'#jsstringFormat(qryResources.id)#'})" 
-							style="color:##333;">#qryResources.id#</a><br>
+							style="color:##333;">#tmpName#</a><br>
 					</cfoutput>
 				</div>
 			</cfoutput>
