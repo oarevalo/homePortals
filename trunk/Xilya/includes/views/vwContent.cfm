@@ -10,9 +10,11 @@
 		WHERE owner = <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
 		<cfif searchTerm neq "">
 			 AND (upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> )
+				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
+				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 			
+				)
 		</cfif>
-		ORDER BY package, id
+		ORDER BY package, name, id
 </cfquery>
 
 <cfquery name="qryResources" dbtype="query">
@@ -21,9 +23,11 @@
 		WHERE owner <> <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
 		<cfif searchTerm neq "">
 			 AND ( upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  )
+				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 			
+				)
 		</cfif>
-		ORDER BY package, id
+		ORDER BY package, name, id
 </cfquery>
 
 <!---- Styles --->
@@ -109,11 +113,16 @@
 
 		<table style="margin:0px;width:100%;">
 			<cfoutput query="qryMyResources">
+				<cfif qryMyResources.name eq "">
+					<cfset tmpName = qryMyResources.id>
+				<cfelse>
+					<cfset tmpName = qryMyResources.name>
+				</cfif>
 				<tr valign="top" style="border-bottom:1px solid ##f5f5f5">
 					<td style="padding-left:5px;" width="150">
 						<a href="##" 
 							onclick="controlPanel.addContent('#jsstringFormat(qryMyResources.id)#')" 
-							style="color:##333;">#qryMyResources.id#</a>
+							style="color:##333;">#tmpName#</a>
 					</td>
 					<td style="font-size:10px;color:##666;">
 						<a href="##"
@@ -138,11 +147,16 @@
 		<div <cfif searchTerm eq "">style="display:none;"</cfif> id="cp_feedGroup#qryResources.currentRow#"> 
 			<table style="margin:0px;width:100%;">
 				<cfoutput>
+				<cfif qryResources.name eq "">
+					<cfset tmpName = qryResources.id>
+				<cfelse>
+					<cfset tmpName = qryResources.name>
+				</cfif>
 				<tr valign="top" style="border-bottom:1px solid ##f5f5f5">
 					<td style="padding-left:5px;" width="150">
 						<a href="##" 
 							onclick="controlPanel.addContent('#jsstringFormat(qryResources.id)#')" 
-							style="color:##333;">#qryResources.id#</a>
+							style="color:##333;">#tmpName#</a>
 					</td>
 					<td style="font-size:10px;color:##666;">
 						#qryResources.description#
