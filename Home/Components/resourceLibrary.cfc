@@ -86,7 +86,7 @@
 
 			// for resources that use local content, set the proper href for the given path based on the ID
 			if(rb.getHREF() eq "") {
-				href = packageDir & "/" & rb.getID() & "." & getResourceTypeExtension(resourceType);
+				href = packageDir & "/" & rb.getID() & "." & getResourceTypeExtension(resType);
 				rb.setHREF(href); 
 			}
 			
@@ -106,7 +106,7 @@
 			// check if we need to update the file descriptor
 			bFound = false;
 			for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resType & "s"].xmlChildren);i=i+1) {
-				xmlNode = xmlDoc.xmlRoot[resourceType & "s"].xmlChildren[i];
+				xmlNode = xmlDoc.xmlRoot[resType & "s"].xmlChildren[i];
 				if(xmlNode.xmlAttributes.id eq rb.getID()) {
 					bFound = true;
 					break;
@@ -117,15 +117,18 @@
 			if(Not bFound) {
 				xmlNode = xmlElemNew(xmlDoc, resType);
 				xmlNode.xmlAttributes["id"] = rb.getID();
-				arrayAppend(xmlDoc.xmlRoot[resourceType & "s"].xmlChildren, xmlNode);
 			}
 
 			// set resource properties			
 			xmlNode.xmlAttributes["href"] = href;
 			xmlNode.xmlAttributes["name"] = rb.getName();
 			xmlNode.xmlAttributes["owner"] = rb.getOwner();
-			xmlNode.xmlAttributes["access "] = rb.getAccessType();
+			xmlNode.xmlAttributes["access"] = rb.getAccessType();
 			xmlNode.xmlText = rb.getDescription();
+
+			if(Not bFound) {
+				arrayAppend(xmlDoc.xmlRoot[resType & "s"].xmlChildren, xmlNode);
+			}
 			
 			// save resource descriptor file
 			saveFile(expandPath(packageDir & "/" & variables.resourceDescriptorFile), toString(xmlDoc));
@@ -342,6 +345,7 @@
 				oResourceBean = createObject("component","resourceBean").init();
 				oResourceBean.setID( arguments.packageName );
 				oResourceBean.setHref( tmpHREF );
+				oResourceBean.setType( arguments.resourceType );
 				oResourceBean.setPackage( arguments.packageName );
 				oResourceBean.setAccessType("general");
 			}

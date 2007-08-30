@@ -36,7 +36,7 @@
 		<cfquery name="qry" dbtype="query">
 			SELECT *
 				FROM variables.qryResources
-				WHERE type = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resourceType#s">
+				WHERE type = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resourceType#">
 		</cfquery>
 		
 		<cfreturn qry>
@@ -52,7 +52,7 @@
 			var item = "";
 			var oResourceBean = 0;
 			
-			for(item in variables.mapResources.modules) {
+			for(item in variables.mapResources.module) {
 				oResourceBean = variables.mapResources.modules[item];
 				if(oResourceBean.getName() eq arguments.moduleName) {
 					return oResourceBean;
@@ -68,8 +68,8 @@
 	<cffunction name="getResourceNode" access="public" returntype="any" hint="Returns the tree node for a given resource on this catalog">
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
 		<cfargument name="resourceID" type="string" required="true" hint="ID of the resource">
-		<cfif StructKeyExists(variables.mapResources[arguments.resourceType & "s"], arguments.resourceID)>
-			<cfreturn variables.mapResources[arguments.resourceType & "s"][arguments.resourceID]>
+		<cfif StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)>
+			<cfreturn variables.mapResources[arguments.resourceType][arguments.resourceID]>
 		<cfelse>
 			<cfthrow message="Resource [#arguments.resourceID#] does not exist" type="homePortals.catalog.resourceNotFound">
 		</cfif>
@@ -81,8 +81,8 @@
 	<cffunction name="deleteResourceNode" access="public" returntype="any" hint="Deletes the given resource node on this catalog">
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
 		<cfargument name="resourceID" type="string" required="true" hint="ID of the resource">
-		<cfif StructKeyExists(variables.mapResources[arguments.resourceType & "s"], arguments.resourceID)>
-			<cfset structDelete(variables.mapResources[arguments.resourceType & "s"], arguments.resourceID)>
+		<cfif StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)>
+			<cfset structDelete(variables.mapResources[arguments.resourceType], arguments.resourceID)>
 			<cfset populateResourcesQuery()>
 		<cfelse>
 			<cfthrow message="Resource [#arguments.resourceID#] does not exist" type="homePortals.catalog.resourceNotFound">
@@ -121,7 +121,7 @@
 				// store the resources in a map
 				for(j=1;j lte arrayLen(aResources);j=j+1) {
 					stResourceBean = aResources[j].getMemento();
-					resTypeGroup = stResourceBean.type & "s";
+					resTypeGroup = stResourceBean.type;
 
 					// create node for resource type group if doesnt exist
 					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
@@ -180,8 +180,8 @@
 			
 			// update resource map
 			for(j=1;j lte arrayLen(aResources);j=j+1) {
-				stResourceBean = aResources.getMemento();
-				resTypeGroup = stResourceBean.type & "s";
+				stResourceBean = aResources[j].getMemento();
+				resTypeGroup = stResourceBean.type;
 
 				// create node for resource type group if doesnt exist
 				if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
