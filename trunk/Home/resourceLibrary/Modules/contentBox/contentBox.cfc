@@ -36,7 +36,7 @@
 	<!------------------------------------------------->
 	<cffunction name="saveContent" access="public" returntype="void">
 		<cfargument name="contentID" type="string" required="true" hint="resource id">
-		<cfargument name="newContentID" type="string" required="true" hint="when creating a new resource, this is the new id">
+		<cfargument name="name" type="string" required="true" hint="Content resource name">
 		<cfargument name="access" type="string" required="true" hint="access type for resource">
 		<cfargument name="description" type="string" required="true" hint="resource description">
 		<cfargument name="body" type="string" required="true" hint="resource body">
@@ -48,24 +48,20 @@
 		<cfset var siteOwner = "">
 				
 		<cfscript>
-				if(arguments.contentID eq "" and arguments.newContentID eq "") throw("The content name cannot be empty.");
 				if(arguments.body eq "") throw("The content body cannot be empty"); 
 
 				// get owner
 				stUser = this.controller.getUserInfo();
 				siteOwner = stUser.username;
 
-				if(arguments.contentID neq "") {
-					arguments.newContentID = arguments.contentID;
-				}
-
-				// remove any invalid characters from the id
-				arguments.newContentID = reReplace(arguments.newContentID, "[^A-Za-z0-9_ ]", "_", "ALL");
+				// if this is a new resource, generate an ID
+				if(arguments.contentID eq "")
+					arguments.contentID = createUUID();
 
 				// create the bean for the new resource
 				oResourceBean = createObject("component","Home.Components.resourceBean").init();	
-				oResourceBean.setID(arguments.newContentID);
-				oResourceBean.setHREF();
+				oResourceBean.setID(arguments.contentID);
+				oResourceBean.setName(arguments.name);
 				oResourceBean.setOwner(siteOwner);
 				oResourceBean.setAccessType(arguments.access); 
 				oResourceBean.setDescription(arguments.description); 
@@ -79,7 +75,7 @@
 				// update catalog
 				oHP.getCatalog().reloadPackage(resourceType,siteOwner);
 						
-				setContentID(arguments.newContentID);
+				setContentID(arguments.contentID);
 		</cfscript>
 	</cffunction>
 	
@@ -154,31 +150,15 @@
 	</cffunction>
 
 	<!---------------------------------------->
-	<!--- saveFile                         --->
-	<!---------------------------------------->
-	<cffunction name="saveFile" access="private" hint="writes a file">
-		<cfargument name="path" type="string" hint="Path for the file as a relative URL">
-		<cfargument name="content" type="string" hint="content">
-
-		<!--- store page --->
-		<cffile action="write" file="#expandpath(arguments.path)#" output="#arguments.content#">
+	<!--- debugging methods				   --->
+	<!---------------------------------------->	
+	<cffunction name="abort" access="private" returntype="void">
+		<cfabort>
+	</cffunction>
+	<cffunction name="dump" access="private" returntype="void">
+		<cfargument name="data" type="any">
+		<cfdump var="#arguments.data#">
 	</cffunction>
 	
-	<!---------------------------------------->
-	<!--- createDir                        --->
-	<!---------------------------------------->
-	<cffunction name="createDir" access="private" returnttye="void">
-		<cfargument name="path" type="string" required="true">
-		<cfdirectory action="create" directory="#ExpandPath(arguments.path)#">
-	</cffunction>		
-
-	<!---------------------------------------->
-	<!--- removeFile                       --->
-	<!---------------------------------------->
-	<cffunction name="removeFile" access="private" hint="deletes a file">
-		<cfargument name="href" type="string" hint="relative path to page">
-
-		<cffile action="delete" file="#expandpath(arguments.href)#">
-	</cffunction>	
-
+	
 </cfcomponent>
