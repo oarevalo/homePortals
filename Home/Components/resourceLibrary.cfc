@@ -66,7 +66,7 @@
 	<!------------------------------------------------->
 	<cffunction name="saveResource">
 		<cfargument name="resourceBean" type="resourceBean" required="true" hint="the resource to add or update"> 		
-		<cfargument name="resourceBody" type="string" required="false" hint="For resources that have local content, this is the text to save as the body of the resource">
+		<cfargument name="resourceBody" type="string" required="false" default="" hint="For resources that have local content, this is the text to save as the body of the resource">
 		
 		<cfscript>
 			var ext = "";
@@ -85,10 +85,12 @@
 			packageDir = resourcesRoot & "/" & resType & "s/" & rb.getPackage();
 
 			// for resources that use local content, set the proper href for the given path based on the ID
-			if(rb.getHREF() eq "") {
+			href = rb.getHREF();
+			if(href eq "") {
 				href = packageDir & "/" & rb.getID() & "." & getResourceTypeExtension(resType);
 				rb.setHREF(href); 
-			}
+			} 
+				
 			
 			// check for file descriptor, if doesnt exist, then create one
 			if(fileExists(expandPath(packageDir & "/" & variables.resourceDescriptorFile))) {
@@ -398,5 +400,10 @@
 		<cfdirectory action="delete" directory="#ExpandPath(arguments.path)#" recurse="true">
 	</cffunction>
 				
+	<cffunction name="throw" access="private">
+		<cfargument name="message" type="string">
+		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 
+		<cfthrow message="#arguments.message#" type="#arguments.type#">
+	</cffunction>
 	
 </cfcomponent>
