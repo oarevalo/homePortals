@@ -1055,15 +1055,15 @@
 		
 			var oFriendsService = oHP.getAccountsService().getFriendsService();
 			var qryFriends = oFriendsService.getFriends(owner);
+			var lstFriends = valueList(qryFriends.userName);
 			
 			var qryResources = oHP.getCatalog().getResourcesByType(arguments.resourceType);
 			
 			for(j=1;j lte qryResources.recordCount;j=j+1) {
 				aAccess[j] = qryResources.access[j] eq "general"
 							or qryResources.access[j] eq ""
-							or (qryResources.access[j] eq "owner" and qryResources.owner[j] eq owner)
-							or (qryResources.access[j] eq "friend" and qryResources.owner[j] eq owner)
-							or (qryResources.access[j] eq "friend" and listFindNoCase(valueList(qryFriends.userName), qryResources.owner[j]));
+							or qryResources.owner[j] eq owner
+							or (qryResources.access[j] eq "friend" and listFindNoCase(lstFriends, qryResources.owner[j]));
 			}
 			queryAddColumn(qryResources, "hasAccess", aAccess);
 		</cfscript>
@@ -1072,7 +1072,6 @@
 			SELECT *
 				FROM qryResources
 				WHERE hasAccess = 1
-				ORDER BY package, id
 		</cfquery>
 
 		<cfreturn qryResources>

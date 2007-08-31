@@ -3,34 +3,26 @@
 <cfparam name="searchTerm" default="">
 
 <cfset siteOwner = variables.oPage.getOwner()>
-<cfset qryFeeds = getResourcesForAccount("feed")>
+<cfset qryResources = getResourcesForAccount("feed")>
 
-<cfquery name="qryMyFeeds" dbtype="query">
+<!--- order resources --->
+<cfquery name="qryResources" dbtype="query">
 	SELECT *
-		FROM qryFeeds
+		FROM qryResources
+		<cfif searchTerm neq "">
+			WHERE  upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
+					OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+					OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+		</cfif>
+		ORDER BY package, name
+</cfquery>
+
+<!--- get owner's resources--->
+<cfquery name="qryMyResources" dbtype="query">
+	SELECT *
+		FROM qryResources
 		WHERE owner = <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
-		<cfif searchTerm neq "">
-			 AND (upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
-				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
-				)
-		</cfif>
-		ORDER BY package, name, id
-</cfquery>
-
-
-<cfquery name="qryFeeds" dbtype="query">
-	SELECT *
-		FROM qryFeeds
-		WHERE owner <> <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
-		<cfif searchTerm neq "">
-			 AND ( upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
-				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
-				)
-		</cfif>
-		ORDER BY package, name, id
-</cfquery>
+</cfquery> 
 
 <!---- Styles --->
 <style type="text/css">
@@ -41,38 +33,9 @@
 	#rd_searchBar input {
 		font-size:10px;
 	}
-	#rd_packagesArea {
-		margin:10px;
-		border:1px solid #ccc;
-		height:250px;
-		overflow:auto;
-		background-color:#fff;
-		line-height:18px;
-		margin-top:0px;
-	}
-	.rd_packageTitle {
-		font-weight:bold;
-		background-color:#ebebeb;
-		padding:0px;
-		border-bottom:1px solid #ccc;
-		border-top:1px solid #fff;
-		font-size:10px;
-		line-height:11px;
-	}
-	.rd_packageTitle a {
-		padding:3px;
-		display:block;
-		outline:none;
-	}
-	.rd_packageTitle a:link, .rd_packageTitle a:active, .rd_packageTitle a:visited {
-		background-color:#ebebeb;
-	}
-	.rd_packageTitle a:hover {
-		background-color:#f5f5f5;
-		text-decoration:none;
-	}
 	#rd_footer {
 		margin:10px;
+		margin-top:0px;
 		border:1px solid #ccc;
 		background-color:#ebebeb;
 	}
@@ -80,14 +43,6 @@
 
 
 <cfset setControlPanelTitle("Feed Directory","feed")>
-
-<div class="cp_sectionBox" 
-	 style="padding:0px;margin:0px;width:475px;margin:10px;">
-	<div style="margin:4px;">
-		Select from the directory below the RSS feed you wish to add to your page, or use
-		the space below to type in the URL of the RSS/Atom feed.
-	</div>
-</div>
 
 <cfoutput>
 	<div id="rd_searchBar">
@@ -99,90 +54,63 @@
 	</div>
 </cfoutput>
 
-<div id="rd_packagesArea">
-	<div class="rd_packageTitle" style="color:#990000;">
-		<cfoutput><a href="##" onclick="Element.toggle('cp_feedGroup0');return false;" style="color:##990000">&raquo; My Feeds (#qryMyFeeds.recordCount#)</a></cfoutput>
-	</div>
-	<div <cfif searchTerm eq "">style="display:none;"</cfif> id="cp_feedGroup0">
-		<div style="background-color:#ffffcc;padding:3px;font-size:10px;text-align:center;">
-			<cfoutput>
-				<img src="#variables.imgRoot#/world.png" align="absmiddle"> 
-				<a href="##" onclick="controlPanel.getView('Sharing',{resourceType:'feed'})" style="color:##333;">Click here to modify sharing settings for your feeds</a>
-			</cfoutput>
-		</div>	
-		
-		<table style="margin:0px;width:100%;">
-			<cfoutput query="qryMyFeeds">
-				<cfif qryMyFeeds.name eq "">
-					<cfset tmpName = qryMyFeeds.id>
-				<cfelse>
-					<cfset tmpName = qryMyFeeds.name>
-				</cfif>
-				<tr valign="top" style="border-bottom:1px solid ##f5f5f5">
-					<td style="padding-left:5px;" width="150">
-						<a href="##" 
-							onclick="controlPanel.addFeed('#jsstringFormat(qryMyFeeds.href)#','#jsstringFormat(tmpName)#')" 
-							style="color:##333;">#tmpName#</a>
-					</td>
-					<td style="font-size:10px;color:##666;">
-						<a href="##"
-							onclick="controlPanel.removeFromMyFeeds('#jsstringFormat(qryMyFeeds.id)#')"><img src="/Home/Modules/Accounts/images/waste_small.gif"
-							 alt="Remove from my feeds" title="Remove from my feeds" 
-							 align="right" width="14" height="14" border="0" /></a>
-						#qryMyFeeds.description# 
-						<div>
-							<b>&raquo; Shared With: </b> <a href="##" onclick="controlPanel.getView('Sharing',{resourceType:'feed'})" style="color:##333;font-size:10px;">#replaceList(qryMyFeeds.access,"general,friend,owner","Everyone,Friends,Nobody")#</a>
-						</div>
-					</td>
-				</tr>
-			</cfoutput>
-			<cfif qryMyFeeds.recordCount eq 0>
-				<tr><td colspan="2" align="center"><em>You have not added any feeds yet!</em></td></tr>
-			</cfif>
-			<tr><td colspan="2">&nbsp;</td></tr>
-		</table>
-	</div>
 
-	<cfoutput query="qryFeeds" group="package">
-		<div class="rd_packageTitle">
-			<a href="##" onclick="Element.toggle('cp_feedGroup#qryFeeds.currentRow#');return false;" style="color:##333">&raquo; #qryFeeds.package#</a>
-		</div>
-		<div <cfif searchTerm eq "">style="display:none;"</cfif> id="cp_feedGroup#qryFeeds.currentRow#"> 
-			<table style="margin:0px;width:100%;">
-				<cfoutput>
-				<cfif qryFeeds.name eq "">
-					<cfset tmpName = qryFeeds.id>
-				<cfelse>
-					<cfset tmpName = qryFeeds.name>
-				</cfif>
-				<tr valign="top" style="border-bottom:1px solid ##f5f5f5">
-					<td style="padding-left:5px;" width="150">
-						<a href="##" 
-							onclick="controlPanel.addFeed('#jsstringFormat(qryFeeds.href)#','#jsstringFormat(tmpName)#')" 
-							style="color:##333;">#tmpName#</a>
-					</td>
-					<td style="font-size:10px;color:##666;">
-						<a href="##"
-							onclick="controlPanel.getView('createFeedResource',{rssURL:'#jsstringFormat(qryFeeds.href)#'})"
-							><img src="/Home/Modules/Accounts/images/add.png" border="0" 
-									alt="Add To My Feeds" title="Add To My Feeds"
-									align="right" width="14" height="14" /></a>
-						#qryFeeds.description#
-					</td>
-				</tr>
+<div style="width:490px;margin-top:5px;">
+	<div style="width:150px;height:320px;border:1px solid silver;float:left;margin-left:5px;background-color:#fff;overflow:auto;">
+
+		<div style="margin:3px;line-height:16px;font-size:11px;">
+			<div class="rd_packageTitle" style="color:#990000;">
+				<cfoutput><a href="##" onclick="Element.toggle('cp_feedGroup0');return false;" style="color:##990000;font-weight:bold;">&raquo; My Feeds (#qryMyResources.recordCount#)</a></cfoutput>
+			</div>
+			<div id="cp_feedGroup0" style="display:none;margin-left:10px;margin-bottom:8px;">
+				<cfoutput query="qryMyResources">
+					<cfif qryMyresources.name eq "">
+						<cfset tmpName = qryMyResources.id>
+					<cfelse>
+						<cfset tmpName = qryMyResources.name>
+					</cfif>
+					<a href="##" 
+						onclick="controlPanel.getPartialView('FeedInfo',{resourceID:'#jsstringFormat(qryMyResources.id)#'},'cp_resourceInfo')" 
+						style="color:##333;margin-bottom:5px;font-size:10px;line-height:11px;">#tmpName#</a><br>
 				</cfoutput>
-				<tr><td colspan="2">&nbsp;</td></tr>
-			</table>
+			</div>
+		
+			<cfoutput query="qryResources" group="package">
+				<cfif qryResources.owner neq siteOwner>
+					<div class="rd_packageTitle">
+						<a href="##" onclick="Element.toggle('cp_feedGroup#qryResources.currentRow#');return false;" style="color:##333;font-weight:bold;">&raquo; #qryResources.package#</a>
+					</div>
+					<div style="display:none;margin-left:10px;margin-bottom:8px;" id="cp_feedGroup#qryResources.currentRow#"> 
+						<cfoutput>
+							<cfif qryResources.name eq "">
+								<cfset tmpName = qryResources.id>
+							<cfelse>
+								<cfset tmpName = qryResources.name>
+							</cfif>
+							<a href="##" 
+								onclick="controlPanel.getPartialView('FeedInfo',{resourceID:'#jsstringFormat(qryResources.id)#'},'cp_resourceInfo')" 
+								style="color:##333;margin-bottom:5px;font-size:10px;line-height:11px;white-space:nowrap;">#tmpName#</a><br>
+						</cfoutput>
+					</div>
+				</cfif>
+			</cfoutput>
 		</div>
-	</cfoutput>
-</div>
 
+	</div>
+	<div style="width:320px;height:320px;border:1px solid silver;margin-left:160px;background-color:#fff;">
+		<div id="cp_resourceInfo_BodyRegion" style="margin:10px;line-height:18px;font-size:12px;">	
+			Select from the directory the RSS feed you wish to add to your page, or use
+			the space below to type in the URL of the RSS/Atom feed.
+		</div>
+	</div>
+</div>
+<br style="clear:both;" />
 <fieldset id="rd_footer">
 	<legend><strong>Add Custom Feed:</strong></legend>
 	<form name="frm" action="#" method="post" style="margin:0px;padding:0px;">
+		<input type="hidden" name="addToMyFeeds" value="1">
 		<input type="text" name="xmlUrl" value="http://" style="width:300px;">
 		<input type="button" name="btnSave" value="Add Feed" onclick="addCustomFeed(this.form)"><br />
-		<span style="padding-left:50px;font-size:10px;"> <input type="checkbox" name="addToMyFeeds" value="1" checked="checked" /> Save to my feeds</span>
 	</form>
 </fieldset>
 
