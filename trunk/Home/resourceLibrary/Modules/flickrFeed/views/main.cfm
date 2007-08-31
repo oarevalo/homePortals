@@ -45,7 +45,7 @@
 	
 	
 		// get and parse feed	
-		oRSSReaderService = createObject("Component","Home.Modules.RSSReader.RSSReaderService");
+		oRSSReaderService = createObject("Component","Home.resourceLibrary.Modules.RSSReader.RSSReaderService");
 		feed = oRSSReaderService.getRSS(tmpURL);
 		
 		// if no number of maxItems has been given, then show all on the feed 
