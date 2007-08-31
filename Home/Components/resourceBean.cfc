@@ -56,8 +56,11 @@
 				if(structKeyExists(xmlNode.xmlAttributes,"owner")) variables.instance.owner = xmlNode.xmlAttributes.owner;
 				if(structKeyExists(xmlNode.xmlAttributes,"access")) variables.instance.accessType = xmlNode.xmlAttributes.access;
 				if(structKeyExists(xmlNode.xmlAttributes,"href")) variables.instance.href = xmlNode.xmlAttributes.href;
-				if(structKeyExists(xmlNode,"description")) variables.instance.description = xmlNode.description.xmlText;
-			
+				if(structKeyExists(xmlNode,"description")) 
+					variables.instance.description = xmlNode.description.xmlText;
+				else
+					variables.instance.description = xmlNode.xmlText;
+					
 				if(structKeyExists(xmlNode,"attributes")) {
 					for(i=1;i lte arrayLen(xmlNode.attributes.xmlChildren);i=i+1) {
 						stSrc = xmlNode.attributes.xmlChildren[i].xmlAttributes;
