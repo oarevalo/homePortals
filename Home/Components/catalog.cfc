@@ -53,7 +53,7 @@
 			var oResourceBean = 0;
 			
 			for(item in variables.mapResources.module) {
-				oResourceBean = variables.mapResources.modules[item];
+				oResourceBean = variables.mapResources.module[item];
 				if(oResourceBean.getName() eq arguments.moduleName) {
 					return oResourceBean;
 				}
