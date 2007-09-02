@@ -260,7 +260,9 @@
 		<cfif stUser.isOwner>
 			<div class="SectionToolbar">
 				<a href="javascript:#moduleID#.getView('config','',{useLayout:false});"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
-				<a href="javascript:#moduleID#.getView('config','',{useLayout:false});">Change Settings</a>
+				<a href="javascript:#moduleID#.getView('config','',{useLayout:false});">Settings</a>
+				<a href="javascript:#moduleID#.getPopupView('directory');"><img src="#imgRoot#/page_white_text.png" border="0" align="absmiddle"></a>
+				<a href="javascript:#moduleID#.getPopupView('directory');">Feed Directory</a>&nbsp;&nbsp;
 			</div>
 		</cfif>
 	</cfoutput>
