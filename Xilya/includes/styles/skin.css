@@ -207,6 +207,7 @@ body{
 #sidePanel {
 	width:200px;
 	border-right:1px solid #3a5164;
+	border-bottom:1px solid #3a5164;
 	background-color:#ccc;
 	background-color:#999;
 	float:left;
