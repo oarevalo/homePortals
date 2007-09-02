@@ -132,7 +132,7 @@
 			for(o in stOutputs) {
 				expr = stOutputs[o];
 				if(structKeyExists(stInputs,expr))
-					val = "'#stInputs[expr]#'";
+					val = "'#jsstringFormat(stInputs[expr])#'";
 				else 
 					val = expr;
 				stOutputs[o] = val;
