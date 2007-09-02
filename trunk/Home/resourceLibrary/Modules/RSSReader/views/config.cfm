@@ -24,7 +24,8 @@
 		</cfif>
 		
 		<strong>Feed URL:</strong><br>
-		<input type="text" name="rss" value="#rssURL#" #tmpDisabled# style="font-size:11px;border:1px solid silver;width:170px;"><br><br>
+		<input type="text" name="rss" value="#rssURL#" #tmpDisabled# style="font-size:11px;border:1px solid silver;width:170px;"><br>
+		<a href="javascript:#moduleID#.getPopupView('directory');">Feed Directory</a><br><br>
 
 		<strong>Display Mode:</strong><br>
 		<select name="displayMode" style="font-size:11px;border:1px solid silver;width:170px;">
