@@ -11,7 +11,7 @@
 	stInputs = getInputs();
 	
 	// get echo input flag
-	bEchoInputs = cfg.getPageSetting("echoInputs",true);
+	bEchoInputs = cfg.getPageSetting("echoInputs",false);
 </cfscript>
 
 <cfoutput>
@@ -34,11 +34,11 @@
 				<tr><td colspan="2" align="center"><em>No inputs detected</em></td></tr>
 			</cfif>
 		</table>
-		<br><br>
+		<br>
 	</cfif>
 	
 	<cfif stUser.isOwner>
-		<div id="toolbar">
+		<div class="SectionToolbar">
 			<a href="javascript:#moduleID#.getPopupView('simpleAdapterConfig');"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getPopupView('simpleAdapterConfig');">Configure Adapter</a>
 		</div>
