@@ -2,7 +2,7 @@
 
 	<cfscript>
 		variables.resourcesRoot = "";
-		variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description");
+		variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
 		variables.stTimers = structNew();
 		variables.mapResources = structNew();
 	</cfscript>
@@ -50,12 +50,12 @@
 		<cfscript>
 			var qry = 0;
 			var item = "";
-			var oResourceBean = 0;
+			var stResourceInfo = structNew();
 			
 			for(item in variables.mapResources.module) {
-				oResourceBean = variables.mapResources.module[item];
-				if(oResourceBean.getName() eq arguments.moduleName) {
-					return oResourceBean;
+				stResourceInfo = variables.mapResources.module[item];
+				if(stResourceInfo.name eq arguments.moduleName) {
+					return getResourceNode("module", stResourceInfo.id);
 				}
 			}
 		</cfscript>
@@ -68,8 +68,22 @@
 	<cffunction name="getResourceNode" access="public" returntype="any" hint="Returns the tree node for a given resource on this catalog">
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
 		<cfargument name="resourceID" type="string" required="true" hint="ID of the resource">
+		
+		<cfset var stResourceInfo = structNew()>
+		<cfset var oResourceLibrary = 0>
+
 		<cfif StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)>
-			<cfreturn variables.mapResources[arguments.resourceType][arguments.resourceID]>
+			<cfscript>
+				// create an instance of the resourceLibrary object
+				oResourceLibrary = createObject("component","resourceLibrary");
+				oResourceLibrary.init(variables.resourcesRoot);
+				
+				// get the resource info
+				stResourceInfo = variables.mapResources[arguments.resourceType][arguments.resourceID];
+
+				// find the requested resource
+				return oResourceLibrary.getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID, stResourceInfo.infoHREF);
+			</cfscript>
 		<cfelse>
 			<cfthrow message="Resource [#arguments.resourceID#] does not exist" type="homePortals.catalog.resourceNotFound">
 		</cfif>
@@ -100,10 +114,11 @@
 			var oResourceLibrary = 0;
 			var aResources = arrayNew(1);
 			var stResourceBean = structNew();
+			var st = structNew();
 
 			// clear the catalog
 			variables.mapResources = structNew();
-			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description");
+			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
 
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = createObject("component","resourceLibrary");
@@ -123,14 +138,6 @@
 					stResourceBean = aResources[j].getMemento();
 					resTypeGroup = stResourceBean.type;
 
-					// create node for resource type group if doesnt exist
-					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
-						variables.mapResources[resTypeGroup] = structNew();
-					}
-
-					// add resource to map
-					variables.mapResources[resTypeGroup][stResourceBean.id] = aResources[j];
-					
 					// add resource to resources query
 					queryAddRow(variables.qryResources);
 					querySetCell(variables.qryResources, "type", stResourceBean.type);
@@ -141,6 +148,28 @@
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "owner", stResourceBean.Owner);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
+					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);					
+					
+					// create resource map entry
+					st = structNew();
+					st.type = stResourceBean.type;
+					st.id = stResourceBean.id;
+					st.access = stResourceBean.AccessType;
+					st.name = stResourceBean.name;
+					st.HREF = stResourceBean.HREF;
+					st.Package = stResourceBean.Package;
+					st.Owner = stResourceBean.Owner;
+					st.Description = stResourceBean.Description;
+					st.infoHREF = stResourceBean.infoHREF;
+
+					// create node for resource type group if doesnt exist
+					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
+						variables.mapResources[resTypeGroup] = structNew();
+					}
+
+					// add resource to map
+					variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
+						
 				}
 			}		
 			
@@ -170,6 +199,7 @@
 			var stResourceBean = structNew();
 			var resTypeGroup = "";
 			var oResourceLibrary = 0;
+			var st = structNew();
 
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = createObject("component","resourceLibrary");
@@ -188,8 +218,20 @@
 					variables.mapResources[resTypeGroup] = structNew();
 				}
 
+				// create resource map entry
+				st = structNew();
+				st.type = stResourceBean.type;
+				st.id = stResourceBean.id;
+				st.access = stResourceBean.AccessType;
+				st.name = stResourceBean.name;
+				st.HREF = stResourceBean.HREF;
+				st.Package = stResourceBean.Package;
+				st.Owner = stResourceBean.Owner;
+				st.Description = stResourceBean.Description;
+				st.infoHREF = stResourceBean.infoHREF;
+
 				// add resource to map
-				variables.mapResources[resTypeGroup][stResourceBean.id] = aResources[j];
+				variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
 			}
 
 			// recreate query of resources
@@ -220,13 +262,13 @@
 			var resType = "";
 			var resID = "";
 			
-			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description");
+			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
 			
 			for(resType in variables.mapResources) {
 			
 				for(resID in variables.mapResources[resType]) {
 					
-					stResourceBean = variables.mapResources[resType][resID].getMemento();
+					stResourceBean = variables.mapResources[resType][resID];
 					
 					queryAddRow(variables.qryResources);
 					querySetCell(variables.qryResources, "type", resType);
@@ -237,6 +279,7 @@
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "owner", stResourceBean.Owner);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);
+					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);
 				
 				}
 	

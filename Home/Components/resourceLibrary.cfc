@@ -33,9 +33,46 @@
 	</cffunction>
 	
 	<!------------------------------------------------->
+	<!--- getResource		                	   ---->
+	<!------------------------------------------------->
+	<cffunction name="getResource" access="public" returntype="resourceBean" hint="returns the resource bean for the given resource">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfargument name="packageName" type="string" required="true">
+		<cfargument name="resourceID" type="string" required="true">
+		<cfargument name="infoHREF" type="string" required="false" default="" hint="the location of the resource descriptor file, if exists">
+		<cfscript>
+			var tmpHREF = "";
+			var oResourceBean = 0; var o = 0;
+			var start = getTickCount();
+			var aResources = arrayNew(1);
+			
+			// check that resourceID is not empty
+			if(arguments.resourceID eq "") throw("Resource ID cannot be blank","HomePortals.resourceLibrary.blankResourceID");
+			
+			// check if there is a resource descriptor for the package
+			if(arguments.infoHREF eq "")
+				arguments.infoHREF = variables.resourcesRoot & "/" & arguments.resourceType & "s/" & arguments.packageName & "/" & variables.resourceDescriptorFile;
+
+			if(fileExists(expandPath(arguments.infoHREF))) {
+				// resource descriptor exists, so read the resource from the descriptor
+				aResources = getResourcesInDescriptorFile(arguments.infoHREF, arguments.packageName, arguments.resourceID);
+				oResourceBean = aResources[1];
+			} else {
+				// no resource descriptor, so create resource based on package name
+				o = getDefaultResourceInPackage(arguments.resourceType, arguments.packageName);
+				if(not isSimpleValue(o)) oResourceBean = o;
+			}
+
+			variables.stTimers.getResource = getTickCount()-start;
+			return oResourceBean;
+		</cfscript>
+	</cffunction>
+
+
+	<!------------------------------------------------->
 	<!--- getResourcesInPackage                	   ---->
 	<!------------------------------------------------->
-	<cffunction name="getResourcesInPackage" access="public" returntype="Array">
+	<cffunction name="getResourcesInPackage" access="public" returntype="Array" hint="returns all resources on a package">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="packageName" type="string" required="true">
 		<cfscript>
@@ -270,9 +307,10 @@
 	<!---------------------------------------->
 	<!--- getResourcesInDescriptorFile	   --->
 	<!---------------------------------------->	
-	<cffunction name="getResourcesInDescriptorFile" access="private" hint="returns all resources on the given file descriptor" returntype="array">
+	<cffunction name="getResourcesInDescriptorFile" access="private" hint="returns all resources on the given file descriptor, also if a resourceID is given, only returns that resource instead of all resources on the package" returntype="array">
 		<cfargument name="href" type="string" required="true" hint="Path of the resource descriptor file">
 		<cfargument name="packageName" type="string" required="true" hint="Name of the package to import">
+		<cfargument name="resourceID" type="string" required="false" default="" hint="Name of a specific resource to import. If given, then the returning array only contains that resource">
 
 		<cfscript>
 			var xmlDescriptorDoc = 0;
@@ -308,14 +346,25 @@
 				// loop through all resources of current type
 				for(i=1;i lte ArrayLen(aResources);i=i+1) {
 
-					oResourceBean = createObject("component","resourceBean").init(aResources[i]);
-					stResourceBean = oResourceBean.getMemento();
+					if(arguments.resourceID eq "" or arguments.resourceID eq aResources[i].xmlAttributes.id) {
+					
+						oResourceBean = createObject("component","resourceBean").init(aResources[i]);
+						stResourceBean = oResourceBean.getMemento();
+	
+						if(stResourceBean.Package eq "")	oResourceBean.setPackage(arguments.packageName);
+						if(stResourceBean.Owner eq "")	oResourceBean.setOwner(ownerName);
+						if(stResourceBean.AccessType eq "")	oResourceBean.setAccessType(access);
+	
+						oResourceBean.setInfoHREF(arguments.href);
+	
+						// add resource bean to returning array
+						arrayAppend(aResBeans, oResourceBean);
+						
+						// if we are looking for a particular resource and we found it, 
+						// then just leave instead of keep looking through the resources
+						if(arguments.resourceID neq "") return aResBeans;
+					}
 
-					if(stResourceBean.Package eq "")	oResourceBean.setPackage(arguments.packageName);
-					if(stResourceBean.Owner eq "")	oResourceBean.setOwner(ownerName);
-					if(stResourceBean.AccessType eq "")	oResourceBean.setAccessType(access);
-
-					arrayAppend(aResBeans, oResourceBean);
 				}
 			}
 			
@@ -404,6 +453,14 @@
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 
 		<cfthrow message="#arguments.message#" type="#arguments.type#">
+	</cffunction>
+
+	<cffunction name="abort" access="private" returntype="void">
+		<cfabort>
+	</cffunction>
+	<cffunction name="dump" access="private" returntype="void">
+		<cfargument name="data" type="any">
+		<cfdump var="#arguments.data#">
 	</cffunction>
 	
 </cfcomponent>

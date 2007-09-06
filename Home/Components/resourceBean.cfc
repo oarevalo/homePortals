@@ -17,6 +17,7 @@
 	<cfproperty name="Attributes" type="array" hint="For module resources, this represent a list of attributes that can be used to configure this module" />
 	<cfproperty name="Resources" type="array" hint="For module resources, this represents a list of required script or style resources that should be added to the page" />
 	<cfproperty name="EventListeners" type="array" hint="For module resources, this represent a list of event listeners that will need to be added to the page" />
+	<cfproperty name="infoHREF" type="string" hint="the location of the package descriptor file that describes this resource" />
 
 	<cffunction name="Init" access="public" output="true" returntype="Any">
 		<cfargument name="resourceNode" type="XML" hint="XML node from a descriptor document that represents the resource" required="false" />
@@ -44,6 +45,7 @@
 			variables.instance.Events = arrayNew(1);
 			variables.instance.Resources = arrayNew(1);
 			variables.instance.EventListeners = arrayNew(1);
+			variables.instance.infoHREF = "";
 			
 			if(structKeyExists(arguments,"resourceNode") and isXmlNode(arguments.resourceNode)) {
 				xmlNode = arguments.resourceNode;
@@ -284,5 +286,13 @@
 		<cfreturn variables.instance.EventListeners />
 	</cffunction>
 
+	<cffunction name="getInfoHREF" access="public" output="false" returntype="string">
+		<cfreturn variables.instance.infoHREF />
+	</cffunction>
 
+	<cffunction name="setInfoHREF" access="public" output="false" returntype="void">
+		<cfargument name="infoHREF" type="string" required="true" />
+		<cfset variables.instance.infoHREF = arguments.infoHREF />
+		<cfreturn />
+	</cffunction>
 </cfcomponent>
