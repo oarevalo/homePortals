@@ -222,7 +222,7 @@
 				st = structNew();
 				st.type = stResourceBean.type;
 				st.id = stResourceBean.id;
-				st.access = stResourceBean.AccessType;
+				st.access = stResourceBean.accessType;
 				st.name = stResourceBean.name;
 				st.HREF = stResourceBean.HREF;
 				st.Package = stResourceBean.Package;
@@ -273,7 +273,7 @@
 					queryAddRow(variables.qryResources);
 					querySetCell(variables.qryResources, "type", resType);
 					querySetCell(variables.qryResources, "id", resID);
-					querySetCell(variables.qryResources, "access", stResourceBean.AccessType);
+					querySetCell(variables.qryResources, "access", stResourceBean.access);
 					querySetCell(variables.qryResources, "name", stResourceBean.Name);
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
