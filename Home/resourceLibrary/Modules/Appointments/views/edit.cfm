@@ -26,6 +26,7 @@
 		// get the appointments to display
 		qryData = getAppointmentByID(arguments.id);
 		
+		tmpDate = qryData.eventDate;
 		tmpTime = qryData.eventTime;
 		tmpDescription = qryData.description;
 		tmpSubject = qryData.subject;
@@ -36,6 +37,11 @@
 		} catch(any e) {
 			// do nothing 
 		}
+		
+		if(arguments.id eq "")
+			tmpDate = arguments.date;
+			
+		tmpDate = dateFormat(tmpDate, "mm/dd/yy");
 				
 	} catch(any e) {
 		aGroups = ArrayNew(1);
@@ -45,6 +51,28 @@
 		errMessage = e.message & "<br>" & e.detail;
 	}
 </cfscript>
+
+<style type="text/css">
+	#frmEditAppointment {
+		padding:0px;
+		margin:0px;
+	}
+	#frmEditAppointment input {
+		font-family:Arial, Helvetica, sans-serif;
+		font-size:11px;
+		border:1px solid black;
+		padding:2px;
+	}
+	#frmEditAppointment textarea  {
+		font-family:Arial, Helvetica, sans-serif;
+		font-size:11px;
+		width:475px;
+		border:1px solid silver;
+		padding:2px;
+		height:320px;
+		margin:5px;
+	}	
+</style>
 
 <cfoutput>
 	<div style="background-color:##f5f5f5;">
@@ -57,29 +85,34 @@
 			</div>
 						
 			<cfif not bFailed>
-				<form action="##" method="post" name="frmEditAppointment" style="padding:0px;margin:0px;">
+				<form action="##" method="post" id="frmEditAppointment" name="frmEditAppointment">
 					<div style="border:1px solid silver;background-color:##fff;margin:5px;">
 						<table style="margin:5px;">
 							<tr>
-								<td><strong>Time:</strong></td>
+								<td style="width:60px;font-size:10px;"><strong>Date:</strong></td>
+								<td style="width:180px;">
+									<input type="text" name="date" value="#arguments.date#" style="width:100px;">
+									<span style="font-size:9px;">mm/dd/yyyy</span>
+								</td>
+								<td style="width:10px;">&nbsp;</td>
 								<td>
-									<input type="text" name="time" value="#tmpTime#" style="width:300px;border:1px solid black;padding:2px;font-size:11px;">
+									<span style="font-size:10px;"><strong>Time:</strong></span>
+									<input type="text" name="time" value="#tmpTime#" style="width:80px;">
+									<span style="font-size:9px;">(optional)</span>
 								</td>
 							</tr>
 							<tr>
-								<td><strong>Subject:</strong></td>
-								<td><input type="text" name="subject" value="#tmpSubject#" style="width:300px;border:1px solid black;padding:2px;font-size:11px;"></td>
+								<td style="width:60px;font-size:10px;"><strong>Subject:</strong></td>
+								<td colspan="3"><input type="text" name="subject" value="#tmpSubject#" style="width:380px;"></td>
 							</tr>
 						</table>
 					</div>
 		
 					<textarea name="description" 
-							  style="width:475px;border:1px solid silver;padding:2px;height:320px;margin:5px;"
 							  rows="22">#htmlEditFormat(tmpDescription)#</textarea>
 		
 					<div style="margin:5px;background-color:##ececec;border:1px solid silver;color:##fff;">
 						<div style="margin:5px;">
-							<input type="hidden" name="date" value="#arguments.date#">
 							<input type="hidden" name="id" value="#arguments.id#">
 							<input type="button" value="Save Appointment" onclick="#moduleID#.doFormAction('saveAppointment',this.form);#moduleID#.closeWindow();">
 							<input type="button" value="Cancel" onclick="#moduleID#.closeWindow()">

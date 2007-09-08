@@ -22,14 +22,14 @@
 
 		if(arguments.viewBy eq "") arguments.viewBy = "agenda";
 		if(arguments.date eq "") arguments.date = now();
+		if(arguments.viewBy eq "agenda") arguments.date = now();
+		
 		arguments.date = DateFormat(Arguments.date, "mm/dd/yyyy");
 		startDate = arguments.date;
 		
 		// get the appointments to display
 		qryData = getAppointments(arguments.date, arguments.viewBy);
 	
-	
-		
 		switch(arguments.viewBy) {
 			case "agenda": {
 				startDate = DateFormat(Arguments.date, "mm/dd/yy");
@@ -44,8 +44,8 @@
 				break;
 			}
 			case "week": {
-				startDate = DateFormat(Arguments.date, "mm/dd/yy");
-				title = "Week of " & startDate;
+				startDate = DateFormat(dateAdd("d",dayofWeek(startDate)*-1,arguments.date), "mm/dd/yy");
+				title = "Week of " & startDate ;
 				delta = "ww";
 				break;
 			}
@@ -133,7 +133,7 @@
 	<table class="calendar_appointments" cellpadding="0" cellspacing="0" style="border-top:1px solid silver;">
 		<cfoutput query="qryData" group="eventDate">
 			<cfif arguments.viewBy neq "day">
-				<tr><td colspan="3" style="font-weight:bold;color:##990000;">#DayOfWeekAsString(DayOfWeek(eventDate))# #lsDateFormat(eventDate)#</td></tr>
+				<tr><th colspan="3">#DayOfWeekAsString(DayOfWeek(eventDate))# #lsDateFormat(eventDate)#</th></tr>
 			</cfif>
 			<cfset i = 1>
 			<cfoutput>
