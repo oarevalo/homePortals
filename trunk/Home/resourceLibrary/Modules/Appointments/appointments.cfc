@@ -9,7 +9,7 @@
 			cfg.setView("default", "main");
 			cfg.setView("htmlHead", "htmlHead");
 	
-			csCfg.setDefaultName("myAppointments.xml");
+			csCfg.setDefaultName("myAppointments");
 			csCfg.setRootNode("calendar");
 		</cfscript>	
 	</cffunction>
@@ -21,7 +21,7 @@
 		<cfargument name="id" type="string" required="true">
 		<cfargument name="description" type="string" default="">
 		<cfargument name="time" type="string" default="">
-		<cfargument name="date" type="date" default="">
+		<cfargument name="date" type="string" default="">
 		<cfargument name="subject" type="string" default="">
 	
 		<cfscript>
@@ -29,10 +29,21 @@
 			var aUpdateNode = 0;
 			var myContentStore = 0;
 			var xmlDoc = 0;
+			var tmpDate = 0;
+
+			// validate form
+			if(arguments.time eq "" and arguments.subject eq "") throw("Both time and subject cannot be empty");
+			if(arguments.date eq "") throw("Please enter the date of the appointment");
 			
-			if(arguments.time eq "" and arguments.subject eq "") {
-				throw("Both time and subject cannot be empty");
-			}
+			// check for recognized values of date and time
+			if(arguments.date eq "today") arguments.date = now();
+			if(arguments.date eq "tomorrow") arguments.date = dateAdd("d",1,now());
+			if(arguments.date eq "yesterday") arguments.date = dateAdd("d",-1,now());
+			
+			if(Not isDate(arguments.date)) throw("Please enter a valid date");
+			
+			// parse date
+			tmpDate = dateFormat(arguments.date,"mm/dd/yyyy");
 			
 			// get content store
 			setContentStoreURL();
@@ -50,18 +61,18 @@
 				// create new node
 				newNode = xmlElemNew(xmlDoc,"item");
 				newNode.xmlText = arguments.description;
-				newNode.xmlAttributes["time"] = arguments.time;
-				newNode.xmlAttributes["date"] = arguments.date;
-				newNode.xmlAttributes["subject"] = arguments.subject;
+				newNode.xmlAttributes["time"] = xmlFormat(arguments.time);
+				newNode.xmlAttributes["date"] = dateFormat(tmpDate,"mm/dd/yyyy");
+				newNode.xmlAttributes["subject"] = xmlFormat(arguments.subject);
 				newNode.xmlAttributes["id"] = createUUID();
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, newNode);
 	
 			} else {
 				// update node
 				aUpdateNode[1].xmlText = arguments.description;
-				aUpdateNode[1].xmlAttributes["time"] = arguments.time;
-				aUpdateNode[1].xmlAttributes["date"] = parseDateTime(arguments.date);
-				aUpdateNode[1].xmlAttributes["subject"] = arguments.subject;
+				aUpdateNode[1].xmlAttributes["time"] = xmlFormat(arguments.time);
+				aUpdateNode[1].xmlAttributes["date"] = dateFormat(tmpDate,"mm/dd/yyyy");
+				aUpdateNode[1].xmlAttributes["subject"] = xmlFormat(arguments.subject);
 	
 			}
 			
@@ -71,7 +82,7 @@
 			// notify client of change
 			this.controller.setEventToRaise("onSave");
 			this.controller.setMessage("Appointment Saved");
-			this.controller.setScript("#moduleID#.getView('','',{date:'#arguments.date#'})");			
+			this.controller.setScript("#moduleID#.getView()");			
 		</cfscript>
 	</cffunction>	
 	

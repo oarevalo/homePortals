@@ -3,11 +3,12 @@
 <modules>
 	<module access="general" id="Appointments" name="Appointments/appointments">
 		<description>
-			Maintains a list of appointments.
+			Maintains a list of appointments organized by date and time. Appointments can be displayed
+			daily, weekly, monthly or for the next 45 days.
 		</description>
 		<resources/>
 		<attributes>
-			<attribute description="[Optional] Indicates the URL of a document where to store your appointments. Leave empty to use default storage." name="calendarURL" required="true"/>
+			<attribute description="[Optional] Indicates the name of a document where to store your appointments. Leave empty to use default storage." name="calendarURL" required="true"/>
 		</attributes>
 		<eventListeners/>
 		<moduleInfo>
