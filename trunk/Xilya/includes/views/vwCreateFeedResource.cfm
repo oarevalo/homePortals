@@ -6,7 +6,7 @@
 	lstInvalidChars = "',<,>,?,\,/,!,@,##,$,%,^,&,*";
 	
 	// get reader service
-	oRSSReaderService = createObject("Component","Home.resourceLibrary.Modules.RSSReader.RSSReaderService");
+	oRSSReaderService = createObject("Component","Home.Components.RSSService");
 
 	try {
 		feed = oRSSReaderService.getRSS(rssURL);
