@@ -92,34 +92,34 @@ History:
 		<cfset var siteOwner = "">
 				
 		<cfscript>
-				if(arguments.rssURL eq "") throw("The feed URL cannot be empty"); 
-				if(arguments.feedName eq "") throw("The feed title cannot be empty"); 
+			if(arguments.rssURL eq "") throw("The feed URL cannot be empty"); 
+			if(arguments.feedName eq "") throw("The feed title cannot be empty"); 
 
-				if(left(arguments.rssURL,4) neq "http") arguments.rssURL = "http://" & arguments.rssURL;
+			if(left(arguments.rssURL,4) neq "http") arguments.rssURL = "http://" & arguments.rssURL;
 
-				// get owner
-				stUser = this.controller.getUserInfo();
-				siteOwner = stUser.username;
+			// get owner
+			stUser = this.controller.getUserInfo();
+			siteOwner = stUser.username;
 
-				// create the bean for the new resource
-				oResourceBean = createObject("component","Home.Components.resourceBean").init();	
-				oResourceBean.setID(createUUID());
-				oResourceBean.setName(arguments.feedName);
-				oResourceBean.setHREF(arguments.rssURL);
-				oResourceBean.setOwner(siteOwner);
-				oResourceBean.setAccessType(arguments.access); 
-				oResourceBean.setDescription(arguments.description); 
-				oResourceBean.setPackage(siteOwner); 
-				oResourceBean.setType(resourceType); 
-				
-				/// add the new resource to the library
-				oResourceLibrary = createObject("component","Home.Components.resourceLibrary").init(resourceLibraryPath);
-				oResourceLibrary.saveResource(oResourceBean, arguments.body);
+			// create the bean for the new resource
+			oResourceBean = createObject("component","Home.Components.resourceBean").init();	
+			oResourceBean.setID(createUUID());
+			oResourceBean.setName(arguments.feedName);
+			oResourceBean.setHREF(arguments.rssURL);
+			oResourceBean.setOwner(siteOwner);
+			oResourceBean.setAccessType(arguments.access); 
+			oResourceBean.setDescription(arguments.description); 
+			oResourceBean.setPackage(siteOwner); 
+			oResourceBean.setType(resourceType); 
 			
-				// update catalog
-				oHP.getCatalog().reloadPackage(resourceType,siteOwner);
-						
-				setRSS(arguments.rssURL);
+			/// add the new resource to the library
+			oResourceLibrary = createObject("component","Home.Components.resourceLibrary").init(resourceLibraryPath);
+			oResourceLibrary.saveResource(oResourceBean, arguments.body);
+		
+			// update catalog
+			oHP.getCatalog().reloadPackage(resourceType,siteOwner);
+					
+			setRSS(arguments.rssURL);
 		</cfscript>
 	</cffunction>
 	

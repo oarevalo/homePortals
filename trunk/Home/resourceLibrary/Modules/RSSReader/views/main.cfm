@@ -1,4 +1,5 @@
 <cfparam name="arguments.rss" default="">
+<cfparam name="arguments.refresh" default="false">
 <!---
 	RSSReaderFull
 	
@@ -35,7 +36,10 @@
 	imgRoot = tmpModulePath & "/images";
 	
 	// get reader service
-	oRSSReaderService = createObject("Component","#tmpModulePath#/RSSReaderService");
+	oRSSReaderService = this.controller.getAPIObject("RSSService").init();
+
+	// check that the feed refresh argument is boolean
+	if(not isBoolean(arguments.refresh)) arguments.refresh = false;
 
 	if(rssURL neq "") {
 		feed = StructNew();
@@ -44,7 +48,7 @@
 		
 		// read feed
 		try {
-			feed = oRSSReaderService.getRSS(rssURL);
+			feed = oRSSReaderService.getRSS(rssURL, arguments.refresh);
 
 			// check for max items to display
 			if(IsNumeric(maxItems)) {
@@ -245,7 +249,7 @@
 			<script>
 				h_setModuleContainerTitle("#moduleID#", "#jsstringformat(feed.title)#");
 				<cfif execMode eq "local">
-					#moduleID#.attachIcon("#imgRoot#/refresh.gif","#moduleID#.getView('','',{rss:'#rssURL#',useLayout:false})","Refresh content");
+					#moduleID#.attachIcon("#imgRoot#/refresh.gif","#moduleID#.getView('','',{rss:'#rssURL#',useLayout:false,refresh:true})","Refresh content");
 					#moduleID#.attachIcon("#imgRoot#/feed-icon16x16.gif","window.open('#rssURL#')","View feed source");
 				</cfif>
 			</script>

@@ -13,6 +13,7 @@
 	errorMessage = "";
 	tmpURL = "http://api.flickr.com/services/feeds/photos_public.gne?format=rss2";
 	tmpTitle = "Flickr:&nbsp;&nbsp;";
+	execMode = this.controller.getExecMode();	
 	
 	try {
 		// get settings
@@ -45,7 +46,7 @@
 	
 	
 		// get and parse feed	
-		oRSSReaderService = createObject("Component","Home.resourceLibrary.Modules.RSSReader.RSSReaderService");
+		oRSSReaderService = this.controller.getAPIObject("RSSService").init();
 		feed = oRSSReaderService.getRSS(tmpURL);
 		
 		// if no number of maxItems has been given, then show all on the feed 
@@ -67,16 +68,13 @@
 	<cfif not bFailed>
 
 		<cfif args.showHeader>
-			<div>
+			<div style="border-bottom:1px solid ##ebebeb;margin-bottom:10px;">
 				<a href="#feed.Image.Link#">
 					<img src="#feed.Image.URL#" border="1" id="RSS_Image" 
-							title="#feed.Image.Title#" align="left" 
-							alt="#feed.Image.Title#" style="margin:3px;" /></a>
-				<div>
-					<a href="#feed.Link#" target="_blank" id="RSS_Title" style="font-weight:bold;font-size:18px;font-family:arial,helvetica,sans-serif;">#feed.Title#</a><br>
-					<a href="#tmpURL#" target="_blank"><img src="/Home/Modules/RSSReader/images/xml.gif" alt="View Feed XML" border="0" align="absmiddle"></a>&nbsp;
-				</div>
-				<br style="clear:both;" />
+							title="#feed.Image.Title#" align="absmiddle" 
+							alt="#feed.Image.Title#" style="margin:3px;margin-right:10px;margin-bottom:10px;" /></a>
+				<a href="#feed.Link#" target="_blank" id="RSS_Title" 
+					style="font-weight:bold;font-size:18px;font-family:arial,helvetica,sans-serif;">#feed.Title#</a><br>
 			</div>
 		</cfif>
 	
@@ -109,6 +107,9 @@
 		<!--- set module title --->
 		<script>
 			h_setModuleContainerTitle("#moduleID#", "#jsstringformat(tmpTitle)#");
+			<cfif execMode eq "local">
+				#moduleID#.attachIcon("#imgRoot#/feed-icon16x16.gif","window.open('#tmpURL#')","RSS Feed");
+			</cfif>
 		</script>
 		
 		<br>
