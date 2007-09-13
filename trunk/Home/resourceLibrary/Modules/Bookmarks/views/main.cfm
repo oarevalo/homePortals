@@ -21,6 +21,7 @@
 	// get settings
 	bookmarksURL = cfg.getPageSetting("url");
 	bFollowLink = cfg.getPageSetting("followLink");
+	moduleTitle = cfg.getPageSetting("title");
 	
 	// default the real URL to the setting
 	realURL = bookmarksURL;
@@ -46,12 +47,14 @@
 			xmlDoc = xmlParse(bookmarksURL);		
 		}
 		
-		if(structKeyExists(xmlDoc.xmlRoot,"head") and structKeyExists(xmlDoc.xmlRoot.head,"title")) {
-			moduleTitle = xmlDoc.xmlRoot.head.title.xmlText;
-		} else if(bookmarksURL neq "") {
-			moduleTitle = bookmarksURL;
+		if(moduleTitle eq "" or moduleTitle eq moduleID) {
+			if(structKeyExists(xmlDoc.xmlRoot,"head") and structKeyExists(xmlDoc.xmlRoot.head,"title")) {
+				moduleTitle = xmlDoc.xmlRoot.head.title.xmlText;
+			} else if(bookmarksURL neq "") {
+				moduleTitle = bookmarksURL;
+			}
 		}
-		
+			
 		// get all content entries
 		if(structKeyExists(xmlDoc.xmlRoot,"body"))
 			aGroups = xmlDoc.xmlRoot.body.xmlChildren;
@@ -192,7 +195,7 @@
 		</span>
 	</div>
 <cfelse>
-	<div style="margin:10px;font-size:11px;">
+	<div class="SectionToolbar">
 		<a href="#realURL#" target="_blank"><img src="#imgRoot#/opml.gif" border="0" align="absmiddle" alt="Link to this list"></a>
 		<a href="#realURL#" target="_blank"><strong>Link to this list</strong></a>
 	</div>
