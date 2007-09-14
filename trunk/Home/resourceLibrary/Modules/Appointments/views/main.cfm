@@ -80,7 +80,7 @@
 <!--- Display header ---->
 <div style="border:1px solid silver;background-color:##ebebeb;padding:3px;">
 	<b>View:</b>
-	&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;
 
 	<a href="javascript:#moduleID#.getView('','',{viewBy:'agenda',date:'#Arguments.date#'});"><img src="#imgRoot#/date.png" align="absmiddle" border="0"></a>
 	<cfif arguments.viewBy eq "agenda">
@@ -88,7 +88,7 @@
 	<cfelse>
 		<a href="javascript:#moduleID#.getView('','',{viewBy:'agenda',date:'#Arguments.date#'});">Agenda</a>
 	</cfif>
-	&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;
 	
 	<a href="javascript:#moduleID#.getView('','',{viewBy:'day',date:'#Arguments.date#'});"><img src="#imgRoot#/date.png" align="absmiddle" border="0"></a>
 	<cfif arguments.viewBy eq "day">
@@ -96,7 +96,7 @@
 	<cfelse>
 		<a href="javascript:#moduleID#.getView('','',{viewBy:'day',date:'#Arguments.date#'});">Day</a>
 	</cfif>
-	&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;
 
 	<a href="javascript:#moduleID#.getView('','',{viewBy:'week',date:'#Arguments.date#'});"><img src="#imgRoot#/application_view_columns.png" align="absmiddle" border="0"></a>
 	<cfif arguments.viewBy eq "week">
@@ -104,7 +104,7 @@
 	<cfelse>
 		<a href="javascript:#moduleID#.getView('','',{viewBy:'week',date:'#Arguments.date#'});">Week</a>
 	</cfif>
-	&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;
 
 	<a href="javascript:#moduleID#.getView('','',{viewBy:'month',date:'#Arguments.date#'});"><img src="#imgRoot#/calendar.png" align="absmiddle" border="0"></a>
 	<cfif arguments.viewBy eq "month">
