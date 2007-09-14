@@ -109,6 +109,15 @@
 				<cfset thisAttribs.url = "##">
 			</cfif>
 
+			<!--- Check if the url has a favicon for the domain --->
+			<cfif left(URLDecode(thisAttribs.url),4) eq "http">
+				<cfset tmpIconURL = "http://" & listGetAt(URLDecode(thisAttribs.url),2,"/") & "/favicon.ico">
+				<cfhttp method="get" url="#tmpIconURL#" timeout="5" throwonerror="no"></cfhttp>
+				<cfif thisAttribs.imgURL eq "" and cfhttp.statusCode eq "200 OK">
+					<cfset thisAttribs.imgURL = tmpIconURL>
+				</cfif>
+			</cfif>
+
 			<div style="line-height:18px;font-size:12px;">
 				<cfif bIsContentOwner and Not isRemoteURL>
 					<div style="float:right;width:35px;">
