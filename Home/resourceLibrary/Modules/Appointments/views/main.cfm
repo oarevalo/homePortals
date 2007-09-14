@@ -79,9 +79,6 @@
 <cfoutput>
 <!--- Display header ---->
 <div style="border:1px solid silver;background-color:##ebebeb;padding:3px;">
-	<b>View:</b>
-	&nbsp;&nbsp;&nbsp;
-
 	<a href="javascript:#moduleID#.getView('','',{viewBy:'agenda',date:'#Arguments.date#'});"><img src="#imgRoot#/date.png" align="absmiddle" border="0"></a>
 	<cfif arguments.viewBy eq "agenda">
 		<b>Agenda</b>
@@ -190,7 +187,6 @@
 
 <cfif bIsContentOwner>
 	<cfoutput>
-	<br>
 	<div class="SectionToolbar">
 		<a href="javascript:#moduleID#.getPopupView('edit',{date:'#startDate#'})"><img src="#imgRoot#/add-page-orange.gif" border="0" align="absmiddle" alt="Add New Appointment"></a>
 		<a href="javascript:#moduleID#.getPopupView('edit',{date:'#startDate#'})"><strong>Add Event</strong></a>
