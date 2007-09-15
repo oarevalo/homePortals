@@ -245,9 +245,19 @@
 				</p>
 			</cfif>
 			
-			<!--- set module title --->
+			<!--- Check if the url has a favicon for the domain --->
+			<cfset tmpFavIconURL = "">
+			<cfset tmpURL = "http://" & listGetAt(URLDecode(rssURL),2,"/") & "/favicon.ico">
+			<cfhttp method="get" url="#tmpURL#" timeout="5" throwonerror="no"></cfhttp>
+			<cfif cfhttp.statusCode eq "200 OK">
+				<cfset tmpFavIconURL = tmpURL>
+			</cfif>
+			
 			<script>
-				h_setModuleContainerTitle("#moduleID#", "#jsstringformat(feed.title)#");
+				#moduleID#.setTitle("#jsstringformat(feed.title)#");
+				<cfif tmpFavIconURL neq "">
+					#moduleID#.setIcon("#tmpFavIconURL#");
+				</cfif>
 				<cfif execMode eq "local">
 					#moduleID#.attachIcon("#imgRoot#/refresh.gif","#moduleID#.getView('','',{rss:'#rssURL#',useLayout:false,refresh:true})","Refresh content");
 					#moduleID#.attachIcon("#imgRoot#/feed-icon16x16.gif","window.open('#rssURL#')","View feed source");

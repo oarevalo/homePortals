@@ -117,8 +117,13 @@
 		</div><br>
 	</cfif>
 
+	<!--- set module icon --->
+	<script type="text/javascript">
+		#moduleID#.setIcon("http://www.youtube.com/favicon.ico");
+	</script>
+
 	<cfif stUser.isOwner>
-		<div id="toolbar">
+		<div class="SectionToolbar">
 			<a href="javascript:#moduleID#.getView('configSearch');"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getView('configSearch');">Change Settings</a>
 		</div>
@@ -137,8 +142,8 @@
 	<cfhtmlhead text="#tmpHead#">
 </cfoutput>
 	<cfcatch type="any">
-	<cfdump var="#cfcatch#">
-</cfcatch>
+		<cfoutput>#cfcatch.Message#</cfoutput>
+	</cfcatch>
 </cftry>
 
 <cfscript>

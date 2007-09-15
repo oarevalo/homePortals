@@ -33,14 +33,16 @@
 	<cffunction name="saveSize" access="public" output="true">
 		<cfargument name="width" type="string" default="">
 		<cfargument name="height" type="string" default="">
+		<cfargument name="autoplay" type="string" default="0">
 		<cfscript>
 			var cfg = this.controller.getModuleConfigBean();
 			var moduleID = this.controller.getModuleID();
 			
 			cfg.setPageSetting("width", arguments.width);
 			cfg.setPageSetting("height", arguments.height);
+			cfg.setPageSetting("autoplay", arguments.autoplay);
 
-			this.controller.setMessage("Video player size changed");
+			this.controller.setMessage("Video player settings changed");
 			this.controller.setScript("#moduleID#.getView();");
 			this.controller.savePageSettings();
 		</cfscript>

@@ -106,7 +106,8 @@
 
 		<!--- set module title --->
 		<script>
-			h_setModuleContainerTitle("#moduleID#", "#jsstringformat(tmpTitle)#");
+			#moduleID#.setTitle("#jsstringformat(tmpTitle)#");
+			#moduleID#.setIcon("http://www.flickr.com/favicon.ico");
 			<cfif execMode eq "local">
 				#moduleID#.attachIcon("#imgRoot#/feed-icon16x16.gif","window.open('#tmpURL#')","RSS Feed");
 			</cfif>
