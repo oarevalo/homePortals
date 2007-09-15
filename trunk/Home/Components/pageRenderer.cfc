@@ -453,6 +453,7 @@
 								if(Not structKeyExists(args, "showPrint")) args.showPrint = true; 
 								if(Not structKeyExists(args, "output")) args.output = true; 
 								if(Not structKeyExists(args, "style")) args.style = ""; 
+								if(Not structKeyExists(args, "icon")) args.icon = ""; 
 	
 								// Provide a unique ID for each module 
 								if(args.id eq "") args.id = "h_module_#args.location#_#j#";
@@ -613,6 +614,10 @@
 			var imgRoot = variables.oHomePortalsConfigBean.getHomePortalsPath() & "Common/Images";
 			var renderTemplateBody = "";
 			var j = 1;
+			var tmpIconURL = "";
+
+			if(arguments.moduleNode.icon neq "") 
+				tmpIconURL = "<img src='#arguments.moduleNode.icon#' width='16' height='16' align='absmiddle'>";
 			
 			if(arguments.moduleNode.Container)
 				renderTemplateBody = variables.oHomePortalsConfigBean.getRenderTemplateBody("module");
@@ -623,6 +628,7 @@
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_TITLE$", arguments.moduleNode.title, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_STYLE$", arguments.moduleNode.style, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", getpageBuffer("_htmlModule", moduleID),  "ALL");	
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
 	
 			return renderTemplateBody;
 		</cfscript>
