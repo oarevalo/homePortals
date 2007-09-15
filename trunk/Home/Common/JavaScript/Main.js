@@ -10,6 +10,10 @@ function h_getModuleContainerTitle(moduleID) {
 	if(d) title = d.innerHTML;
 	return title;
 }
+function h_setModuleContainerIcon(moduleID,imgURL) {
+	var d = $(moduleID + '_Icon');
+	if(d) d.innerHTML = "<img src='"+imgURL+"' width=16 height=16 align='absmiddle'>";
+}
 function h_setLoadingImg(secID) {
 	var d = document.getElementById("h_loading");
 	var url_loadingImage =  "/Home/Common/Images/loading_text.gif";

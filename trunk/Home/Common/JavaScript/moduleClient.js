@@ -136,6 +136,18 @@ function moduleClient() {
 		aElem = h.getElementsByTagName("h2");
 		new Insertion.Top(aElem[0],  "<a href='#' onclick=\"" + onclickStr + "\"><img src=\"" + imgSrc + "\" border='0' style='margin-top:3px;margin-right:3px;' align='right' alt='" + alt + "' title='" + alt + "'></a>");
 	}
+	
+	function setIcon(imgSrc) {
+		h_setModuleContainerIcon(this.moduleID, imgSrc);
+	}
+
+	function setTitle(title) {
+		h_setModuleContainerTitle(this.moduleID, title);
+	}
+
+	function getTitle() {
+		return h_getModuleContainerTitle(this.moduleID);
+	}
 
 	// Attach functions to the prototype of this object
 	// (this is what creates the actual "methods" of the object)
@@ -151,6 +163,10 @@ function moduleClient() {
 	moduleClient.prototype.closeWindow = closeWindow;
 	moduleClient.prototype.setMessage = setMessage;
 	moduleClient.prototype.raiseEvent = raiseEvent;
+
 	moduleClient.prototype.attachIcon = attachIcon;
+	moduleClient.prototype.setIcon = setIcon;
+	moduleClient.prototype.setTitle = setTitle;
+	moduleClient.prototype.getTitle = getTitle;
 	
 }
