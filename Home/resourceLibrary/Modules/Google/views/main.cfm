@@ -24,6 +24,12 @@
 			<a href="javascript:#moduleID#.getView('config','#moduleID#');">Settings</a>
 		</div>
 	</cfif>
+
+	<script type="text/javascript">
+		#moduleID#.setTitle("Google Search");
+		#moduleID#.setIcon("http://www.google.com/favicon.ico");
+	</script>
+
 	<cfif this.controller.getExecMode() eq "remote">
 		<script>
 			// Create a search control

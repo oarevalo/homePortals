@@ -11,6 +11,7 @@
 	videoID = cfg.getPageSetting("videoID","");
 	width = cfg.getPageSetting("width","425");
 	height = cfg.getPageSetting("height","350");
+	autoplay = cfg.getPageSetting("autoplay","0");
 
 	// get current user info
 	stUser = this.controller.getUserInfo();
@@ -68,6 +69,10 @@
 				<b>Video Size:</b> &nbsp;&nbsp;
 				Width: <input type="text" name="width" value="#width#" style="width:50px;font-size:11px;" />&nbsp;&nbsp;
 				Height: <input type="text" name="height" value="#height#" style="width:50px;font-size:11px;" />
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<b>Autoplay?</b>
+				<input type="checkbox" name="autoplay" value="1" <cfif isBoolean(autoplay) and autoplay>checked</cfif>>
+				&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type="button" value="Apply" onclick="#moduleID#.doFormAction('saveSize',this.form)">
 			</form>
 		</div>

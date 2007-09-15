@@ -17,7 +17,8 @@
 	</cfif>
 
     <script language="Javascript" type="text/javascript">
-	
+
+		// create function for setup google search widget	
 		#moduleID#.setupGoogleSearch = function() {
 
 	      // Create a search control

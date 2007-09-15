@@ -29,7 +29,8 @@
 		if(videoID eq "") videoID = cfg.getPageSetting("videoID","");
 		width = cfg.getPageSetting("width","425");
 		height = cfg.getPageSetting("height","350");
-	
+		autoplay = cfg.getPageSetting("autoplay","0");
+		
 		if(videoID neq "") {
 			obj = getYouTubeService();
 			xmlResults = obj.getDetails(videoID);
@@ -47,10 +48,15 @@
 	<div style="text-align:center;">
 		<cfif errorMsg eq "">
 			<cfif videoID neq "">
+				<cfset tmpVideoURL = "http://www.youtube.com/v/#videoID#">
+				<cfif autoplay>
+					<cfset tmpVideoURL = tmpVideoURL & "&autoplay=1">
+				</cfif>
+				
 				<object width="#width#" height="#height#">
-					<param name="movie" value="http://www.youtube.com/v/#videoID#&autoplay=1"></param>
+					<param name="movie" value="#tmpVideoURL#"></param>
 					<param name="wmode" value="transparent"></param>
-					<embed src="http://www.youtube.com/v/#videoID#&autoplay=1" 
+					<embed src="#tmpVideoURL#" 
 							type="application/x-shockwave-flash" 
 							wmode="transparent" width="#width#" height="#height#">
 					</embed>
@@ -61,7 +67,8 @@
 				
 				<!--- set module title --->
 				<script>
-					h_setModuleContainerTitle("#moduleID#", "#jsstringformat(title)#");
+					#moduleID#.setTitle("#jsstringformat(title)#");
+					#moduleID#.setIcon("http://www.youtube.com/favicon.ico");
 				</script>				
 			<cfelse>
 				<b>No video set</b>

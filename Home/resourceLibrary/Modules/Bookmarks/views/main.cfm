@@ -79,6 +79,7 @@
 			<cfset aLinks = aGroups[i].XMLChildren>
 			<cfset thisAttribs = duplicate(aGroups[i].XMLAttributes)>
 			<cfset isFeed = false>
+			<cfset tmpIconURL = "">
 	
 			<cfparam name="thisAttribs.text" default="" type="string">
 			<cfparam name="thisAttribs.url" default="##" type="string">
@@ -105,10 +106,6 @@
 			<cfset tmpEvent = "#moduleID#.raiseEvent('onClick',{url:'#thisAttribs.url#'})">
 			<cfset thisAttribs.onclick = ListAppend(thisAttribs.onclick, tmpEvent, ";")>					
 	
-			<cfif Not bFollowLink>
-				<cfset thisAttribs.url = "##">
-			</cfif>
-
 			<!--- Check if the url has a favicon for the domain --->
 			<cfif left(URLDecode(thisAttribs.url),4) eq "http">
 				<cfset tmpIconURL = "http://" & listGetAt(URLDecode(thisAttribs.url),2,"/") & "/favicon.ico">
@@ -118,6 +115,11 @@
 				</cfif>
 			</cfif>
 
+			<!--- if links are not to be followed, then removed URL param --->
+			<cfif Not bFollowLink>
+				<cfset thisAttribs.url = "##">
+			</cfif>
+
 			<div style="line-height:18px;font-size:12px;">
 				<cfif bIsContentOwner and Not isRemoteURL>
 					<div style="float:right;width:35px;">
@@ -125,9 +127,9 @@
 						<a href="##" onclick="if(confirm('Delete Bookmark?')) #moduleID#.doAction('deleteItem',{index:#i#});"><img src="#imgRoot#/omit-page-orange.gif" border="0" alt="Delete '#thisItem#'" align="absmiddle" title="Delete '#thisItem#'"></a>
 					</div>
 				</cfif>
-				
+
 				<cfif thisAttribs.imgURL neq "">
-					<img src="#thisAttribs.imgURL#" border="0" align="absmiddle" style="margin-right:5px;">
+					<img src="#thisAttribs.imgURL#" border="0" align="absmiddle" style="margin-right:5px;width:16px;height:16px;">
 				</cfif>
 				<a href="#URLDecode(thisAttribs.url)#" 
 					<cfif thisAttribs.target neq "">target="#thisAttribs.target#"</cfif> 
