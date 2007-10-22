@@ -6,6 +6,9 @@
 		variables.siteURL = "";
 		variables.xmlDoc = 0;
 		variables.owner = 0;
+		
+		variables.aPages = arrayNew(1);
+		variables.siteTitle = "";
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -17,38 +20,121 @@
 		
 		<cfscript>
 			var oAccountsConfigBean = arguments.accounts.getConfig();
-			var tmpSitePath = "";
 			var accountsRoot = oAccountsConfigBean.getAccountsRoot();
 			
 			variables.accounts = arguments.accounts;
 			variables.owner = arguments.owner;
 
 			variables.siteURL = accountsRoot & "/" & arguments.owner & "/site.xml";
-			tmpSitePath = ExpandPath(variables.siteURL);
-			if(Not fileExists(tmpSitePath)) throw("Site information file does not exist for account #variables.owner#","homePortals.site.missingSiteXML");
-			variables.xmlDoc = xmlParse(tmpSitePath);
-
+			load(expandPath(variables.siteURL));
 		</cfscript>
 		<cfreturn this>
 	</cffunction>
+	
+
+	<!---------------------------------------->
+	<!--- load					           --->
+	<!---------------------------------------->		
+	<cffunction name="load" access="private" returntype="void" hint="load and parse xml file">
+		<cfargument name="siteDocPath" type="string" required="yes" hint="The full path to the site descriptor document">
+		
+		<cfscript>
+			var xmlDoc = 0;
+			var st = structNew(); var xmlNode = 0;
+			var i = 0;
+				
+			// read configuration file
+			if(Not fileExists(arguments.siteDocPath))
+				throw("Site descriptor file not found [#siteDocPath#]","","homePortals.site.missingSiteXML");
+			else
+				xmlDoc = xmlParse(arguments.siteDocPath);
+
+			// set initial values
+			variables.siteTitle = "";
+			variables.aPages = arrayNew(1);
+
+			
+			// get site title
+			if(structKeyExists(xmlDoc.site,"title")) 
+				variables.siteTitle = xmlDoc.xmlRoot.title.xmlText;
+			
+			// read pages
+			if(structKeyExists(xmlDoc.xmlRoot,"pages")) {
+			
+				for(i=1;i lte arrayLen(xmlDoc.xmlRoot.pages.xmlChildren); i=i+1) {
+				
+					xmlNode = xmlDoc.xmlRoot.pages.xmlChildren[i]; 
+					
+					// build default page struct
+					st = structNew();
+					st.default = false;
+					st.href = "";
+					st.title = "";
+									
+					if(structKeyExists(xmlNode.xmlAttributes, "default")) st.default = xmlNode.xmlAttributes.default;
+					if(structKeyExists(xmlNode.xmlAttributes, "href")) st.href = xmlNode.xmlAttributes.href;
+					if(structKeyExists(xmlNode.xmlAttributes, "title")) st.title = xmlNode.xmlAttributes.title;
+					
+					// append to pages array
+					arrayAppend(variables.aPages, st);
+					
+				}
+			
+			
+			}
+			
+		</cfscript>
+		
+	</cffunction>
+	
+
+	<cffunction name="toXML" access="public" returnType="xml" hint="Returns the site information as an XML document">
+		<cfscript>
+			var xmlDoc = 0;
+			var xmlNode = 0;
+			var tmpPage = structNew();
+			var i = 0;
+
+			// create a blank xml document and add the root node
+			xmlDoc = xmlNew();
+			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "site");	
+			
+			// add title node
+			xmlNode = xmlElemNew(xmlDoc, "title");
+			xmlNode.xmlText = xmlFormat(variables.siteTitle);
+			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
+			
+			// add pages node
+			xmlNode = xmlElemNew(xmlDoc, "pages");
+			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
+			
+			// add page nodes
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+			
+				var tmpPage = variables.aPages[i];
+			
+				xmlNode = xmlElemNew(xmlDoc, "page");
+				xmlNode.xmlAttributes["title"] = xmlFormat(tmpPage.title);
+				xmlNode.xmlAttributes["href"] = xmlFormat(tmpPage.href);
+				xmlNode.xmlAttributes["default"] = xmlFormat(tmpPage.default);
+			
+				arrayAppend(xmlDoc.xmlRoot.pages.xmlChildren, xmlNode);	
+			
+			}
+			
+		</cfscript>
+		<cfreturn xmlDoc>
+	</cffunction>
+	
+	
 
 	<!---------------------------------------->
 	<!--- setSiteTitle			           --->
 	<!---------------------------------------->	
 	<cffunction name="setSiteTitle" access="public" output="false" returntype="void">
 		<cfargument name="title" type="string" required="true" hint="The new title for the site">
-		<cfscript>
-			var xmlNewNode = 0;
-			
-			if(structKeyExists(variables.xmlDoc.site,"title"))
-				variables.xmlDoc.xmlRoot.title.xmlText = xmlFormat(arguments.title);
-			else {
-				xmlNewNode = xmlElemNew(variables.xmlDoc,"title");
-				xmlNewNode.xmlText = xmlFormat(arguments.title);
-				arrayAppend(variables.xmlDoc.xmlRoot.xmlChildren,xmlNewNode);
-			}
-			save();
-		</cfscript>
+		<cfset variables.siteTitle = arguments.title>
+		<cfset save()>
 	</cffunction>
 
 
@@ -56,13 +142,7 @@
 	<!--- getSiteTitle			           --->
 	<!---------------------------------------->	
 	<cffunction name="getSiteTitle" access="public" returntype="string">
-		<cfscript>
-			var retVal = "";
-			if(structKeyExists(variables.xmlDoc.site,"title")) {
-				retVal = variables.xmlDoc.xmlRoot.title.xmlText;
-			}
-		</cfscript>
-		<cfreturn retVal>
+		<cfreturn variables.siteTitle>
 	</cffunction>
 
 
@@ -70,17 +150,7 @@
 	<!--- getPages				           --->
 	<!---------------------------------------->	
 	<cffunction name="getPages" access="public" returntype="array">
-		<cfscript>
-			var aPageNodes = ArrayNew(1);
-			var aPages = ArrayNew(1);
-			var i = 0;
-		
-			aPageNodes = variables.xmlDoc.xmlRoot.pages.xmlChildren;
-			for(i=1;i lte ArrayLen(aPageNodes);i=i+1) {
-				ArrayAppend(aPages, duplicate(aPageNodes[i].xmlAttributes));
-			}
-		</cfscript>		
-		<cfreturn aPages>
+		<cfreturn variables.aPages>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -114,7 +184,6 @@
 		<cfargument name="newPageHREF" type="string" required="true" hint="The new location of the page.">
 		<cfscript>
 			var i = 1;
-			var aPages = 0;
 			var tmpTitle = "";
 			var xmlPageDoc = 0;
 			var bFoundOnSite = false;
@@ -131,57 +200,15 @@
 			}
 			
 			// rename the page
-			aPages = variables.xmlDoc.xmlRoot.pages.xmlChildren;
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-				if(aPages[i].xmlAttributes.href eq getFileFromPath(arguments.pageHREF)) {
-					aPages[i].xmlAttributes["href"] = getFileFromPath(arguments.newPageHREF);
-					aPages[i].xmlAttributes["title"] = tmpTitle;
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+				if(variables.aPages[i].href eq getFileFromPath(arguments.pageHREF)) {
+					variables.aPages[i].href = getFileFromPath(arguments.newPageHREF);
+					variables.aPages[i].title = tmpTitle;
 					bFoundOnSite = true;
 					break;
 				}
 			}
 			if(Not bFoundOnSite) throw("The page [#arguments.pageHREF#] does not exist on this site.");
-			save();
-		</cfscript>
-	</cffunction>
-
-
-	<!---------------------------------------->
-	<!--- setPageNavStatus		           --->
-	<!---------------------------------------->	
-	<cffunction name="setPageNavStatus" access="public" output="false" returntype="void">
-		<cfargument name="pageHREF" type="string" required="true" hint="The page to set whether it should appear on the nave map or not">
-		<cfargument name="showInNav" type="boolean" required="true" hint="If true, then page shows in the nav bar.">
-		<cfscript>
-			var i = 1;
-			var aPages = 0;
-			
-			aPages = variables.xmlDoc.xmlRoot.pages.xmlChildren;
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-				if(aPages[i].xmlAttributes.href eq arguments.pageHREF) {
-					aPages[i].xmlAttributes["showInNav"] = arguments.showInNav;
-				}
-			}
-			save();
-		</cfscript>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- setPagePrivacyStatus	           --->
-	<!---------------------------------------->	
-	<cffunction name="setPagePrivacyStatus" access="public" output="false" returntype="void">
-		<cfargument name="pageHREF" type="string" required="true" hint="The page to set its private status">
-		<cfargument name="isPrivate" type="boolean" required="true" hint="private flag.">
-		<cfscript>
-			var i = 1;
-			var aPages = 0;
-			
-			aPages = variables.xmlDoc.xmlRoot.pages.xmlChildren;
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-				if(aPages[i].xmlAttributes.href eq arguments.pageHREF) {
-					aPages[i].xmlAttributes["private"] = arguments.isPrivate;
-				}
-			}
 			save();
 		</cfscript>
 	</cffunction>
@@ -194,11 +221,8 @@
 		<cfargument name="pageHREF" type="string" required="true" hint="The page to set as default">
 		<cfscript>
 			var i = 1;
-			var aPages = 0;
-			
-			aPages = variables.xmlDoc.xmlRoot.pages.xmlChildren;
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-				aPages[i].xmlAttributes["default"] = (aPages[i].xmlAttributes.href eq arguments.pageHREF);
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+				variables.aPages[i].default = (variables.aPages[i].href eq arguments.pageHREF);
 			}
 			save();
 		</cfscript>
@@ -214,11 +238,9 @@
 			var targetIndex = 0;
 			var originalIndex = 0;
 			var i = 1;
-			var aPages = 0;
 	
-			aPages = variables.xmlDoc.xmlRoot.pages.xmlChildren;
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-				if(aPages[i].xmlAttributes.href eq arguments.pageHREF) {
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+				if(variables.aPages[i].href eq arguments.pageHREF) {
 					originalIndex = i;
 					break;
 				}
@@ -227,7 +249,7 @@
 			
 			targetIndex = originalIndex - 1;
 			if(targetIndex gt 0) {
-				arraySwap(aPages,originalIndex,targetIndex);
+				arraySwap(variables.aPages,originalIndex,targetIndex);
 				save();
 			} else {
 				throw("Page could not be moved.");
@@ -245,19 +267,17 @@
 			var targetIndex = 0;
 			var originalIndex = 0;
 			var i = 1;
-			var aPages = 0;
 	
-			aPages = variables.xmlDoc.xmlRoot.pages.xmlChildren;
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-				if(aPages[i].xmlAttributes.href eq arguments.pageHREF) {
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+				if(variables.aPages[i].xmlAttributes.href eq arguments.pageHREF) {
 					originalIndex = i;
 					break;
 				}
 			}
 			
 			targetIndex = originalIndex + 1;
-			if(targetIndex lte arrayLen(aPages)) {
-				arraySwap(aPages,originalIndex,targetIndex);
+			if(targetIndex lte arrayLen(variables.aPages)) {
+				arraySwap(variables.aPages,originalIndex,targetIndex);
 				save();
 			} else {
 				throw("Page could not be moved.");
@@ -274,17 +294,16 @@
 
 		<cfscript>
 			var tmpPageURL = "";
-			var aPages = variables.xmlDoc.site.pages.xmlChildren;
 			var oAccountsConfigBean = variables.accounts.getConfig();
 			var accountsRoot = oAccountsConfigBean.getAccountsRoot();
 
 			// check that user has at least one other page
-			if(ArrayLen(aPages) eq 1)
+			if(ArrayLen(variables.aPages) eq 1)
 				throw("You cannot delete all pages in a site. A site must have at least one page.");
 				
 			// get page url
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-				if(aPages[i].xmlAttributes.href eq arguments.pageHREF) {
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+				if(variables.aPages[i].href eq arguments.pageHREF) {
 					tmpPageURL = accountsRoot & "/" & variables.owner & "/layouts/" & arguments.pageHREF;
 					break;
 				}
@@ -299,9 +318,10 @@
 	
 			<cfscript>
 				// delete from site
-				for(i=1;i lte ArrayLen(aPages);i=i+1) {
-					if(aPages[i].xmlAttributes.href eq arguments.pageHREF)
-						ArrayDeleteAt(aPages,i);
+				for(i=1;i lte ArrayLen(variables.aPages);i=i+1) {
+					if(variables.aPages[i].href eq arguments.pageHREF) {
+						ArrayDeleteAt(variables.aPages,i);
+					}
 				}
 				
 				// save site
@@ -394,8 +414,8 @@
 			bFound = true;
 			while(bFound) {
 				bFound = false;
-				for(i=1;i lte arrayLen(xmlSite.xmlRoot.pages.xmlChildren);i=i+1) {
-					thisPageHREF = xmlSite.xmlRoot.pages.xmlChildren[i].xmlAttributes.href; 
+				for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+					thisPageHREF = variables.aPages[i].href; 
 					if(replaceNoCase(thisPageHREF,".xml","") eq pName) {
 						currIndex = currIndex + 1;
 						pName = originalName & currIndex;
@@ -421,10 +441,11 @@
 			saveXML(newPageURL, xmlPage);
 
 			// append new page name to site definition
-			newNode = xmlElemNew(xmlSite,"page");
-			newNode.xmlAttributes["title"] = Replace(pname,".xml","");
-			newNode.xmlAttributes["href"] = pname;
-			ArrayAppend(xmlSite.site.pages.xmlChildren, newNode);
+			newNode = structNew();
+			newNode.title = Replace(pname,".xml","");
+			newNode.href = pname;
+			newNode.default = false;
+			ArrayAppend(variables.aPages, newNode);
 			
 			// save changes to site
 			save();
@@ -438,12 +459,15 @@
 	<!--- P R I V A T E     M E T H O D S  --->
 	<!---------------------------------------->	
 	<cffunction name="save" access="private" hint="Saves the site xml">
+		<!--- get page in xml format --->
+		<cfset var xmlDoc = toXML()>
+	
 		<!--- check that is a valid xml file --->
-		<cfif Not IsXML(variables.xmlDoc)>
+		<cfif Not IsXML(xmlDoc)>
 			<cfset throw("The given site doc is not a valid XML document.")>
 		</cfif>		
 		<!--- store page --->
-		<cffile action="write" file="#expandpath(variables.siteURL)#" output="#toString(variables.xmlDoc)#">
+		<cffile action="write" file="#expandpath(variables.siteURL)#" output="#toString(xmlDoc)#">
 	</cffunction>
 
 	<cffunction name="saveXML" access="private" hint="Saves any xml file">
