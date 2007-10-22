@@ -13,8 +13,10 @@
 		variables.memCacheSize = 50;
 		
 		// time to live in minutes for content store docs cached in memory
-		// (set it to a large number because we control the only access)
-		variables.memCacheTTL = 9999;
+		variables.memCacheTTL = 30;
+		
+		// name of the lock to use when accessing the memory cache service
+		variables.lockName = "hp_contentStore_cache";
 	</cfscript>
 		
 	<!---------------------------------------->
@@ -152,7 +154,9 @@
 				output="#toString(variables.xmlDoc)#">
 				
 		<!--- invalidate cache entry (if exists) --->		
-		<cfset application[variables.cacheServiceName].flush(hash(tmpURL))>
+        <cflock type="exclusive" name="#variables.lockName#" timeout="30">
+			<cfset application[variables.cacheServiceName].flush(hash(tmpURL))>
+        </cflock>
 	</cffunction>
 
 	<!-------------------------------------->
@@ -174,7 +178,7 @@
 				variables.xmlDoc = xmlParse(ExpandPath(tmpURL));
 				
 				// store file in cache
-				oCacheService.store(memCacheKey, variables.xmlDoc);
+				storeInCache(memCacheKey, variables.xmlDoc);
 			}
 
 			// if the storage file has already an owner, then set the current owner to the one on the storage
@@ -197,13 +201,25 @@
 		</cfscript>
 	</cffunction>
 
+
 	<cffunction name="initCacheService" access="private" returntype="void">
 		<cfset var oCacheService = createObject("component","cacheService").init(variables.memCacheSize, variables.memCacheTTL)>
-		<cflock scope="Application" type="exclusive" timeout="20">
+		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
 			<cfset application[variables.cacheServiceName]= oCacheService>
 		</cflock>
 	</cffunction>
-
+    
+	<cffunction name="storeInCache" access="private" returntype="void">
+    	<cfargument name="key" type="string" required="yes">
+        <cfargument name="xmlDoc" type="xml" required="yes">
+        
+    	<cfset var oCacheService = application[variables.cacheServiceName]>
+        
+		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
+			<cfset oCacheService.store(arguments.key, arguments.xmlDoc)>
+		</cflock>
+    </cffunction>
+ 
 	<!---------------------------------------->
 	<!--- throw                            --->
 	<!---------------------------------------->
