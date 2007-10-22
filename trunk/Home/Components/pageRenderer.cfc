@@ -336,7 +336,8 @@
 			var xmlThisNode = 0;
 			var tmrStart = getTickCount();
 			var isHTTPS = (structKeyExists(cgi,"HTTPS") and cgi.https eq "ON");
-		
+			var item = "";
+			
 			var aScriptResources = variables.oHomePortalsConfigBean.getBaseResourcesByType("script");
 			var aStyleResources = variables.oHomePortalsConfigBean.getBaseResourcesByType("style");
 			var lstLayoutSections = variables.oHomePortalsConfigBean.getLayoutSections();
@@ -441,7 +442,12 @@
 						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
 							if(xmlNode.xmlChildren[j].xmlName eq "module") {
 								xmlThisNode = xmlNode.xmlChildren[j];
-								args = duplicate(xmlThisNode.xmlAttributes);
+
+								// copy all attributes from the node into another struct
+								// (modified for Railo2 compatibility)
+								for(item in xmlThisNode.xmlAttributes) {
+									args[item] = xmlThisNode.xmlAttributes[item];
+								}
 								
 								// validate module attributes
 								if(Not structKeyExists(args, "name")) args.name = "";
@@ -532,7 +538,7 @@
 				if(variables.stPage.page.basePath neq "")
 					moduleName = variables.stPage.page.basePath & moduleName;
 				else
-					moduleName = variables.oHomePortalsConfigBean.getResourceLibraryPath() & "/modules/" & moduleName;
+					moduleName = variables.oHomePortalsConfigBean.getResourceLibraryPath() & "/Modules/" & moduleName;
 
 				// convert the moduleName into a dot notation path
 				moduleName = replace(moduleName,"/",".","ALL");
@@ -629,9 +635,8 @@
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_STYLE$", arguments.moduleNode.style, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", getpageBuffer("_htmlModule", moduleID),  "ALL");	
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
-	
-			return renderTemplateBody;
 		</cfscript>
+		<cfreturn renderTemplateBody>
 	</cffunction>
 
 	
