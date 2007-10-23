@@ -135,54 +135,50 @@
 
 		<cfscript>
 			var oResourceBean = arguments.moduleResourceBean;
-			var tmpNode = 0;
-			var nodeIndex = 0;
-			var aNodeID = 0;
-			var moduleID = oResourceBean.getID();
-			var newModuleID = 0;
-			var aAttr = 0;
-			var i = 0;
-			var thisAttr = 0;
-			var def = 0;
-			var aRes = 0;
-			var thisRes = 0;
-			var aCHK = 0;
-			var moduleindex = 0;
+			var stModule = structNew();
+			var moduleID = "";
+			var aModules = arrayNew(1);
+			var moduleName = "";
 			var keepLooping = true;
+			var moduleIndex = 1;
+			var st = structNew();
 			var aTemp = arrayNew(1);
+			var i = 0;
+			var thisAttr = "";
+			var def = "";
 			
-			// insert new node in document
-			tmpNode = variables.xmlDoc.Page.modules;
-			nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
-			tmpNode.xmlChildren[nodeIndex] = xmlElemNew(variables.xmlDoc,"module");				
+			// define a unique id for the new module based on the module name
+			moduleName =  oResourceBean.getName();
+			moduleID =  oResourceBean.getName();
+			aModules = variables.oPageBean.getModules();
 			
-			// create an id for the new module based on the resource id 
-			aNodeID = xmlSearch(xmlDoc,"//module[@name='" & oResourceBean.getName() & "']");
-			
-			moduleIndex = ArrayLen(aNodeID)+1;
-			keepLooping = true;
 			while(keepLooping) {
-				aTemp = xmlSearch(xmlDoc,"//module[@id='#moduleID##moduleIndex#']");
-				if(arrayLen(aTemp) eq 0) {
-					newModuleID = moduleID & moduleIndex;
+				try {
+					moduleID = moduleName & moduleIndex;
+					st = variables.oPageBean.getModule(moduleID);
+					moduleIndex = moduleIndex + 1;
+					keepLooping = true;
+				
+				} catch(homePortals.pageBean.moduleNotFound e) {
 					keepLooping = false;
 				}
-				moduleIndex = moduleIndex + 1;
 			}
-			
+
+
 			// if no location is given, then add the module to the first location
 			if(arguments.locationID eq "") {
-				qryLocations = getLocations();
-				if(qryLocations.recordCount gt 0) {
-					arguments.locationID = qryLocations.name;
+				aTemp = variables.oPageBean.getLayoutRegions();
+				if(arrayLen(aTemp) gt 0) {
+					arguments.locationID = aTemp[1].name;
 				}
 			}
-			
-			// add common properties
-			tmpNode.xmlChildren[nodeIndex].xmlAttributes["id"] = newModuleID;
-			tmpNode.xmlChildren[nodeIndex].xmlAttributes["location"] = arguments.locationID;
-			tmpNode.xmlChildren[nodeIndex].xmlAttributes["name"] = oResourceBean.getName();
-			tmpNode.xmlChildren[nodeIndex].xmlAttributes["title"] = newModuleID;
+
+
+			// add basic properties to module
+			stModule["id"] = moduleID;
+			stModule["location"] = arguments.locationID;
+			stModule["name"] = oResourceBean.getName();
+			stModule["title"] = moduleID;
 			
 			// add default properties from resourceBean
 			aTemp = oResourceBean.getAttributes();
@@ -190,67 +186,40 @@
 				thisAttr = aTemp[i]; 
 				def = "";
 				if(structKeyExists(thisAttr, "default")) def = thisAttr.default;
-				tmpNode.xmlChildren[nodeIndex].xmlAttributes[thisAttr.name] = def;
+				stModule[thisAttr.name] = def;
 			}
 			
 			// add custom properties 
 			for(attr in arguments.customAttributes) {
-				tmpNode.xmlChildren[nodeIndex].xmlAttributes[attr] = arguments.customAttributes[attr];
+				stModule[attr] = arguments.customAttributes[attr];
 			}
-			
-			
-			
-			// add resources
+
+			// add module to page
+			variables.oPageBean.addModule(moduleID, stModule);
+
+
+			// add resources used by this module
 			aTemp = oResourceBean.getResources();
 			for(i=1; i lte ArrayLen(aTemp); i=i+1) {
-				thisRes = aTemp[i]; 
-				if(thisRes.type eq "script") {
-					aChk = XMLSearch(variables.xmlDoc,"/Page/script[@src='#thisRes.href#']");
-					if(ArrayLen(aChk) eq 0) {
-						// add script resource
-						tmpNode = variables.xmlDoc.Page;
-						nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
-						tmpNode.xmlChildren[nodeIndex] = xmlElemNew(xmlDoc,"script");
-						tmpNode.xmlChildren[nodeIndex].xmlAttributes["src"] = thisRes.href;
-					}
-				}
+				if(aTemp[i].type eq "script") 	variables.oPageBean.addScript(aTemp[i].href);
+				if(aTemp[i].type eq "stylesheet") 	variables.oPageBean.addStylesheet(aTemp[i].href);
+			}
 
-				if(thisRes.type eq "stylesheet") {
-					aChk = XMLSearch(xmlDoc,"/Page/stylesheet[@href='#thisRes.href#']");
-					if(ArrayLen(aChk) eq 0) {
-						// add stylesheet resource
-						tmpNode = variables.xmlDoc.Page;
-						nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
-						tmpNode.xmlChildren[nodeIndex] = xmlElemNew(xmlDoc,"stylesheet");
-						tmpNode.xmlChildren[nodeIndex].xmlAttributes["href"] = thisRes.href;
-					}
-				}
+
+			// add event handlers for this moudule
+			aTemp = oResourceBean.getEventListeners();
+			for(i=1; i lte ArrayLen(aTemp); i=i+1) {
+				variables.oPageBean.addEventListener(aTemp[i].objectName,
+													aTemp[i].eventName,
+													ReplaceNoCase(aTemp[i].eventHandler,"$ID$",moduleID)
+													);
 			}
-			
-			// add event handlers
-			aEvs = oResourceBean.getEventListeners();
-			for(i=1; i lte ArrayLen(aEvs); i=i+1) {
-				thisEv = aEvs[i]; 
-				aChk = XMLSearch(variables.xmlDoc,"/Page/eventListeners");
-				// add eventlisteners section (in case it doesnt exist)
-				if(ArrayLen(aChk) eq 0) {
-					tmpNode = variables.xmlDoc.Page;
-					nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
-					tmpNode.xmlChildren[nodeIndex] = xmlElemNew(xmlDoc,"eventListeners");
-				}
-				
-				// add event listener
-				tmpNode = variables.xmlDoc.Page.eventListeners;
-				nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
-				tmpNode.xmlChildren[nodeIndex] = xmlElemNew(xmlDoc,"event");
-				tmpNode.xmlChildren[nodeIndex].xmlAttributes["eventHandler"] = ReplaceNoCase(thisEv.eventHandler,"$ID$",newModuleID);
-				tmpNode.xmlChildren[nodeIndex].xmlAttributes["eventName"] = thisEv.eventName;
-				tmpNode.xmlChildren[nodeIndex].xmlAttributes["objectName"] = thisEv.objectName;
-			}
-			
+
+
+			// save page			
 			if(variables.autoSave) save();				
 		</cfscript>
-		<cfreturn newModuleID>
+		<cfreturn moduleID>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -260,31 +229,8 @@
 				hint="Saves changes to module properties on a page module">
 		<cfargument name="moduleID" type="string" required="true">
 		<cfargument name="moduleAttributes" type="struct" required="false">
-
 		<cfscript>
-			var _attribs = arguments.moduleAttributes;
-			var i = 0;
-			var aNodes = 0;
-			var fld = "";
-			var tmpNode = 0;
-			var nodeIndex = 0;
-			
-			// update selected node
-			aNodes = xmlSearch(variables.xmlDoc,"//modules/module[@id='#arguments.moduleID#']");
-			
-			// if node found, then this is an update, else insert node
-			if(ArrayLen(aNodes) gt 0) {
-				for(fld in _attribs) {
-					aNodes[1].xmlAttributes[fld] = _attribs[fld];
-				}
-			} else {
-				tmpNode = xmlElemNew(variables.xmlDoc,"module");
-				for(fld in _attribs) {
-					tmpNode.xmlAttributes[fld] = _attribs[fld];
-				}
-				ArrayAppend(variables.xmlDoc.Page.modules.xmlChildren, tmpNode);				
-			}
-			
+			variables.oPageBean.setModule(arguments.moduleID, arguments.moduleAttributes);
 			if(variables.autoSave) save();	
 		</cfscript>
 	</cffunction>
@@ -296,26 +242,7 @@
 				hint="Removes a module from the page">
 		<cfargument name="moduleID" type="string" required="true">
 		<cfscript>
-			var aNodes = 0;
-			var i = 0;
-			
-			// delete the module from the page
-			aNodes = variables.xmlDoc.Page.modules.xmlChildren;
-			for(i=1;i lte ArrayLen(aNodes);i=i+1) {
-				if(aNodes[i].xmlAttributes.id eq arguments.moduleID)
-					ArrayDeleteAt(aNodes, i);
-			}
-			
-			// delete eventhandlers that refer to the instance of the module
-			if(structKeyExists(xmlDoc.Page, "eventListeners")) {
-				aNodes = variables.xmlDoc.Page.eventListeners.xmlChildren;
-				for(i=1;i lte ArrayLen(aNodes);i=i+1) {
-					if(findNoCase(arguments.moduleID & ".", aNodes[i].xmlAttributes.eventHandler) ) {
-						ArrayDeleteAt(aNodes, i);
-					}
-				}
-			} 
-			
+			variables.oPageBean.removeModule(arguments.moduleID);
 			if(variables.autoSave) save();	
 		</cfscript>
 	</cffunction>
@@ -327,29 +254,22 @@
 				hint="Changes the order in which modules appear on the page">
 		<cfargument name="layout" type="string" required="true" hint="New layout in serialized form">
 		<cfscript>
-			var xmlOriginalDoc = 0;
 			var aLocations = 0;
 			var i = 0;
 			var thisLocation = 0;
 			var lstModules = 0;
-			var aModules = 0;
+			var aModules = arrayNew(1);
+			var aNewModules = arrayNew(1);
+			var stModule = structNew();
 			var j = 0;
-			var tmpModuleNode = 0;
-			var xmlNewModuleNode = 0;
-			var stAttributes = 0;
-			var attr = 0;
 			
-			
-			// make copy of page
-			xmlOriginalDoc = duplicate(variables.xmlDoc);
-
-			// clear all modules from page
-			arrayClear(variables.xmlDoc.xmlRoot.modules.xmlChildren);
+			// in this array we will put the modules in the new order
+			aNewModules = arrayNew(1);
 
 			// get all locations into an array
 			aLocations = listToArray(arguments.layout,":");
 			
-			// append modules to new page in the new order
+			// arrange all modules into the new array in the desired order
 			for(i=1;i lte arrayLen(aLocations);i=i+1) {
 				if(listLen(aLocations[i],"|") gt 1) {
 					thisLocation = ListGetAt(aLocations[i],1,"|");
@@ -357,25 +277,24 @@
 					aModules = listToArray(lstModules);
 				
 					for(j=1;j lte arrayLen(aModules);j=j+1) {
-						
 						// find module node in original page
-						tmpModuleNode = xmlSearch(xmlOriginalDoc,"//modules/module[@id='#aModules[j]#']");
-
-						// create new module node
-						xmlNewModuleNode = xmlElemNew(variables.xmlDoc,"module");
-
-						if(arrayLen(tmpModuleNode) gt 0) {
-							stAttributes = tmpModuleNode[1].xmlAttributes;
-							for(attr in stAttributes) {
-								xmlNewModuleNode.xmlAttributes[attr] = stAttributes[attr];
-							}
-							xmlNewModuleNode.xmlAttributes["location"] = '#thisLocation#';
-							
-							// append new module
-							arrayAppend(variables.xmlDoc.xmlRoot.modules.xmlChildren, xmlNewModuleNode);
-						}
+						stModule = variables.oPageBean.getModule(aModules[j]);
+						
+						// update location in module
+						stModule["location"] = thisLocation;
+						
+						// add module to new modules array
+						arrayAppend(aNewModules, stModule);
 					}
 				}
+			}
+			
+			// clear all modules from page
+			variables.oPageBean.removeAllModules();
+
+			// attach all modules again in the new order
+			for(i=1;i lte arrayLen(aNewModules);i=i+1) {
+				variables.oPageBean.addModule(aNewModules[i].id, aNewModules[i]);
 			}
 
 			// save page
@@ -402,16 +321,12 @@
 		<cfargument name="index" type="numeric" required="true">
 		<cfargument name="value" type="string" required="true">
 		<cfscript>
-			var aNodes = xmlSearch(variables.xmlDoc,"//stylesheet");
-			var tmpNode = variables.xmlDoc.Page;
+			var aStylesheets = variables.oPageBean.getStylesheets();
 					
-			if(ArrayLen(aNodes) gt 0 and arguments.index gt 0) {
-				aNodes[arguments.index].xmlAttributes["href"] = arguments.value;
-			} else {			
-				nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
-				tmpNode.xmlChildren[nodeIndex] = xmlElemNew(xmlDoc, "stylesheet");
-				tmpNode.xmlChildren[nodeIndex].xmlAttributes["href"] = arguments.value;
+			if(arguments.index gt 0) {
+				variables.oPageBean.removeStylesheet(aStylesheets[arguments.index]);
 			}
+			variables.oPageBean.addStylesheet(arguments.value);
 			
 			if(variables.autoSave) save();	
 		</cfscript>
@@ -424,9 +339,9 @@
 				hint="Removes a stylesheet resource from the page">
 		<cfargument name="index" type="numeric" required="true">
 		<cfscript>
-			var aNodes = xmlSearch(variables.xmlDoc,"//stylesheet");
-			if(arrayLen(aNodes) gte arguments.index) {
-				ArrayDeleteAt(aNodes, arguments.index);
+			var aStylesheets = variables.oPageBean.getStylesheets();
+			if(arrayLen(aStylesheets) gte arguments.index) {
+				variables.oPageBean.removeStylesheet(aStylesheets[arguments.index]);
 				if(variables.autoSave) save();	
 			}
 		</cfscript>
@@ -451,16 +366,12 @@
 		<cfargument name="index" type="numeric" required="true">
 		<cfargument name="value" type="string" required="true">
 		<cfscript>
-			var aNodes = xmlSearch(variables.xmlDoc,"//script");
-			var tmpNode = variables.xmlDoc.Page;
+			var aScripts = variables.oPageBean.getScripts();
 					
-			if(ArrayLen(aNodes) gt 0 and arguments.index gt 0) {
-				aNodes[arguments.index].xmlAttributes["src"] = arguments.value;
-			} else {			
-				nodeIndex = ArrayLen(tmpNode.xmlChildren)+1;
-				tmpNode.xmlChildren[nodeIndex] = xmlElemNew(xmlDoc, "script");
-				tmpNode.xmlChildren[nodeIndex].xmlAttributes["src"] = arguments.value;
+			if(arguments.index gt 0) {
+				variables.oPageBean.removeScript(aScripts[arguments.index]);
 			}
+			variables.oPageBean.addScript(arguments.value);
 			
 			if(variables.autoSave) save();	
 		</cfscript>
@@ -473,10 +384,10 @@
 				hint="Removes a script resource from the page">
 		<cfargument name="index" type="numeric" required="true">
 		<cfscript>
-			var aNodes = xmlSearch(variables.xmlDoc,"//script");
-			if(arrayLen(aNodes) gte arguments.index) {
-				ArrayDeleteAt(aNodes, arguments.index);
-				if(variables.autoSave) save();		
+			var aScripts = variables.oPageBean.getScripts();
+			if(arrayLen(aScripts) gte arguments.index) {
+				variables.oPageBean.removeScript(aScripts[arguments.index]);
+				if(variables.autoSave) save();	
 			}
 		</cfscript>
 	</cffunction>
@@ -487,7 +398,7 @@
 	<!--- getEventHandlers		           --->
 	<!---------------------------------------->	
 	<cffunction name="getEventHandlers" access="public" returntype="query" output="False"
-				hint="Returns all page event handlers">
+				hint="Returns all page event listeners">
 		<cfscript>
 			var aNodes = 0;
 			var qry = queryNew("objectName,eventName,eventHandler");
@@ -496,12 +407,9 @@
 			aNodes = variables.oPageBean.getEventListeners();
 			for(i=1;i lte arrayLen(aNodes);i=i+1) {
 				queryAddRow(qry);
-				if(structKeyExists(aNodes[i],"objectName"))
-					querySetCell(qry,"objectName",aNodes[i].objectName);
-				if(structKeyExists(aNodes[i],"eventName"))
-					querySetCell(qry,"eventName",aNodes[i].eventName);
-				if(structKeyExists(aNodes[i],"eventHandler"))
-					querySetCell(qry,"eventHandler",aNodes[i].eventHandler);
+				querySetCell(qry,"objectName",aNodes[i].objectName);
+				querySetCell(qry,"eventName",aNodes[i].eventName);
+				querySetCell(qry,"eventHandler",aNodes[i].eventHandler);
 			}
 		</cfscript>
 		<cfreturn qry>
@@ -517,22 +425,20 @@
 		<cfargument name="eventName" type="string" required="true">
 		<cfargument name="eventHandler" type="string" required="true">
 		<cfscript>
-			var aNodes = xmlSearch(variables.xmlDoc,"//eventListeners/event");
-			var tmpNode = variables.xmlDoc.Page;
-			var tmpNewNode = 0;
+			aNodes = variables.oPageBean.getEventListeners();
+
+			// remove existing event listener
+			if(arguments.index gt 0 and arrayLen(aNodes) gte arguments.index) {
+				variables.oPageBean.removeEventListener(aNodes[i].objectName, 
+														aNodes[i].eventName, 
+														aNodes[i].eventHandler);
+			}	
+				
+			// insert event listener	
+			variables.oPageBean.addEventListener(arguments.objectName, 
+												arguments.eventName, 
+												arguments.eventHandler);
 					
-			if(ArrayLen(aNodes) gt 0 and arguments.index gt 0) {
-				aNodes[arguments.index].xmlAttributes["objectName"] = arguments.objectName;
-				aNodes[arguments.index].xmlAttributes["eventName"] = arguments.eventName;
-				aNodes[arguments.index].xmlAttributes["eventHandler"] = arguments.eventHandler;
-			} else {		
-				tmpNewNode = xmlElemNew(variables.xmlDoc,"event");
-				tmpNewNode.xmlAttributes["objectName"] = arguments.objectName;
-				tmpNewNode.xmlAttributes["eventName"] = arguments.eventName;
-				tmpNewNode.xmlAttributes["eventHandler"] = arguments.eventHandler;
-				ArrayAppend(variables.xmlDoc.xmlRoot.eventListeners.xmlChildren, tmpNewNode);
-			}
-			
 			if(variables.autoSave) save();	
 		</cfscript>
 	</cffunction>
@@ -544,11 +450,15 @@
 				hint="Removes a page event handler from the page">
 		<cfargument name="index" type="numeric" required="true">
 		<cfscript>
-			var aNodes = xmlSearch(variables.xmlDoc,"//eventListeners/event");
+			aNodes = variables.oPageBean.getEventListeners();
+			
 			if(arrayLen(aNodes) gte arguments.index) {
-				ArrayDeleteAt(variables.xmlDoc.xmlRoot.eventListeners.xmlChildren, arguments.index);
-				if(variables.autoSave) save();	
-			}
+				variables.oPageBean.removeEventListener(aNodes[arguments.index].objectName, 
+														aNodes[arguments.index].eventName, 
+														aNodes[arguments.index].eventHandler);
+			}	
+			
+			if(variables.autoSave) save();	
 		</cfscript>
 	</cffunction>
 
@@ -593,18 +503,19 @@
 		<cfargument name="locationType" type="string" required="true">
 		<cfscript>
 			var aNodes = 0;
-			var qry = queryNew("name,type,class");
+			var qry = queryNew("name,type,class,style,id");
 			var i = 0;
 
-			aNodes = xmlSearch(variables.xmlDoc,"//layout/location[@type='#arguments.locationType#']");
+			aNodes = variables.oPageBean.getLayoutRegions();
 			for(i=1;i lte arrayLen(aNodes);i=i+1) {
-				queryAddRow(qry);
-				if(structKeyExists(aNodes[i].xmlAttributes,"name"))
-					querySetCell(qry,"name",aNodes[i].xmlAttributes.name);
-				if(structKeyExists(aNodes[i].xmlAttributes,"type"))
-					querySetCell(qry,"type",aNodes[i].xmlAttributes.type);
-				if(structKeyExists(aNodes[i].xmlAttributes,"class"))
-					querySetCell(qry,"class",aNodes[i].xmlAttributes.class);
+				if(aNodes[i].type eq arguments.locationType) {
+					queryAddRow(qry);
+					querySetCell(qry,"name",aNodes[i].name);
+					querySetCell(qry,"type",aNodes[i].type);
+					querySetCell(qry,"class",aNodes[i].class);
+					querySetCell(qry,"style",aNodes[i].style);
+					querySetCell(qry,"id",aNodes[i].id);
+				}
 			}
 		</cfscript>
 		<cfreturn qry>
@@ -617,37 +528,8 @@
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="class" type="string" required="false" default="">
-
 		<cfscript>
-			var lstLocationTypes = "";
-			var aNodes = 0;
-			var i = 0;
-			var xmlNode = 0;
-
-			// validate type
-			lstLocationTypes = arrayToList(getLocationTypes());
-			if(Not ListFindNoCase(lstLocationTypes, arguments.type)) throw("Invalid location type. Allowed values are: #lstLocationTypes#");
-			
-			// validate name
-			if(arguments.name eq "") throw("Location name cannot be empty");
-			
-			// search location nodes to see if that node already exists
-			aNodes = xmlSearch(variables.xmlDoc,"//layout/location[@name='#arguments.name#']");
-			if(arrayLen(aNodes) gt 0) throw("A location with that name already exists");
-			
-			// make sure the layout section exists
-			if(Not StructKeyExists(variables.xmlDoc.xmlRoot,"layout")) {
-				xmlNode = xmlElemNew(variables.xmlDoc,"layout");
-				arrayAppend(variables.xmlDoc.xmlRoot.xmlChildren, xmlNode);
-			}
-			
-			// build and append the new location node
-			xmlNode = xmlElemNew(variables.xmlDoc,"location");
-			xmlNode.xmlAttributes["name"] = arguments.name;
-			xmlNode.xmlAttributes["type"] = arguments.type;
-			if(arguments.class neq "") xmlNode.xmlAttributes["class"] = arguments.class;
-			arrayAppend(variables.xmlDoc.xmlRoot.layout.xmlChildren, xmlNode);
-			
+			variables.oPageBean.addLayoutRegion(arguments.name, arguments.type, arguments.class);
 			if(variables.autoSave) save();			
 		</cfscript>
 	</cffunction>
@@ -668,25 +550,14 @@
 			var bFound = false;
 			var xmlNode = 0;
 
-			// validate type
-			lstLocationTypes = arrayToList(getLocationTypes());
-			if(Not ListFindNoCase(lstLocationTypes, arguments.type)) throw("Invalid location type. Allowed values are: #lstLocationTypes#");
-			
-			// validate name
-			if(arguments.name eq "") throw("Location name cannot be empty");
-			
-			// search location nodes to see if we are updating a node
-			aNodes = xmlSearch(variables.xmlDoc,"//layout/location[@name='#arguments.name#']");
-			if(arrayLen(aNodes) eq 0) throw("Location not found.");
-			
-			// update node
-			aNodes[1].xmlAttributes["name"] = arguments.newName;
-			aNodes[1].xmlAttributes["type"] = arguments.type;
-			if(arguments.class neq "") 
-				aNodes[1].xmlAttributes["class"] = arguments.class;
-			else
-				structDelete(aNodes[1].xmlAttributes, "class", false);
-			
+			if(arguments.newName eq "" and arguments.name neq "") arguments.newName = arguments.name;
+
+			// remove layout region
+			removeLayoutRegion(arguments.name);
+
+			// add new region
+			variables.oPageBean.addLayoutRegion(arguments.newName, arguments.type, arguments.class);
+
 			// if the location name has changed, then update
 			// all of the modules on this location
 			if(arguments.newName neq arguments.name) {
@@ -694,7 +565,7 @@
 				for(i=1;i lte arrayLen(aModules);i=i+1) {
 					stModule = aModules[i];
 					stModule.location = arguments.newName;
-					saveModule(stModule.ID, stModule);
+					variables.oPageBean.setModule(stModule.ID, stModule);
 				}
 			}
 			
@@ -708,32 +579,8 @@
 	<cffunction name="deleteLocation" access="public" output="false">
 		<cfargument name="name" type="string" required="true">
 		<cfscript>
-			var aNodes = 0;
-			var i = 0;
-			
-			aNodes = variables.xmlDoc.xmlRoot.layout.xmlChildren;
-			for(i=1;i lte ArrayLen(aNodes);i=i+1) {
-				if(aNodes[i].xmlAttributes.name eq arguments.name) {
-					// node found, now we need to move any modules
-					// on this section to another section
-					aModules = getModulesByLocation(arguments.name);
-					qryLocations = getLocations();
-					if(qryLocations.recordCount gt 0) {
-						for(j=1;j lte arrayLen(aModules);j=j+1) {
-							stModule = aModules[j];
-							stModule.location = qryLocations.name[1];
-							saveModule(stModule.ID, stModule);
-						}
-					}
-					
-					// delete layout node
-					arrayDeleteAt(aNodes,i);
-					
-					// save document
-					if(variables.autoSave) save();	
-					break;
-				}
-			}
+			variables.oPageBean.removeLayoutRegion(arguments.newName);
+			if(variables.autoSave) save();	
 		</cfscript>
 	</cffunction>
 
@@ -743,12 +590,23 @@
     <cffunction name="getLocationByName" access="public" returntype="query" output="False"
                 hint="Returns info about a location">
         <cfargument name="name" type="string" required="true">
-        <cfset var qry = getLocations()>
-        <cfquery name="qry" dbtype="query">
-            SELECT *
-                FROM qry
-                WHERE name = <cfqueryparam value="#arguments.name#" cfsqltype="cf_sql_varchar">
-        </cfquery>
+		<cfscript>
+			var aNodes = 0;
+			var qry = queryNew("name,type,class,style,id");
+			var i = 0;
+
+			aNodes = variables.oPageBean.getLayoutRegions();
+			for(i=1;i lte arrayLen(aNodes);i=i+1) {
+				if(aNodes[i].name eq arguments.name) {
+					queryAddRow(qry);
+					querySetCell(qry,"name",aNodes[i].name);
+					querySetCell(qry,"type",aNodes[i].type);
+					querySetCell(qry,"class",aNodes[i].class);
+					querySetCell(qry,"style",aNodes[i].style);
+					querySetCell(qry,"id",aNodes[i].id);
+				}
+			}
+		</cfscript>
         <cfreturn qry>
     </cffunction>
 	
@@ -782,36 +640,24 @@
 		<cfargument name="skinHREF" default="" type="string">			
 		<cfscript>
 			var localStyleHREF = "";
-			var i=0;
-			var tmpNode = 0;
-			var nodeIndex = 0;
 			var hasLocalStyle = false;
+			var href = variables.oPageBean.getHREF();
 			
 			// local style
-			localStyleHREF = ReplaceNoCase(variables.pageHREF,"/layouts/","/styles/") & ".css";
-			hasLocalStyle = fileExists(expandPath(localStyleHREF));
+			localStyleHREF = ReplaceNoCase(href,"/layouts/","/styles/") & ".css";
+			hasLocalStyle = variables.oPageBean.hasStylesheet(localStyleHREF);
 	
 			// remove all stylesheets
-			for(i=1;i lte ArrayLen(variables.xmlDoc.Page.xmlChildren);i=i+1) {
-				tmpNode = variables.xmlDoc.Page.xmlChildren[i];
-				if(tmpNode.xmlName eq "stylesheet") {
-					ArrayDeleteAt(variables.xmlDoc.Page.xmlChildren,i);
-					i=i-1;
-				}
-			}
-		
+			variables.oPageBean.removeAllStylesheets();
+			
 			// add new stylesheet
 			if(arguments.skinHREF neq "") {
-				nodeIndex = ArrayLen(variables.xmlDoc.Page.xmlChildren)+1;
-				variables.xmlDoc.Page.xmlChildren[nodeIndex] = xmlElemNew(variables.xmlDoc,"stylesheet");
-				variables.xmlDoc.Page.xmlChildren[nodeIndex].xmlAttributes["href"] = arguments.skinHREF;
+				hasLocalStyle = variables.oPageBean.addStylesheet(arguments.skinHREF);
 			}
 			
 			// add local style (if it had any)
 			if(hasLocalStyle) {
-				nodeIndex = ArrayLen(variables.xmlDoc.Page.xmlChildren)+1;
-				variables.xmlDoc.Page.xmlChildren[nodeIndex] = xmlElemNew(variables.xmlDoc,"stylesheet");
-				variables.xmlDoc.Page.xmlChildren[nodeIndex].xmlAttributes["href"] = localStyleHREF;
+				variables.oPageBean.addStylesheet(localStyleHREF);
 			}
 			
 			// save page
@@ -827,74 +673,53 @@
 				hint="Applies a page template. Page templates determine layout, styles, but preserve existing modules.">
 		<cfargument name="pageTemplateHREF" default="" type="string">			
 		<cfscript>
+			var oPageTemplateBean = 0;
 			var localStyleHREF = "";
 			var i=0;
-			var tmpNode = 0;
-			var nodeIndex = 0;
+			var aTemp = arrayNew(1);
 			var hasLocalStyle = false;
-			var xmlPTDoc = 0;
-			var xmlNode = 0;
 			var lstLocations = "";
+			var href = variables.oPageBean.getHREF();
 			
 			// get page template
-			if(Not fileExists(expandPath(arguments.pageTemplateHREF))) throw("The given page template does not exist.");
-			xmlPTDoc = xmlParse(expandPath(arguments.pageTemplateHREF));
-			
+			oPageTemplateBean = createObject("component","pageBean").init(arguments.pageTemplateHREF);
+
 			// local style
-			localStyleHREF = ReplaceNoCase(variables.pageHREF,"/layouts/","/styles/") & ".css";
-			hasLocalStyle = fileExists(expandPath(localStyleHREF));
+			localStyleHREF = ReplaceNoCase(href,"/layouts/","/styles/") & ".css";
+			hasLocalStyle = variables.oPageBean.hasStylesheet(localStyleHREF);
 
-			// remove all stylesheets
-			for(i=1;i lte ArrayLen(variables.xmlDoc.Page.xmlChildren);i=i+1) {
-				tmpNode = variables.xmlDoc.Page.xmlChildren[i];
-				if(tmpNode.xmlName eq "stylesheet") {
-					ArrayDeleteAt(variables.xmlDoc.Page.xmlChildren,i);
-					i=i-1;
-				}
-			}
-
-			// remove all layouts
-			for(i=1;i lte ArrayLen(variables.xmlDoc.Page.layout.xmlChildren);i=i+1) {
-				ArrayDeleteAt(variables.xmlDoc.Page.layout.xmlChildren,i);
-				i=i-1;
-			}
-		
+			// remove all stylesheets and layouts
+			variables.oPageBean.removeAllStylesheets();
+			variables.oPageBean.removeAllLayoutRegions();
+			
 			// add stylesheets from page template
-			for(i=1;i lte ArrayLen(xmlPTDoc.Page.xmlChildren);i=i+1) {
-				tmpNode = xmlPTDoc.Page.xmlChildren[i];
-				if(tmpNode.xmlName eq "stylesheet") {
-					xmlNode = xmlElemNew(variables.xmlDoc,"stylesheet");
-					xmlNode.xmlAttributes["href"] = tmpNode.xmlAttributes["href"];
-					ArrayAppend(variables.xmlDoc.Page.xmlChildren,xmlNode);
+			aTemp = oPageTemplateBean.getStylesheets();
+			for(i=1;i lte arrayLen(aTemp);i=i+1) {
+				variables.oPageBean.addStylesheet(aTemp[i]);
+			}
+			
+			// add locations from page template
+			aTemp = oPageTemplateBean.getLayoutRegions();
+			for(i=1;i lte arrayLen(aTemp);i=i+1) {
+				lstLocations = listAppend(lstLocations, aTemp[i].name);
+				variables.oPageBean.addLayoutRegion(argumentCollection = aTemp[i]);
+			}
+			
+			
+			// if a module location no longer exist, then move the module to the first location 
+			aTemp = variables.oPageBean.getModules();
+			for(i=1;i lte arrayLen(aTemp);i=i+1) {
+				if(not listFind(lstLocations, aTemp[i].location)) {
+					aTemp[i]["location"] = listFirst(lstLocations);
+					variables.oPageBean.setModule(aTemp[i].id, aTemp[i]);
 				}
 			}
-
-			// add locations from page template
-			for(i=1;i lte ArrayLen(xmlPTDoc.Page.layout.xmlChildren);i=i+1) {
-				tmpNode = xmlPTDoc.Page.layout.xmlChildren[i];
-				xmlNode = xmlElemNew(variables.xmlDoc,"location");
-				xmlNode.xmlAttributes["type"] = tmpNode.xmlAttributes["type"];
-				xmlNode.xmlAttributes["name"] = tmpNode.xmlAttributes["name"];
-				xmlNode.xmlAttributes["class"] = tmpNode.xmlAttributes["class"];
-				lstLocations = listAppend(lstLocations, tmpNode.xmlAttributes["name"]);
-				ArrayAppend(variables.xmlDoc.Page.layout.xmlChildren,xmlNode);
-			}
-
-
-			// if the module location doesn't exist, then move the module to the first location 
-			for(i=1;i lte ArrayLen(variables.xmlDoc.Page.modules.xmlChildren);i=i+1) {
-				tmpNode = variables.xmlDoc.Page.modules.xmlChildren[i];
-				if(not listFind(lstLocations, tmpNode.xmlAttributes.location))
-					tmpNode.xmlAttributes.location = listFirst(lstLocations);
-			}
-
+			
 			// add local style (if it had any)
 			if(hasLocalStyle) {
-				nodeIndex = ArrayLen(variables.xmlDoc.Page.xmlChildren)+1;
-				variables.xmlDoc.Page.xmlChildren[nodeIndex] = xmlElemNew(variables.xmlDoc,"stylesheet");
-				variables.xmlDoc.Page.xmlChildren[nodeIndex].xmlAttributes["href"] = localStyleHREF;
+				variables.oPageBean.addStylesheet(localStyleHREF);
 			}
-					
+			
 			// save page
 			if(variables.autoSave) save();	
 		</cfscript>
@@ -913,11 +738,11 @@
 		<cfset var localStyleHREF = "">
 		<cfset var stylesPath = "">
 		<cfset var tmpCSS = "">
-		<cfset var aStyleNode = 0>
+		<cfset var href = variables.oPageBean.getHREF()>
 
 		<!--- compose the name of the local css --->
-		<cfset localStyleHREF = ReplaceNoCase(variables.pageHREF,"/layouts/","/styles/") & ".css">
-		<cfset stylesPath = ReplaceNoCase(localStyleHREF, getFileFromPath(variables.pageHREF) & ".css", "")>
+		<cfset localStyleHREF = ReplaceNoCase(href,"/layouts/","/styles/") & ".css">
+		<cfset stylesPath = ReplaceNoCase(localStyleHREF, getFileFromPath(href) & ".css", "")>
 		
 		<!--- only save the css if it has something in it, otherwise, delete it if exists --->
 		<cfif trim(arguments.content) neq ""> 
@@ -936,13 +761,11 @@
 			<!--- write the css file --->
 			<cffile action="write" file="#expandpath(localStyleHREF)#" output="#tmpCSS#">
 
-			<!--- add the style to the page only if it doesnt exist --->
-			<cfscript>
-				aStyleNode = xmlSearch(variables.xmlDoc,"//stylesheet[@href='#localStyleHREF#']");
-				if(ArrayLen(aStyleNode) eq 0 ) {
-					saveStylesheet(0, localStyleHREF);
-				}
-			</cfscript>
+			<!--- add the style to the page --->
+			<cfset variables.oPageBean.addStylesheet(localStyleHREF)>
+			<cfif variables.autoSave>
+				<cfset save()>
+			</cfif>
 		<cfelse>
 			<!--- if local css exists, then delete it --->
 			<cfif fileExists(expandpath(localStyleHREF))>
@@ -958,9 +781,10 @@
 				hint="Returns the contents of the local stylesheet">
 		<cfset var retVal = "">
 		<cfset var localStyleHREF = "">
+		<cfset var href = variables.oPageBean.getHREF()>
 
 		<!--- compose the name of the local css --->
-		<cfset localStyleHREF = ReplaceNoCase(variables.pageHREF,"/layouts/","/styles/") & ".css">
+		<cfset localStyleHREF = ReplaceNoCase(href,"/layouts/","/styles/") & ".css">
 
 		<cfif fileExists(expandpath(localStyleHREF))>
 			<cffile action="read" file="#expandpath(localStyleHREF)#" variable="retVal">
@@ -999,19 +823,20 @@
 		<cfset var short_name = "">
 		<cfset var full_name = "">
 		<cfset var newPageURL = "">
+		<cfset var href = variables.oPageBean.getHREF()>
 
 		<!--- get the name with and without extension (in case user gave one) --->
 		<cfset short_name = replaceNoCase(arguments.pageName,".xml","")>
 		<cfset full_name = short_name & ".xml">
 
 		<!--- build the full path to the new page --->
-		<cfset newPageURL = replaceNoCase(variables.pageHREF, getFileFromPath(variables.pageHREF), full_name)>
+		<cfset newPageURL = replaceNoCase(href, getFileFromPath(href), full_name)>
 					
 		<!--- rename file --->
-		<cffile action="rename" source="#expandPath(variables.pageHREF)#" destination="#expandPath(newPageURL)#">
+		<cffile action="rename" source="#expandPath(href)#" destination="#expandPath(newPageURL)#">
 
 		<!--- update instance --->
-		<cfset variables.pageHREF = newPageURL>
+		<cfset variables.oPageBean.setHREF(newPageURL)>
 	</cffunction>
 
 
