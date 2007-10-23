@@ -9,7 +9,7 @@
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
 		variables.instance.aEventListeners = ArrayNew(1);
-		variables.instance.stLayouts = StructNew();			// holds properties for layout sections
+		variables.instance.aLayouts = StructNew();			// holds properties for layout sections
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		
@@ -307,26 +307,38 @@
 	<!---------------------------------------->
 	<!--- Stylesheets			           --->
 	<!---------------------------------------->			
-	<cffunction name="getStylesheets" access="public" returntype="array">
+	<cffunction name="getStylesheets" access="public" returntype="array" hint="returns an array with all stylesheets on the page">
 		<cfreturn variables.instance.aStyles>
 	</cffunction>
 
-	<cffunction name="addStylesheet" access="public" returnType="void">
+	<cffunction name="addStylesheet" access="public" returnType="void" hint="adds a stylesheet to the page">
 		<cfargument name="href" type="string" required="true">
-		<cfset arrayAppend(variables.instance.aStyles, arguments.href)>
+		<cfif not hasStylesheet(arguments.href)>
+			<cfset arrayAppend(variables.instance.aStyles, arguments.href)>
+		</cfif>
 	</cffunction>
+
+	<cffunction name="hasStylesheet" access="public" returnType="boolean" hint="checks if the page is already using a given stylesheet">
+		<cfargument name="href" type="string" required="true">
+		<cfloop from="1" to="#arrayLen(variables.instance.aStyles)#" index="i">
+			<cfif variables.instance.aStyles[i] eq arguments.href>
+				<cfreturn true>
+			</cfif>
+		</cfloop>
+		<cfreturn false>
+	</cffunction>	
 	
-	<cffunction name="removeStylesheet" access="public" returnType="void">
+	<cffunction name="removeStylesheet" access="public" returnType="void" hint="removes a stylesheet from the page">
 		<cfargument name="href" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aStyles)#" index="i">
 			<cfif variables.instance.aStyles[i] eq arguments.href>
 				<cfset arrayDeleteAt(variables.instance.aStyles, i)>
-				<cfexit>
+				<cfreturn>
 			</cfif>
 		</cfloop>
 	</cffunction>	
 
-	<cffunction name="removeAllStylesheets" access="public" returnType="void">
+	<cffunction name="removeAllStylesheets" access="public" returnType="void" hint="removes all stylesheets on the page">
 		<cfset variables.instance.aStyles = ArrayNew(1)>
 	</cffunction>
 	
@@ -340,15 +352,27 @@
 
 	<cffunction name="addScript" access="public" returnType="void">
 		<cfargument name="src" type="string" required="true">
-		<cfset arrayAppend(variables.instance.aScripts, arguments.src)>
+		<cfif not hasScript(arguments.src)>
+			<cfset arrayAppend(variables.instance.aScripts, arguments.src)>
+		</cfif>
 	</cffunction>
+
+	<cffunction name="hasScript" access="public" returnType="boolean" hint="checks if the page is already using a given script">
+		<cfargument name="src" type="string" required="true">
+		<cfloop from="1" to="#arrayLen(variables.instance.aScripts)#" index="i">
+			<cfif variables.instance.aScripts[i] eq arguments.src>
+				<cfreturn true>
+			</cfif>
+		</cfloop>
+		<cfreturn false>
+	</cffunction>	
 	
 	<cffunction name="removeScript" access="public" returnType="void">
 		<cfargument name="src" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aScripts)#" index="i">
 			<cfif variables.instance.aScripts[i] eq arguments.src>
 				<cfset arrayDeleteAt(variables.instance.aScripts, i)>
-				<cfexit>
+				<cfreturn>
 			</cfif>
 		</cfloop>
 	</cffunction>	
@@ -385,12 +409,13 @@
 		<cfargument name="eventHandler" type="string" required="true">
 		<cfset var i = 0>
 		<cfset var st = structNew()>
-		<cfloop from="1" to="#arrayLen(variables.aEventHandlers)#" index="i">
+		<cfloop from="1" to="#arrayLen(variables.instance.aEventListeners)#" index="i">
 			<cfset st = variables.instance.aEventListeners[i]>
 			<cfif st.objectName eq arguments.objectName and st.eventName eq arguments.eventName and st.eventHandler eq arguments.eventHandler>
 				<cfset arrayDeleteAt(variables.instance.aEventListeners, i)>
-				<cfexit>
+				<cfreturn>
 			</cfif>
+			<Cfthrow message="event listener not found">
 		</cfloop>
 	</cffunction>	
 	
@@ -404,11 +429,7 @@
 	<!--- Layout Regions		           --->
 	<!---------------------------------------->	
 	<cffunction name="getLayoutRegions" access="public" returntype="array">
-		<cfset var aRet = arrayNew(1)>
-		<cfloop collection="#variables.instance.stLayouts#" item="key">
-			<cfset arrayAppend(aRet, variables.instance.stLayouts[key])>
-		</cfloop>
-		<cfreturn aRet>
+		<cfreturn variables.instance.aLayouts>
 	</cffunction>
 
 	<cffunction name="addLayoutRegion" access="public" returnType="void">
@@ -422,9 +443,11 @@
 		<cfif arguments.name eq "">
 			<cfthrow message="Layout region name cannot be empty" type="homePortals.pageBean.invalidLayoutRegionName">
 		</cfif>
-
 		<cfif not listFindNoCase(variables.LAYOUT_REGION_TYPES, arguments.type)>
 			<cfthrow message="Invalid layout region type. Valid types are: #variables.LAYOUT_REGION_TYPES#" type="homePortals.pageBean.invalidLayoutRegionType">
+		</cfif>
+		<cfif hasLayoutRegion(arguments.name)>
+			<cfthrow message="Layout region name already exists" type="homePortals.pageBean.duplicateLayoutRegionName">
 		</cfif>
 		
 		<cfset st.name = arguments.name>
@@ -433,16 +456,31 @@
 		<cfset st.style = arguments.style>
 		<cfset st.id = arguments.id>
 		
-		<cfset variables.instance.stLayouts[arguments.name] = duplicate(st)>
+		<cfset ArrayAppend(variables.instance.aLayouts, st)>
 	</cffunction>
+
+	<cffunction name="hasLayoutRegion" access="public" returnType="boolean" hint="checks if the page contains a given layout region">
+		<cfargument name="name" type="string" required="true">
+		<cfloop from="1" to="#arrayLen(variables.instance.aLayouts)#" index="i">
+			<cfif variables.instance.aLayouts[i].name eq arguments.name>
+				<cfreturn true>
+			</cfif>
+		</cfloop>
+		<cfreturn false>
+	</cffunction>	
 
 	<cffunction name="removeLayoutRegion" access="public" returnType="void">
 		<cfargument name="name" type="string" required="true">
-		<cfset structDelete(variables.instance.stLayouts, arguments.name)>
+		<cfloop from="1" to="#arrayLen(variables.instance.aLayouts)#" index="i">
+			<cfif variables.instance.aLayouts[i].name eq arguments.name>
+				<cfset arrayDeleteAt(variables.instance.aLayouts, i)>
+				<cfreturn>
+			</cfif>
+		</cfloop>
 	</cffunction>
 
 	<cffunction name="removeAllLayoutRegions" access="public" returnType="void">
-		<cfset variables.instance.stLayouts = structNew()>
+		<cfset variables.instance.aLayouts = arrayNew(1)>
 	</cffunction>
 
 
@@ -564,7 +602,7 @@
 			variables.instance.aStyles = arrayNew(1);
 			variables.instance.aScripts = arrayNew(1);
 			variables.instance.aEventListeners = ArrayNew(1);
-			variables.instance.stLayouts = StructNew();			
+			variables.instance.aLayouts = ArrayNew(1);			
 			variables.instance.aModules = ArrayNew(1);				
 			variables.instance.stModuleIndex = structNew();
 		</cfscript>	
