@@ -1,10 +1,8 @@
 <cfcomponent hint="This component is used to manipulate a homeportals page">
 
 	<cfscript>
-		variables.pageHREF = "";
-		variables.xmlDoc = 0;
+		variables.oPageBean = 0;
 		variables.autoSave = true;
-		variables.lstAccessTypes = "general,owner,friend";
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -14,28 +12,24 @@
 		<cfargument name="pageHREF" type="string" required="false" default="" hint="The location of the page as a relative address. If not empty, then loads the page">
 		<cfargument name="autoSave" type="boolean" required="false" default="true" hint="This flag is to force a saving of the page everytime a change is made, if false then the save method must be called manually">		
 		<cfscript>
-			variables.pageHREF = arguments.pageHREF;
 			variables.autoSave = arguments.autoSave;
-			if(variables.pageHREF neq "") 
-				variables.xmlDoc = xmlParse(expandPath(variables.pageHREF));
-			else {
-				// create blank page structure
-				variables.xmlDoc = xmlNew();
-				variables.xmlDoc.xmlRoot = xmlElemNew(variables.xmlDoc, "Page");
-				arrayAppend(variables.xmlDoc.xmlRoot.xmlChildren, xmlElemNew(variables.xmlDoc, "title"));
-				arrayAppend(variables.xmlDoc.xmlRoot.xmlChildren, xmlElemNew(variables.xmlDoc, "layout"));
-				arrayAppend(variables.xmlDoc.xmlRoot.xmlChildren, xmlElemNew(variables.xmlDoc, "modules"));
-				arrayAppend(variables.xmlDoc.xmlRoot.xmlChildren, xmlElemNew(variables.xmlDoc, "eventListeners"));
-			}
+			variables.oPageBean = createObject("Component","pageBean").init(arguments.pageHREF);
 		</cfscript>
 		<cfreturn this>
+	</cffunction>
+
+	<!---------------------------------------->
+	<!--- getPage				           --->
+	<!---------------------------------------->	
+	<cffunction name="getPage" access="public" returntype="pageBean">
+		<cfreturn variables.oPageBean>
 	</cffunction>
 	
 	<!---------------------------------------->
 	<!--- getHREF				           --->
 	<!---------------------------------------->	
 	<cffunction name="getHREF" access="public" returntype="string">
-		<cfreturn variables.pageHREF>
+		<cfreturn variables.oPageBean.getHREF()>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -43,40 +37,22 @@
 	<!---------------------------------------->	
 	<cffunction name="setHREF" access="public" returntype="string">
 		<cfargument name="pageHREF" type="string" required="true">
-		<cfset variables.pageHREF = arguments.pageHREF>
+		<cfset variables.oPageBean.setHREF(arguments.pageHREF)>
 	</cffunction>
 
 	<!---------------------------------------->
 	<!--- getXML				           --->
 	<!---------------------------------------->	
 	<cffunction name="getXML" access="public" returntype="xml">
-		<cfreturn variables.xmlDoc>
+		<cfreturn variables.oPageBean.toXML()>
 	</cffunction>
-
-	<!---------------------------------------->
-	<!--- setXML				           --->
-	<!---------------------------------------->	
-	<cffunction name="setXML" access="public" returntype="void">
-		<cfargument name="xmlDoc" required="true" type="xml">
-		<cfset variables.xmlDoc = arguments.xmlDoc>
-		<cfif variables.autoSave>
-			<cfset save()>
-		</cfif>
-	</cffunction>
-
 
 
 	<!---------------------------------------->
 	<!--- getOwner				           --->
 	<!---------------------------------------->	
 	<cffunction name="getOwner" access="public" returntype="string" hint="returns the owner of the page">
-		<cfset owner = "">
-		
-		<cfif structKeyExists(variables.xmlDoc.xmlRoot.xmlAttributes, "owner")>
-			<cfset owner = xmlDoc.xmlRoot.xmlAttributes.owner>
-		</cfif>
-		
-		<cfreturn owner>
+		<cfreturn variables.oPageBean.getOwner()>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -84,7 +60,7 @@
 	<!---------------------------------------->	
 	<cffunction name="setOwner" access="public" returntype="void" hint="sets the owner of the page">
 		<cfargument name="owner" type="string" required="true" hint="The owner of the page, must be a username of a valid account">
-		<cfset xmlDoc.xmlRoot.xmlAttributes["owner"] = arguments.owner>
+		<cfset variables.oPageBean.setOwner(arguments.owner)>
 		<cfif variables.autoSave>
 			<cfset save()>
 		</cfif>
@@ -94,13 +70,7 @@
 	<!--- getAccess				           --->
 	<!---------------------------------------->	
 	<cffunction name="getAccess" access="public" returntype="string" hint="returns the access level of the page">
-		<cfset access = "">
-		
-		<cfif structKeyExists(variables.xmlDoc.xmlRoot.xmlAttributes, "access")>
-			<cfset access = xmlDoc.xmlRoot.xmlAttributes.access>
-		</cfif>
-		
-		<cfreturn access>
+		<cfreturn variables.oPageBean.getAccess()>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -108,10 +78,7 @@
 	<!---------------------------------------->	
 	<cffunction name="setAccess" access="public" returntype="void" hint="sets the access level of the page">
 		<cfargument name="access" type="string" required="true" hint="The access level of the page">
-		<cfif not listFindNoCase(variables.lstAccessTypes, arguments.access)>
-			<cfthrow message="Invalid access type. Valid types are: #variables.lstAccessType#" type="homePortals.page.invalidAccessType">
-		</cfif>
-		<cfset xmlDoc.xmlRoot.xmlAttributes["access"] = arguments.access>
+		<cfset variables.oPageBean.setAccess(arguments.access)>
 		<cfif variables.autoSave>
 			<cfset save()>
 		</cfif>
@@ -124,19 +91,7 @@
 	<!---------------------------------------->	
 	<cffunction name="getModules" access="public" returntype="array" output="False"
 				hint="Returns all page modules">
-		<cfscript>
-			var aModuleNodes = ArrayNew(1);
-			var aModules = ArrayNew(1);
-			var i=0;
-			var stTemp = 0;
-
-			aModuleNodes = xmlSearch(variables.xmlDoc, "//modules/module");
-			for(i=1;i lte arrayLen(aModuleNodes);i=i+1) {
-				stTemp = duplicate(aModuleNodes[i].xmlAttributes);
-				ArrayAppend(aModules, stTemp);
-			}
-		</cfscript>
-		<cfreturn aModules>
+		<cfreturn variables.oPageBean.getModules()>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -149,12 +104,12 @@
 			var aModuleNodes = ArrayNew(1);
 			var aModules = ArrayNew(1);
 			var i=0;
-			var stTemp = 0;
 
-			aModuleNodes = xmlSearch(variables.xmlDoc,"//modules/module[@location='#arguments.location#']");
+			aModuleNodes = variables.oPageBean.getModules();
 			for(i=1;i lte arrayLen(aModuleNodes);i=i+1) {
-				stTemp = duplicate(aModuleNodes[i].xmlAttributes);
-				ArrayAppend(aModules, stTemp);
+				if(aModuleNodes[i].location eq arguments.location) {
+					ArrayAppend(aModules, aModuleNodes[i]);
+				}
 			}
 		</cfscript>
 		<cfreturn aModules>
@@ -166,16 +121,7 @@
 	<cffunction name="getModule" access="public" returntype="struct" output="False"
 				hint="Returns information about a module with the given moduleID">
 		<cfargument name="moduleID" type="string" required="true">
-		<cfscript>
-			var aModuleNodes = 0;
-			var stTemp = StructNew();
-
-			aModuleNodes = xmlSearch(variables.xmlDoc,"//modules/module[@id='#arguments.moduleID#']");
-			if(arrayLen(aModuleNodes) gt 0) {
-				stTemp = duplicate(aModuleNodes[1].xmlAttributes);
-			}
-		</cfscript>
-		<cfreturn stTemp>
+		<cfreturn variables.oPageBean.getModule(arguments.moduleID)>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -445,17 +391,7 @@
 	<!---------------------------------------->	
 	<cffunction name="getStylesheets" access="public" returntype="array" output="False"
 				hint="Returns all stylesheet resources">
-		<cfscript>
-			var aNodes = 0;
-			var aResources = ArrayNew(1);
-			var i = 0;
-
-			aNodes = xmlSearch(variables.xmlDoc,"//stylesheet");
-			for(i=1;i lte arrayLen(aNodes);i=i+1) {
-				ArrayAppend(aResources, aNodes[i].xmlAttributes.href);
-			}
-		</cfscript>
-		<cfreturn aResources>
+		<cfreturn variables.oPageBean.getStylesheets()>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -504,17 +440,7 @@
 	<!---------------------------------------->	
 	<cffunction name="getScripts" access="public" returntype="array" output="False"
 				hint="Returns all script resources">
-		<cfscript>
-			var aNodes = 0;
-			var aResources = ArrayNew(1);
-			var i = 0;
-
-			aNodes = xmlSearch(variables.xmlDoc,"//script");
-			for(i=1;i lte arrayLen(aNodes);i=i+1) {
-				ArrayAppend(aResources, aNodes[i].xmlAttributes.src);
-			}
-		</cfscript>
-		<cfreturn aResources>
+		<cfreturn variables.oPageBean.getScripts()>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -567,15 +493,15 @@
 			var qry = queryNew("objectName,eventName,eventHandler");
 			var i = 0;
 
-			aNodes = xmlSearch(variables.xmlDoc,"//eventListeners/event");
+			aNodes = variables.oPageBean.getEventListeners();
 			for(i=1;i lte arrayLen(aNodes);i=i+1) {
 				queryAddRow(qry);
-				if(structKeyExists(aNodes[i].xmlAttributes,"objectName"))
-					querySetCell(qry,"objectName",aNodes[i].xmlAttributes.objectName);
-				if(structKeyExists(aNodes[i].xmlAttributes,"eventName"))
-					querySetCell(qry,"eventName",aNodes[i].xmlAttributes.eventName);
-				if(structKeyExists(aNodes[i].xmlAttributes,"eventHandler"))
-					querySetCell(qry,"eventHandler",aNodes[i].xmlAttributes.eventHandler);
+				if(structKeyExists(aNodes[i],"objectName"))
+					querySetCell(qry,"objectName",aNodes[i].objectName);
+				if(structKeyExists(aNodes[i],"eventName"))
+					querySetCell(qry,"eventName",aNodes[i].eventName);
+				if(structKeyExists(aNodes[i],"eventHandler"))
+					querySetCell(qry,"eventHandler",aNodes[i].eventHandler);
 			}
 		</cfscript>
 		<cfreturn qry>
@@ -635,22 +561,17 @@
 				hint="Returns a query with all layout locations defined on the page">
 		<cfscript>
 			var aNodes = 0;
-			var qry = queryNew("name,type,class,id");
+			var qry = queryNew("name,type,class,style,id");
 			var i = 0;
 
-			aNodes = xmlSearch(variables.xmlDoc,"//layout/location");
+			aNodes = variables.oPageBean.getLayoutRegions();
 			for(i=1;i lte arrayLen(aNodes);i=i+1) {
 				queryAddRow(qry);
-				if(structKeyExists(aNodes[i].xmlAttributes,"name"))
-					querySetCell(qry,"name",aNodes[i].xmlAttributes.name);
-				if(structKeyExists(aNodes[i].xmlAttributes,"type"))
-					querySetCell(qry,"type",aNodes[i].xmlAttributes.type);
-				if(structKeyExists(aNodes[i].xmlAttributes,"class"))
-					querySetCell(qry,"class",aNodes[i].xmlAttributes.class);
-				if(structKeyExists(aNodes[i].xmlAttributes,"id"))
-					querySetCell(qry,"id",aNodes[i].xmlAttributes.id);
-				else
-					querySetCell(qry,"id","h_location_#aNodes[i].xmlAttributes.type#_#i#");
+				querySetCell(qry,"name",aNodes[i].name);
+				querySetCell(qry,"type",aNodes[i].type);
+				querySetCell(qry,"class",aNodes[i].class);
+				querySetCell(qry,"style",aNodes[i].style);
+				querySetCell(qry,"id",aNodes[i].id);
 			}
 		</cfscript>
 		<cfreturn qry>
@@ -661,13 +582,7 @@
 	<!---------------------------------------->	
 	<cffunction name="getLocationTypes" access="public" returntype="array" output="False"
 				hint="Returns an array with possible values for layout location types">
-		<cfscript>
-			var aLocationTypes = ArrayNew(1);
-			aLocationTypes[1] = "header";
-			aLocationTypes[2] = "column";
-			aLocationTypes[3] = "footer";
-		</cfscript>
-		<cfreturn aLocationTypes>
+		<cfreturn variables.oPageBean.getLocationTypes()>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -844,7 +759,7 @@
 	<cffunction name="setPageTitle" access="public" returntype="void" output="False"
 				hint="Sets the title for the page">
 		<cfargument name="title" type="string" required="true">
-		<cfset variables.xmlDoc.xmlRoot.title.xmlText = xmlFormat(arguments.title)>
+		<cfset variables.oPageBean.setTitle(arguments.title)>
 		<cfif variables.autoSave>
 			<cfset save()>
 		</cfif>		
@@ -855,7 +770,7 @@
 	<!---------------------------------------->	
 	<cffunction name="getPageTitle" access="public" returntype="string" output="False"
 				hint="Returns the page title">
-		<cfreturn variables.xmlDoc.xmlRoot.title.xmlText>
+		<cfreturn variables.oPageBean.getTitle()>
 	</cffunction>
 
 
@@ -1068,11 +983,10 @@
 	<!---------------------------------------->	
 	<cffunction name="save" access="public" hint="Saves the site xml">
 		<!--- check that is a valid xml file --->
-		<cfif Not IsXML(variables.xmlDoc)>
-			<cfset throw("The given site doc is not a valid XML document.")>
-		</cfif>		
+		<cfset var xmlDoc = variables.oPageBean.toXML()>
+		<cfset var href = variables.oPageBean.getHREF()>	
 		<!--- store page --->
-		<cffile action="write" file="#expandpath(variables.pageHREF)#" output="#toString(variables.xmlDoc)#">
+		<cffile action="write" file="#expandpath(href)#" output="#toString(xmlDoc)#">
 	</cffunction>
 	
 	<!---------------------------------------->
