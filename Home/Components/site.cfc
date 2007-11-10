@@ -111,7 +111,7 @@
 			// add page nodes
 			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
 			
-				var tmpPage = variables.aPages[i];
+				tmpPage = variables.aPages[i];
 			
 				xmlNode = xmlElemNew(xmlDoc, "page");
 				xmlNode.xmlAttributes["title"] = xmlFormat(tmpPage.title);
@@ -222,7 +222,7 @@
 		<cfscript>
 			var i = 1;
 			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
-				variables.aPages[i].default = (variables.aPages[i].href eq arguments.pageHREF);
+				variables.aPages[i]["default"] = (variables.aPages[i].href eq arguments.pageHREF);
 			}
 			save();
 		</cfscript>
