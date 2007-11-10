@@ -218,7 +218,7 @@
 			// if the page exists on the cache, and the page hasnt been modified after
 			// storing it on the cache, then get it from the cache
 			if(structKeyExists(variables.stPageCache, pageCacheKey) 
-					and getFileLastModified(expandPath(arguments.pageHREF)) lt variables.stPageCache[pageCacheKey].timestamp ) {
+					and DateDiff("n", getFileLastModified(expandPath(arguments.pageHREF)), variables.stPageCache[pageCacheKey].timestamp ) lt 0) {
 				oPageRenderer = variables.stPageCache[pageCacheKey].data;
 				
 			} else {
