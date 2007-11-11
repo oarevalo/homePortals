@@ -528,6 +528,7 @@
 			var moduleName = arguments.moduleNode.name;
 			var tmpMsg = "";
 			var isHTTPS = (structKeyExists(cgi,"HTTPS") and cgi.https eq "ON");
+			var start = getTickCount();
 
 			// if we are on HTTPS then prefix the module with the SSL root
 			if(isHTTPS) moduleName = variables.oHomePortalsConfigBean.getSSLRoot() & moduleName;
@@ -571,6 +572,8 @@
 				tmpMsg = "<b>An unexpected error ocurred while initializing module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
 				appendpageBuffer("_htmlModule", moduleID, tmpMsg );
 			}
+			
+			variables.stTimers["processModule_#moduleID#"] = getTickCount()-start;
 		</cfscript>		
 	</cffunction>	
 	
