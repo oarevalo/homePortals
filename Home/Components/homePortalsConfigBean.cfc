@@ -164,7 +164,7 @@
 
 	<!--- Getters --->
 	<cffunction name="getVersion" access="public" returntype="string">
-		<cfreturn variables.stConfig.version>
+		<cfreturn variables.hpEngineVersionTag>
 	</cffunction>
 
 	<cffunction name="getInitialEvent" access="public" returntype="string">
