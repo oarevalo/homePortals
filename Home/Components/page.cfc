@@ -149,12 +149,11 @@
 			
 			// define a unique id for the new module based on the module name
 			moduleName =  oResourceBean.getName();
-			moduleID =  oResourceBean.getName();
 			aModules = variables.oPageBean.getModules();
 			
 			while(keepLooping) {
 				try {
-					moduleID = moduleName & moduleIndex;
+					moduleID = oResourceBean.getID() & moduleIndex;
 					st = variables.oPageBean.getModule(moduleID);
 					moduleIndex = moduleIndex + 1;
 					keepLooping = true;
