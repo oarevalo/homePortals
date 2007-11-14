@@ -231,11 +231,15 @@
 		<cfset var aStylesheets = variables.stPage.page.stylesheets>
 		<cfset var aScripts = variables.stPage.page.scripts>
 		<cfset var aEventListeners = variables.stPage.page.eventListeners>
+		<cfset var aMeta = variables.stPage.page.meta>
 		<cfset var stPageHeadContent = getpageBufferByType("_htmlHead")>
 		<cfset var moduleID = "">
 		<cfset var tmpHTML = "">
 		<cfset var appRoot = variables.oHomePortalsConfigBean.getAppRoot()>
-		
+		<!--- Add user-defined meta tags --->
+		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
+			<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#aMeta[i].content#"" />">
+		</cfloop>
 			
 		<!--- Include basic and user-defined CSS styles --->
 		<cfloop from="1" to="#ArrayLen(aStylesheets)#" index="i">
@@ -367,6 +371,7 @@
 			variables.stPage.page.eventListeners = ArrayNew(1);
 			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
 			variables.stPage.page.modules = StructNew();		// holds modules
+			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
 		
 			// set page owner
 			if(structKeyExists(xmlDoc.xmlRoot.xmlAttributes, "owner"))
@@ -500,7 +505,7 @@
 						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
 							if(xmlNode.xmlChildren[j].xmlName eq "event") {
 								xmlThisNode = xmlNode.xmlChildren[j];
-								if(Not StructKeyExists(xmlThisNode.xmlAttributes,"objectName")) xmlThisNode.objectName = ""; 
+								if(Not StructKeyExists(xmlThisNode.xmlAttributes,"objectName")) xmlThisNode.xmlAttributes.objectName = ""; 
 								if(Not StructKeyExists(xmlThisNode.xmlAttributes,"eventName")) xmlThisNode.xmlAttributes.eventName = ""; 
 								if(Not StructKeyExists(xmlThisNode.xmlAttributes,"eventHandler")) xmlThisNode.xmlAttributes.eventHandler= ""; 
 								
@@ -508,6 +513,15 @@
 							}
 						}
 						break;	
+
+					// meta tags
+					case "meta":
+						if(Not StructKeyExists(xmlNode.xmlAttributes,"name")) xmlNode.xmlAttributes.name = ""; 
+						if(Not StructKeyExists(xmlNode.xmlAttributes,"content")) xmlNode.xmlAttributes.content = ""; 
+						
+						ArrayAppend(variables.stPage.page.meta, duplicate(xmlNode.xmlAttributes));
+						break;	
+
 						
 				}
 			}		

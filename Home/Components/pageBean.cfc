@@ -12,6 +12,7 @@
 		variables.instance.aLayouts = StructNew();			// holds properties for layout sections
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
+		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
 		
 		variables.LAYOUT_REGION_TYPES = "header,column,footer";
 		variables.ACCESS_TYPES = "general,owner,friend";
@@ -159,6 +160,20 @@
 							}
 						}
 						break;	
+						
+					// meta tags
+					case "meta":
+						args = structNew();
+						args.name = "";
+						args.content = "";
+
+						if(StructKeyExists(xmlNode.xmlAttributes,"name")) args.name = xmlNode.xmlAttributes.name; 
+						if(StructKeyExists(xmlNode.xmlAttributes,"content")) args.content = xmlNode.xmlAttributes.content; 
+						
+						addMetaTag(argumentCollection = args);
+						break;	
+						
+						
 				}
 			}		
 		</cfscript>
@@ -184,6 +199,16 @@
 			xmlNode.xmlText = xmlFormat(getTitle());
 			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 
+			// add meta tags
+			aTemp = getMetaTags();
+			for(i=1;i lte arrayLen(aTemp);i=i+1) {
+				xmlNode = xmlElemNew(xmlDoc,"meta");
+				xmlNode.xmlAttributes["name"] = xmlFormat(aTemp[i].name);
+				xmlNode.xmlAttributes["content"] = xmlFormat(aTemp[i].content);
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			}
+
+			
 			// add stylesheets
 			aTemp = getStylesheets();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
@@ -567,6 +592,46 @@
 
 
 
+	<!---------------------------------------->
+	<!--- User-Defined Meta Tags           --->
+	<!---------------------------------------->	
+	<cffunction name="getMetaTags" access="public" returntype="array">
+		<cfreturn variables.instance.aMeta>
+	</cffunction>
+
+	<cffunction name="addMetaTag" access="public" returnType="void">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="content" type="string" required="true">
+		<cfset var st = structNew()>
+		<cfif arguments.name eq "">
+			<cfthrow message="A meta tag must include a non-blank name" type="homePortals.pageBean.invalidMetaTag">
+		</cfif>
+		<cfset st.name = arguments.name>
+		<cfset st.content = arguments.content>
+		<cfset ArrayAppend(variables.instance.aMeta, st)>
+	</cffunction>
+
+	<cffunction name="removeMetaTag" access="public" returnType="void">
+		<cfargument name="name" type="string" required="true">
+		<cfset var i = 0>
+		<cfset var st = structNew()>
+		<cfloop from="1" to="#arrayLen(variables.instance.aMeta)#" index="i">
+			<cfset st = variables.instance.aMeta[i]>
+			<cfif st.name eq arguments.name>
+				<cfset arrayDeleteAt(variables.instance.aMeta, i)>
+				<cfreturn>
+			</cfif>
+		</cfloop>
+		<Cfthrow message="event listener not found">
+	</cffunction>	
+	
+	<cffunction name="removeAllMetaTags" access="public" returnType="void">
+		<cfset variables.instance.aMeta = arrayNew(1)>
+	</cffunction>
+
+
+
+
 
 	<!---------------------------------------->
 	<!--- getLocationTypes		           --->
@@ -605,6 +670,7 @@
 			variables.instance.aLayouts = ArrayNew(1);			
 			variables.instance.aModules = ArrayNew(1);				
 			variables.instance.stModuleIndex = structNew();
+			variables.instance.aMeta = ArrayNew(1);	
 		</cfscript>	
 	</cffunction>
 
