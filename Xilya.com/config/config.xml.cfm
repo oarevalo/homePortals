@@ -2,8 +2,8 @@
 <Config>
 	<Settings>
 		<Setting name="AppName" 					value="Xilya"/>
-		<Setting name="AppMapping" 					value=""/>
-		<Setting name="AppDevMapping" 				value="xilyaweb"/>
+		<Setting name="AppMapping" 					value="xilyaweb"/>
+		<!-- <Setting name="AppDevMapping" 				value="xilyaweb"/> -->
 		<Setting name="DebugMode" 					value="false"/>
 		<Setting name="DebugPassword" 				value="Textus"/>
 		<Setting name="DefaultEvent" 				value="ehGeneral.dspHome"/>
