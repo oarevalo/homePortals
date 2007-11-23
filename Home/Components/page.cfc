@@ -424,13 +424,13 @@
 		<cfargument name="eventName" type="string" required="true">
 		<cfargument name="eventHandler" type="string" required="true">
 		<cfscript>
-			aNodes = variables.oPageBean.getEventListeners();
+			var aNodes = variables.oPageBean.getEventListeners();
 
 			// remove existing event listener
 			if(arguments.index gt 0 and arrayLen(aNodes) gte arguments.index) {
-				variables.oPageBean.removeEventListener(aNodes[i].objectName, 
-														aNodes[i].eventName, 
-														aNodes[i].eventHandler);
+				variables.oPageBean.removeEventListener(aNodes[arguments.index].objectName, 
+														aNodes[arguments.index].eventName, 
+														aNodes[arguments.index].eventHandler);
 			}	
 				
 			// insert event listener	
@@ -449,7 +449,7 @@
 				hint="Removes a page event handler from the page">
 		<cfargument name="index" type="numeric" required="true">
 		<cfscript>
-			aNodes = variables.oPageBean.getEventListeners();
+			var aNodes = variables.oPageBean.getEventListeners();
 			
 			if(arrayLen(aNodes) gte arguments.index) {
 				variables.oPageBean.removeEventListener(aNodes[arguments.index].objectName, 
@@ -552,7 +552,7 @@
 			if(arguments.newName eq "" and arguments.name neq "") arguments.newName = arguments.name;
 
 			// remove layout region
-			removeLayoutRegion(arguments.name);
+			variables.oPageBean.removeLayoutRegion(arguments.name);
 
 			// add new region
 			variables.oPageBean.addLayoutRegion(arguments.newName, arguments.type, arguments.class);
@@ -578,7 +578,34 @@
 	<cffunction name="deleteLocation" access="public" output="false">
 		<cfargument name="name" type="string" required="true">
 		<cfscript>
-			variables.oPageBean.removeLayoutRegion(arguments.newName);
+			var aRegions = variables.oPageBean.getLayoutRegions();
+			var tmpNewRegion = "";
+			var i = 0;
+			var stModule = 0;
+
+			// check that we are not deleting all locations
+			if(arrayLen(aRegions) eq 1) throw("You cannot delete all layout regions on a page");
+			
+			// find the first location different that the one we are deleting
+			for(i=1;i lte arrayLen(aRegions);i=i+1) {
+				if(aRegions[i].name neq arguments.name) {
+					tmpNewRegion = aRegions[i].name;
+					break;
+				}
+			}
+			
+			// if there is a module on the location to remove, then
+			// move the module to another location
+			aModules = getModulesByLocation(arguments.name);
+			for(i=1;i lte arrayLen(aModules);i=i+1) {
+				stModule = aModules[i];
+				stModule.location = tmpNewRegion;
+				variables.oPageBean.setModule(stModule.ID, stModule);
+			}
+			
+			// now we can safely remove the region
+			variables.oPageBean.removeLayoutRegion(arguments.name);
+			
 			if(variables.autoSave) save();	
 		</cfscript>
 	</cffunction>
@@ -792,6 +819,69 @@
 		<cfreturn retVal>
 	</cffunction>
 	
+
+
+	<!---------------------------------------->
+	<!--- getMetaTags			           --->
+	<!---------------------------------------->	
+	<cffunction name="getMetaTags" access="public" returntype="query" output="False"
+				hint="Returns all user-defined page meta tags">
+		<cfscript>
+			var aNodes = 0;
+			var qry = queryNew("name,content");
+			var i = 0;
+
+			aNodes = variables.oPageBean.getMetaTags();
+			for(i=1;i lte arrayLen(aNodes);i=i+1) {
+				queryAddRow(qry);
+				querySetCell(qry,"name",aNodes[i].name);
+				querySetCell(qry,"content",aNodes[i].content);
+			}
+		</cfscript>
+		<cfreturn qry>
+	</cffunction>
+
+	<!---------------------------------------->
+	<!--- saveMetaTag			           --->
+	<!---------------------------------------->	
+	<cffunction name="saveMetaTag" access="public" returntype="void" output="False"
+				hint="Adds or updates a user-defined page meta tag">
+		<cfargument name="index" type="numeric" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="content" type="string" required="true">
+		<cfscript>
+			var aNodes = variables.oPageBean.getMetaTags();
+
+			// remove existing meta tag
+			if(arguments.index gt 0 and arrayLen(aNodes) gte arguments.index) {
+				variables.oPageBean.removeMetaTag(aNodes[arguments.index].name);
+			}	
+				
+			// insert meta tag	
+			variables.oPageBean.addMetaTag(arguments.name, arguments.content);
+					
+			if(variables.autoSave) save();	
+		</cfscript>
+	</cffunction>
+	
+	<!---------------------------------------->
+	<!--- deleteMetaTag		       --->
+	<!---------------------------------------->	
+	<cffunction name="deleteMetaTag" access="public" returntype="void" output="False"
+				hint="Removes a user-defined page meta tag from the page">
+		<cfargument name="index" type="numeric" required="true">
+		<cfscript>
+			var aNodes = variables.oPageBean.getMetaTags();
+			
+			if(arrayLen(aNodes) gte arguments.index) {
+				variables.oPageBean.removeMetaTag(aNodes[arguments.index].name);
+			}	
+			
+			if(variables.autoSave) save();	
+		</cfscript>
+	</cffunction>
+
+
 
 
 	
