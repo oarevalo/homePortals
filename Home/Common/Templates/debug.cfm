@@ -70,6 +70,14 @@
 					<td>#request.appRoot#</td>
 				</tr>
 				<tr>
+					<td width="130"><b>Acounts Root:</b></td>
+					<td>#hp.getAccountsService().getConfig().getAccountsRoot()#</td>
+				</tr>
+				<tr>
+					<td width="130"><b>Resources Root:</b></td>
+					<td>#hp.getConfig().getResourceLibraryPath()#</td>
+				</tr>
+				<tr>
 					<td width="130"><b>HP Engine Version:</b></td>
 					<td>#hp.getVersion()#</td>
 				</tr>
