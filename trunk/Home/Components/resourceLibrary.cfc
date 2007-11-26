@@ -121,6 +121,11 @@
 			// setup base directory
 			packageDir = resourcesRoot & "/" & resType & "s/" & rb.getPackage();
 
+			// check if we need to create the package directory
+			if(not directoryExists(expandPath(packageDir))) {
+				createDir( packageDir );
+			}
+
 			// for resources that use local content, set the proper href for the given path based on the ID
 			href = rb.getHREF();
 			if(href eq "") {
