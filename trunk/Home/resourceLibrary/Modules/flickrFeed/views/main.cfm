@@ -50,7 +50,7 @@
 		feed = oRSSReaderService.getRSS(tmpURL);
 		
 		// if no number of maxItems has been given, then show all on the feed 
-		if(args.maxItems eq 0) args.maxItems = ArrayLen(feed.items);
+		if(val(args.maxItems) eq 0) args.maxItems = ArrayLen(feed.items);
 
 		// set default title
 		if(args.tags eq "" and args.userID eq "")
@@ -62,7 +62,7 @@
 	}
 </cfscript>
 
-	
+<cftry>
 <!--- display images --->
 <cfoutput>
 	<cfif not bFailed>
@@ -127,3 +127,7 @@
 	
 </cfoutput>
 
+<cfcatch type="any">
+<cfdump var="#cfcatch#">
+</cfcatch>
+</cftry>	
