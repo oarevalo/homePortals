@@ -678,7 +678,7 @@
 			
 			// add new stylesheet
 			if(arguments.skinHREF neq "") {
-				hasLocalStyle = variables.oPageBean.addStylesheet(arguments.skinHREF);
+				variables.oPageBean.addStylesheet(arguments.skinHREF);
 			}
 			
 			// add local style (if it had any)
