@@ -68,13 +68,23 @@
 						stSrc = xmlNode.attributes.xmlChildren[i].xmlAttributes;
 						stTgt = structNew();
 						stTgt.name = "";
+						stTgt.label = "";
 						stTgt.description = "";
 						stTgt.required = false;
 						stTgt.default = "";
+						stTgt.type = "";		// text,number,list,resource,resourceonly
+						stTgt.resourceType = "";
+						stTgt.resourceField = "";
+						stTgt.values = "";
 						if(structKeyExists(stSrc,"name")) stTgt.name = stSrc.name;
+						if(structKeyExists(stSrc,"label")) stTgt.label = stSrc.label;
 						if(structKeyExists(stSrc,"description")) stTgt.description = stSrc.description;
 						if(structKeyExists(stSrc,"required")) stTgt.required = stSrc.required;
 						if(structKeyExists(stSrc,"default")) stTgt.default = stSrc.default;
+						if(structKeyExists(stSrc,"type")) stTgt.type = stSrc.type;
+						if(structKeyExists(stSrc,"resourceType")) stTgt.resourceType = stSrc.resourceType;
+						if(structKeyExists(stSrc,"resourceField")) stTgt.resourceField = stSrc.resourceField;
+						if(structKeyExists(stSrc,"values")) stTgt.values = stSrc.values;
 						arrayAppend(variables.instance.attributes, stTgt);
 					}
 				}
