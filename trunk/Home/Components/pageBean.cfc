@@ -434,14 +434,15 @@
 		<cfargument name="eventHandler" type="string" required="true">
 		<cfset var i = 0>
 		<cfset var st = structNew()>
+
 		<cfloop from="1" to="#arrayLen(variables.instance.aEventListeners)#" index="i">
 			<cfset st = variables.instance.aEventListeners[i]>
 			<cfif st.objectName eq arguments.objectName and st.eventName eq arguments.eventName and st.eventHandler eq arguments.eventHandler>
 				<cfset arrayDeleteAt(variables.instance.aEventListeners, i)>
 				<cfreturn>
 			</cfif>
-			<Cfthrow message="event listener not found">
 		</cfloop>
+		<Cfthrow message="event listener not found">
 	</cffunction>	
 	
 	<cffunction name="removeAllEventListeners" access="public" returnType="void">
