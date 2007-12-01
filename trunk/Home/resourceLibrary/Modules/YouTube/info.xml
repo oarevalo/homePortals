@@ -8,6 +8,9 @@
             </description>
             <attributes>
                 <attribute name="videoID" description="ID of the video" default="" />
+                <attribute name="width" description="Viewer width" default="" />
+                <attribute name="height" description="Viewer height" default="" />
+                <attribute name="autoplay" description="Automatically start playing video?" default="no" type="list" values="Yes,No" />
             </attributes>
             <moduleInfo>
                 <authorName>Oscar Arevalo</authorName>
@@ -30,7 +33,8 @@
             </description>
             <attributes>
                 <attribute name="term" description="Search term" default="" />
-                <attribute name="resultsPanelID" description="The panel where to display the video. If empty, video will be displayed on youTube website" default="" />
+                <attribute name="onClickGotoURL" description="Determines whether to go to YouTube website when selecting a vide" default="true" type="list" values="Yes,No" />
+                <attribute name="mode" description="Type of search to perform" default="searchByTag" type="list" values="searchByTag,searchByUser,listFeatured,listPopular" />
             </attributes>
             <moduleInfo>
                 <authorName>Oscar Arevalo</authorName>
