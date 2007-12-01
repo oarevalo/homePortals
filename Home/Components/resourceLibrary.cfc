@@ -1,8 +1,8 @@
 <cfcomponent>
 
 	<cfscript>
-		variables.lstResourceTypes = "module,skin,pageTemplate,page,content,feed";
-		variables.lstResourceTypesExtensions = "cfc,css,xml,xml,html,rss";
+		variables.lstResourceTypes = "module,skin,pageTemplate,page,content,feed,html";
+		variables.lstResourceTypesExtensions = "cfc,css,xml,xml,html,rss,html";
 		variables.lstAccessTypes = "general,owner,friend";	
 		variables.resourceDescriptorFile = "info.xml";
 		variables.resourcesRoot = "";
