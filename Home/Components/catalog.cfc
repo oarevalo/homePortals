@@ -29,7 +29,7 @@
 	<!---------------------------------------->	
 	<cffunction name="getResourcesByType" access="public" returntype="query" output="False"
 				hint="Returns all resources of a given type">
-		<cfargument name="resourceType" type="string" required="false" hint="Type of resource">
+		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
 
 		<cfset var qry = queryNew("")>
 		
