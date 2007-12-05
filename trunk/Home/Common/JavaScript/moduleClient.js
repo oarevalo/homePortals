@@ -133,8 +133,10 @@ function moduleClient() {
 
 	function attachIcon(imgSrc, onclickStr, alt) {
 		h = $(this.moduleID + "_Head");
-		aElem = h.getElementsByTagName("h2");
-		new Insertion.Top(aElem[0],  "<a href='#' onclick=\"" + onclickStr + "\"><img src=\"" + imgSrc + "\" border='0' style='margin-top:3px;margin-right:3px;' align='right' alt='" + alt + "' title='" + alt + "'></a>");
+		if(h) {
+			aElem = h.getElementsByTagName("h2");
+			new Insertion.Top(aElem[0],  "<a href='#' onclick=\"" + onclickStr + "\"><img src=\"" + imgSrc + "\" border='0' style='margin-top:3px;margin-right:3px;' align='right' alt='" + alt + "' title='" + alt + "'></a>");
+		}
 	}
 	
 	function setIcon(imgSrc) {
