@@ -8,9 +8,9 @@
 				or send them to another module such as a Panel module.
 			</description>
 			<attributes>
-				<attribute description="RSS URL" name="rss" required="true"/>
+				<attribute description="RSS URL" name="rss" required="true" type="resource" resourceType="feed" resourceField="Href" />
 				<attribute description="Number of Items to Display" name="maxItems" required="true"/>
-				<attribute description="Use 'short' for displaying only headlines, or 'long' for displaying headlines and content" name="displayMode" required="true" default="short" />
+				<attribute description="Use 'short' for displaying only headlines, or 'long' for displaying headlines and content" label="Display Mode" name="displayMode" required="true" default="short" type="list" values="short,long" />
 			</attributes>
 			<moduleInfo>
 				<authorName>Oscar Arevalo</authorName>
