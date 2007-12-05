@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<?xml-stylesheet type="text/xsl" href="$HOME_ROOT$/pageLoader.xsl"?>
+<Page>
+	<title/>
+	<stylesheet href="$HOME_ROOT$/Skins/default/default.css"/>
+	<layout>
+		<location class="leftcolumn" name="left" type="column"/>
+		<location class="middlecolumn" name="middle" type="column"/>
+		<location class="rightcolumn" name="right" type="column"/>
+	</layout>		
+	<modules />
+	<eventListeners/>
+</Page>		
+		
