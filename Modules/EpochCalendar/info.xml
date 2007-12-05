@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+
+<modules>
+
+	
+	<!-- ********   Epoch Calendar  ************ -->
+	<module access="general" id="EpochCalendar" name="EpochCalendar/calendar">
+		<description>
+			Displays a calendar
+		</description>
+		<moduleInfo>
+			<authorName>Oscar Arevalo</authorName>
+			<authorEmail>oarevalo@gmail.com</authorEmail>
+			<authorURL>http://www.homeportals.com</authorURL>
+			<screenshot/>
+		</moduleInfo>
+		<eventListeners>
+			<event eventHandler="$ID$.initCalendar" eventName="onPageLoaded" objectName="Framework"/>
+		</eventListeners>		
+		<api>
+			<methods>
+				<method name="initCalendar" description="Initializes the calendar." /> 
+			</methods>
+			<events>
+				<event name="onSelectDate" description="This event is raised when someone clicks on a date. The argument passed is the selected date." />
+			</events>
+		</api>
+	</module>
+	
+</modules>
+</catalog>

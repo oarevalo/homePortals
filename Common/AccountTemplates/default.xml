@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<?xml-stylesheet type="text/xsl" href="$HOME_ROOT$/pageLoader.xsl"?>
+<Page>
+	<title>HomePortals - $USERNAME$ Home</title>
+	<stylesheet href="$HOME_ROOT$/Skins/rounded/rounded.css"/>
+		
+	<!-- Define Screen Layout -->
+	<layout>
+		<location type="column" name="left" class="leftcolumn" />
+		<location type="column" name="middle" class="middlecolumn" />
+		<location type="column" name="right" class="rightcolumn" />
+		<location type="footer" name="footer" class="footer"/>
+	</layout>
+
+	<!-- Define Modules -->	
+	<modules>
+		<!-- Left Column -->		
+		<module id="AccountLogin"
+				name="Accounts/login"
+				location="left"
+				title="HomePortals" />
+	</modules>
+
+</Page>

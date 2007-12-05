@@ -1,0 +1,25 @@
+body {
+	text-align:center;
+	background-color:#bcc8d2;
+	padding-top:5px;
+}
+#navMenu, #h_body_main {
+	width:800px;
+	margin: 0 auto;
+	background-color:#fff;
+}
+#h_body_main {
+	border-left:1px solid black;
+	border-right:1px solid black;
+	border-bottom:1px solid black;
+}
+.rightcolumn {
+	background-color:#eee;
+	border-left:1px solid #333;
+}
+#editBox1 {
+font-family: "Trebuchet MS", verdana, arial, sans-serif; 
+font-size: 1.2em; 
+line-height: 135%;
+margin:20px;
+}

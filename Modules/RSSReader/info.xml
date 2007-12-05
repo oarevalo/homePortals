@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+	<modules>
+		<!-- ********   RSS Reader  ************ -->
+		<module access="general" id="rssReader" name="RSSReader/RSSReader">
+			<description>
+				Displays content from RSS and Atom feeds. You may select to display the feed contents in the same module
+				or send them to another module such as a Panel module.
+			</description>
+			<attributes>
+				<attribute description="RSS URL" name="rss" required="true"/>
+				<attribute default="" description="Display Contents In" name="targetID" required="false"/>
+				<attribute description="Number of Items to Display" name="maxItems" required="true"/>
+			</attributes>
+			<moduleInfo>
+				<authorName>Oscar Arevalo</authorName>
+				<authorEmail>oarevalo@gmail.com</authorEmail>
+				<authorURL>http://www.homeportals.com</authorURL>
+				<screenshot/>
+			</moduleInfo>
+			<api>
+				<methods>
+					<method name="getFeed" description="Retrieves and displays the given feed." /> 
+				</methods>
+				<events />
+			</api>
+		</module>	
+		
+		<!-- ********   RSS Reader (Full) ************ -->
+		<module access="general" id="rssReaderFull" name="RSSReader/RSSReaderFull">
+			<description>
+				Displays content from RSS and Atom feeds. Similar to the regular RSS Reader, but instead
+				of showing only the title, this displays the full content of the feed.
+			</description>
+			<attributes>
+				<attribute description="RSS URL" name="rss" required="true"/>
+				<attribute description="Number of Items to Display" name="maxItems" required="true"/>
+			</attributes>
+			<moduleInfo>
+				<authorName>Oscar Arevalo</authorName>
+				<authorEmail>oarevalo@gmail.com</authorEmail>
+				<authorURL>http://www.homeportals.com</authorURL>
+				<screenshot/>
+			</moduleInfo>
+			<api>
+				<methods>
+					<method name="getFeed" description="Retrieves and displays the given feed." /> 
+				</methods>
+				<events />
+			</api>
+		</module>	
+	</modules>
+</catalog>

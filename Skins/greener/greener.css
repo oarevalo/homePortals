@@ -1,0 +1,47 @@
+body {
+	background-color:#FFFFFF;
+}
+.Section {
+	margin:10px;
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+	border-top:1px solid silver;
+	background-color:#F9F9EC;
+	border-bottom:1px solid silver;
+}
+
+.SectionTitle {
+	background-color:#FFFFCC;
+	padding-top:5px;
+	padding-bottom:5px;
+}
+.SectionTitleLabel {
+	color:#990000;
+	font-weight:bold;
+	font-size:1.3em;
+	line-height: 1em;
+	font-stretch:expanded;
+}
+
+.SectionBody {
+	border-top:1px solid silver;
+}
+.header {
+	padding:0px;
+	margin:0px;
+}
+.leftcolumn {
+	width:240px;
+}
+.rightcolumn {
+	width:250px;
+}
+#header_Body {
+	border:0px;
+	padding:0px;
+	margin:0px;
+}
+#header_BodyRegion {
+	padding:0px;
+	margin:0px;
+}
