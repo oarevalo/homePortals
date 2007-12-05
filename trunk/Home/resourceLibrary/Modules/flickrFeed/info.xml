@@ -12,8 +12,8 @@
 			<attribute default="" description="Flickr Username" name="username" required="false"/>
 			<attribute default="" description="Flickr User ID" name="userid" required="false"/>
 			<attribute default="" description="Tags" name="tags" required="false"/>
-			<attribute default="true" description="Show Header?" name="showheader" required="false"/>
-			<attribute default="true" description="On Click Goto Flickr?" name="onClickGotoFlickr" required="false"/>
+			<attribute default="true" description="Show Header?" name="showheader" required="false" type="list" values="Yes,No" />
+			<attribute default="true" description="On Click Goto Flickr?" name="onClickGotoFlickr" required="false" type="list" values="Yes,No" />
 			<attribute default="" description="Maximum number of pictures to display" name="maxItems" required="false" />
 		</attributes>
 		<moduleInfo>
