@@ -1,5 +1,5 @@
 <cfset moduleID = this.controller.getModuleID()>
-<cfset thisPageURL = "index.cfm?currentHome=#this.controller.getModuleConfigBean().getPageHREF()#&refresh=true&#RandRange(1,100)#">
+<cfset appRoot = this.controller.getHomePortalsConfigBean().getAppRoot()>	
 
 <!--- Process autologin (when user has clicked on remember me before) --->
 <cfif isDefined("cookie.homeportals_username") and isDefined("cookie.homeportals_userKey") 
@@ -13,11 +13,11 @@
 
 <cfoutput>
 	<cfif stUser.username neq "">
-	<!--- There is a user logged in --->
+		<!--- There is a user logged in --->
 		<div style="font-size:11px;">
 			<b>Welcome, #stUser.username#</b>
 			<p>
-				&bull; <a href="/Accounts/#stUser.username#/">Go to my homepage</a><br /><br />
+				&bull; <a href="#appRoot#/?account=#stUser.username#">Go to my homepage</a><br /><br />
 				&bull; <a href="javascript:#moduleID#.doAction('doLogoff')"><strong>Log Out</strong></a><br />
 			</p>
 		</div>
