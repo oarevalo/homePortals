@@ -9,7 +9,10 @@
 			<attributes>
 				<attribute name="contentID" 
 							required="true"
-							description="The contentID of the content snippet to add to the page." />
+							description="The contentID of the content snippet to add to the page."
+							type="resourceOnly"
+							resourceType="content"
+							resourceField="ID" />
 			</attributes>
             <moduleInfo>
                 <authorName>Oscar Arevalo</authorName>
