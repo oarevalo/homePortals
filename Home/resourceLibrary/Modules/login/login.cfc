@@ -22,21 +22,21 @@ Also processes cookie logins.
 		<cfargument name="rememberMe" default="false" type="boolean" required="no">
 
 		<cfset var qryUser = QueryNew("")>
-		<cfset var oAccounts = application.homePortals.getAccountsService()>
-		<cfset var accountsRoot = oAccounts.getConfig().getAccountsRoot()>
+		<cfset var oAccountsService = application.homePortals.getAccountsService()>
 		<cfset var appRoot = this.controller.getHomePortalsConfigBean().getAppRoot()>	
 		
 		<cftry>
 			<!--- check login --->
-			<cfset qryUser = oAccounts.loginUser(arguments.username, Arguments.password)>
+			<cfset qryUser = oAccountsService.loginUser(arguments.username, Arguments.password)>
 
 			<cfif rememberMe eq 1>
+				<cfset userKey = encrypt(qryUser.userID, getLocalSecret())>
 				<cfcookie name="homeportals_username" value="#qryUser.username#" expires="never">			
-				<cfcookie name="homeportals_userKey" value="#Hash(localSecret)#" expires="never">			
+				<cfcookie name="homeportals_userKey" value="#userKey#" expires="never">			
 			</cfif>
-			<cfset this.controller.setMessage("Welcome Back!")>
 
-			<cfset this.controller.setScript("document.location='#appRoot#'")>
+			<cfset this.controller.setMessage("Welcome Back!")>
+			<cfset this.controller.setScript("document.location='#appRoot#/?account=#qryUser.username#'")>
 					
 			<cfcatch type="any">
 				<cfset this.controller.setMessage(jsstringformat(cfcatch.Message))>
@@ -51,7 +51,25 @@ Also processes cookie logins.
 	<cffunction name="doCookieLogin" access="public" output="true">
 		<cfargument name="username" type="string" required="yes">
 		<cfargument name="userkey" type="string" required="yes">
-		<cfthrow message="cookie login is not implemented yet">
+
+		<cfset var oAccountsService = application.homePortals.getAccountsService()>
+		<cfset var decKey = "">
+		<cfset var qry = 0>
+		
+		<cftry>
+			<cfset decKey = decrypt(arguments.userKey, getLocalSecret())>
+			<cfset qry = oAccountsService.getAccountByUsername(arguments.username)>
+	
+			<cfif decKey eq qry.userID>
+				<cfset qryUser = oAccountsService.loginUser(arguments.username, "", qry.password)>
+			</cfif>
+
+			<cfcatch type="any">
+				<!--- if something happens, the clear cookies and abort login --->
+				<cfset doLogoff()>
+			</cfcatch>
+		</cftry>
+		
 		<cfreturn>
 	</cffunction>
 
@@ -72,6 +90,17 @@ Also processes cookie logins.
 			
 	</cffunction>
 
+	<!---------------------------------------->
+	<!--- getLocalSecret   	               --->
+	<!---------------------------------------->	
+	<cffunction name="getLocalSecret" returntype="string">
+		<cfset var localSecret = "En su grave rincon, los jugadores "
+							& "rigen las lentas piezas. El tablero "
+							& "los demora hasta el alba en su severo "
+							& "ambito en que se odian dos colores. ">
+		<cfreturn localSecret>
+	</cffunction>
+	
 	<!---------------------------------------->
 	<!--- throw                            --->
 	<!---------------------------------------->
