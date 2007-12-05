@@ -14,7 +14,7 @@
 		</description>
 		<attributes>
 			<attribute description="[Optional] Source of the bookmarks entries. For local storage you may only use a simple name, or it can also be a full URL for external opml files. Leave empty to use default storage." name="url" required="true"/>
-			<attribute description="Must be either Yes or No. Indicates whether to go to the URL address in the bookmark when clicking on it" name="followLink" required="true"/>
+			<attribute description="Must be either Yes or No. Indicates whether to go to the URL address in the bookmark when clicking on it" name="followLink" required="true" type="list" values="Yes,No" />
 		</attributes>
 		<api>
 			<methods>
