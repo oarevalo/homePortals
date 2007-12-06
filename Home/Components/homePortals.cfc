@@ -223,7 +223,7 @@
 				
 			} else {
 				// page is not in cache, so load the page
-				oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, variables.oHomePortalsConfigBean);
+				oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, variables.oHomePortalsConfigBean, variables.oCatalog);
 			
 				// store page in cache
 				variables.stPageCache[pageCacheKey] = structNew();

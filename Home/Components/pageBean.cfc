@@ -5,6 +5,7 @@
 		variables.instance.href = "";
 		variables.instance.title = "";
 		variables.instance.owner = "";
+		variables.instance.skinID = "";
 		variables.instance.access = "general";
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
@@ -173,6 +174,11 @@
 						addMetaTag(argumentCollection = args);
 						break;	
 						
+					// skin	
+					case "skin":
+						setSkinID(xmlNode.xmlAttributes.id);
+						break;
+						
 						
 				}
 			}		
@@ -262,6 +268,14 @@
 				arrayAppend(xmlNode.xmlChildren, xmlNode2);
 			}
 			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			
+			
+			// add skin
+			if(variables.instance.skinID neq "") {
+				xmlNode = xmlElemNew(xmlDoc,"skin");
+				xmlNode.xmlAttributes["id"] = variables.instance.skinID;
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			}
 		</cfscript>
 		<cfreturn xmlDoc>
 	</cffunction>
@@ -631,6 +645,17 @@
 	</cffunction>
 
 
+	<!---------------------------------------->
+	<!--- SkinID				           --->
+	<!---------------------------------------->		
+	<cffunction name="getSkinID" access="public" returntype="string">
+		<cfreturn variables.instance.skinID>
+	</cffunction>
+	
+	<cffunction name="setSkinID" access="public" returnType="void">
+		<cfargument name="skinID" type="string" required="true">
+		<cfset variables.instance.skinID = arguments.skinID>
+	</cffunction>
 
 
 

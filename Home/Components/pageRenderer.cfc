@@ -12,6 +12,7 @@
 		variables.pageHREF = "";		// path to the current page
 		variables.oHomePortalsConfigBean = 0;		// homeportals config
 		variables.stTimers = structNew();
+		variables.oCatalog = 0;			// reference to the current catalog
 	</cfscript>
 
 	<!--------------------------------------->
@@ -20,6 +21,7 @@
 	<cffunction name="init" access="public" returntype="pageRenderer">
 		<cfargument name="pageHREF" type="string" required="true" hint="The url of the page to load">
 		<cfargument name="configBean" type="homePortalsConfigBean" required="true" hint="HomePortals application settings">
+		<cfargument name="catalog" type="catalog" required="true" hint="Current resource catalog">
 		<cfset var start = getTickCount()>
 		
 		<cfif trim(arguments.pageHREF) eq "">
@@ -28,6 +30,7 @@
 
 		<cfset variables.pageHREF = arguments.pageHREF>
 		<cfset variables.oHomePortalsConfigBean = arguments.configBean>
+		<cfset variables.oCatalog = arguments.catalog>
 		
 		<cfset loadPage()>
 		
@@ -236,6 +239,7 @@
 		<cfset var moduleID = "">
 		<cfset var tmpHTML = "">
 		<cfset var appRoot = variables.oHomePortalsConfigBean.getAppRoot()>
+		
 		<!--- Add user-defined meta tags --->
 		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
 			<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#aMeta[i].content#"" />">
@@ -245,6 +249,11 @@
 		<cfloop from="1" to="#ArrayLen(aStylesheets)#" index="i">
 			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#aStylesheets[i]#""/>">
 		</cfloop>
+		
+		<!--- Add page skin --->
+		<cfif variables.stPage.page.skinHREF neq "">
+			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#variables.stPage.page.skinHREF#""/>">
+		</cfif>
 		
 		<!--- Include required and user-defined Javascript files --->
 		<cfloop from="1" to="#ArrayLen(aScripts)#" index="i">
@@ -278,7 +287,12 @@
 			</cfif>
 		</cfloop>
 
-		 <!--- <cfset tmpHTML = REReplace(tmpHTML, "[[:space:]]{2,}","","ALL")> --->
+		 <!--- 
+		 	Remove all whitespace from HEAD code
+		 	(for now is commented out because this can create problems with some JavaScript files)
+		 	<cfset tmpHTML = REReplace(tmpHTML, "[[:space:]]{2,}","","ALL")> 
+		 --->
+		 
 		<cfreturn tmpHTML>
 	</cffunction>
 	
@@ -346,6 +360,8 @@
 			var aStyleResources = variables.oHomePortalsConfigBean.getBaseResourcesByType("style");
 			var lstLayoutSections = variables.oHomePortalsConfigBean.getLayoutSections();
 			var aModuleIcons = variables.oHomePortalsConfigBean.getModuleIcons();
+			
+			var oResourceBean = 0;
 		
 			// check if we are on HTTPS and if we need to modify the root
 			if(isHTTPS and left(variables.pageHREF,1) eq "/")
@@ -372,6 +388,7 @@
 			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
 			variables.stPage.page.modules = StructNew();		// holds modules
 			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
+			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
 		
 			// set page owner
 			if(structKeyExists(xmlDoc.xmlRoot.xmlAttributes, "owner"))
@@ -522,7 +539,15 @@
 						ArrayAppend(variables.stPage.page.meta, duplicate(xmlNode.xmlAttributes));
 						break;	
 
+					// skin	
+					case "skin":
+						if(Not StructKeyExists(xmlNode.xmlAttributes,"id")) xmlNode.xmlAttributes.id = ""; 
 						
+						// get skin location from catalog 
+						oResourceBean = variables.oCatalog.getResourceNode("skin", xmlNode.xmlAttributes.id);
+						variables.stPage.page.skinHREF = oResourceBean.getHref();
+						
+						break;	
 				}
 			}		
 			
