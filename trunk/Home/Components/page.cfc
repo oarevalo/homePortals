@@ -85,6 +85,25 @@
 	</cffunction>
 
 
+	<!---------------------------------------->
+	<!--- getSkinID				           --->
+	<!---------------------------------------->	
+	<cffunction name="getSkinID" access="public" returntype="string" hint="returns the ID of the skin resource">
+		<cfreturn variables.oPageBean.getSkinID()>
+	</cffunction>
+
+	<!---------------------------------------->
+	<!--- setSkinID				           --->
+	<!---------------------------------------->	
+	<cffunction name="setSkinID" access="public" returntype="void" hint="sets the page skin">
+		<cfargument name="skinID" type="string" required="true" hint="ID of an skin resource">
+		<cfset variables.oPageBean.setSkinID(arguments.skinID)>
+		<cfif variables.autoSave>
+			<cfset save()>
+		</cfif>
+	</cffunction>
+
+
 
 	<!---------------------------------------->
 	<!--- getModules			           --->
@@ -655,40 +674,6 @@
 	<cffunction name="getPageTitle" access="public" returntype="string" output="False"
 				hint="Returns the page title">
 		<cfreturn variables.oPageBean.getTitle()>
-	</cffunction>
-
-
-	<!---------------------------------------->
-	<!--- setSkin				           --->
-	<!---------------------------------------->	
-	<cffunction name="setSkin" access="public" returntype="void" output="False"
-				hint="Selects a skin from the catalog">
-		<cfargument name="skinHREF" default="" type="string">			
-		<cfscript>
-			var localStyleHREF = "";
-			var hasLocalStyle = false;
-			var href = variables.oPageBean.getHREF();
-			
-			// local style
-			localStyleHREF = ReplaceNoCase(href,"/layouts/","/styles/") & ".css";
-			hasLocalStyle = variables.oPageBean.hasStylesheet(localStyleHREF);
-	
-			// remove all stylesheets
-			variables.oPageBean.removeAllStylesheets();
-			
-			// add new stylesheet
-			if(arguments.skinHREF neq "") {
-				variables.oPageBean.addStylesheet(arguments.skinHREF);
-			}
-			
-			// add local style (if it had any)
-			if(hasLocalStyle) {
-				variables.oPageBean.addStylesheet(localStyleHREF);
-			}
-			
-			// save page
-			if(variables.autoSave) save();	
-		</cfscript>
 	</cffunction>
 
 
