@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog>
 	<pageTemplates>
-		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout1.xml" id="Layout 1"/>
-		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout2.xml" id="Layout 2"/>
-		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout3.xml" id="Layout 3"/>
-		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout4.xml" id="Layout 4"/>
-		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout5.xml" id="Layout 5"/>
-		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout6.xml" id="Layout 6"/>
+		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout1.xml" id="3-col-wide-center"/>
+		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout2.xml" id="2-col-wide-right"/>
+		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout3.xml" id="2-col-wide-left"/>
+		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout4.xml" id="3-col-equal"/>
+		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout5.xml" id="2-col-header-wide-right"/>
+		<pageTemplate href="/Home/resourceLibrary/PageTemplates/layouts/layout6.xml" id="3-col-header-wide-center"/>
 	</pageTemplates>
 </catalog>
