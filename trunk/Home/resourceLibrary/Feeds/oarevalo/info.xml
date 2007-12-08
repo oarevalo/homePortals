@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalog>
-      <feeds>
-      <feed access="friend" href="http://rss.cnn.com/rss/cnn_world.rss" id="CNN_com _ World" owner="oarevalo">CNN.com delivers up-to-the-minute news and information on the latest top stories, weather, entertainment, politics and more.</feed><feed access="friend" href="http://www.forta.com/blog/rss.cfm?mode=full" id="Ben Forta_s Blog" owner="oarevalo">ColdFusion, Flex, Java, Web Services, and whatever else tickles my fancy.</feed><feed access="friend" href="http://www.luismajano.com/blog/index.cfm?event=ehBlog.dspRss&amp;mode=full" id="Luis Majano_s Java_ Coldfusion _ More Blog" owner="oarevalo">A blog about coldfusion, java, linux, technology, etc.</feed></feeds>
-    </catalog>
