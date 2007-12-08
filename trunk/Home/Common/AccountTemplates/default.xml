@@ -1,17 +1,14 @@
-<?xml version="1.0" encoding="utf-8" ?> 
-<?xml-stylesheet type="text/xsl" href="$HOME_ROOT$/pageLoader.xsl"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Page owner="$USERNAME$">
-	<title>HomePortals - $USERNAME$ Home</title>
-		
-	<!-- Define Screen Layout -->
+	<title>
+		HomePortals - $USERNAME$ Home
+	</title>
 	<layout>
-		<location type="column" name="left" class="leftcolumn" />
-		<location type="column" name="middle" class="middlecolumn" />
-		<location type="column" name="right" class="rightcolumn" />
-		<location type="footer" name="footer" class="footer"/>
+		<location class="leftcolumn" name="left" type="column" />
+		<location class="middlecolumn" name="middle" type="column" />
+		<location class="rightcolumn" name="right" type="column" />
+		<location class="footer" name="footer" type="footer" />
 	</layout>
-
-	<!-- Define Modules -->	
 	<modules />
-
 </Page>
+
