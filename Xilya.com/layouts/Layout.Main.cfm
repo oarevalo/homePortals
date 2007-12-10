@@ -72,5 +72,13 @@
 		</table>
 	
 	</cfoutput>	
+
+	<!--- google analytics --->	
+	<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+	</script>
+	<script type="text/javascript">
+	_uacct = "UA-1666655-10";
+	urchinTracker();
+	</script>	
 </body>
 </html>
