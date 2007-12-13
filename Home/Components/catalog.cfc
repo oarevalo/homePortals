@@ -72,6 +72,10 @@
 		<cfset var stResourceInfo = structNew()>
 		<cfset var oResourceLibrary = 0>
 
+		<cfif not StructKeyExists(variables.mapResources, arguments.resourceType)>
+			<cfthrow message="Resource type [#arguments.resourceType#] does not exist" type="homePortals.catalog.resourceTypeNotFound">
+		</cfif>
+
 		<cfif StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)>
 			<cfscript>
 				// create an instance of the resourceLibrary object
@@ -95,6 +99,11 @@
 	<cffunction name="deleteResourceNode" access="public" returntype="any" hint="Deletes the given resource node on this catalog">
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
 		<cfargument name="resourceID" type="string" required="true" hint="ID of the resource">
+
+		<cfif not StructKeyExists(variables.mapResources, arguments.resourceType)>
+			<cfthrow message="Resource type [#arguments.resourceType#] does not exist" type="homePortals.catalog.resourceTypeNotFound">
+		</cfif>
+
 		<cfif StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)>
 			<cfset structDelete(variables.mapResources[arguments.resourceType], arguments.resourceID)>
 			<cfset populateResourcesQuery()>
