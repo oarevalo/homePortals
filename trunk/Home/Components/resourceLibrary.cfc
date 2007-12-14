@@ -396,10 +396,10 @@
 			thisResTypeExt = getResourceTypeExtension(arguments.resourceType);
 				
 			// build the default name of the resource to register
-			tmpHREF = variables.resourcesRoot & "/" & arguments.resourceType & "s/" & arguments.packageName & "/" & arguments.packageName & "." & thisResTypeExt;
+			tmpHREF = arguments.resourceType & "s/" & arguments.packageName & "/" & arguments.packageName & "." & thisResTypeExt;
 
 			// if the file exists, then register it
-			if(fileExists(expandPath(tmpHREF))) {
+			if(fileExists(expandPath(variables.resourcesRoot & "/" & tmpHREF))) {
 
 				// create resource bean
 				oResourceBean = createObject("component","resourceBean").init();
