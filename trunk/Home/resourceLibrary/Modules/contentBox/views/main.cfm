@@ -5,6 +5,7 @@
 	contentTitle = "ContentBox";
 	bContentFound = true;
 	txtDoc = "";
+	resourceType = "content";
 	
 	// get module path
 	cfg = this.controller.getModuleConfigBean();
@@ -23,7 +24,7 @@
 	
 	// get the content entry from the catalog
 	try {
-		oResourceBean = application.homePortals.getCatalog().getResourceNode("content",contentID);
+		oResourceBean = application.homePortals.getCatalog().getResourceNode(resourceType,contentID);
 		
 	} catch(homePortals.catalog.resourceNotFound e) {
 		bContentFound = false;
@@ -34,7 +35,10 @@
 						or
 					 	(bContentFound and stUser.isOwner and (stUser.username eq oResourceBean.getOwner()));
 	
-
+	// get resource library root
+	hpConfigBean = this.controller.getHomePortalsConfigBean();
+	resourcesRoot = hpConfigBean.getResourceLibraryPath();
+	
 </cfscript>
 
 <!--- If no content found, then exit --->
@@ -67,6 +71,7 @@
 			<b>External content is not allowed!</b>
 		</cfif>
 	<cfelse>
+		<cfset contentLocation = resourcesRoot & "/" & contentLocation>
 		<cfif fileExists(expandPath(contentLocation))>
 			<cffile action="read" file="#expandPath(contentLocation)#" variable="txtDoc">
 		<cfelse>
