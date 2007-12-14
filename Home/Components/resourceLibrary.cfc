@@ -111,6 +111,7 @@
 			var packageDir = "";
 			var rb = arguments.resourceBean;
 			var resType = rb.getType();
+			var filePath = "";
 		
 			// validate bean			
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
@@ -119,7 +120,7 @@
 			if(not listFindNoCase(variables.lstAccessTypes, rb.getAccessType())) throw("The access type is invalid","homePortals.resourceLibrary.invalidAccessType");
 
 			// setup base directory
-			packageDir = resourcesRoot & "/" & resType & "s/" & rb.getPackage();
+			packageDir = variables.resourcesRoot & "/" & resType & "s/" & rb.getPackage();
 
 			// check if we need to create the package directory
 			if(not directoryExists(expandPath(packageDir))) {
@@ -127,9 +128,11 @@
 			}
 
 			// for resources that use local content, set the proper href for the given path based on the ID
+			// the path to the local content is always stored as path relative to the resources root,
+			// this is to make the resource more portable
 			href = rb.getHREF();
 			if(href eq "") {
-				href = packageDir & "/" & rb.getID() & "." & getResourceTypeExtension(resType);
+				href = resType & "s/" & rb.getPackage() & "/" & rb.getID() & "." & getResourceTypeExtension(resType);
 				rb.setHREF(href); 
 			} 
 				
@@ -180,11 +183,12 @@
 			// if this points to a local resource, then create or update the file,
 			// otherwise remove the file (if exists)
 			if(href neq "") {
+				filePath = expandPath(variables.resourcesRoot & "/" & href);
 				if(left(href,4) neq "http" and arguments.resourceBody neq "") {
-					saveFile(expandPath(href), arguments.resourceBody);
+					saveFile(filePath, arguments.resourceBody);
 				} else {
-					if(fileExists(expandPath(href)))
-						removeFile(expandPath(href));
+					if(fileExists(filePath))
+						removeFile(filePath);
 				}
 			}
 		</cfscript>
@@ -234,8 +238,8 @@
 			}				
 			
 			// remove resource file
-			if(resHref neq "" and left(resHref,4) neq "http" and fileExists(expandPath(resHref))) {
-				removeFile(expandPath(resHref));			
+			if(resHref neq "" and left(resHref,4) neq "http" and fileExists(expandPath(variables.resourcesRoot & "/" & resHref))) {
+				removeFile(expandPath(variables.resourcesRoot & "/" & resHref));			
 			}
 			
 		</cfscript>	
