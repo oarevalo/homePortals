@@ -239,6 +239,7 @@
 		<cfset var moduleID = "">
 		<cfset var tmpHTML = "">
 		<cfset var appRoot = variables.oHomePortalsConfigBean.getAppRoot()>
+		<cfset var resRoot = variables.oHomePortalsConfigBean.getResourceLibraryPath()>
 		
 		<!--- Add user-defined meta tags --->
 		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
@@ -252,7 +253,7 @@
 		
 		<!--- Add page skin --->
 		<cfif variables.stPage.page.skinHREF neq "">
-			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#variables.stPage.page.skinHREF#""/>">
+			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#resRoot#/#variables.stPage.page.skinHREF#""/>">
 		</cfif>
 		
 		<!--- Include required and user-defined Javascript files --->
