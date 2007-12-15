@@ -5,14 +5,14 @@
 .Section {
 	margin: 3px;
 	/*width: 17em; *//* ems so it will grow */
-	background: url(/Home/resourceLibrary/Skins/silver/bottom_right.gif) no-repeat bottom right;
+	background: url(bottom_right.gif) no-repeat bottom right;
 	/*font-size: 100%;*/
 	border:0px;
 	font-size:11px;
 	font-family:Arial, Helvetica, sans-serif;
 }
 .SectionTitle {
-	background: url(/Home/resourceLibrary/Skins/silver/top_right.gif) no-repeat top right;
+	background: url(top_right.gif) no-repeat top right;
 	margin: 0;
 	padding: 0;
 	text-align: left;
@@ -27,7 +27,7 @@ html>body .SectionTitle {
 }
 .SectionTitle h2 {
 	text-align: left;
-	background: url(/Home/resourceLibrary/Skins/silver/top_left.gif) no-repeat top left;
+	background: url(top_left.gif) no-repeat top left;
 	margin: 0;
 	padding: 9px 9px 10px 9px;
 	color: #333333; 
@@ -43,7 +43,7 @@ html>body .SectionTitle h2 {
 }
 
 .SectionBody {
-	background: url(/Home/resourceLibrary/Skins/silver/bottom-left.gif) no-repeat bottom left;
+	background: url(bottom-left.gif) no-repeat bottom left;
 	margin: 0;
 	padding: 10px;
 	width:100%;    /* IE only */

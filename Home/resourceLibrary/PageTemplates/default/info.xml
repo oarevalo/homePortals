@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog>
 	<pageTemplates>
-		<pageTemplate href="/Home/resourceLibrary/PageTemplates/default/default.xml" id="default"/>
+		<pageTemplate href="PageTemplates/default/default.xml" id="default"/>
 	</pageTemplates>
 </catalog>

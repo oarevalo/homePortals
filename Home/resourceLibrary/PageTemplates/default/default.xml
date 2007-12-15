@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Page>
-	<stylesheet href="/Home/resourceLibrary/PageTemplates/default/style.css"/>
-	
+	<skin id="silver"/>
+		
 	<layout>
 		<location class="middlecolumn" name="middle" type="column"/>
 		<location class="rightcolumn" name="right" type="column"/>

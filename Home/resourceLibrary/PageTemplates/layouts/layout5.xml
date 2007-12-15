@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Page>
+	<stylesheet href="/Home/resourceLibrary/PageTemplates/layoutTemplates.css" />
+	
 	<layout>
 		<location class="row" name="header" type="header"/>
 		<location class="column_small" name="left" type="column"/>
