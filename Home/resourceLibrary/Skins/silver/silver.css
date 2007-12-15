@@ -59,11 +59,12 @@ html>body .SectionBody {
 	padding:0px;
 	margin:0px;
 }
-
 .leftcolumn {
-	width:240px;
+	width:250px;
 }
-
+.middlecolumn {
+	
+}
 .rightcolumn {
 	width:250px;
 }
