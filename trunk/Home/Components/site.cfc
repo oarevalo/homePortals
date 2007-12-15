@@ -335,7 +335,7 @@
 	<!--- addPage			               --->
 	<!---------------------------------------->	
 	<cffunction name="addPage" access="public" output="false" returntype="string">
-		<cfargument name="pageName" required="true" type="string">
+		<cfargument name="pageName" required="true" type="string" hint="the name of the new page. If no extension is given, then .xml will be appended. The name is ignored if a pageHREF is given">
 		<cfargument name="pageHREF" required="false" default="" type="string" hint="Optional. The page to copy, if pageHREF is only the document name (without path), then assumes it is a local page on the current account">
 
 		<cfscript>
@@ -453,6 +453,16 @@
 		<cfreturn newPageURL>
 	</cffunction>
 
+	<!---------------------------------------->
+	<!--- addPageResource	               --->
+	<!---------------------------------------->	
+	<cffunction name="addPageResource" access="public" output="false" returntype="string">
+		<cfargument name="pageResourceBean" required="true" type="resourceBean" hint="resource bean">
+		<cfargument name="resourceRoot" default="/Home/resourceLibrary/" type="string" required="true">
+		<cfset var href = arguments.resourceRoot & "/" & arguments.pageResourceBean.getHREF()>	
+		<cfset var newHREF = addPage("", href)>
+		<cfreturn newHREF>
+	</cffunction>
 
 
 	<!---------------------------------------->
