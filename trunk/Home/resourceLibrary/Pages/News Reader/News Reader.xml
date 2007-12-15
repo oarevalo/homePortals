@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="/Home/pageLoader.xsl"?><Page>
+<Page>
 	<title>News Reader</title>
-	
-	<stylesheet href="/Home/Skins/hp/hp.css"/>
+
+	<skin id="silver"/>
 	
 	<layout>
 		<location class="column_small" name="left" type="column"/>
@@ -16,7 +16,7 @@
 		<module followLink="false" 
 			id="bookmarks21" location="left" name="Bookmarks/bookmarks" title="My News Feeds" 
 			url="NewsReaderFeeds"/>
-		<module id="rssReader1" location="right" maxItems="9999" moduleHREF="/Home/Modules//Accounts/catalog.xml#rssReader" 
+		<module id="rssReader1" location="right" maxItems="9999" 
 			name="RSSReader/RSSReader" style="height:500px;overflow:auto;" targetID="" title="RSS Reader"
 			rss="http://www.digg.com/rss/index.xml" />
 	</modules>

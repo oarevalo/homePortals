@@ -1,0 +1,18 @@
+.column { 
+	min-width:100px;
+}
+.column_small {
+	width:250px !important;
+}
+.row {
+	min-height:50px;
+	margin-left:210px;
+}
+.column_third {
+	width:33%;
+}
+.header {
+	padding:0px;
+	margin:5px;
+	border:0px;
+}

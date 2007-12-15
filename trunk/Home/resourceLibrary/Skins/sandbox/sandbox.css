@@ -7,7 +7,7 @@ html{
 
 body{
 	color: #333;
-	background:  url("/Home/resourceLibrary/Skins/sandbox/bg.gif");
+	background:  url("bg.gif");
 }
 
 .Section {
