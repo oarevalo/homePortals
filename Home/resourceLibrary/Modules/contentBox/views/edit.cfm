@@ -1,17 +1,17 @@
-<cfparam name="arguments.contentID" default="">
+<cfparam name="arguments.resourceID" default="">
 <cfscript>
 	// get module path
 	cfg = this.controller.getModuleConfigBean();
 	tmpModulePath = cfg.getModuleRoot();	
 	imgRoot = tmpModulePath & "/Images";
 	
-	contentID = arguments.contentID;	
+	resourceID = arguments.resourceID;	
 	
 	stUser = this.controller.getUserInfo();
 	siteOwner = stUser.username;
 	
-	if(contentID neq "") {
-		oResourceBean = application.homePortals.getCatalog().getResourceNode("content",contentID);
+	if(resourceID neq "") {
+		oResourceBean = application.homePortals.getCatalog().getResourceNode(getResourceType(),resourceID);
 		access = oResourceBean.getAccessType();
 		name = oResourceBean.getName();
 		description = oResourceBean.getDescription();
@@ -29,10 +29,18 @@
 		
 	// get the moduleID
 	moduleID = this.controller.getModuleID();	
+	
+	// get the resources root
+	resourcesRoot = hpConfigBean.getResourceLibraryPath();
 </cfscript>
 
 <cfif contentLocation neq "">
-	<cffile action="read" file="#expandPath(contentLocation)#" variable="content">
+	<cfset contentLocation = resourcesRoot & "/" & contentLocation>
+	<cfif fileExists(expandPath(contentLocation))>
+		<cffile action="read" file="#expandPath(contentLocation)#" variable="content">
+	<cfelse>
+		<cfset content = "Content document not found!">
+	</cfif>
 </cfif>
 
 <cfoutput>
@@ -41,12 +49,12 @@
 		
 			<div style="margin:5px;background-color:##333;border:1px solid silver;color:##fff;">
 				<div style="margin:5px;">
-					<strong>ContentBox:</strong> #tmpTitle#
+					<strong>#getResourceType()#Box:</strong> #tmpTitle#
 				</div>
 			</div>
 	
 			<form name="frmEditContent" action="##" method="post" style="margin:0px;padding:0px;">
-				<input type="hidden" name="contentID" value="#contentID#">
+				<input type="hidden" name="resourceID" value="#resourceID#">
 				<div style="border:1px solid silver;background-color:##fff;margin:5px;">
 					<table>
 						<tr>
@@ -76,8 +84,8 @@
 				
 				<div style="margin-top:10px;padding-bottom:10px;text-align:center;">
 					<input type="button" name="btnSave" value="Save" onclick="#moduleID#.doFormAction('saveContent',this.form);#moduleID#.closeWindow();">&nbsp;&nbsp;&nbsp;
-					<cfif contentID neq "">
-						<input type="button" name="btnDelete" value="Delete" onclick="if(confirm('Delete entry?')){#moduleID#.doAction('deleteContent',{contentID:'#contentID#'});#moduleID#.closeWindow();}">
+					<cfif resourceID neq "">
+						<input type="button" name="btnDelete" value="Delete" onclick="if(confirm('Delete entry?')){#moduleID#.doAction('deleteContent',{resourceID:'#resourceID#'});#moduleID#.closeWindow();}">
 					</cfif>
 				</div>
 				

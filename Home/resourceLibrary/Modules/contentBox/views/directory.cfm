@@ -11,7 +11,7 @@
 	
 	stUser = this.controller.getUserInfo();
 	siteOwner = stUser.username;
-	qryResources = getResourcesForAccount(siteOwner,"content");
+	qryResources = getResourcesForAccount(siteOwner);
 	
 	// get the moduleID
 	moduleID = this.controller.getModuleID();	
@@ -49,7 +49,7 @@
 
 	<div style="margin:5px;background-color:#333;border:1px solid silver;color:#fff;">
 		<div style="margin:5px;">
-			<strong>ContentBox:</strong> Search Directory 
+			<strong>#getResourceType()#Box:</strong> Search Directory 
 		</div>
 	</div>
 
