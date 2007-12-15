@@ -681,9 +681,11 @@
 	<!--- applyPageTemplate		           --->
 	<!---------------------------------------->	
 	<cffunction name="applyPageTemplate" access="public" returntype="void" output="False"
-				hint="Applies a page template. Page templates determine layout, styles, but preserve existing modules.">
-		<cfargument name="pageTemplateHREF" default="" type="string">			
-		<cfscript>
+				hint="Applies a page template resource bean. Page templates determine layout, styles, but preserve existing modules.">
+		<cfargument name="pageTemplateResourceBean" type="resourceBean" required="true">			
+		<cfargument name="resourceRoot" default="/Home/resourceLibrary/" type="string">			
+
+ 		<cfscript>
 			var oPageTemplateBean = 0;
 			var localStyleHREF = "";
 			var i=0;
@@ -691,9 +693,11 @@
 			var hasLocalStyle = false;
 			var lstLocations = "";
 			var href = variables.oPageBean.getHREF();
+			var pageTemplateHREF = "";
 			
 			// get page template
-			oPageTemplateBean = createObject("component","pageBean").init(arguments.pageTemplateHREF);
+			pageTemplateHREF = resourceRoot & "/" & pageTemplateResourceBean.getHREF();
+			oPageTemplateBean = createObject("component","pageBean").init(pageTemplateHREF);
 
 			// local style
 			localStyleHREF = ReplaceNoCase(href,"/layouts/","/styles/") & ".css";
@@ -703,6 +707,11 @@
 			variables.oPageBean.removeAllStylesheets();
 			variables.oPageBean.removeAllLayoutRegions();
 			
+			// add skin from the page template (if any)
+			tmpSkinID = oPageTemplateBean.getSkinID();
+			if(tmpSkinID neq "")
+				variables.oPageBean.setSkinID(tmpSkinID);
+							
 			// add stylesheets from page template
 			aTemp = oPageTemplateBean.getStylesheets();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
