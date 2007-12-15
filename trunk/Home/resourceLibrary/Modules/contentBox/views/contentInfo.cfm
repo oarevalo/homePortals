@@ -9,7 +9,7 @@
 	
 	stUser = this.controller.getUserInfo();
 	siteOwner = stUser.username;
-	qryResources = getResourcesForAccount(siteOwner,"content");
+	qryResources = getResourcesForAccount(siteOwner);
 	
 	// get the moduleID
 	moduleID = this.controller.getModuleID();	
@@ -49,6 +49,6 @@
 			</cfif>
 		</div>
 		<br>
-		<input type="button" name="btnAdd" value="Select This" onclick="#moduleID#.doAction('setContentID',{contentID:'#resourceID#'})">
+		<input type="button" name="btnAdd" value="Select This" onclick="#moduleID#.doAction('setResourceID',{resourceID:'#resourceID#'})">
 	</cfoutput>
 </cfif>

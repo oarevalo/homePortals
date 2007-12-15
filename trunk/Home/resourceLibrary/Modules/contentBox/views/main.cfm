@@ -1,11 +1,11 @@
-<cfparam name="contentID" default="">
+<cfparam name="resourceID" default="">
 
 <cfscript>
 	contentLocation = "";
 	contentTitle = "ContentBox";
 	bContentFound = true;
 	txtDoc = "";
-	resourceType = "content";
+	resourceType = getResourceType();
 	
 	// get module path
 	cfg = this.controller.getModuleConfigBean();
@@ -20,11 +20,11 @@
 	moduleID = this.controller.getModuleID();
 	
 	// get settings
-	if(contentID eq "") contentID = cfg.getPageSetting("contentID","");	
+	if(resourceID eq "") resourceID = cfg.getPageSetting("resourceID","");	
 	
 	// get the content entry from the catalog
 	try {
-		oResourceBean = application.homePortals.getCatalog().getResourceNode(resourceType,contentID);
+		oResourceBean = application.homePortals.getCatalog().getResourceNode(getResourceType(),resourceID);
 		
 	} catch(homePortals.catalog.resourceNotFound e) {
 		bContentFound = false;
@@ -44,7 +44,7 @@
 <!--- If no content found, then exit --->
 <cfif Not bContentFound>
 
-	<cfif contentID eq "">
+	<cfif resourceID eq "">
 		<em>Select a content entry to display</em>
 	<cfelse>
 		<em>Content entry not found!</em>
@@ -59,7 +59,7 @@
 	<cfif oResourceBean.getName() neq "">
 		<cfset contentTitle = oResourceBean.getName()>
 	<cfelse>
-		<cfset contentTitle = contentID>
+		<cfset contentTitle = resourceID>
 	</cfif>
 
 	<!--- Check if this is an external content or local content --->
@@ -76,7 +76,7 @@
 			<cffile action="read" file="#expandPath(contentLocation)#" variable="txtDoc">
 		<cfelse>
 			<b>Content not found!</b>
-			<cfset contentID = "">
+			<cfset resourceID = "">
 		</cfif>
 	</cfif>
 </cfif>
@@ -95,9 +95,9 @@
 			<a href="javascript:#moduleID#.getPopupView('edit');"><img src="#imgRoot#/add-page-orange.gif" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getPopupView('edit');">New</a>
 			&nbsp;&nbsp;
-			<cfif bIsContentOwner and contentID neq "">
-				<a href="javascript:#moduleID#.getPopupView('edit',{contentID:'#contentID#'});"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
-				<a href="javascript:#moduleID#.getPopupView('edit',{contentID:'#contentID#'});">Edit</a>
+			<cfif bIsContentOwner and resourceID neq "">
+				<a href="javascript:#moduleID#.getPopupView('edit',{resourceID:'#resourceID#'});"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
+				<a href="javascript:#moduleID#.getPopupView('edit',{resourceID:'#resourceID#'});">Edit</a>
 				&nbsp;&nbsp;
 			</cfif>
 			<a href="javascript:#moduleID#.getPopupView('directory');"><img src="#imgRoot#/page_white_text.png" border="0" align="absmiddle"></a>
