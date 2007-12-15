@@ -8,7 +8,7 @@
 			cfg.setModuleClassName("contentBox");
 			cfg.setView("default", "main");
 			
-			variables.contentType = "content";
+			variables.resourceType = "content";
 		</cfscript>	
 	</cffunction>
 	

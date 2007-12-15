@@ -8,7 +8,7 @@
 			cfg.setModuleClassName("htmlBox");
 			cfg.setView("default", "main");
 			
-			variables.contentType = "html";
+			variables.resourceType = "html";
 		</cfscript>	
 	</cffunction>
 	
