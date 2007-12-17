@@ -1,4 +1,4 @@
-<cfcomponent name="ehGeneral" extends="coldbox.system.eventhandler">
+<cfcomponent name="ehGeneral" extends="eventhandler">
 
 	<cffunction name="dspProfile" access="public" returntype="string">
 		<cfscript>
@@ -7,34 +7,41 @@
 			var stUserInfo = 0;
 			var avatarHREF = "/xilya/includes/images/avatar.jpg";
 			
-			// get info on current user
-			oUserRegistry = createObject("component","Home.Components.userRegistry").init();
-			stUserInfo = oUserRegistry.getUserInfo();
-			
-			if(stUserInfo.userID neq "") {
-				bLoggedIn = true;
-				qryUser = stUserInfo.userData;
-			} 
-			
-			if(not bLoggedIn) {
-				getPlugin("messagebox").setMessage("error", "You must first login to your account before editing your profile");
-				setNextEvent("ehGeneral.dspLogin");
-			}
-			
-			// get member info
-			o = createObject("component","xilya.components.members");
-			o.init();	
-			qryMember = o.getByAccountID(qryUser.userID);
-			
-			// check if user has avatar pic
-			if(fileExists(expandPath("/Accounts/#stUserInfo.userName#/avatar.jpg")))
-				avatarHREF = "/Accounts/#stUserInfo.userName#/avatar.jpg";
-			
-			setValue("qryUser", qryUser);	
-			setValue("qryMember", qryMember);	
-			setValue("avatarHREF", avatarHREF);	
+			try {
+				// get info on current user
+				oUserRegistry = createObject("component","Home.Components.userRegistry").init();
+				stUserInfo = oUserRegistry.getUserInfo();
+				
+				if(stUserInfo.userID neq "") {
+					bLoggedIn = true;
+					qryUser = stUserInfo.userData;
+				} 
+				
+				if(not bLoggedIn) {
+					setMessage("warning", "You must first login to your account before editing your profile");
+					setNextEvent("ehGeneral.dspLogin");
+				}
+				
+				// get member info
+				o = createObject("component","xilya.components.members");
+				o.init();	
+				qryMember = o.getByAccountID(qryUser.userID);
+				
+				// check if user has avatar pic
+				if(fileExists(expandPath("/Accounts/#stUserInfo.userName#/avatar.jpg")))
+					avatarHREF = "/Accounts/#stUserInfo.userName#/avatar.jpg";
+				
+				setValue("qryUser", qryUser);	
+				setValue("qryMember", qryMember);	
+				setValue("avatarHREF", avatarHREF);	
+	
+				setView("vwProfile");
 
-			setView("vwProfile");
+			} catch(any e) {
+				setMessage("error", e.message);
+				getService("bugTracker").notifyService(e.message, e);
+				setNextEvent("ehGeneral.dspHome");
+			}
 		</cfscript>
 	</cffunction>
 
@@ -65,13 +72,13 @@
 				} 
 
 				if(not bLoggedIn) {
-					getPlugin("messagebox").setMessage("error", "You must first login to your account before editing your profile");
+					setMessage("error", "You must first login to your account before editing your profile");
 					setNextEvent("ehGeneral.dspLogin");
 				}
 
 				// validate form
-				if(email eq "") throw("Please enter your email address.");
-				if(reReplace(email,"^.+@[^\.].*\.[a-z]{2,}$","OK") neq "OK") throw("Please enter a valid email address.");
+				if(email eq "") throw("Please enter your email address.","xilya.validation");
+				if(reReplace(email,"^.+@[^\.].*\.[a-z]{2,}$","OK") neq "OK") throw("Please enter a valid email address.","xilya.validation");
 				
 				// create and initialize account object
 				o = getAccountsService();	
@@ -118,17 +125,20 @@
 					
 				}
 
-				getPlugin("messagebox").setMessage("info", "Member profile updated");
-				
-			} catch(any e) {
-				getPlugin("messagebox").setMessage("error", e.message);
-			}
+				setMessage("info", "Member profile updated");
 	
+			} catch(xilya.validation e) { 
+				setMessage("warning", e.message);
+			
+			} catch(any e) {
+				setMessage("error", e.message);
+				getService("bugTracker").notifyService(e.message, e);
+			}
+				
 			setNextEvent("ehProfile.dspProfile");
 		</cfscript>
 	</cffunction>	
-	
-	
+		
 	<cffunction name="doChangePassword" access="public" returntype="string">
 		<cfscript>
 			var o = 0;
@@ -154,14 +164,14 @@
 				} 
 				
 				if(not bLoggedIn) {
-					getPlugin("messagebox").setMessage("error", "You must first login to your account before editing your profile");
+					setMessage("error", "You must first login to your account before editing your profile");
 					setNextEvent("ehGeneral.dspLogin");
 				}
 
 				// validate form
-				if(password eq "") throw("Password cannot be empty");
-				if(len(password) lt 6) throw("Passwords must be at least 6 characters long");
-				if(password neq password2) throw("The password confirmation does not match the selected passwords. Please correct.");
+				if(password eq "") throw("Password cannot be empty","xilya.validation");
+				if(len(password) lt 6) throw("Passwords must be at least 6 characters long","xilya.validation");
+				if(password neq password2) throw("The password confirmation does not match the selected passwords. Please correct.","xilya.validation");
 				
 				// create and initialize account object
 				o = getAccountsService();	
@@ -186,12 +196,17 @@
 				o.save(argumentCollection = args);
 				o.commit();
 
-				getPlugin("messagebox").setMessage("info", "Member profile updated");
+				setMessage("info", "Member profile updated");
+
+			} catch(xilya.validation e) { 
+				setMessage("warning", e.message);
 				
 			} catch(any e) {
-				getPlugin("messagebox").setMessage("error", e.message);
-				setNextEvent("ehProfile.dspProfile");
+				getService("bugTracker").notifyService(e.message, e);
+				setMessage("error", e.message);
 			}
+
+			setNextEvent("ehProfile.dspProfile");
 		</cfscript>
 	</cffunction>		
 	

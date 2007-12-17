@@ -1,8 +1,13 @@
+<cfparam name="request.requestState.accountName" default="">
+<cfparam name="request.requestState.email" default="">
+<cfparam name="request.requestState.firstName" default="">
+<cfparam name="request.requestState.lastName" default="">
+
 <cfscript>
-	accountName = getValue("accountName","");
-	email = getValue("email","");
-	firstName = getValue("firstName","");
-	lastName = getValue("lastName","");
+	accountName = request.requestState.accountName;
+	email = request.requestState.email;
+	firstName = request.requestState.firstName;
+	lastName = request.requestState.lastName;
 </cfscript>
 
 <table width="600" align="center">
