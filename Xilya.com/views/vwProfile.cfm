@@ -1,6 +1,10 @@
-<cfset qryUser = getValue("qryUser")>
-<cfset qryMember = getValue("qryMember")>
-<cfset avatarHREF = getValue("avatarHREF")>
+<cfparam name="request.requestState.qryUser" default="">
+<cfparam name="request.requestState.qryMember" default="">
+<cfparam name="request.requestState.avatarHREF" default="">
+
+<cfset qryUser = request.requestState.qryUser>
+<cfset qryMember = request.requestState.qryMember>
+<cfset avatarHREF = request.requestState.avatarHREF>
 
 <table width="600" align="center">
 	<tr><td>

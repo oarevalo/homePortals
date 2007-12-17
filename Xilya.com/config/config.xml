@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+	<!-- This section describes application-specific settings -->
+	<settings>
+		<setting name="bugLogListener" value="http://www.oscararevalo.com/bugLog/listeners/bugLogListenerWS.cfc?WSDL" />
+		<setting name="bugEmailRecipients" value="info@xilya.com" />
+		<setting name="bugEmailSender" value="info@xilya.com" />
+	</settings>
+	
+	
+	<!-- This section describes all services that will be loaded into the application -->
+	<services>
+		<!-- error reporting service -->
+		<service name="bugTracker" class="components/services/bugLogService.cfc">
+			<init-param name="bugLogListener" settingName="bugLogListener" />
+			<init-param name="bugEmailSender" settingName="bugEmailSender" />
+			<init-param name="bugEmailRecipients" settingName="bugEmailRecipients" />
+		</service>
+	</services>
+</config>
+

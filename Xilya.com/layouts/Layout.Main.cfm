@@ -1,6 +1,4 @@
 <cfscript>
-	tmpMsg = getPlugin("messageBox").renderit();
-	
 	oUserRegistry = createObject("component","Home.Components.userRegistry").init();
 	stUserInfo = oUserRegistry.getUserInfo();
 				
@@ -54,19 +52,19 @@
 					<cfinclude template="../includes/sideBar.cfm">
 				</td>
 				<td>
-					<cfif tmpMsg neq "">
-						#tmpMsg#<br>
-					</cfif>
+					<cfinclude template="../includes/message.cfm">
 
-					#renderView()#	
+					<!--- Render the view --->
+					<cfif request.requestState.view neq "">
+						<cfinclude template="../views/#request.requestState.view#.cfm">
+					</cfif>
 					
 					<br /><br />
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2" style="border-top:1px solid silver;border-bottom:1px solid silver;background-color:##ebebeb;font-size:10px;line-height:18px;" align="center">
-					<a href="http://www.cfempire.com" style="color:##333;">CFEmpire.com</a> &nbsp;&nbsp;|&nbsp;&nbsp;
-					<a href="mailto:info@cfempire.com" style="color:##333;">Contact Us</a>
+					<a href="mailto:info@xilya.com" style="color:##333;">info@xilya.com</a>
 				</td>
 			</tr>
 		</table>
