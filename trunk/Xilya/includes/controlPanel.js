@@ -185,12 +185,13 @@ function controlPanelClient() {
 	}
 
 	function applyPageTemplate(frm) {
+		var resourceID = "";
 		for (var i=0; i<frm.layout.length; i++)  {
 			if (frm.layout[i].checked)  {
-				pageTemplateHREF = frm.layout[i].value
+				resourceID = frm.layout[i].value
 			}
 		}
-		h_callServer(this.server,"applyPageTemplate","siteMapStatusBar",{pageTemplateHREF:pageTemplateHREF});
+		h_callServer(this.server,"applyPageTemplate","siteMapStatusBar",{resourceID:resourceID});
 	}
 		
 	function setPageAccess(accessType) {

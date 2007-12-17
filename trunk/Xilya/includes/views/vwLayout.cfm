@@ -18,30 +18,30 @@
 			<tr valign="top">
 				<td align="center">
 					<img src="#imgRoot#/layouts/layout1.gif"><br>
-					<input type="radio" name="layout" value="layouts/layout1.xml">
+					<input type="radio" name="layout" value="3-col-wide-center">
 				</td>
 				<td align="center">
 					<img src="#imgRoot#/layouts/layout2.gif"><br>
-					<input type="radio" name="layout" value="layouts/layout2.xml">
+					<input type="radio" name="layout" value="2-col-wide-right">
 				</td>
 				<td align="center">
 					<img src="#imgRoot#/layouts/layout3.gif"><br>
-					<input type="radio" name="layout" value="layouts/layout3.xml">
+					<input type="radio" name="layout" value="2-col-wide-left">
 				</td>
 			</tr>
 			<tr><td colspan="3">&nbsp;</td></tr>
 			<tr valign="top">
 				<td align="center">
 					<img src="#imgRoot#/layouts/layout4.gif"><br>
-					<input type="radio" name="layout" value="layouts/layout4.xml">
+					<input type="radio" name="layout" value="3-col-equal">
 				</td>
 				<td align="center">
 					<img src="#imgRoot#/layouts/layout5.gif"><br>
-					<input type="radio" name="layout" value="layouts/layout5.xml">
+					<input type="radio" name="layout" value="2-col-header-wide-right">
 				</td>
 				<td align="center">
 					<img src="#imgRoot#/layouts/layout6.gif"><br>
-					<input type="radio" name="layout" value="layouts/layout6.xml">
+					<input type="radio" name="layout" value="3-col-header-wide-center">
 				</td>
 			</tr>
 			<tr>
