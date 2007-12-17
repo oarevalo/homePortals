@@ -295,13 +295,17 @@
 	<!--- applyPageTemplate		           --->
 	<!---------------------------------------->	
 	<cffunction name="applyPageTemplate" access="public" output="true">
-		<cfargument name="pageTemplateHREF" default="" type="string">
+		<cfargument name="resourceID" default="" type="string">
 		<cfset var resLibraryPath = "">
 		<cftry>
 			<cfscript>
 				validateOwner();
 				resLibraryPath = application.homePortals.getConfig().getResourceLibraryPath();
-				variables.oPage.applyPageTemplate(resLibraryPath & "/PageTemplates/" & arguments.pageTemplateHREF);
+
+				// get pagetemplate resource
+				oResourceBean = application.homePortals.getCatalog().getResourceNode("pageTemplate", arguments.resourceID);
+
+				variables.oPage.applyPageTemplate(oResourceBean, resLibraryPath);
 			</cfscript>
 			<script>
 				controlPanel.setStatusMessage("Layout changed.");
