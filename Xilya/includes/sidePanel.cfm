@@ -214,7 +214,7 @@
 		<div class="sidePanelSectionContent" id="sbPnl_addWorkspace" style="display:none;">
 			<cfloop query="qryCatalogPages">
 				&bull;&nbsp;
-				<a href="##" onclick="controlPanel.addPage('','#qryCatalogPages.href#')" >#qryCatalogPages.id#</a><br />
+				<a href="##" onclick="controlPanel.addPageResource('#jsstringformat(qryCatalogPages.id)#')" >#qryCatalogPages.id#</a><br />
 			</cfloop>
 		</div>		
 		</cfoutput>

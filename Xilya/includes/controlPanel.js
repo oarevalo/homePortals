@@ -131,6 +131,15 @@ function controlPanelClient() {
 		}
 	}
 
+	function addPageResource(resourceID) {
+		if(resourceID==undefined || resourceID==null || resourceID=="")
+			alert("You must select a workspace to add to the site.");	
+		else {
+			h_callServer(this.server,"addPageResource","siteMapStatusBar",{resourceID:resourceID});
+		}
+	}
+
+
 	function deletePage(pageHREF) {
 		if(confirm("Delete page from site?")) {
 			h_callServer(this.server,"deletePage","siteMapStatusBar",{pageHREF:pageHREF});
@@ -332,6 +341,7 @@ function controlPanelClient() {
 	controlPanelClient.prototype.addModule = addModule;
 	controlPanelClient.prototype.deleteModule = deleteModule;
 	controlPanelClient.prototype.addPage = addPage;
+	controlPanelClient.prototype.addPageResource = addPageResource;
 	controlPanelClient.prototype.deletePage = deletePage;
 	controlPanelClient.prototype.changeTitle = changeTitle;
 	controlPanelClient.prototype.renamePage = renamePage;

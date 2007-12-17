@@ -190,6 +190,40 @@
 	</cffunction>
 
 	<!---------------------------------------->
+	<!--- addPageResource	               --->
+	<!---------------------------------------->	
+	<cffunction name="addPageResource" access="public" output="true">
+		<cfargument name="resourceID" type="string">
+		<cfset var newPageURL = "">
+		<cfset var resLibraryPath = "">
+		<cfset var oResourceBean = 0>
+
+		<cftry>
+			<cfscript>
+				validateOwner();
+				resLibraryPath = application.homePortals.getConfig().getResourceLibraryPath();
+
+				// get page resource
+				oResourceBean = application.homePortals.getCatalog().getResourceNode("page", arguments.resourceID);
+
+				// add page to site
+				newPageURL = getSite().addPageResource(oResourceBean, resLibraryPath);
+
+				// redirect to new page				
+				newPageURL = "index.cfm?account=" & variables.oPage.getOwner() & "&page=" & replaceNoCase(getFileFromPath(newPageURL),".xml","");
+			</cfscript>
+			<script>
+				controlPanel.closeEditWindow();
+				window.location.replace('#newPageURL#');
+			</script>
+			<cfcatch type="any">
+				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+			</cfcatch>
+		</cftry>			
+	</cffunction>
+
+
+	<!---------------------------------------->
 	<!--- deletePage		               --->
 	<!---------------------------------------->	
 	<cffunction name="deletePage" access="public" output="true">
