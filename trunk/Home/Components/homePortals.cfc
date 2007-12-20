@@ -29,9 +29,6 @@
 			
 			variables.appRoot = arguments.appRoot;
 
-			// validate license
-			validateLicense();
-
 			// create object to store configuration settings
 			variables.oHomePortalsConfigBean = createObject("component", "homePortalsConfigBean").init();
 
@@ -161,32 +158,6 @@
 		<cfargument name="type" type="string" default="custom"> 
 		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
 	</cffunction>
-
-	<cffunction name="validateLicense" access="private" returntype="void" hint="Checks that this installation has a valid license">
-		<cfscript>
-			var oLicense = 0;
-			var stLicense = structNew();
-			var stLicenseCheck = structNew();
-			var start = getTickCount();
-			
-			try {
-				oLicense = CreateObject("component","license");
-				stLicense = oLicense.getLicenseKey();
-				stLicenseCheck = oLicense.validateLicenseKey(stLicense);
-			} catch(any e) {
-				throw("An error ocurred while validating the license key. You may need to reinstall HomePortals. #e.mssage#");
-			}
-
-			if(Not stLicenseCheck.valid) {
-				if(stLicenseCheck.message eq "invalid key.")
-					throw("This installation of HomePortals does not have a valid license.","","homeportals.license.invalidKey");
-				else
-					throw(stLicenseCheck.message,"","homeportals.license.invalidLicense");
-			}		
-			
-			variables.stTimers.validateLicense = getTickCount()-start;
-		</cfscript>	
-	</cffunction>			
 
 	<cffunction name="getFileLastModified" returntype="date" access="private" hint="Returns the date the file was last modified">
 		<cfargument name="fileName" type="string" required="true" hint="full path to the file">
