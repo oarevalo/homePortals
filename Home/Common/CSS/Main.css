@@ -19,9 +19,9 @@ th, td {
 	font-size: 11px;
 }
 A:link, A:visited,  A:active, A.highlighted {
-	color: #386189;
 	text-decoration: none;
 	font-size: 11px;
+	color:#333;
 }
 A:hover {
 	color: black;
@@ -53,6 +53,20 @@ h2 {
 }
 .SectionBodyRegion {
 	padding: 15px;
+}
+.SectionToolbar {
+	border:1px solid silver;
+	background-color:#fefcd8;
+	margin:0px;
+	color:#993300;
+	margin-top:8px;
+	padding:2px;
+	font-size:11px;
+}
+.SectionToolbar a {
+	color:#333333 !important;
+	font-weight:bold;
+	font-size:10px;
 }
 #h_loading {
 	position:absolute;
