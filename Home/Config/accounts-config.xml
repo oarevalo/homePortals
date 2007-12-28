@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- THIS XML DOCUMENT CONTAINS DETAILS TO CONNECT TO 
+	THE DATASOUCE WHERE ACCOUNT INFORMATION IS STORED.
+	DO NOT EDIT MANUALLY. 
+--><homePortalsAccounts version="1.0">
+	<!-- Database connection info -->
+	<datasource />
+	<username />
+	<password />
+	
+	<!-- Root directory for account directories -->
+	<accountsRoot>).-(:GE:Y^8]-
+</accountsRoot>
+<homeRoot>%.-L6D%P 
+</homeRoot>
+
+<!-- Mail settings -->
+<mailServer />
+<emailAddress />
+
+<!-- Default templates -->
+<newAccountTemplate>?./(:GE:Y^8]-]J,IN9^6^.B&amp;lt;5-&amp;amp;7&amp;amp;YR\29^/&amp;amp;4:SGP  
+</newAccountTemplate>
+<newPageTemplate>?./(:GE:Y^8]-]J,IN9^6^.B&amp;lt;5-&amp;amp;=&amp;amp;XV-792&amp;gt;&amp;amp;4:SGP  
+</newPageTemplate>
+<siteTemplate>&amp;lt;./(:GE:Y^8]-]J,IN9^6^.B&amp;lt;5-&amp;amp; %XZX$HN66P  
+</siteTemplate>
+
+</homePortalsAccounts>

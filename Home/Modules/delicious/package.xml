@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   del.icio.us  ************ -->
+	<module access="general" id="del.icio.us" name="delicious/delicious">
+		<description>
+			This module allows you to interact with del.icio.us
+		</description>
+		<resources>
+			<resource href="/home/modules/delicious/delicious.js" type="script"/>
+		</resources>		
+		<api>
+			<methods>
+				<method description="Performs a delicious search" name="doSearch"/>
+			</methods>	
+		</api>
+	</module>
+</modules>
+</catalog>

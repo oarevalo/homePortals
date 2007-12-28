@@ -8,20 +8,16 @@ defined on the configuration xml for each homepage
 */
 
 /*********** CSS Styles for default appearance of HTML tags ********/
-body {
+body{
 	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-	font-size: 11px;
+	font-size: 10pt;
 	margin:0px;
 	padding:0px;
 }
-th, td {
-	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-	font-size: 11px;
-}
 A:link, A:visited,  A:active, A.highlighted {
+	color: #386189;
 	text-decoration: none;
 	font-size: 11px;
-	color:#333;
 }
 A:hover {
 	color: black;
@@ -38,49 +34,52 @@ h2 {
 }
 .SectionTitle {
 	text-align: left;
-	padding:0px;
+	padding-left:0px;
+	padding-bottom:5px;
 	white-space:nowrap;
 	display:block;
+	width:100%;
 }
+.SectionControls_Arrow {
+	width:20px;
+	display:inline;
+}
+.SectionControls_Arrow img {border:0px;}
+.SectionControls_Print {display:inline;}
+.SectionControls_Print img {border:0px;}
 .SectionTitleLabel {
+	display:inline;
 	font-weight:bold;
-	font-size:12px;
-	line-height:20px;
-	margin-left:5px;
+	font-size:8pt;
 }
+a.SectionTitleLabel:link { }
 .SectionBody {
 	display:block;
 }
 .SectionBodyRegion {
 	padding: 15px;
 }
-.SectionToolbar {
-	border:1px solid silver;
-	background-color:#fefcd8;
-	margin:0px;
-	color:#993300;
-	margin-top:8px;
-	padding:2px;
-	font-size:11px;
-}
-.SectionToolbar a {
-	color:#333333 !important;
-	font-weight:bold;
-	font-size:10px;
-}
-#h_loading {
-	position:absolute;
-	border:1px solid silver;
-	background-color:#FFFFFF;
-	color:#000000;
-	width:70px;
-	height:15px;
-	z-index:100000;
-	text-align:center;
-	padding-top:6px;
-    margin:4px;
-}
 
+
+	ul.h_modulesList li.Section {
+		position: relative;
+	}
+	ul.h_modulesList {
+		list-style-type: none;
+		padding: 0px;
+		margin: 0px;
+	}
+	ul.h_modulesList li.Section {
+		margin: 2px;
+		padding: 0px;
+	} 
+	
+
+/***************** CSS Styles for the Container module **********************/
+.containerElement {
+	float:left;
+	border:0pt solid black;
+}
 
 /***************** CSS Styles for popup module window ******************/
 #h_moduleWindow {
@@ -95,6 +94,7 @@ h2 {
 	z-index:99999;
 	top:100px;
 	overflow:auto;
+	background:  url("/Accounts/default/skins/sandbox/bg.gif");
 }
 #h_moduleWindowClose {
 	position:absolute;

@@ -24,14 +24,4 @@
 		</cfsavecontent>
 		<cfreturn tmpHTML>
 	</cffunction>	
-
-	<!---------------------------------------->
-	<!--- throw			                   --->
-	<!---------------------------------------->		
-	<cffunction name="throw" access="private">
-		<cfargument name="message" type="string" required="false" default="">
-		<cfargument name="detail" type="string" required="false" default="">
-		<cfargument name="type" type="string" required="false" default="custom">
-		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
-	</cffunction>
 </cfcomponent>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<path>/Home/Modules/Bookmarks2/</path>
+<modules>
+	<!-- ********   Bookmarks2  ************ -->
+	<module access="general" id="bookmarks2" name="bookmarks2/bookmarks2">
+		<description>
+			Displays an interactive list of items and/or links. You can add/edit/delete items. Whenever an
+			option is selected the event bookmakrs.onClick is raised.
+		</description>
+		<resources>
+			<resource href="/home/modules/bookmarks2/bookmarks2.js" type="script"/>
+		</resources>		
+		<attributes>
+			<attribute description="[Optional] Indicates the URL of a document where to store the bookmark entries. Leave empty to use default storage." name="url" required="true"/>
+			<attribute description="Must be either Yes or No. Indicates whether to go to the URL address in the bookmark when clicking on it" name="followLink" required="true"/>
+		</attributes>
+		<eventListeners>
+			<event eventHandler="$ID$.getBookmarks" eventName="PageLoaded" objectName="Framework"/>
+		</eventListeners>	
+		<api>
+			<methods>
+				<method description="Retrieves all bookmarks" name="getBookmarks"/>
+				<method description="Display a dialog box to create a new item" name="getAddItem"/>
+				<method description="Adds an item to the list" name="addItem"/>
+				<method description="Adds an item to the list (alternate format)" name="addItem2"/>
+				<method description="Follows the given hyperlink" name="followLink"/>
+				<method description="Opens an XML editor to modify the bookmarks manually" name="getEdit"/>
+			</methods>	
+			<events>
+				<event description="This event is raised when someone clicks on a bookmark" name="onClick"/>
+			</events>
+		</api>
+	</module>
+</modules>
+</catalog>

@@ -6,25 +6,10 @@
 	<!---------------------------------------->
 	<!--- init		                       --->
 	<!---------------------------------------->		
-	<cffunction name="init" access="public" hint="constructor" returntype="moduleControllerRemote">
+	<cffunction name="init" access="public" hint="constructor">
 		<cfargument name="moduleID" type="any" required="true">
-		<cfargument name="homePortalsConfigBean" type="homePortalsConfigBean" required="true" hint="homeportals settings">
-		
-		<cfscript>
-			var myConfigBeanStore = createObject("component", "configBeanStore");
-			
-			// verify that the session still exists before initializing the module controller
-			if(myConfigBeanStore.exists(arguments.moduleID)) {
-				variables.oModuleController = createObject("component","moduleController");
-				variables.oModuleController.init(moduleID = arguments.moduleID,
-												execMode = 'remote',
-												homePortalsConfigBean = arguments.homePortalsConfigBean);
-			} else {
-				throwSessionTimedOut();
-			}
-			
-			return this;
-		</cfscript>
+		<cfset variables.oModuleController = createObject("component","moduleController")>
+		<cfset variables.oModuleController.init(arguments.moduleID)>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -89,10 +74,4 @@
 		<cfreturn tmpHTML>
 	</cffunction>	
 
-	<!---------------------------------------->
-	<!--- throwSessionTimedOut             --->
-	<!---------------------------------------->	
-	<cffunction name="throwSessionTimedOut" access="private">
-		<cfthrow message="The session has timed out." type="homePortals.sessionTimedOut">
-	</cffunction>
 </cfcomponent>

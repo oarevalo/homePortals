@@ -1,8 +1,4 @@
 <!--- This page displays the default error layout --->
-<cfparam name="cfcatch" type="any" default="#structNew()#">
-<cfparam name="cfcatch.type" default="Custom">
-<cfparam name="cfcatch.message" default="">
-<cfparam name="cfcatch.Detail" default="">
 
 <cfoutput>
 	<cfif cfcatch.Type eq "Custom">
@@ -11,10 +7,6 @@
 			<br /><br />
 			#cfcatch.Message#
 		</div>
-	<cfelseif cfcatch.type eq "homePortals.sessionTimedOut">
-		<div style="margin:10px;padding:10px;border:1px solid silver;background-color:##FFFF99;color:red;font-family:arial;font-size:11px;">
-			<b>Your session has timed out. Please refresh the page.</b>
-		</div>	
 	<cfelse>
 		<div style="margin:10px;padding:10px;border:1px solid silver;background-color:##FFFF99;font-family:arial;font-size:11px;color:black;">
 			<b>HomePortal Framework</b> - The following problem was encountered during processing:

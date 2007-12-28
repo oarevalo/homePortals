@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   WebSearch  ************ -->
+	<module access="general" id="search" name="search/search">
+		<description>
+			Searches the web and displays the results on the same page.
+		</description>
+		<resources>
+			<resource href="/home/modules/search/search.js" type="script"/>
+		</resources>		
+		<api>
+			<methods>
+				<method description="Performs a web search" name="doSearch"/>
+			</methods>	
+		</api>
+	</module>	
+</modules>
+</catalog>

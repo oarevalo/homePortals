@@ -1,9 +1,7 @@
 <cfcomponent displayName="configBeanStore" hint="This component provides an interface for persistent storage of configBeans data">
 
-	<cfset variables.storeVarName = "_hpModuleConfigBeans">
-
-	<cfif Not StructKeyExists(session, variables.storeVarName)>
-		<cfset session[variables.storeVarName] = structNew()>
+	<cfif Not StructKeyExists(session, "moduleConfigBeans")>
+		<cfset session.moduleConfigBeans = structNew()>
 	</cfif>
 
 	<!---------------------------------------->
@@ -15,8 +13,8 @@
 		<cfargument name="configBean" required="true" type="configBean" hint="Empty configBean that will be populated with the loaded data">
 	
 		<cfset var tmpData = "">
-		<cfif structKeyExists(session[variables.storeVarName], arguments.key)>
-			<cfset tmpData = session[variables.storeVarName][arguments.key]>
+		<cfif structKeyExists(session.moduleConfigBeans, arguments.key)>
+			<cfset tmpData = session.moduleConfigBeans[arguments.key]>
 			<cfset arguments.configBean.deserialize(tmpData)>
 		</cfif>
 		
@@ -32,7 +30,7 @@
 		<cfargument name="configBean" required="true" type="configBean" hint="Empty configBean that will be populated with the loaded data">
 		<cfset var tmpData = "">
 		<cfset tmpData = arguments.configBean.serialize()>
-		<cfset session[variables.storeVarName][arguments.key] = tmpData>
+		<cfset session.moduleConfigBeans[arguments.key] = tmpData>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -41,7 +39,7 @@
 	<cffunction name="exists" access="public"
 				hint="Checks if given configBean exists on the persistent storage">
 		<cfargument name="key" required="true" hint="Key used to identify the config bean">
-		<cfreturn structKeyExists(session[variables.storeVarName], arguments.key)>
+		<cfreturn structKeyExists(session.moduleConfigBeans, arguments.key)>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -50,7 +48,7 @@
 	<cffunction name="flush" access="public"
 				hint="Flushs a configBean from the persistent storage">
 		<cfargument name="key" required="true" hint="Key used to identify the config bean">
-		<cfset structDelete(session[variables.storeVarName], arguments.key, false)>
+		<cfset structDelete(session.moduleConfigBeans, arguments.key, false)>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -58,7 +56,7 @@
 	<!---------------------------------------->		
 	<cffunction name="flushAll" access="public"
 				hint="Flushes all configBeans from the persistent storage">
-		<cfset structDelete(session, variables.storeVarName, false)>
+		<cfset structDelete(session, "moduleConfigBeans", false)>
 	</cffunction>
 	
 </cfcomponent>

@@ -11,8 +11,6 @@
 		variables.aEventsToRaise = ArrayNew(1);
 		variables.stErrorInfo = structNew();
 		variables.script = "";
-		variables.execMode = "local";
-		variables.homePortalsConfigBean = 0;
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -23,86 +21,45 @@
 		<cfargument name="moduleID" required="true">
 		<cfargument name="moduleClassLocation" required="false" default="">
 		<cfargument name="modulePageSettings" required="false" default="0">
+		<cfargument name="pageHREF" required="false" default="">
 		<cfargument name="isFirstInClass" required="false" type="boolean" default="false">
-		<cfargument name="execMode" required="false" type="string" default="local" hint="Could be 'local' or 'remote', depending on under which context is being executed.">
-		<cfargument name="homePortalsConfigBean" type="homePortalsConfigBean" required="true" hint="homeportals settings">
 	
 		<cfscript>
 			var contentStoreID = "";
 			var moduleName = "";
 			var myConfigBeanStore = createObject("component", "configBeanStore");
-			var tmpModuleRoot = "";
-			var oModuleProperties = 0;
-		
-			// validate the module class name
-			if(arguments.moduleID eq "") throw("Module ID is empty.");
-			if(arguments.moduleClassLocation eq "" and arguments.execMode eq "local") throw("Module name is empty.");
 		
 			// initialize instance variables
 			variables.moduleID = arguments.moduleID;
 			variables.isFirstInClass = arguments.isFirstInClass;
-			variables.execMode  = arguments.execMode;
-			variables.homePortalsConfigBean = arguments.homePortalsConfigBean;
 
 			// create configBeans
 			variables.oModuleConfigBean = createObject("component", "moduleConfigBean");
 			variables.oContentStoreConfigBean = createObject("component", "contentStoreConfigBean");
-			
+
 			// this will be used to identify the contentStoreConfigBean on the configBeanStore
 			contentStoreID = variables.moduleID & "_CS";
-
-			// derive the relative path to the module directory from the module cfc location
-			if(arguments.moduleClassLocation neq "") {
-				tmpModuleRoot = listDeleteAt(arguments.moduleClassLocation, listLen(arguments.moduleClassLocation,"."), ".");
-				tmpModuleRoot = "/" & replace(tmpModuleRoot,".","/","all") & "/";
-			}
 
 			// get the moduleConfigBean from the configBeanStore
 			if(myConfigBeanStore.exists(variables.moduleID)) {
 				variables.oModuleConfigBean = myConfigBeanStore.load(variables.moduleID, variables.oModuleConfigBean);
 			} else {
 				variables.oModuleConfigBean.setPageSettings(arguments.modulePageSettings);
-				variables.oModuleConfigBean.setPageHREF(arguments.modulePageSettings["_page"].href);
+				variables.oModuleConfigBean.setPageHREF(arguments.pageHREF);
 				variables.oModuleConfigBean.setModuleClassLocation(arguments.moduleClassLocation);
-				variables.oModuleConfigBean.setModuleRoot(tmpModuleRoot);
 				myConfigBeanStore.save(variables.moduleID, variables.oModuleConfigBean);
 			}
-
-
-			// set the accounts root and the page owner on the content store
-			variables.oContentStoreConfigBean.setAccountsRoot( homePortalsConfigBean.getAccountsRoot() );
-			variables.oContentStoreConfigBean.setOwner( variables.oModuleConfigBean.getPageSetting("_page").owner );
-
 		
-			// check if the contentStoreConfigBean is already on the configBeanStore, otherwise add it
+			// get the contentStoreConfigBean from the configBeanStore
 			if(myConfigBeanStore.exists(contentStoreID)) {
 				variables.oContentStoreConfigBean = myConfigBeanStore.load(contentStoreID, variables.oContentStoreConfigBean);
 			} else {
 				myConfigBeanStore.save(contentStoreID, variables.oContentStoreConfigBean);
 			}
-
-			
-			if(arguments.execMode eq "local") {
-
-				// get module properties for this module (if any)
-				oModuleProperties = createObject("component","moduleProperties").init();
-				stModuleProperties = oModuleProperties.getProperties(arguments.modulePageSettings.name);
-	
-				// copy module properties to the module config bean
-				for(key in stModuleProperties) {
-					// store all module properties on the module config bean
-					variables.oModuleConfigBean.setProperty(key, stModuleProperties[key]);
-				}
-			
-			}
-
-			// if this is a remote call, then get the module class location from the config bean
-			if(arguments.execMode eq "remote") {
-				arguments.moduleClassLocation = variables.oModuleConfigBean.getModuleClassLocation();
-			}
 			
 			// instantiate and initialize the module
-			variables.oModule = createObject("component", arguments.moduleClassLocation);
+			moduleName = variables.oModuleConfigBean.getModuleClassLocation();
+			variables.oModule = createObject("component", moduleName);
 			variables.oModule.controller = this;
 			variables.oModule.init();
 			
@@ -137,15 +94,7 @@
 				hint="Returns the moduleConfigBean">
 		<cfreturn variables.oModuleConfigBean>
 	</cffunction>
-
-	<!---------------------------------------->
-	<!--- getHomePortalsConfigBean         --->
-	<!---------------------------------------->		
-	<cffunction name="getHomePortalsConfigBean" returntype="homePortalsConfigBean" access="public"
-				hint="Returns a bean with configuration settings for the HomePortals application">
-		<cfreturn variables.homePortalsConfigBean>
-	</cffunction>
-		
+	
 	<!---------------------------------------->
 	<!--- getModuleID                      --->
 	<!---------------------------------------->		
@@ -160,16 +109,17 @@
 	<cffunction name="getUserInfo" returntype="struct" access="public"
 				hint="Returns a structure with information about the current user and the owner of the current page">
 		<cfset var stRet = StructNew()>
-		<cfset var oUserRegistry = 0>
-		<cfset var stUserInfo = structNew()>
+		<cfset stRet.username = "">
+		<cfset stRet.isOwner = false>
+		<cfset stRet.owner = "">
 		
-		<!--- get information on currently logged-in user (if any) from the registry --->
-		<cfset oUserRegistry = createObject("component", "userRegistry").init()>
-		<cfset stRet = oUserRegistry.getUserInfo()>
-
-		<!--- add additional information about the page owner --->
-		<cfset stRet.owner = variables.oModuleConfigBean.getPageSetting("_page").owner>
-		<cfset stRet.isOwner = stRet.username neq "" and (stRet.owner eq stRet.username)>
+		<cfif IsDefined("Session.homeConfig")>
+			<cfif IsDefined("Session.User.qry")>
+				<cfset stRet.username = session.user.qry.username>
+				<cfset stRet.isOwner = (session.user.qry.username eq ListGetAt(session.homeConfig.href, 2, "/"))>
+			</cfif>
+			<cfset stRet.owner = ListGetAt(session.homeConfig.href, 2, "/")>
+		</cfif>
 		
 		<cfreturn stRet>
 	</cffunction>
@@ -182,36 +132,19 @@
 		<cfreturn variables.isFirstInClass>
 	</cffunction>
 
-	<!---------------------------------------->
-	<!--- getExecMode                      --->
-	<!---------------------------------------->		
-	<cffunction name="getExecMode" returntype="string" access="public"
-				hint="Returns either 'local' or 'remote' depending on under which context the module is being executed. A return value of 'local' means that the module is being executed during the initial page rendering phase, 'remote' indicates that the module is being executed as result of a call made from the client browser.">
-		<cfreturn variables.execMode>
-	</cffunction>
 
-	<!---------------------------------------->
-	<!--- getAPIObject                     --->
-	<!---------------------------------------->		
-	<cffunction name="getAPIObject" returntype="any" access="public"
-				hint="Instantiates a HomePortals API object and returns the instance. This method is used so that the module can use any HomePortals API object without knowing the full path to the API location.">
-		<cfargument name="APIObjectName" type="string" required="true">
-		<cfscript>
-			var o = 0;
-			if(findoneof("./",arguments.APIObjectName)) throw("Invalid API object name");
-			o = createObject("component", arguments.APIObjectName);
-		</cfscript>
-		<cfreturn o>
-	</cffunction>
+
 
 	<!---------------------------------------->
 	<!--- setEventToRaise                  --->
 	<!---------------------------------------->		
 	<cffunction name="setEventToRaise" access="public" 
 				hint="Adds a framework event to raise on the client">
+		<cfargument name="object" type="string" required="true">	
 		<cfargument name="event" type="string" required="true">	
 		<cfargument name="args" type="string" default="" hint="arguments structure to pass to the event handler">	
 		<cfset var stTemp = structNew()>
+		<cfset stTemp.object = jsstringFormat(arguments.object)>
 		<cfset stTemp.event = jsstringFormat(arguments.event)>
 		<cfset stTemp.args = arguments.args>
 		<cfset arrayAppend(variables.aEventsToRaise, stTemp)>
@@ -322,10 +255,9 @@
 			var stSettings = cfg.getPageSettings();
 			var tmpField = "";
 			var myConfigBeanStore = createObject("component", "configBeanStore");
-
+			
 			// read and parse layout page
 			xmlDoc = xmlParse(expandPath(href));
-
 
 			// loop through all page modules
 			for(i=1;i lte arrayLen(xmlDoc.xmlRoot.modules.xmlChildren);i=i+1) {
@@ -334,12 +266,10 @@
 					xmlModuleNode = xmlDoc.xmlRoot.modules.xmlChildren[i];
 					// update all attributes sent
 					for(tmpField in stSettings) {
-						if(isSimpleValue(stSettings[tmpField]))
+						//throw(tmpField);
+						if(tmpField neq "icons")
 							xmlModuleNode.xmlAttributes[tmpField] = stSettings[tmpField];
 					}	
-					
-					// exit loop
-					break;
 				}	
 			}
 
@@ -469,9 +399,9 @@
 				<cfloop from="1" to="#arrayLen(aEventsToRaise)#" index="i">
 					<cfset thisEvent = aEventsToRaise[i]>
 					<cfif thisEvent.args neq "">
-						h_raiseEvent('#variables.moduleID#','#thisEvent.event#',{#thisEvent.args#});
+						h_raiseEvent('#thisEvent.object#','#thisEvent.event#',{#thisEvent.args#});
 					<cfelse>
-						h_raiseEvent('#variables.moduleID#','#thisEvent.event#');
+						h_raiseEvent('#thisEvent.object#','#thisEvent.event#');
 					</cfif>
 				</cfloop>
 			</cfoutput>
@@ -552,13 +482,6 @@
 		<cfdump var="#arguments.data#">
 	</cffunction>	
 
-	<!---------------------------------------->
-	<!--- abort                             --->
-	<!---------------------------------------->
-	<cffunction name="abort" access="private">
-		<cfabort>
-	</cffunction>	
-
 	<!-------------------------------------->
 	<!--- writeFile                      --->
 	<!-------------------------------------->
@@ -569,7 +492,6 @@
 				file="#arguments.file#" 
 				output="#toString(arguments.content)#">
 	</cffunction>
-	
 </cfcomponent>
 			 
 			 

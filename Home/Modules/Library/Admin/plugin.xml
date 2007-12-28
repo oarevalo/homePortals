@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adminPlugin id="libraryManager" version="1.0">
+	<description>
+		This plugin is used to manage HomePortals content catalogs. Catalogs group modules, skins, and published pages.
+	</description>
+	
+	<menu optionGroupLabel="Library">
+		<option label="Catalogs" view="libraryManager/catalogs" />
+		<option label="Modules" view="libraryManager/modules" />
+		<option label="Skins" view="libraryManager/skins" />
+		<option label="Pages" view="libraryManager/pages" />
+		<option label="Download" view="libraryManager/downloadSites" />
+	</menu>
+	
+	<views>
+		<view id="libraryManager/catalogs" />
+		<view id="libraryManager/catalog_edit" />
+		<view id="libraryManager/catalog_register" />
+		<view id="libraryManager/modules" />
+		<view id="libraryManager/module_register" />
+		<view id="libraryManager/module_view" />
+		<view id="libraryManager/skins" />
+		<view id="libraryManager/skin_register" />
+		<view id="libraryManager/pages" />
+		<view id="libraryManager/page_publish" />
+		<view id="libraryManager/downloadSites" />
+		<view id="libraryManager/downloadSites_register" />
+		<view id="libraryManager/download" />
+	</views>
+	
+	<events>
+		<event id="libraryManager.doSaveCatalog" component="eventHandlers.libraryManager.ehCatalogs" method="doSave" />
+		<event id="libraryManager.doDeleteCatalog" component="eventHandlers.libraryManager.ehCatalogs" method="doDelete" />
+		<event id="libraryManager.doRegisterCatalog" component="eventHandlers.libraryManager.ehCatalogs" method="doRegister" />
+
+		<event id="libraryManager.doRegisterSkin" component="eventHandlers.libraryManager.ehSkins" method="doRegister" />
+		<event id="libraryManager.doDeleteSkin" component="eventHandlers.libraryManager.ehSkins" method="doDelete" />
+
+		<event id="libraryManager.doRegisterModule" component="eventHandlers.libraryManager.ehModules" method="doRegister" />
+		<event id="libraryManager.doDeleteModule" component="eventHandlers.libraryManager.ehModules" method="doDelete" />
+
+		<event id="libraryManager.doDeletePage" component="eventHandlers.libraryManager.ehPages" method="doDelete" />
+		<event id="libraryManager.doPublishPage" component="eventHandlers.libraryManager.ehPages" method="doPublish" />
+		
+		<event id="libraryManager.doDownloadPackage" component="eventHandlers.libraryManager.ehDownload" method="doDownloadPackage" />
+		<event id="libraryManager.doRegisterSite" component="eventHandlers.libraryManager.ehDownload" method="doRegister" />
+		<event id="libraryManager.doDeleteSite" component="eventHandlers.libraryManager.ehDownload" method="doDelete" />
+	</events>
+</adminPlugin>

@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Javascript API Reference</title>
+<link rel="stylesheet" type="text/css" href="main.css"></head>
+
+<body>
+<h1>HomePortals JavaScript Reference</h1>
+<p>This document describes the Javascript functions provided by HomePortals. These functions are contained in the Main.js file. </p>
+<p>&nbsp;</p>
+<table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="236" valign="top"><p><strong>Name / Parameters</strong></p></td>
+    <td width="433" valign="top"><p><strong>Description</strong></p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_Hide(secName)</p></td>
+    <td width="433" valign="top"><p>Sets the css display property    to &ldquo;none&rdquo; for the element with ID <em>secName</em>.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_Show(secName,display)</p></td>
+    <td width="433" valign="top"><p>Sets the css display property    to <em>display</em> for the element with ID <em>secName</em>. If <em>display</em> is not provided, then defaults to &ldquo;block&rdquo;.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_CollapseSection(secID)</p></td>
+    <td width="433" valign="top"><p>Collapses a container element.    On a collapsed container only the Title bar is visible. <em>secID</em> is the ID of the module which container should be    collapsed.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_ExpandSection(secID)</p></td>
+    <td width="433" valign="top"><p>Expands a container element. <em>secID </em>is the ID of the module which    container should be expanded.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_IsVisible(secName)</p></td>
+    <td width="433" valign="top"><p>Returns True if the element    with ID <em>secName </em>has its css display    property different than &ldquo;none&rdquo;.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_IsSectionExpanded(secID)</p></td>
+    <td width="433" valign="top"><p>Returns True if the container    of the module with ID <em>secID</em> is    expanded.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_ToggleSection(secID)</p></td>
+    <td width="433" valign="top"><p>Toggles the state of the    container of the module with ID <em>secID</em> between Expanded and Collapsed.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_ToggleSectionVisibility(secID)</p></td>
+    <td width="433" valign="top"><p>Toggles the visibility state of    the element with ID <em>secID</em></p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_SetSectionTitle(secID,title)</p></td>
+    <td width="433" valign="top"><p>Changes the title of the    container of the module with ID <em>secID</em> to <em>title</em></p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_GetSectionTitle(secID)</p></td>
+    <td width="433" valign="top"><p>Returns the title of the    container of the module <em>secID</em></p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_Print(secID,srcID)</p></td>
+    <td width="433" valign="top"><p>If <em>srcID </em>is missing, then prints the contents of the container of    the module <em>secID. </em>If <em>srcID </em>is provided, then prints the    contents of <em>srcID</em> using the title    of the module <em>secID</em>.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_callServer(server,method,sec,params,rcv)</p></td>
+    <td width="433" valign="top"><p>Makes an asynchronous call a remote server using the parameters given. <em><br />
+      server</em> identifies the remote process or file that will be called. This can be a relative or absolute path. External addresses will be called via http requests made by a gateway on the server.<br />
+      <em>method </em>will be passed as a variable to the target server.<br />
+      <em>sec</em> is the ID of the element in which the returning output of the call will be displayed. If empty or not found, the the received output will be discarded.<br />
+      <em>params </em>is  a collection representing attributes or parameters that will be passed to the server side element.<br />
+      <em>rcv </em>is the name of a function that will be called when the call to the server-side function has returned.
+    </p>
+    </td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_resizeToClient(sec,offset)</p></td>
+    <td width="433" valign="top"><p>Resizes a section to fit the    browser&rsquo;s window height. The height of the element <em>sec</em> will be changed to the current browser&rsquo;s window height minus <em>offset</em>.<br />
+    This function uses the <em>clientHeight</em> property to obtain the    height of the window.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_setLoadingImg(secID)</p></td>
+    <td width="433" valign="top"><p>This function changes the    contents of <em>secID </em>with an animated    gif of a loading bar. You may use this function when waiting for the server    to return with a user interface element.</p></td>
+  </tr>
+  <tr>
+    <td width="236" valign="top"><p>h_raiseEvent(objectName,    eventName, args)</p></td>
+    <td width="433" valign="top"><p>This function is defined only    when event listeners have been declared on the configuration XML using    &lt;event&gt; tags. <br />
+    This function can used to raise    a framework event by any module in the application.</p></td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+
+<p align="center" style="font-size:9px;">
+(c)2006 <A href="http://www.cfempire.com" target="_blank">CFEmpire</A>
+</p>
+</body>
+</html>

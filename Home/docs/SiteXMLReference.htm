@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Site.xml Reference</title>
+<link rel="stylesheet" type="text/css" href="main.css">
+</head>
+
+<body class="body">
+<h1>HomePortals Site XML Reference</h1>
+<p>This document describes the tags used in a HomePortals Site document. The site.xml document is used by the HomePortals Accounts system and provides information about an Account's pages. This document must be located on each <em>Account/&lt;usernname&gt;/</em> folder. </p>
+<p>&nbsp;</p>
+<h3><a name="site" id="site">&lt;site&gt;</a> </h3>
+<p><strong>Description:</strong><br />
+  This is the root node of the  document. All tags must be children of this tag.</p>
+<p><strong>Attributes:</strong><br />
+    <em>None</em></p>
+<hr />
+<h3><a name="title" id="title">&lt;title&gt;</a></h3>
+<p><strong>Description:</strong><br />
+  Title for the site  described in the current XML. Currently this title does not used. This tag should appear only once per document.</p>
+<p><strong>Attributes:</strong><br />
+    <em>None</em></p>
+<hr />
+<h3><a name="pages" id="pages">&lt;pages&gt;</a></h3>
+<p><strong>Description:</strong><br />
+  This tag is used to enclose the  region of the document where the site pages are listed. May appear only  once per document. This tag should only contain &lt;page&gt; tags as children. </p>
+<p><strong>Attributes:</strong><br />
+    <em>None</em></p>
+<hr />
+<h3><a name="page" id="page">&lt;page&gt;</a></h3>
+<p><strong>Description:</strong><br />
+Identifies a HomePortals page on the site. </p>
+<p><strong>Attributes:</strong></p>
+<table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="103" valign="top"><strong>Name</strong> </td>
+    <td width="136" valign="top"><strong>Type</strong></td>
+    <td width="418" valign="top"><strong>Description</strong></td>
+  </tr>
+  <tr>
+    <td width="103" valign="top"><p>href</p></td>
+    <td width="136" valign="top"><p>String</p></td>
+    <td width="418" valign="top"><p><strong>Required. </strong>Filename of the HomePortals page. The page should be an existing file in the layouts subdirectory of the current account directory. </p></td>
+  </tr>
+  <tr>
+    <td width="103" valign="top"><p>title</p></td>
+    <td width="136" valign="top"><p>String</p></td>
+    <td width="418" valign="top"><p><strong>Required. </strong>Page Title. This is the label that will be shown on the SiteMap module..</p></td>
+  </tr>
+  <tr>
+    <td valign="top">private</td>
+    <td valign="top">Boolean</td>
+    <td valign="top"><strong>Optional</strong>. Determines if a page is private. Private pages may only be accessed by the account owner and are only displayed on the SiteMap. Default is false. </td>
+  </tr>
+</table>
+<hr />
+<h3><a name="defaultPage" id="defaultPage">&lt;defaultPage&gt;</a></h3>
+<p><strong>Description:</strong><br />
+  This tag encloses the template to use when adding new pages to this site. When the user adds a page using the SiteMap, the contents of this node will be used as the source of the new page. </p>
+<p><strong>Attributes:</strong><br />
+    <em>None</em></p>
+<hr />
+<h3><a name="catalogs" id="catalogs">&lt;catalogs&gt;</a></h3>
+<p><strong>Description:</strong><br />
+  This tag is used to enclose the  region of the document where the site catalogs are listed. May appear only  once per document. This tag should only contain &lt;catalog&gt; tags as children. </p>
+<p><strong>Attributes:</strong><br />
+    <em>None</em></p>
+<hr />
+<h3><a name="catalog" id="catalog">&lt;catalog&gt;</a></h3>
+<p><strong>Description:</strong><br />
+  Identifies a catalog to which the account is subscribed. Catalogs are xml documents that contain references to modules and published pages. The catalogs are used by the Control Panel to display available modules for the user to add to a page. </p>
+<p><strong>Attributes:</strong></p>
+<table border="1" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="103" valign="top"><strong>Name</strong></td>
+    <td width="136" valign="top"><strong>Type</strong></td>
+    <td width="418" valign="top"><strong>Description</strong></td>
+  </tr>
+  <tr>
+    <td width="103" valign="top"><p>href</p></td>
+    <td width="136" valign="top"><p>String</p></td>
+    <td width="418" valign="top"><p><strong>Required. </strong>URL of the catalog file. </p></td>
+  </tr>
+  <tr>
+    <td width="103" valign="top"><p>name</p></td>
+    <td width="136" valign="top"><p>String</p></td>
+    <td width="418" valign="top"><p><strong>Required.</strong> Catalog title. </p></td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<p align="center" style="font-size:9px;">
+(c)2006 <A href="http://www.cfempire.com" target="_blank">CFEmpire</A>
+</p>
+</body>
+</html>

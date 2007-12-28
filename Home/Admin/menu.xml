@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menuOptions>
+	<optionGroup label="Setup" ID="Setup">
+		<option label="Settings" view="settings" />
+		<option label="Accounts" view="accounts" />
+		<option label="Plugins" view="plugins" />
+	</optionGroup>
+</menuOptions>

@@ -4,19 +4,6 @@
 		variables.oContentStoreConfigBean = 0;
 		variables.xmlDoc = xmlNew();
 		variables.owner = "";
-		variables.type = "";
-		
-		// name of the cache service instance
-		variables.cacheServiceName = "_hpContentStoreCache";
-
-		// number of content store docs to cache in memory
-		variables.memCacheSize = 50;
-		
-		// time to live in minutes for content store docs cached in memory
-		variables.memCacheTTL = 30;
-		
-		// name of the lock to use when accessing the memory cache service
-		variables.lockName = "hp_contentStore_cache";
 	</cfscript>
 		
 	<!---------------------------------------->
@@ -28,48 +15,26 @@
 		<cfscript>
 			var bStorageExists = false;
 			var tmpURL = "";
-			var hpPagePath = "";
-			var tmp = "";
-			var ext = "";
 			
 			// store settings
 			variables.oContentStoreConfigBean = arguments.contentStoreConfigBean;
-			variables.owner = variables.oContentStoreConfigBean.getOwner();
-			variables.type = variables.oContentStoreConfigBean.getType();
-			
-		 	// create cache service if not exists
-			if(Not structKeyExists(application, variables.cacheServiceName)) {
-				initCacheService();
-			}
-			
-			// get document file extension to use
-			ext = variables.oContentStoreConfigBean.getExtension();
+			variables.owner = "";
 			
 			tmpURL = variables.oContentStoreConfigBean.getURL();
-
+			
+			// get owner
+			if(IsDefined("Session.homeConfig")) {
+				variables.owner = ListGetAt(session.homeConfig.href, 2, "/");
+			}
+			
 			// if not storage URL is given, then use the default storage
 			if(tmpURL eq "") {
 				tmpURL = variables.oContentStoreConfigBean.getAccountsRoot() 
 								& "/" & variables.owner
-								& "/" & variables.oContentStoreConfigBean.getDefaultName()
-								& "." & ext;
+								& "/" & variables.oContentStoreConfigBean.getDefaultName();
 				variables.oContentStoreConfigBean.setURL(tmpURL);
 			}
-			
-			// if url is not a relative path, then default to owner's directory
-			// (this is to avoid writing files in random places)
-			if(listLen(tmpURL,"/") lte 1 or left(tmpURL,1) neq "/") {
-				tmpURL = variables.oContentStoreConfigBean.getAccountsRoot() 
-								& "/" & variables.oContentStoreConfigBean.getOwner()
-								& "/" & tmpURL;
 				
-				// append .xml if necessary
-				if(listLast(tmpURL,".") neq ext)
-					tmpURL = listAppend(tmpURL,ext,".");
-				
-				variables.oContentStoreConfigBean.setURL(tmpURL);
-			}
-
 			// check if storage URL exists
 			bStorageExists = FileExists(ExpandPath(tmpURL));
 			
@@ -102,28 +67,28 @@
 	<!---------------------------------------->
 	<!--- getURL               			   --->
 	<!---------------------------------------->	
-	<cffunction name="getURL" access="public" returntype="string" output="false">
+	<cffunction name="getURL" access="public" returntype="string">
 		<cfreturn variables.oContentStoreConfigBean.getURL()>
 	</cffunction>
 
 	<!---------------------------------------->
 	<!--- getXMLData		               --->
 	<!---------------------------------------->	
-	<cffunction name="getXMLData" access="public" returntype="xml" output="false">
+	<cffunction name="getXMLData" access="public" returntype="xml">
 		<cfreturn variables.xmlDoc>
 	</cffunction>
 
 	<!---------------------------------------->
 	<!--- getOwner			               --->
 	<!---------------------------------------->	
-	<cffunction name="getOwner" access="public" returntype="string" output="false">
+	<cffunction name="getOwner" access="public" returntype="string">
 		<cfreturn variables.xmlDoc.xmlRoot.xmlAttributes.owner>
 	</cffunction>
 
 	<!---------------------------------------->
 	<!--- getCreateDate		               --->
 	<!---------------------------------------->	
-	<cffunction name="getCreateDate" access="public" returntype="string" output="false">
+	<cffunction name="getCreateDate" access="public" returntype="string">
 		<cfreturn variables.xmlDoc.xmlRoot.xmlAttributes.createdOn>
 	</cffunction>
 
@@ -139,87 +104,60 @@
 		<cfset variables.xmlDoc.xmlRoot = xmlElemNew(variables.xmlDoc, variables.oContentStoreConfigBean.getRootNode())>
 		<cfset variables.xmlDoc.xmlRoot.xmlAttributes["owner"] = variables.owner>
 		<cfset variables.xmlDoc.xmlRoot.xmlAttributes["createdOn"] = GetHTTPTimeString(now())>
-		<cfset variables.xmlDoc.xmlRoot.xmlAttributes["type"] = variables.type>
 	</cffunction>
 
 	<!-------------------------------------->
 	<!--- saveStorageDoc                 --->
 	<!-------------------------------------->
 	<cffunction name="saveStorageDoc" access="private">
-		<cfset var tmpURL = variables.oContentStoreConfigBean.getURL()>
-		
-		<!--- write to file system --->
 		<cffile action="write" 
-				file="#ExpandPath(tmpURL)#" 
+				file="#ExpandPath(variables.oContentStoreConfigBean.getURL())#" 
 				output="#toString(variables.xmlDoc)#">
-				
-		<!--- invalidate cache entry (if exists) --->		
-        <cflock type="exclusive" name="#variables.lockName#" timeout="30">
-			<cfset application[variables.cacheServiceName].flush(hash(tmpURL))>
-        </cflock>
 	</cffunction>
 
 	<!-------------------------------------->
 	<!--- readStorageDoc                 --->
 	<!-------------------------------------->
 	<cffunction name="readStorageDoc" access="private">
-		<cfscript>
-			var xmlDoc = 0;
-			var tmpURL = variables.oContentStoreConfigBean.getURL();
-			var memCacheKey = hash(tmpURL);
-			var oCacheService = application[variables.cacheServiceName];
+		<cfset var txtDoc = "">
+		<cfset var tmpURL = variables.oContentStoreConfigBean.getURL()>
+		<cfset var tmpHshFile = hash(tmpURL)>
 
-			// retrieve the contentStore doc from memory cache if it exists and is still valid
-			try {
-				variables.xmlDoc = oCacheService.retrieve(memCacheKey);
+		<!--- create the request cache if not exists --->
+		<cfif not structKeyExists(request,"dataFiles")>
+			<cfset request.dataFiles = structNew()>
+		</cfif>
+		
+		<!--- check if this file has already been read into
+				the request cache, if not, put it there --->
+		<cfif not structKeyExists(request.dataFiles, tmpHshFile)>		
+			<cffile action="read" file="#ExpandPath(tmpURL)#" variable="txtDoc">
 
-			} catch(homePortals.cacheService.itemNotFound e) {
-				// file not in cache, so get it from file system
-				variables.xmlDoc = xmlParse(ExpandPath(tmpURL));
-				
-				// store file in cache
-				storeInCache(memCacheKey, variables.xmlDoc);
-			}
+			<!--- check that the given file is a valid xml --->
+			<cfif not IsXML(txtDoc)>
+				<cfthrow message="The given storage document is not valid xml.">
+			</cfif>
 
-			// if the storage file has already an owner, then set the current owner to the one on the storage
-			if(StructKeyExists(variables.xmlDoc.xmlRoot.xmlAttributes,"owner"))
-				variables.owner = variables.xmlDoc.xmlRoot.xmlAttributes.owner;
-			else {
-				// storage doesnt have an owner, so we will claim it
-				variables.xmlDoc.xmlRoot.xmlAttributes["owner"] = variables.owner;
-			}
-	
-			// set a default created on date 
-			if(Not StructKeyExists(variables.xmlDoc.xmlRoot.xmlAttributes,"createdOn")) {
-				variables.xmlDoc.xmlRoot.xmlAttributes["createdOn"] = GetHTTPTimeString(CreateDate(2000,1,1));
-			}
-			
-			// set the type if it doesnt have any
-			if(Not StructKeyExists(variables.xmlDoc.xmlRoot.xmlAttributes,"type") and variables.type neq "") {
-				variables.xmlDoc.xmlRoot.xmlAttributes["type"] = variables.type;
-			}
-		</cfscript>
+			<cfset request.dataFiles[tmpHshFile] = xmlParse(txtDoc)>
+		</cfif>
+
+		<!--- get parsed xml content from request cache --->
+		<cfset variables.xmlDoc = request.dataFiles[tmpHshFile]>
+
+		<!--- if the storage file has already an owner, then set the current owner to the one on the storage --->
+		<cfif StructKeyExists(variables.xmlDoc.xmlRoot.xmlAttributes,"owner")>
+			<cfset variables.owner = variables.xmlDoc.xmlRoot.xmlAttributes.owner>
+		<cfelse>
+			<!--- storage doesnt have an owner, so we will claim it --->
+			<cfset variables.xmlDoc.xmlRoot.xmlAttributes.owner = variables.owner>
+		</cfif> 
+
+		<!--- set a default created on date --->
+		<cfif Not StructKeyExists(variables.xmlDoc.xmlRoot.xmlAttributes,"createdOn")>
+			<cfset variables.xmlDoc.xmlRoot.xmlAttributes.createdOn = GetHTTPTimeString(CreateDate(2000,1,1))>
+		</cfif> 	
 	</cffunction>
 
-
-	<cffunction name="initCacheService" access="private" returntype="void">
-		<cfset var oCacheService = createObject("component","cacheService").init(variables.memCacheSize, variables.memCacheTTL)>
-		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
-			<cfset application[variables.cacheServiceName]= oCacheService>
-		</cflock>
-	</cffunction>
-    
-	<cffunction name="storeInCache" access="private" returntype="void">
-    	<cfargument name="key" type="string" required="yes">
-        <cfargument name="xmlDoc" type="xml" required="yes">
-        
-    	<cfset var oCacheService = application[variables.cacheServiceName]>
-        
-		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
-			<cfset oCacheService.store(arguments.key, arguments.xmlDoc)>
-		</cflock>
-    </cffunction>
- 
 	<!---------------------------------------->
 	<!--- throw                            --->
 	<!---------------------------------------->

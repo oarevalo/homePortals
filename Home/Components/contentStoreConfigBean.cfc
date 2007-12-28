@@ -4,14 +4,11 @@
 
 	<cfscript>
 		variables.data.accountsRoot = "/Accounts";
-		variables.data.defaultName = "myContentStore";
+		variables.data.defaultName = "myContentStore.xml";
 		variables.data.description = "";
 		variables.data.rootNode = "dataStore";
 		variables.data.url = "";
 		variables.data.createStorage = true;
-		variables.data.owner = "";
-		variables.data.type = "";		// an identifier for the type of data stored (bookmarks, calendars, etc)
-		variables.data.extension = "xml";	// the extension to use when writing the document
 	</cfscript>
 
 	<!---------------------------------------->
@@ -39,18 +36,6 @@
 
 	<cffunction name="getCreateStorage" returntype="any" access="public">
 		<cfreturn variables.data.createStorage>
-	</cffunction>
-	
-	<cffunction name="getOwner" returntype="any" access="public">
-		<cfreturn variables.data.owner>
-	</cffunction>
-
-	<cffunction name="getType" returntype="any" access="public">
-		<cfreturn variables.data.type>
-	</cffunction>
-
-	<cffunction name="getExtension" returntype="any" access="public">
-		<cfreturn variables.data.extension>
 	</cffunction>
 
 
@@ -86,20 +71,4 @@
 		<cfargument name="data" required="true">
 		<cfset variables.data.createStorage = arguments.data>
 	</cffunction>		
-
-	<cffunction name="setOwner" access="public">
-		<cfargument name="data" required="true">
-		<cfset variables.data.owner = arguments.data>
-	</cffunction>	
-
-	<cffunction name="setType" access="public">
-		<cfargument name="data" required="true">
-		<cfset variables.data.type = arguments.data>
-	</cffunction>				
-
-	<cffunction name="setExtension" access="public">
-		<cfargument name="data" required="true">
-		<cfset variables.data.extension = arguments.data>
-	</cffunction>				
-	
 </cfcomponent>	

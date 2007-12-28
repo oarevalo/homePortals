@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   Calendar  ************ -->
+	<module access="general" id="calendar" name="Calendar/Calendar">
+		<description>
+			Displays a calendar to select dates. The event calendar.onSelectDate is raised
+			everytime a date is selected on the calendar to allow interaction with other modules.
+		</description>
+		<resources>
+			<resource href="/home/modules/Calendar/Calendar.js" type="script"/>
+		</resources>		
+		<eventListeners>
+			<event eventHandler="$ID$.getCalendar" eventName="PageLoaded" objectName="Framework"/>
+		</eventListeners>
+		<api>
+			<events>
+				<event description="Raised when a date is selected" name="onSelectDate" objectName="calendar"/>
+			</events>
+		</api>
+	</module>	
+</modules>
+</catalog>

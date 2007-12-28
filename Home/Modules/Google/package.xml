@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   Google  ************ -->
+	<module access="general" id="google" name="Google/google">
+		<description>
+			Provides a box to submit searches to google.
+		</description>
+	</module>
+</modules>
+</catalog>

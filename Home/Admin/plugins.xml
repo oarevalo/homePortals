@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugins>
+	<!--
+	<plugin id="accountsManager" src="/home/modules/accounts/admin/plugin.xml" version="1.0">
+		This plugin is used to manage HomePortals accounts
+	</plugin>
+	-->
+</plugins>

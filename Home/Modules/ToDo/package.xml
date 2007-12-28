@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   ToDo  ************ -->
+	<module access="general" id="ToDo" name="todo/todo">
+		<attributes>
+			<attribute description="[Optional] Indicates the URL of a document where to store the ToDo list contents. Leave empty to use default storage." name="url" required="true"/>
+		</attributes>
+		<resources>
+			<resource href="/home/modules/ToDo/todo.js" type="script"/>
+		</resources>
+		<eventListeners>
+			<event eventHandler="$ID$.init" eventName="PageLoaded" objectName="Framework"/>
+		</eventListeners>
+		<description>
+			This module displays a to-do list, you can add, edit, delete
+			and set as complete/uncomplete items on the list.
+			All items are stored on an xml document, so that multiple
+			ToDo modules can coexist on a page.
+		</description>
+	</module>	
+</modules>
+</catalog>
