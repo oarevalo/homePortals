@@ -1,0 +1,66 @@
+/********************* "rounded" skin for homeportals  **********************/
+/** based on "trashbox" skin **/
+
+/* Show only to IE PC \*/
+* html .SectionTitle h2 {height: 1%;} /* For IE 5 PC */
+
+.Section {
+	margin: 0 auto; /* center for now */
+	/*width: 17em; *//* ems so it will grow */
+	background: url(/home/modules/skins/rounded-green/rounded_r2_c2.jpg) no-repeat bottom right;
+	/*font-size: 100%;*/
+	border:0px;
+	background-color:#DFF9DF;
+	margin:5px;
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+}
+.SectionTitle {
+	background: url(/home/modules/skins/rounded-green/rounded_r1_c2.jpg) no-repeat top right;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	border-bottom:1px solid white;
+}
+.SectionTitle a {
+	color:#666666;
+}
+.SectionTitle h2 {
+	text-align: left;
+	background: url(/home/modules/skins/rounded-green/rounded_r1_c1.jpg) no-repeat top left;
+	margin: 0;
+	padding: 5px;
+	color: #666666; 
+	font-weight: bold; 
+	font-size: 1.2em; 
+	line-height: 1em;
+}
+.SectionBody {
+	background: url(/home/modules/skins/rounded-green/rounded_r2_c1.jpg) no-repeat bottom left;
+	margin: 0;
+	padding: 5px;
+}
+
+
+body {
+	background-color:#FFFFFF;
+}
+.header {
+	padding:0px;
+	margin:0px;
+}
+.leftcolumn {
+	width:240px;
+}
+.rightcolumn {
+	width:250px;
+}
+#header_Body {
+	border:0px;
+	padding:0px;
+	margin:0px;
+}
+#header_BodyRegion {
+	padding:0px;
+	margin:0px;
+}

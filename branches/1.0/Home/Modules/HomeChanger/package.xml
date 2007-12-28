@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   HomeChanger  ************ -->
+	<module access="general" id="homeChanger" name="HomeChanger/HomeChanger">
+		<description>
+			This modules displays a drop-down box that allows to select between the current site's pages.
+		</description>
+	</module>
+</modules>
+</catalog>

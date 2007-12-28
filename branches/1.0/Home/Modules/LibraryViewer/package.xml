@@ -1,0 +1,18 @@
+<catalog>
+	<modules>
+	<module id="libraryViewer" name="LibraryViewer/LibraryViewer" access="general">
+		<description>
+			Displays information about items on a catalog.
+		</description>
+		<resources>
+			<resource href="/home/modules/LibraryViewer/LibraryViewer.js" type="script"/>
+		</resources>		
+		<api>
+			<methods>
+				<method name="getResource" description="Displays information about a given resource. The resource to display is identified by a single argument with the format: catalogIndex/resourceType/resourceID" />
+				<method name="getCatalogResources" description="Displays a dropdown control with all resources in a catalog. Selecting a resource from this list calls the getResourceMethod, Use the catalogIndex as a parameter." />
+			</methods>			
+		</api>
+	</module>
+	</modules>
+</catalog>

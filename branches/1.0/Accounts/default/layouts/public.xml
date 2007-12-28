@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<title>HomePortals Portal Server</title>
+	<stylesheet href="/accounts/default/style.css"/>
+	<script src="/home/modules/RSSReader/RSSReader.js"/>
+
+	<!-- Define Screen Layout -->
+	<layout>
+		<location class="leftcolumn" name="left" type="column"/>
+		<location class="middlecolumn" name="middle" type="column"/>
+		<location class="rightcolumn" name="right" type="column"/>
+	</layout>
+
+	<!-- Define Modules -->	
+	<modules>
+		<module Container="false" Display="normal" Output="true" ShowPrint="false" id="AccountLogin" location="left" moduleHREF="/home/modules/Accounts/catalog.xml#login" name="Accounts/login" style="background-color:#f0f0d5;border:1px solid silver;" title="Account Login"/>
+		<module Container="false" Display="normal" Output="true" ShowPrint="true" id="rssReader1" location="middle" moduleHREF="/home/modules/Accounts/catalog.xml#rssReader" name="RSSReader/RSSReader" rss="http://www.cfempire.com/home/modules/blog/blog.cfc?method=getrss&amp;url=/accounts/wencho/blog.xml" style="font:8pt georgia, serif; color:#333;background-color:#f0f0d5;border:1px solid silver;" targetID="" title="rssReader1"/>
+		<module Container="false" Display="normal" Output="true" ShowPrint="false" id="directory1" location="right" moduleHREF="/home/modules/Accounts/catalog.xml#directory" name="Accounts/directory" style="background-color:#f0f0d5;border:1px solid silver;" title="Recent Accounts"/>
+	</modules>
+
+	<eventListeners>
+		<event eventHandler="rssReader1.getFeed" eventName="PageLoaded" objectName="Framework"/>
+	</eventListeners>
+
+</Page>

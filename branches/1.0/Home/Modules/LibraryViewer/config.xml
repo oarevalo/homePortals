@@ -1,0 +1,6 @@
+<config>
+	<homeRoot>/home/</homeRoot>
+	<catalogs>
+		<catalog label="Default Catalog">/home/modules/accounts/catalog.xml</catalog>
+	</catalogs>
+</config>

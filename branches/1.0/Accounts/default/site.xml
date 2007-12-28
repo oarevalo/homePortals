@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+  <title>HomePortals</title>
+  <pages>
+	<page href="public.xml" order="1" title="Home"/>
+  </pages>
+  <defaultPage />
+  <catalogs>
+	<catalog href="/home/modules/content/catalog.xml" name="catalog"/>
+  </catalogs>
+</site>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   TextPad  ************ -->
+	<module access="general" id="textPad" name="TextPad/textPad">
+		<resources>
+			<resource href="/home/modules/TextPad/textPad.js" type="script"/>
+		</resources>
+		<attributes>
+			<attribute description="[Optional] Indicates the URL of a document where to store editBox contents. Leave empty to use default storage." name="url" required="false"/>
+			<attribute description="The ID of the content entry to display by default. If empty, displays an index of all entries." name="contentID" required="true"/>
+		</attributes>		
+		<description>
+			This module allows you to create one or more text entries to display on your page. To add or edit entries you
+			must be signed-in as the owner of the current page.
+		</description>
+		<api>
+			<methods>
+				<method name="getContent" description="Retrieves the content entry with the given ContentID" />
+			</methods>
+			<events>
+				<event name="editBox.contentChanged" description="This event is raised anytime a content entry is changed." />
+			</events>
+		</api>
+	</module>	
+</modules>
+</catalog>

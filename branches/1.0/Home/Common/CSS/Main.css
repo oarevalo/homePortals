@@ -1,0 +1,114 @@
+/* Main.css
+
+This is CSS contains the main definitions for the basic HOME application.
+Any definition may by overriden or extended using a separate stylesheet
+defined on the configuration xml for each homepage
+
+				** DO NOT CHANGE THIS FILE **
+*/
+
+/*********** CSS Styles for default appearance of HTML tags ********/
+body{
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	margin:0px;
+	padding:0px;
+}
+A:link, A:visited,  A:active, A.highlighted {
+	color: #386189;
+	text-decoration: none;
+	font-size: 11px;
+}
+A:hover {
+	color: black;
+	text-decoration: underline;
+}
+h2 {
+	margin:0px;
+	padding:0px;
+}
+
+/*********** CSS Styles for default appearance of all modules and sections ********/
+.Section {
+	border:0px;
+}
+.SectionTitle {
+	text-align: left;
+	padding-left:0px;
+	padding-bottom:5px;
+	white-space:nowrap;
+	display:block;
+	width:100%;
+}
+.SectionControls_Arrow {
+	width:20px;
+	display:inline;
+}
+.SectionControls_Arrow img {border:0px;}
+.SectionControls_Print {display:inline;}
+.SectionControls_Print img {border:0px;}
+.SectionTitleLabel {
+	display:inline;
+	font-weight:bold;
+	font-size:8pt;
+}
+a.SectionTitleLabel:link { }
+.SectionBody {
+	display:block;
+}
+.SectionBodyRegion {
+	padding: 15px;
+}
+
+
+	ul.h_modulesList li.Section {
+		position: relative;
+	}
+	ul.h_modulesList {
+		list-style-type: none;
+		padding: 0px;
+		margin: 0px;
+	}
+	ul.h_modulesList li.Section {
+		margin: 2px;
+		padding: 0px;
+	} 
+	
+
+/***************** CSS Styles for the Container module **********************/
+.containerElement {
+	float:left;
+	border:0pt solid black;
+}
+
+/***************** CSS Styles for popup module window ******************/
+#h_moduleWindow {
+	position:absolute;
+	border:1px solid black;
+	padding:2px;
+	background-color:#FFFFFF;
+	color:#000000;
+	font-size:12px;
+	width:500px;
+	height:500px;
+	z-index:99999;
+	top:100px;
+	overflow:auto;
+	background:  url("/Accounts/default/skins/sandbox/bg.gif");
+}
+#h_moduleWindowClose {
+	position:absolute;
+	top:2px;
+	right:2px;
+}
+.h_actionOutputMessage {
+	margin:5px;
+	background-color:#FFFFCC;
+	color:#990000;
+	font-weight:bold;
+	text-align:center;
+}
+
+
+
+
