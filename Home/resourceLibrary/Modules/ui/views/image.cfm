@@ -37,7 +37,7 @@
 	</cfif>
 	
 	<cfif stUser.isOwner>
-		<div id="toolbar">
+		<div class="SectionToolbar">
 			<a href="javascript:#moduleID#.getView('configImage');"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getView('configImage');">Settings</a>
 		</div>

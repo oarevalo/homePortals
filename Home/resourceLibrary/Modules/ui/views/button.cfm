@@ -21,7 +21,7 @@
 	</p>
 	
 	<cfif stUser.isOwner>
-		<div id="toolbar">
+		<div class="SectionToolbar">
 			<a href="javascript:#moduleID#.getView('configButton');"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getView('configButton');">Settings</a>
 		</div>
