@@ -63,7 +63,7 @@
 	
 	
 	<cfif bIsContentOwner>
-		<div class="photoAlbumToolbar">
+		<div class="SectionToolbar">
 			<a href="javascript:#moduleID#.getPopupView('manager')"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle" alt="Mange Images"></a>
 			<a href="javascript:#moduleID#.getPopupView('manager')"><strong>Manager</strong></a>
 			&nbsp;&nbsp;
