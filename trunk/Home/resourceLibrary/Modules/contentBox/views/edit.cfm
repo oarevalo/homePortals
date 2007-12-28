@@ -31,6 +31,8 @@
 	moduleID = this.controller.getModuleID();	
 	
 	// get the resources root
+	// get resource library root
+	hpConfigBean = this.controller.getHomePortalsConfigBean();	
 	resourcesRoot = hpConfigBean.getResourceLibraryPath();
 </cfscript>
 
@@ -83,9 +85,9 @@
 							style="width:475px;border:1px solid silver;padding:2px;height:285px;margin:5px;">#HTMLEditFormat(content)#</textarea>
 				
 				<div style="margin-top:10px;padding-bottom:10px;text-align:center;">
-					<input type="button" name="btnSave" value="Save" onclick="#moduleID#.doFormAction('saveContent',this.form);#moduleID#.closeWindow();">&nbsp;&nbsp;&nbsp;
+					<input type="button" name="btnSave" value="Save" onclick="#moduleID#.doFormAction('saveResource',this.form);#moduleID#.closeWindow();">&nbsp;&nbsp;&nbsp;
 					<cfif resourceID neq "">
-						<input type="button" name="btnDelete" value="Delete" onclick="if(confirm('Delete entry?')){#moduleID#.doAction('deleteContent',{resourceID:'#resourceID#'});#moduleID#.closeWindow();}">
+						<input type="button" name="btnDelete" value="Delete" onclick="if(confirm('Delete entry?')){#moduleID#.doAction('deleteResource',{resourceID:'#resourceID#'});#moduleID#.closeWindow();}">
 					</cfif>
 				</div>
 				

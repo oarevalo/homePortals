@@ -2,10 +2,10 @@
 
 <cfscript>
 	contentLocation = "";
-	contentTitle = "ContentBox";
 	bContentFound = true;
 	txtDoc = "";
 	resourceType = getResourceType();
+	contentTitle = resourceType & "Box";
 	
 	// get module path
 	cfg = this.controller.getModuleConfigBean();
@@ -28,6 +28,8 @@
 		
 	} catch(homePortals.catalog.resourceNotFound e) {
 		bContentFound = false;
+	} catch(homePortals.catalog.resourceTypeNotFound e) {
+		bContentFound = false;
 	}
 
 	// check if current user is owner
@@ -45,7 +47,11 @@
 <cfif Not bContentFound>
 
 	<cfif resourceID eq "">
-		<em>Select a content entry to display</em>
+		<cfif stUser.isOwner>
+			<em>Select a content entry to display</em>
+		<cfelse>
+			<em>No content selected</em>
+		</cfif>
 	<cfelse>
 		<em>Content entry not found!</em>
 	</cfif>

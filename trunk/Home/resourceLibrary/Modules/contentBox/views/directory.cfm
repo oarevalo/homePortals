@@ -49,7 +49,7 @@
 
 	<div style="margin:5px;background-color:#333;border:1px solid silver;color:#fff;">
 		<div style="margin:5px;">
-			<strong>#getResourceType()#Box:</strong> Search Directory 
+			<cfoutput><strong>#getResourceType()#Box:</strong> Search Directory </cfoutput>
 		</div>
 	</div>
 
