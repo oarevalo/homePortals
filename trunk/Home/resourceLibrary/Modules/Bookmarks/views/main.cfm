@@ -205,11 +205,6 @@
 			<a href="#realURL#" target="_blank"><strong>Link to this list</strong></a>
 		</span>
 	</div>
-<cfelse>
-	<div class="SectionToolbar">
-		<a href="#realURL#" target="_blank"><img src="#imgRoot#/opml.gif" border="0" align="absmiddle" alt="Link to this list"></a>
-		<a href="#realURL#" target="_blank"><strong>Link to this list</strong></a>
-	</div>
 </cfif>
 
 </cfoutput>
