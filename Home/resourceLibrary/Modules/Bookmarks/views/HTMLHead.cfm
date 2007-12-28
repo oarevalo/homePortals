@@ -2,20 +2,6 @@
 
 <cfif this.controller.isFirstInClass()>
 <style type="text/css">
-	.Bookmarks2Toolbar {
-		border:1px solid silver;
-		background-color:#fefcd8;
-		margin:0px;
-		color:#993300;
-		margin-top:10px;
-		padding:2px;
-		font-size:12px;
-	}
-	.Bookmarks2Toolbar a {
-		color:#333333 !important;
-		font-weight:bold !important;
-		font-size:10px;
-	}	
 	.Bookmarks2Settings {
 		background-color:#fefcd8;
 		padding:10px;
