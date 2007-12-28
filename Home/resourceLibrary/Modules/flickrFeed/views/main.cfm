@@ -119,7 +119,7 @@
 	</cfif>
 
 	<cfif stUser.isOwner>
-		<div class="flickrFeedToolbar">
+		<div class="SectionToolbar">
 			<a href="javascript:#moduleID#.getView('config');"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getView('config');">Settings</a>
 		</div>	
