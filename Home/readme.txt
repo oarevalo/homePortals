@@ -4,7 +4,7 @@
 /**************************************************************/	
 
 /*
-	Copyright 2007 - Oscar Arevalo (http://www.oscararevalo.com)
+	Copyright 2007-2008 - Oscar Arevalo (http://www.oscararevalo.com)
 
     This file is part of HomePortals.
 
@@ -50,7 +50,7 @@ a page and how to organize them.
 Additionally, it provides a simple yet powerful framework on which to develop
 "modules" which are the basic functionality units that can be embedded within
 a page. Modules can range from the very basic (simple static html content) to 
-full fledged ajax powered mini applications.
+full fledged AJAX powered mini applications.
 
 HomePortals provides an extensive set of tools and features that allow 
 developers to create multiple types of applications like start pages, personal
@@ -104,7 +104,7 @@ supports SQL should work with no problem.
 4. Installing HomePortals
 -----------------------------------------------------------------------
 Installing HomePortals is as easy as unzipping the installation package at the webserver root. 
-All HomePortals files are contained within a single directory called /Home that must site at the
+All HomePortals files are contained within a single directory called /Home that must sit at the
 root level of your site. 
 To verify the installation, use your browser to go to the /Home directory and you will see the
 current version of your HomePortals installation.
@@ -219,7 +219,7 @@ my wife Isa, Tom DeManincor and Anabel Fernandez (you were there when it all beg
 -----------------------------------------------------------------------
 9. Bugs, suggestions, criticisms, well-wishes, good vibrations, etc
 ---------------------------------------------------------------------------
-Please send them to info@homeportals.com or share them on the forum at http://www.homeportals.net/
+Please send them to info@homeportals.net or share them on the forum at http://www.homeportals.net/
 
 
 
