@@ -17,6 +17,7 @@
 		
 		variables.LAYOUT_REGION_TYPES = "header,column,footer";
 		variables.ACCESS_TYPES = "general,owner,friend";
+		variables.DEFAULT_CONTENT_CACHE_TTL = 30;
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
@@ -110,35 +111,53 @@
 					case "modules":
 						if(structKeyExists(xmlNode.xmlAttributes, "basePath"))
 							variables.stPage.page.basePath = xmlNode.xmlAttributes.basePath;
-	
-						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
-							if(xmlNode.xmlChildren[j].xmlName eq "module") {
-								xmlThisNode = xmlNode.xmlChildren[j];
 
-								// copy all attributes from the node into another struct
-								// (modified for Railo2 compatibility)
-								args = structNew();
-								for(item in xmlThisNode.xmlAttributes) {
-									args[item] = xmlThisNode.xmlAttributes[item];
-								}
-								
-								// validate module attributes
-								if(Not structKeyExists(args, "id")) args.id = ""; 
-								if(Not structKeyExists(args, "name")) args.name = "";
-								if(Not structKeyExists(args, "location")) args.location = "";
-								if(Not structKeyExists(args, "title")) args.title = args.name; 
-								if(Not structKeyExists(args, "container")) args.container = true; 
-								if(Not structKeyExists(args, "display")) args.display = "normal";  // normal, collapsed, hidden
-								if(Not structKeyExists(args, "output")) args.output = true; 
-								if(Not structKeyExists(args, "style")) args.style = ""; 
-								if(Not structKeyExists(args, "icon")) args.icon = ""; 
-	
-								// make sure there is a unique ID for each module 
-								if(args.id eq "") args.id = "h_module_#args.location#_#j#";
-	
-								addModule(args.id, args);
-							}
+						xmlThisNode = xmlNode.xmlChildren[j];
+
+						args = structNew();	// this structure is used to hold the module attributes
+						args["_moduleType"] = xmlThisNode.xmlName;	// store the "type" of module
+
+						// copy all attributes from the node into another struct
+						// (modified for Railo2 compatibility)
+						for(item in xmlThisNode.xmlAttributes) {
+							args[item] = xmlThisNode.xmlAttributes[item];
 						}
+
+
+						// define common attributes for module tags
+						if(Not structKeyExists(args, "id")) args.id = ""; 
+						if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
+						if(Not structKeyExists(args, "container")) args.container = true; 
+						if(Not structKeyExists(args, "title")) args.title = ""; 
+						if(Not structKeyExists(args, "icon")) args.icon = ""; 
+						if(Not structKeyExists(args, "style")) args.style = ""; 
+						if(Not structKeyExists(args, "output")) args.output = true; 
+
+						// Provide a unique ID for each module 
+						if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
+
+
+						// handle child tags
+						switch(xmlThisNode.xmlName) {
+						
+							case "module":		// handle <module> tag
+
+								if(Not structKeyExists(args, "name")) args.name = "";
+								if(args.title eq "") args.title = args.name; 
+								break;
+						
+							case "content":		// handle <content> tag
+							
+								if(Not structKeyExists(args, "resourceID")) args.resourceID = ""; 
+								if(Not structKeyExists(args, "resourceType")) args.resourceType = "content"; 
+								if(Not structKeyExists(args, "href")) args.href = ""; 
+								if(Not structKeyExists(args, "cache")) args.cache = true; 
+								if(Not structKeyExists(args, "cacheTTL")) args.cacheTTL = variables.DEFAULT_CONTENT_CACHE_TTL; 
+								break;
+						}
+
+						// add module to instance
+						addModule(args.id, args);
 	
 						break;
 							
@@ -261,9 +280,10 @@
 			xmlNode = xmlElemNew(xmlDoc,"modules");
 			aTemp = getModules();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
-				xmlNode2 = xmlElemNew(xmlDoc,"module");
+				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i]["_moduleType"]);
 				for(attr in aTemp[i]) {
-					xmlNode2.xmlAttributes[attr] = xmlFormat(aTemp[i][attr]);
+					if(attr neq "_moduleType")
+						xmlNode2.xmlAttributes[attr] = xmlFormat(aTemp[i][attr]);
 				}
 				arrayAppend(xmlNode.xmlChildren, xmlNode2);
 			}
