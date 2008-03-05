@@ -13,6 +13,9 @@
 		variables.oHomePortalsConfigBean = 0;		// homeportals config
 		variables.stTimers = structNew();
 		variables.oCatalog = 0;			// reference to the current catalog
+		
+		variables.HTTP_GET_TIMEOUT = 15;	// timeout for HTTP requests in content modules
+		variables.DEFAULT_CONTENT_CACHE_TTL = 30;	// default TTL for content items on the content cache
 	</cfscript>
 
 	<!--------------------------------------->
@@ -55,6 +58,7 @@
 			var sectionType = "";
 			var aSections = 0;
 			var start = getTickCount();
+			var moduleType = "";
 			
 			// reset the buffer
 			resetPageBuffer();
@@ -74,14 +78,25 @@
 						// loop through all modules in this location
 						for(k=1;k lte arrayLen(aModules);k=k+1) {
 							stModuleNode = stModules[location][k];
-							if(stModuleNode.name neq "") {
-								if(left(stModuleNode.name,4) neq "http")
-									processModule(stModuleNode);
-								else
-									processRemoteModule(stModuleNode);
-								variables.lstModulesRender = listAppend(variables.lstModulesRender, stModuleNode.id);
-
+							moduleType = stModuleNode["_moduleType"];
+							
+							switch(moduleType) {
+								
+								case "module":	// render normal modules
+									if(stModuleNode.name neq "") {
+										if(left(stModuleNode.name,4) neq "http")
+											processModule(stModuleNode);
+										else
+											processRemoteModule(stModuleNode);
+										variables.lstModulesRender = listAppend(variables.lstModulesRender, stModuleNode.id);
+									}
+									break;
+									
+								case "content": // render content modules
+									processContent(stModuleNode);
+									break;
 							}
+							
 						}
 					}
 				}
@@ -360,9 +375,9 @@
 			var aScriptResources = variables.oHomePortalsConfigBean.getBaseResourcesByType("script");
 			var aStyleResources = variables.oHomePortalsConfigBean.getBaseResourcesByType("style");
 			var lstLayoutSections = variables.oHomePortalsConfigBean.getLayoutSections();
-			var aModuleIcons = variables.oHomePortalsConfigBean.getModuleIcons();
 			
 			var oResourceBean = 0;
+			var args = structNew();
 		
 			// check if we are on HTTPS and if we need to modify the root
 			if(isHTTPS and left(variables.pageHREF,1) eq "/")
@@ -463,57 +478,57 @@
 							variables.stPage.page.basePath = xmlNode.xmlAttributes.basePath;
 	
 						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
-							if(xmlNode.xmlChildren[j].xmlName eq "module") {
-								xmlThisNode = xmlNode.xmlChildren[j];
 
-								// copy all attributes from the node into another struct
-								// (modified for Railo2 compatibility)
-								for(item in xmlThisNode.xmlAttributes) {
-									args[item] = xmlThisNode.xmlAttributes[item];
-								}
-								
-								// validate module attributes
-								if(Not structKeyExists(args, "name")) args.name = "";
-								if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
-								if(Not structKeyExists(args, "title")) args.title = args.name; 
-								if(Not structKeyExists(args, "container")) args.container = true; 
-								if(Not structKeyExists(args, "display")) args.display = "normal";  // normal, collapsed, hidden
-								if(Not structKeyExists(args, "id")) args.id = ""; 
-								if(Not structKeyExists(args, "showPrint")) args.showPrint = true; 
-								if(Not structKeyExists(args, "output")) args.output = true; 
-								if(Not structKeyExists(args, "style")) args.style = ""; 
-								if(Not structKeyExists(args, "icon")) args.icon = ""; 
-	
-								// Provide a unique ID for each module 
-								if(args.id eq "") args.id = "h_module_#args.location#_#j#";
-	
-								// ******** process user-defined module icons  ******
-								// get base module icons
-								args["icons"] = aModuleIcons;
-								
-								// get icons defined for the current module
-								for(k=1;k lte ArrayLen(xmlThisNode.xmlChildren);k=k+1) {
-									if(xmlThisNode.xmlChildren[k].xmlName eq "moduleIcon") {
-										thisStruct = aTmpIcons[j].xmlAttributes;
-										if(Not StructKeyExists(thisStruct,"alt")) thisStruct.alt = ""; //alternate text
-										if(Not StructKeyExists(thisStruct,"image")) thisStruct.image = ""; // url of image
-										if(Not StructKeyExists(thisStruct,"onClickFunction")) thisStruct.onClickFunction= ""; //JS for onclick event 
-									
-										stIcon = structNew();
-										stIcon.alt = thisStruct.alt;
-										stIcon.image = thisStruct.image;
-										stIcon.onClickFunction = thisStruct.onClickFunction;
-										
-										ArrayAppend(args.icons, stIcon);
-									}
-								}
-	
-								// create structure for modules that belong to the same location
-								if(Not StructKeyExists(variables.stPage.page.modules, args.location) )
-									variables.stPage.page.modules[args.location] = ArrayNew(1);
-								
-								ArrayAppend(variables.stPage.page.modules[args.location], duplicate(args) );
+							xmlThisNode = xmlNode.xmlChildren[j];
+
+							args = structNew();	// this structure is used to hold the module attributes
+							args["_moduleType"] = xmlThisNode.xmlName;	// store the "type" of module
+
+							// copy all attributes from the node into another struct
+							// (modified for Railo2 compatibility)
+							for(item in xmlThisNode.xmlAttributes) {
+								args[item] = xmlThisNode.xmlAttributes[item];
 							}
+							
+
+							// define common attributes for module tags
+							if(Not structKeyExists(args, "id")) args.id = ""; 
+							if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
+							if(Not structKeyExists(args, "container")) args.container = true; 
+							if(Not structKeyExists(args, "title")) args.title = ""; 
+							if(Not structKeyExists(args, "icon")) args.icon = ""; 
+							if(Not structKeyExists(args, "style")) args.style = ""; 
+							if(Not structKeyExists(args, "output")) args.output = true; 
+
+							// Provide a unique ID for each module 
+							if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
+
+
+							// handle child tags
+							switch(xmlThisNode.xmlName) {
+							
+								case "module":		// handle <module> tag
+
+									if(Not structKeyExists(args, "name")) args.name = "";
+									if(args.title eq "") args.title = args.name; 
+									break;
+
+							
+								case "content":		// handle <content> tag
+								
+									if(Not structKeyExists(args, "resourceID")) args.resourceID = ""; 
+									if(Not structKeyExists(args, "resourceType")) args.resourceType = "content"; 
+									if(Not structKeyExists(args, "href")) args.href = ""; 
+									if(Not structKeyExists(args, "cache")) args.cache = true; 
+									if(Not structKeyExists(args, "cacheTTL")) args.cacheTTL = variables.DEFAULT_CONTENT_CACHE_TTL; 
+									break;
+							}
+							
+							// create structure for modules that belong to the same location
+							if(Not StructKeyExists(variables.stPage.page.modules, args.location) )
+								variables.stPage.page.modules[args.location] = ArrayNew(1);
+							
+							ArrayAppend(variables.stPage.page.modules[args.location], duplicate(args) );
 						}
 	
 						break;
@@ -649,6 +664,51 @@
 		</cftry>
 	</cffunction>	
 	
+	<!--------------------------------------->
+	<!----  processContent				----->
+	<!--------------------------------------->
+	<cffunction name="processContent" access="private" hint="Retrieves content to display in the page">
+		<cfargument name="moduleNode" type="any" required="true">
+		<cfscript>
+			var moduleID = arguments.moduleNode.id;
+			var start = getTickCount();
+			var tmpHTML = "";
+			var contentSrc = "";
+			
+			try {
+
+				// define source of content (resource or external)
+				if(arguments.moduleNode.resourceID neq "") {
+					oResourceBean = variables.oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
+					contentSrc = variables.oHomePortalsConfigBean.getResourceLibraryPath() & "/" & oResourceBean.getHref();
+				
+				} else if(arguments.moduleNode.href neq "") {
+					contentSrc = arguments.moduleNode.href;
+				}
+
+				// retrieve content
+				if(contentSrc neq "") {
+					if(left(contentSrc,4) eq "http") {
+						st = httpget(contentSrc);
+						tmpHTML = st.fileContent;
+					} else {
+						tmpHTML = readFile( expandPath( contentSrc) );
+					}
+				}
+
+				// add rendered content to buffer
+				appendpageBuffer("_htmlModule", moduleID, tmpHTML );
+
+			} catch(any e) {
+				tmpHTML = "<b>An unexpected error ocurred while retrieving content for content module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
+				appendpageBuffer("_htmlModule", moduleID, tmpHTML );
+			}
+
+			variables.stTimers["processContent_#moduleID#"] = getTickCount()-start;
+		</cfscript>
+	</cffunction>
+
+
 
 	<!--------------------------------------->
 	<!----  renderModule				----->
@@ -658,11 +718,7 @@
 
 		<cfscript>
 			var moduleID = arguments.moduleNode.id;
-			var moduleName = arguments.moduleNode.name;
-			var aIcons = arguments.moduleNode.icons;
-			var imgRoot = variables.oHomePortalsConfigBean.getHomePortalsPath() & "Common/Images";
 			var renderTemplateBody = "";
-			var j = 1;
 			var tmpIconURL = "";
 
 			if(arguments.moduleNode.icon neq "") 
@@ -764,6 +820,22 @@
 		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
 	</cffunction>
 
+	<cffunction name="httpget" access="private" returntype="struct">
+		<cfargument name="href" type="string">
+		<cfhttp url="#arguments.href#" method="get" throwonerror="true" 
+				resolveurl="true" redirect="true" 
+				timeout="#variables.HTTP_GET_TIMEOUT#">
+		<cfreturn cfhttp>
+	</cffunction>	
 	
+	<!---------------------------------------->
+	<!--- readFile		                   --->
+	<!---------------------------------------->		
+	<cffunction name="readFile" access="private" returntype="string" hint="Reads a file from disk and returns the contents.">
+		<cfargument name="filePath" type="string" required="true">
+		<cfset var txtDoc = "">
+		<cffile action="read" file="#filePath#" variable="txtDoc">
+		<cfreturn txtDoc>
+	</cffunction>		
 	
 </cfcomponent>
