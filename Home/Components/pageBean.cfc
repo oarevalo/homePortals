@@ -17,7 +17,7 @@
 		
 		variables.LAYOUT_REGION_TYPES = "header,column,footer";
 		variables.ACCESS_TYPES = "general,owner,friend";
-		variables.DEFAULT_CONTENT_CACHE_TTL = 30;
+		variables.DEFAULT_CONTENT_CACHE_TTL = 60;
 		variables.DEFAULT_CONTENT_RESOURCE_TYPE = "content";
 		variables.DEFAULT_CONTENT_CACHE = true;
 	</cfscript>

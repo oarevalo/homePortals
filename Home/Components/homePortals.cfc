@@ -47,6 +47,8 @@
 			var defaultConfigFilePath = "";
 			var oModuleProperties = 0;
 			var start = getTickCount();
+			var oCacheRegistry = 0;
+			var oCacheService = 0;
 			
 			variables.appRoot = arguments.appRoot;
 
@@ -74,6 +76,15 @@
 			// load module properties
 			oModuleProperties = createObject("component","moduleProperties").init(true, arguments.appRoot);
 			
+			// initialize cache registry
+			oCacheRegistry = createObject("component","cacheRegistry").init();
+			oCacheRegistry.flush();		// clear registry
+
+			// crate page cache instances
+			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
+																			variables.oHomePortalsConfigBean.getPageCacheTTL());
+			oCacheRegistry.register("hpPageCache", oCacheService);
+
 			variables.stTimers.init = getTickCount()-start;
 			return this;
 		</cfscript>
@@ -206,52 +217,24 @@
 			var oPageRenderer = 0;
 			var pageCacheKey = hash(arguments.pageHREF);
 			var start = getTickCount();
+			var oCacheRegistry = createObject("component","cacheRegistry").init();			
+			var oCache = oCacheRegistry.getCache("hpPageCache");
 						
 			// if the page exists on the cache, and the page hasnt been modified after
 			// storing it on the cache, then get it from the cache
-			if(structKeyExists(variables.stPageCache, pageCacheKey) 
-					and DateDiff("n", getFileLastModified(expandPath(arguments.pageHREF)), variables.stPageCache[pageCacheKey].timestamp ) lt 0) {
-				oPageRenderer = variables.stPageCache[pageCacheKey].data;
-				
-			} else {
+			try {
+				oPageRenderer = oCache.retrieveIfNewer(pageCacheKey, getFileLastModified(expandPath(arguments.pageHREF)));
+			
+			} catch(homePortals.cacheService.itemNotFound e) {
 				// page is not in cache, so load the page
 				oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, variables.oHomePortalsConfigBean, variables.oCatalog);
 			
 				// store page in cache
-				variables.stPageCache[pageCacheKey] = structNew();
-				variables.stPageCache[pageCacheKey].data = oPageRenderer;
-				variables.stPageCache[pageCacheKey].timestamp = now();
+				oCache.store(pageCacheKey, oPageRenderer);
 			}
 			
 			variables.stTimers.loadPageRenderer = getTickCount()-start;
 			return oPageRenderer;
-		</cfscript>
-	</cffunction>
-
-	<cffunction name="loadSite" access="private" returntype="pageRenderer">
-		<cfargument name="userName" type="string" required="true">
-		<cfscript>
-			var oSite = 0;
-			var siteHREF = getConfig().getAccountsRoot() & "/" & arguments.username & "/site.xml";
-			var key = hash(siteHREF);
-						
-			// if the object exists on the cache, and the page hasnt been modified after
-			// storing it on the cache, then get it from the cache
-			if(structKeyExists(variables.stSiteCache, key) 
-					and getFileLastModified(expandPath(siteHREF)) lt variables.stSiteCache[key].timestamp ) {
-				oSite = variables.stSiteCache[key].data;
-				
-			} else {
-				// page is not in cache, so load the page
-				oSite = createObject("component","site").init(arguments.userName, variables.oAccountsService);
-			
-				// store page in cache
-				variables.stSiteCache[key] = structNew();
-				variables.stSiteCache[key].data = oSite;
-				variables.stSiteCache[key].timestamp = now();
-			}
-			
-			return oSite;
 		</cfscript>
 	</cffunction>
 

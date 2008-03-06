@@ -12,7 +12,8 @@
     <cfset variables.lockName = "hp_rssService_cache">
     <!--- seconds to wait when retrieving a feed with an HTTP request --->
     <cfset variables.httpTimeout = 10>
-    
+	<!--- name of the cacheService instance on the cache registry --->
+    <cfset variables.cacheName = "rssCacheService">
     
 	<!-------------------------------------->
 	<!--- init                           --->
@@ -24,6 +25,9 @@
 		<cfargument name="memCacheTTL" type="numeric" required="false" default="#variables.memCacheTTL#">
 		<cfargument name="reloadCache" type="boolean" required="false" default="false">
 
+		<cfset var oCacheRegistry = 0>
+		<cfset var oCacheService = 0>
+
 		<!--- set instance variables --->
 		<cfif arguments.cacheDir neq "">
 			<cfset variables.cacheDir = arguments.cacheDir>
@@ -32,13 +36,18 @@
 		<cfset variables.memCacheSize = arguments.memCacheSize>
 		<cfset variables.memCacheTTL = arguments.memCacheTTL>
 		
-		<!--- create memcache structure if not exists --->
-		<cfif Not structKeyExists(application, "rssCacheService") or arguments.reloadCache>
-			<cfset oCacheService = createObject("component","cacheService").init(variables.memCacheSize, variables.memCacheTTL)>
-			<cflock type="exclusive" name="#variables.lockName#" timeout="30">
-				<cfset application.rssCacheService = oCacheService>
-			</cflock>
-		</cfif>
+		<!--- check cacheRegistry for the rss cache --->
+		<cfset oCacheRegistry = createObject("component","cacheRegistry").init()>
+
+		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
+			<cfif not oCacheRegistry.isRegistered(variables.cacheName) or arguments.reloadCache>
+				<!--- crate cache instance --->
+				<cfset oCacheService = createObject("component","cacheService").init(variables.memCacheSize, variables.memCacheTTL)>
+
+				<!--- add cache to registry --->
+				<cfset oCacheRegistry.register(variables.cacheName, oCacheService)>
+			</cfif>
+		</cflock>
 		
 		<cfreturn this>
 	</cffunction>
@@ -47,7 +56,8 @@
 	<!--- getCacheService                --->
 	<!-------------------------------------->	
 	<cffunction name="getCacheService" access="public" returnType="cacheService">
-		<cfreturn application.rssCacheService>
+		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
+		<cfreturn oCacheRegistry.getCache(variables.cacheName)>
 	</cffunction>
 	
 	<!-------------------------------------->
@@ -169,7 +179,7 @@
 		<cfset var cacheFileName = "">
 		<cfset var cacheFile = "">
 		<cfset var txtDoc = "">
-		<cfset var oCacheService = application.rssCacheService>
+		<cfset var oCacheService = getCacheService()>
 		
 		<!--- replace "feed://" with "http://" --->
 		<cfset arguments.url = ReplaceNoCase(arguments.url,"feed://","http://")> 
