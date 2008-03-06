@@ -20,6 +20,10 @@
 			variables.stConfig.SSLRoot = "";		
 			variables.stConfig.appRoot = "";
 			variables.stConfig.accountsRoot = "";
+			variables.stConfig.pageCacheSize = "";
+			variables.stConfig.pageCacheTTL = "";
+			variables.stConfig.contentCacheSize = "";
+			variables.stConfig.contentCacheTTL = "";
 
 			variables.stConfig.moduleIcons = ArrayNew(1);
 
@@ -119,7 +123,7 @@
 			xmlConfigDoc.xmlRoot.xmlAttributes["version"] = variables.hpEngineVersionTag;
 			
 			// save simple value settings
-			lstKeys = "initialEvent,layoutSections,defaultPage,bodyOnLoad,homePortalsPath,resourceLibraryPath,defaultAccount,SSLRoot,appRoot,accountsRoot";
+			lstKeys = "initialEvent,layoutSections,defaultPage,bodyOnLoad,homePortalsPath,resourceLibraryPath,defaultAccount,SSLRoot,appRoot,accountsRoot,pageCacheSize,pageCacheTTL,contentCacheSize,contentCacheTTL";
 			for(i=1;i lte ListLen(lstKeys);i=i+1) {
 				thisKey = ListGetAt(lstKeys,i);
 
@@ -206,6 +210,23 @@
 	<cffunction name="getAccountsRoot" access="public" returnType="string" hint="The path to the directory where account files are stored">
 		<cfreturn variables.stConfig.accountsRoot>
 	</cffunction>
+
+	<cffunction name="getPageCacheSize" access="public" returntype="numeric" hint="The maximum number of homeportals pages to cache at any given time">
+		<cfreturn val(variables.stConfig.pageCacheSize)>	
+	</cffunction>
+
+	<cffunction name="getPageCacheTTL" access="public" returntype="numeric" hint="The maximum amount in minutes before an unchanged page is expelled from the cache.">
+		<cfreturn val(variables.stConfig.pageCacheTTL)>
+	</cffunction>
+
+	<cffunction name="getContentCacheSize" access="public" returntype="numeric" hint="The maximum number of items to hold in the content cache">
+		<cfreturn val(variables.stConfig.contentCacheSize)>	
+	</cffunction>
+
+	<cffunction name="getContentCacheTTL" access="public" returntype="numeric" hint="Default TTL in minutes for content items on the content cache. This can be overriden for individual entries">
+		<cfreturn val(variables.stConfig.contentCacheTTL)>
+	</cffunction>
+
 
 
 	<cffunction name="getBaseResourcesByType" access="public" returntype="array">

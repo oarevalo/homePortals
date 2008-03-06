@@ -2,7 +2,7 @@
 	
 	<!--- number of max items to store in the cache --->
 	<cfset variables.cacheSize = 10>
-	<!--- time to live in minutes for items in the cached --->
+	<!--- time to live in minutes for items in the cached (default value) --->
 	<cfset variables.cacheTTL = 30>
 	<!--- structure where data will be stored --->
 	<cfset variables.stData = structNew()>
@@ -68,6 +68,7 @@
         	<cfset st = structNew()>
             <cfset st.key = key>
             <cfset st.timestamp = variables.stData[key].timestamp>
+			<cfset st.ttl = variables.stData[key].ttl>
             <cfset arrayAppend(aItems, st)>
         </cfloop>
         
@@ -83,7 +84,7 @@
 
 		<!---check if the item exists in the cache and if it is still valid --->
 		<cfif structKeyExists(variables.stData, arguments.key)>
-			<cfif DateDiff("n", variables.stData[arguments.key].timestamp, now()) lt variables.cacheTTL>
+			<cfif DateDiff("n", variables.stData[arguments.key].timestamp, now()) lt variables.stData[arguments.key].TTL>
 			
 				<!--- update hit count --->
                 <cfif variables.collectStats>
@@ -108,8 +109,47 @@
             </cfif>
         </cfif>
 		<cfthrow type="homePortals.cacheService.itemNotFound" message="Item not found in cache or item no longer valid">
-		
 	</cffunction>
+
+
+	<!-------------------------------------->
+	<!--- retrieveIfNewer				 --->
+	<!-------------------------------------->	
+	<cffunction name="retrieveIfNewer" access="public" returntype="any" hint="retrieves an item of the cache only if the cached item is newer than a given timestamp">
+		<cfargument name="key" type="string" required="true">
+		<cfargument name="timestamp" type="Date" required="true">
+
+		<!---check if the item exists in the cache and if it is  valid --->
+		<cfif structKeyExists(variables.stData, arguments.key)>
+			<cfif variables.stData[arguments.key].timestamp gt arguments.timestamp>
+			
+				<!--- update hit count --->
+                <cfif variables.collectStats>
+                	<cfif variables.stInfo.hitCount lt variables.counterLimit>
+						<cfset variables.stInfo.hitCount = variables.stInfo.hitCount + 1>
+                    <cfelse>
+						<cfset variables.stInfo.hitCount = 1>
+                    </cfif>
+                </cfif>
+				
+				<!--- return data --->
+				<cfreturn variables.stData[arguments.key].data>
+			</cfif>
+		</cfif>
+		
+		<!--- item not in cache, or not valid. Update miss count --->
+        <cfif variables.collectStats>
+           	<cfif variables.stInfo.missCount lt variables.counterLimit>
+				<cfset variables.stInfo.missCount = variables.stInfo.missCount + 1>
+			<cfelse>
+                <cfset variables.stInfo.missCount = 1>
+            </cfif>
+        </cfif>
+		<cfthrow type="homePortals.cacheService.itemNotFound" message="Item not found in cache or item no longer valid">
+
+	</cffunction>
+	
+
 	
 	<!-------------------------------------->
 	<!--- store                         	  --->
@@ -117,6 +157,7 @@
 	<cffunction name="store" access="public" returntype="void" hint="stores an item on the cache">
 		<cfargument name="key" type="string" required="true">
 		<cfargument name="data" type="any" required="true">
+		<cfargument name="ttl" type="numeric" required="false" default="#variables.cacheTTL#">
 
 		<cfset var memCacheKey = "">
 		<cfset var tmpOldestCacheKey = "">
@@ -140,6 +181,7 @@
 		<cfset variables.stData[arguments.key] = structNew()>
 		<cfset variables.stData[arguments.key].data = arguments.data>
 		<cfset variables.stData[arguments.key].timestamp = now()>
+		<cfset variables.stData[arguments.key].ttl = val(arguments.ttl)>
 		
 	</cffunction>
 
@@ -158,7 +200,7 @@
 		
 		<!--- cache size is too big, so get rid of old entries --->
         <cfloop list="#lstKeys#" index="memCacheKey">
-            <cfif DateDiff("n", variables.stData[memCacheKey].timestamp, now()) gt variables.cacheTTL>
+            <cfif DateDiff("n", variables.stData[memCacheKey].timestamp, now()) gt variables.stData[memCacheKey].TTL>
                 <cfset structDelete(variables.stData, memCacheKey)>
             <cfelse>
                 <cfif DateCompare(variables.stData[memCacheKey].timestamp, tmpOldestTS) lt 0>

@@ -14,8 +14,7 @@
 		variables.stTimers = structNew();
 		variables.oCatalog = 0;			// reference to the current catalog
 		
-		variables.HTTP_GET_TIMEOUT = 15;	// timeout for HTTP requests in content modules
-		variables.DEFAULT_CONTENT_CACHE_TTL = 30;	// default TTL for content items on the content cache
+		variables.HTTP_GET_TIMEOUT = 30;	// timeout for HTTP requests in content modules
 	</cfscript>
 
 	<!--------------------------------------->
@@ -520,7 +519,7 @@
 									if(Not structKeyExists(args, "resourceType")) args["resourceType"] = "content"; 
 									if(Not structKeyExists(args, "href")) args["href"] = ""; 
 									if(Not structKeyExists(args, "cache")) args["cache"] = true; 
-									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = variables.DEFAULT_CONTENT_CACHE_TTL; 
+									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = variables.oHomePortalsConfigBean.getContentCacheTTL(); 
 									break;
 							}
 							
@@ -673,27 +672,34 @@
 			var moduleID = arguments.moduleNode.id;
 			var start = getTickCount();
 			var tmpHTML = "";
-			var contentSrc = "";
+			var cacheKey = "";
+			var oCache = 0;
 			
 			try {
+				if(arguments.moduleNode.cache) {
+					// get the content cache (this will initialize it, if needed)
+					oCache = getContentCache();
 
-				// define source of content (resource or external)
-				if(arguments.moduleNode.resourceID neq "") {
-					oResourceBean = variables.oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
-					contentSrc = variables.oHomePortalsConfigBean.getResourceLibraryPath() & "/" & oResourceBean.getHref();
-				
-				} else if(arguments.moduleNode.href neq "") {
-					contentSrc = arguments.moduleNode.href;
-				}
-
-				// retrieve content
-				if(contentSrc neq "") {
-					if(left(contentSrc,4) eq "http") {
-						st = httpget(contentSrc);
-						tmpHTML = st.fileContent;
-					} else {
-						tmpHTML = readFile( expandPath( contentSrc) );
+					// generate a key for the cache entry
+					cacheKey = arguments.moduleNode.resourceID & "/" 
+								& arguments.moduleNode.resourceType & "/" 
+								& arguments.moduleNode.href;
+					
+					try {
+						// read from cache
+						tmpHTML = oCache.retrieve(cacheKey);
+					
+					} catch(homePortals.cacheService.itemNotFound e) {
+						// read from source
+						tmpHTML = retrieveContent( arguments.moduleNode );
+						
+						// update cache
+						oCache.store(cacheKey, tmpHTML, arguments.moduleNode.cacheTTL);
 					}
+					
+				} else {
+					// retrieve from source
+					tmpHTML = retrieveContent( arguments.moduleNode );
 				}
 
 				// add rendered content to buffer
@@ -837,5 +843,55 @@
 		<cffile action="read" file="#filePath#" variable="txtDoc">
 		<cfreturn txtDoc>
 	</cffunction>		
+	
+	<cffunction name="getContentCache" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
+		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
+		<cfset var cacheName = "contentCacheService">
+		<cfset var oCacheService = 0>
+		<cfset var cacheSize = variables.oHomePortalsConfigBean.getContentCacheSize()>
+		<cfset var cacheTTL = variables.oHomePortalsConfigBean.getContentCacheTTL()>
+
+		<cflock type="exclusive" name="contentCacheLock" timeout="30">
+			<cfif not oCacheRegistry.isRegistered(cacheName)>
+				<!--- crate cache instance --->
+				<cfset oCacheService = createObject("component","cacheService").init(cacheSize, cacheTTL)>
+
+				<!--- add cache to registry --->
+				<cfset oCacheRegistry.register(cacheName, oCacheService)>
+			</cfif>
+		</cflock>
+		
+		<cfreturn oCacheRegistry.getCache(cacheName)>
+	</cffunction>
+	
+	<cffunction name="retrieveContent" access="private" returntype="string" hint="retrieves content from source for a content module">
+		<cfargument name="moduleNode" type="any" required="true">
+		<cfscript>
+			var oResourceBean = 0;
+			var contentSrc = "";
+			var tmpHTML = "";
+			var st = structNew();
+			
+			// define source of content (resource or external)
+			if(arguments.moduleNode.resourceID neq "") {
+				oResourceBean = variables.oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
+				contentSrc = variables.oHomePortalsConfigBean.getResourceLibraryPath() & "/" & oResourceBean.getHref();
+			
+			} else if(arguments.moduleNode.href neq "") {
+				contentSrc = arguments.moduleNode.href;
+			}
+
+			// retrieve content
+			if(contentSrc neq "") {
+				if(left(contentSrc,4) eq "http") {
+					st = httpget(contentSrc);
+					tmpHTML = st.fileContent;
+				} else {
+					tmpHTML = readFile( expandPath( contentSrc) );
+				}
+			}
+		</cfscript>
+		<cfreturn tmpHTML>
+	</cffunction>
 	
 </cfcomponent>
