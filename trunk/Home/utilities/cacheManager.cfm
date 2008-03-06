@@ -14,7 +14,7 @@
 		</p>
 		
 
-		<form name="frm" action="cache.cfm" method="post">
+		<form name="frm" action="cacheManager.cfm" method="post">
 			<input type="submit" name="action" value="info" />
 			<input type="submit" name="action" value="clear" />
 			<input type="submit" name="action" value="cleanup" />

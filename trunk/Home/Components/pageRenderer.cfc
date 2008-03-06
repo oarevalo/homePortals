@@ -78,7 +78,7 @@
 						// loop through all modules in this location
 						for(k=1;k lte arrayLen(aModules);k=k+1) {
 							stModuleNode = stModules[location][k];
-							moduleType = stModuleNode["_moduleType"];
+							moduleType = stModuleNode.moduleType;
 							
 							switch(moduleType) {
 								
@@ -482,7 +482,7 @@
 							xmlThisNode = xmlNode.xmlChildren[j];
 
 							args = structNew();	// this structure is used to hold the module attributes
-							args["_moduleType"] = xmlThisNode.xmlName;	// store the "type" of module
+							args.moduleType = xmlThisNode.xmlName;	// store the "type" of module
 
 							// copy all attributes from the node into another struct
 							// (modified for Railo2 compatibility)
@@ -492,13 +492,13 @@
 							
 
 							// define common attributes for module tags
-							if(Not structKeyExists(args, "id")) args.id = ""; 
+							if(Not structKeyExists(args, "id")) args["id"] = ""; 
 							if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
-							if(Not structKeyExists(args, "container")) args.container = true; 
-							if(Not structKeyExists(args, "title")) args.title = ""; 
-							if(Not structKeyExists(args, "icon")) args.icon = ""; 
-							if(Not structKeyExists(args, "style")) args.style = ""; 
-							if(Not structKeyExists(args, "output")) args.output = true; 
+							if(Not structKeyExists(args, "container")) args["container"] = true; 
+							if(Not structKeyExists(args, "title")) args["title"] = ""; 
+							if(Not structKeyExists(args, "icon")) args["icon"] = ""; 
+							if(Not structKeyExists(args, "style")) args["style"] = ""; 
+							if(Not structKeyExists(args, "output")) args["output"] = true; 
 
 							// Provide a unique ID for each module 
 							if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
@@ -509,18 +509,18 @@
 							
 								case "module":		// handle <module> tag
 
-									if(Not structKeyExists(args, "name")) args.name = "";
+									if(Not structKeyExists(args, "name")) args["name"] = "";
 									if(args.title eq "") args.title = args.name; 
 									break;
 
 							
 								case "content":		// handle <content> tag
 								
-									if(Not structKeyExists(args, "resourceID")) args.resourceID = ""; 
-									if(Not structKeyExists(args, "resourceType")) args.resourceType = "content"; 
-									if(Not structKeyExists(args, "href")) args.href = ""; 
-									if(Not structKeyExists(args, "cache")) args.cache = true; 
-									if(Not structKeyExists(args, "cacheTTL")) args.cacheTTL = variables.DEFAULT_CONTENT_CACHE_TTL; 
+									if(Not structKeyExists(args, "resourceID")) args["resourceID"] = ""; 
+									if(Not structKeyExists(args, "resourceType")) args["resourceType"] = "content"; 
+									if(Not structKeyExists(args, "href")) args["href"] = ""; 
+									if(Not structKeyExists(args, "cache")) args["cache"] = true; 
+									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = variables.DEFAULT_CONTENT_CACHE_TTL; 
 									break;
 							}
 							
