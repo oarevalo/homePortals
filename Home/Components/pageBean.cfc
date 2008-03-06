@@ -18,6 +18,8 @@
 		variables.LAYOUT_REGION_TYPES = "header,column,footer";
 		variables.ACCESS_TYPES = "general,owner,friend";
 		variables.DEFAULT_CONTENT_CACHE_TTL = 30;
+		variables.DEFAULT_CONTENT_RESOURCE_TYPE = "content";
+		variables.DEFAULT_CONTENT_CACHE = true;
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
@@ -111,54 +113,58 @@
 					case "modules":
 						if(structKeyExists(xmlNode.xmlAttributes, "basePath"))
 							variables.stPage.page.basePath = xmlNode.xmlAttributes.basePath;
+				
+						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
 
-						xmlThisNode = xmlNode.xmlChildren[j];
-
-						args = structNew();	// this structure is used to hold the module attributes
-						args["_moduleType"] = xmlThisNode.xmlName;	// store the "type" of module
-
-						// copy all attributes from the node into another struct
-						// (modified for Railo2 compatibility)
-						for(item in xmlThisNode.xmlAttributes) {
-							args[item] = xmlThisNode.xmlAttributes[item];
-						}
-
-
-						// define common attributes for module tags
-						if(Not structKeyExists(args, "id")) args.id = ""; 
-						if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
-						if(Not structKeyExists(args, "container")) args.container = true; 
-						if(Not structKeyExists(args, "title")) args.title = ""; 
-						if(Not structKeyExists(args, "icon")) args.icon = ""; 
-						if(Not structKeyExists(args, "style")) args.style = ""; 
-						if(Not structKeyExists(args, "output")) args.output = true; 
-
-						// Provide a unique ID for each module 
-						if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
-
-
-						// handle child tags
-						switch(xmlThisNode.xmlName) {
-						
-							case "module":		// handle <module> tag
-
-								if(Not structKeyExists(args, "name")) args.name = "";
-								if(args.title eq "") args.title = args.name; 
-								break;
-						
-							case "content":		// handle <content> tag
-							
-								if(Not structKeyExists(args, "resourceID")) args.resourceID = ""; 
-								if(Not structKeyExists(args, "resourceType")) args.resourceType = "content"; 
-								if(Not structKeyExists(args, "href")) args.href = ""; 
-								if(Not structKeyExists(args, "cache")) args.cache = true; 
-								if(Not structKeyExists(args, "cacheTTL")) args.cacheTTL = variables.DEFAULT_CONTENT_CACHE_TTL; 
-								break;
-						}
-
-						// add module to instance
-						addModule(args.id, args);
+							xmlThisNode = xmlNode.xmlChildren[j];
 	
+							args = structNew();	// this structure is used to hold the module attributes
+							args.moduleType = xmlThisNode.xmlName;	// store the "type" of module
+	
+							// copy all attributes from the node into another struct
+							// (modified for Railo2 compatibility)
+							for(item in xmlThisNode.xmlAttributes) {
+								args[item] = xmlThisNode.xmlAttributes[item];
+							}
+	
+	
+							// define common attributes for module tags
+							if(Not structKeyExists(args, "id")) args["id"] = ""; 
+							if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
+							if(Not structKeyExists(args, "container")) args["container"] = true; 
+							if(Not structKeyExists(args, "title")) args["title"] = ""; 
+							if(Not structKeyExists(args, "icon")) args["icon"] = ""; 
+							if(Not structKeyExists(args, "style")) args["style"] = ""; 
+							if(Not structKeyExists(args, "output")) args["output"] = true; 
+	
+							// Provide a unique ID for each module 
+							if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
+	
+	
+							// handle child tags
+							switch(xmlThisNode.xmlName) {
+							
+								case "module":		// handle <module> tag
+	
+									if(Not structKeyExists(args, "name")) args["name"] = "";
+									if(args.title eq "") args.title = args.name; 
+									break;
+							
+								case "content":		// handle <content> tag
+								
+									if(Not structKeyExists(args, "resourceID")) args["resourceID"] = ""; 
+									if(Not structKeyExists(args, "resourceType")) args["resourceType"] = variables.DEFAULT_CONTENT_RESOURCE_TYPE; 
+									if(Not structKeyExists(args, "href")) args["href"] = ""; 
+									if(Not structKeyExists(args, "cache")) args["cache"] = variables.DEFAULT_CONTENT_CACHE; 
+									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = variables.DEFAULT_CONTENT_CACHE_TTL; 
+									break;
+							}
+	
+							// add module to instance
+							addModule(args.id, args);
+						
+						}
+						
 						break;
 							
 					// event handlers
@@ -211,6 +217,7 @@
 			var i = 0; var j = 0;
 			var aTemp = arrayNew(1);
 			var attr = "";
+			var bWriteAttribute = false;
 
 			// create a blank xml document and add the root node
 			xmlDoc = xmlNew();
@@ -280,10 +287,47 @@
 			xmlNode = xmlElemNew(xmlDoc,"modules");
 			aTemp = getModules();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
-				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i]["_moduleType"]);
+				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i].moduleType);
 				for(attr in aTemp[i]) {
-					if(attr neq "_moduleType")
-						xmlNode2.xmlAttributes[attr] = xmlFormat(aTemp[i][attr]);
+					
+					switch(attr) {
+						case "moduleType":
+							bWriteAttribute = false; 	// this attribute is ignored
+							break;
+						case "container":
+						case "output":
+							bWriteAttribute = (not aTemp[i][attr]);	// only write it if is false
+							break;
+						case "icon":
+						case "title":
+						case "style":
+							bWriteAttribute = (aTemp[i][attr] neq "");	// only write it if is not empty
+							break;
+						case "href":
+						case "resourceID":
+							if(aTemp[i].moduleType eq "content") 
+								bWriteAttribute = (aTemp[i][attr] neq "");	// only write it if is not empty
+							break;
+						case "cache":
+							if(aTemp[i].moduleType eq "content") 
+								bWriteAttribute = (not aTemp[i][attr]);	// only write it if is false
+							break;
+						case "resourceType":
+							if(aTemp[i].moduleType eq "content") 
+								bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_CONTENT_RESOURCE_TYPE and aTemp[i][attr] neq "");
+							break;
+						case "cacheTTL":
+							if(aTemp[i].moduleType eq "content") 
+								bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_CONTENT_CACHE_TTL and val(aTemp[i][attr]) neq 0);
+							break;
+						case "name":
+							bWriteAttribute = (aTemp[i].moduleType eq "module");	// this attribute is only needed for type "module"
+							break;
+						default:
+							bWriteAttribute = true;		// write down all other attributes
+					}
+					
+					if(bWriteAttribute) xmlNode2.xmlAttributes[attr] = xmlFormat(aTemp[i][attr]);
 				}
 				arrayAppend(xmlNode.xmlChildren, xmlNode2);
 			}
@@ -573,6 +617,9 @@
 		<cfif not structKeyExists(arguments.moduleAttributes,"location") or arguments.moduleAttributes.location eq "">
 			<cfthrow message="module location cannot be empty" type="homePortals.pageBean.blankModuleLocation">
 		</cfif>
+		<cfif not structKeyExists(arguments.moduleAttributes,"moduleType") or arguments.moduleAttributes.moduleType eq "">
+			<cfset arguments.moduleAttributes.moduleType = "module">
+		</cfif>
 		
 		<cfset variables.instance.aModules[getModuleIndex(arguments.moduleID)] = arguments.moduleAttributes>
 	</cffunction>
@@ -594,6 +641,9 @@
 		</cfif>
 		<cfif not structKeyExists(arguments.moduleAttributes,"location") or arguments.moduleAttributes.location eq "">
 			<cfthrow message="module location cannot be empty" type="homePortals.pageBean.blankModuleLocation">
+		</cfif>
+		<cfif not structKeyExists(arguments.moduleAttributes,"moduleType") or arguments.moduleAttributes.moduleType eq "">
+			<cfset arguments.moduleAttributes.moduleType = "module">
 		</cfif>
 		<cfset arrayAppend(variables.instance.aModules, arguments.moduleAttributes)>
 		<cfset indexModules()>
