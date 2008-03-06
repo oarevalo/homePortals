@@ -1,4 +1,4 @@
-<cfcomponent output="false">
+<cfcomponent output="false" hint="Main component for the HomePortals framework. This component provides the interface for the initialization of the entire application as well as the loading, parsing and rendering of pages">
 <!---
 /*
 	Copyright 2007 - Oscar Arevalo (http://www.oscararevalo.com)
@@ -177,7 +177,12 @@
 	<!--------------------------------------->
 	<cffunction name="dump" access="private">
 		<cfargument name="var" type="any">
-		<cfdump var="#arguments.var#">
+		<cfargument name="console" type="boolean" required="false" default="false">
+		<cfif arguments.console>
+			<cfdump var="#arguments.var#" output="console">
+		<cfelse>
+			<cfdump var="#arguments.var#">
+		</cfif>
 	</cffunction>
 
 	<cffunction name="abort" access="private">
@@ -193,22 +198,9 @@
 
 	<cffunction name="getFileLastModified" returntype="date" access="private" hint="Returns the date the file was last modified">
 		<cfargument name="fileName" type="string" required="true" hint="full path to the file">
-		<cfscript>
-			/**
-			 * Returns the date the file was last modified.
-			 * 
-			 * @param filename 	 Name of the file. (Required)
-			 * @return Returns a date. 
-			 * @author Jesse Houwing (j.houwing@student.utwente.nl) 
-			 * @version 1, November 15, 2002 
-			 */
-			var _File =  createObject("java","java.io.File");
-			// Calculate adjustments fot timezone and daylightsavindtime
-			var _Offset = ((GetTimeZoneInfo().utcHourOffset)+1)*-3600;
-			_File.init(JavaCast("string", filename));
-			// Date is returned as number of seconds since 1-1-1970
-			return DateAdd('s', (Round(_File.lastModified()/1000))+_Offset, CreateDateTime(1970, 1, 1, 0, 0, 0));
-		</cfscript>
+		<cfset var fileObj = createObject("java","java.io.File").init(arguments.fileName)>
+		<cfset var fileDate = createObject("java","java.util.Date").init(fileObj.lastModified())>		
+		<cfreturn fileDate>
 	</cffunction>
 				
 	<cffunction name="loadPageRenderer" access="private" returntype="pageRenderer">
@@ -219,11 +211,12 @@
 			var start = getTickCount();
 			var oCacheRegistry = createObject("component","cacheRegistry").init();			
 			var oCache = oCacheRegistry.getCache("hpPageCache");
-						
+			var fileLastModDate = getFileLastModified(expandPath(arguments.pageHREF));
+
 			// if the page exists on the cache, and the page hasnt been modified after
 			// storing it on the cache, then get it from the cache
 			try {
-				oPageRenderer = oCache.retrieveIfNewer(pageCacheKey, getFileLastModified(expandPath(arguments.pageHREF)));
+				oPageRenderer = oCache.retrieveIfNewer(pageCacheKey, fileLastModDate);
 			
 			} catch(homePortals.cacheService.itemNotFound e) {
 				// page is not in cache, so load the page
