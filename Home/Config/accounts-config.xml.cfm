@@ -6,7 +6,7 @@
 	<password></password>
 	
 	<!-- Root directory for account directories -->
-	<accountsRoot>/Accounts</accountsRoot>
+	<accountsRoot>/Home/Accounts</accountsRoot>
 	<homeRoot>/Home</homeRoot>
 
 	<!-- Mail settings -->
@@ -25,5 +25,5 @@
 	<storageCFC></storageCFC>
 	<accountsTable>cfe_user</accountsTable>
 	<dbtype>MSSQL</dbtype>
-	<storageFileHREF>/Accounts/accounts.xml</storageFileHREF>
+	<storageFileHREF>/Home/Accounts/accounts.xml</storageFileHREF>
 </homePortalsAccounts>
