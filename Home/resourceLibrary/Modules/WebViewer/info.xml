@@ -8,8 +8,11 @@
             </description>
             <attributes>
                 <attribute name="URL" required="true" description="This is the URL to display on the viewer" />
-                <attribute name="width" required="true" description="This is the URL to display on the viewer" />
-                <attribute name="height" required="true" description="This is the URL to display on the viewer" />
+                <attribute name="width" required="true" description="Width of the viewer area" />
+                <attribute name="height" required="true" description="Height of the viewer area" />
+                <attribute name="scrolling" required="false" 
+							description="Use to determine whether scrollbars should be displayed when content size exceeds the viewer area"
+							default="auto" type="list" values="yes,no,auto" />
             </attributes>
             <moduleInfo>
                 <authorName>Oscar Arevalo</authorName>
