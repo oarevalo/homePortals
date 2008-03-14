@@ -21,6 +21,7 @@
 	*/ 
 	---->
 	<cfset this.name = "hpEngine"> 
+	<cfset this.sessionManagement = true>
 		
 	<cffunction name="onRequestStart">
 		
@@ -29,21 +30,23 @@
 		<cfset var currentPath = getDirectoryFromPath(getCurrentTemplatePath())>
 		<cfset var configFile = currentPath & pathSeparator & "Config" & pathSeparator & "homePortals-config.xml">
 		
-		<b>HomePortals Application Platform</b><br>
-
-		<!--- read the base config --->
-		<cfif fileExists(configFile)>
-			<cfset xmlDoc = xmlParse(configFile)>
-			<cfif structKeyExists(xmlDoc.xmlRoot.xmlAttributes,"version")>
-				<cfoutput><em>Version: #xmlDoc.xmlRoot.xmlAttributes.version#</em></cfoutput>
+		<cfif cgi.QUERY_STRING eq "version">
+			<b>HomePortals Application Platform</b><br>
+	
+			<!--- read the base config --->
+			<cfif fileExists(configFile)>
+				<cfset xmlDoc = xmlParse(configFile)>
+				<cfif structKeyExists(xmlDoc.xmlRoot.xmlAttributes,"version")>
+					<cfoutput><em>Version: #xmlDoc.xmlRoot.xmlAttributes.version#</em></cfoutput>
+				<cfelse>
+					<b>Error: Config file is corrupted!</b>
+				</cfif>
 			<cfelse>
-				<b>Error: Config file is corrupted!</b>
+				<b>Error: Config file not found!</b>
 			</cfif>
-		<cfelse>
-			<b>Error: Config file not found!</b>
+			
+			<cfabort>
 		</cfif>
-		
-		<cfabort>
 	</cffunction>
 
 </cfcomponent>

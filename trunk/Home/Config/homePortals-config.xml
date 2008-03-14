@@ -11,7 +11,7 @@
 	<appRoot>/Home/</appRoot>
 
 	<!-- Directory where account files are stored -->
-	<accountsRoot>/Accounts/</accountsRoot>
+	<accountsRoot>/Home/Accounts/</accountsRoot>
 
 	<!-- HomePortals account to load when no page has been provided -->
 	<defaultAccount>default</defaultAccount>

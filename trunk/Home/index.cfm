@@ -19,4 +19,4 @@
 
 */ 
 ---->
-<!--- a blank file --->
+<cfinclude template="Common/Templates/page.cfm">
