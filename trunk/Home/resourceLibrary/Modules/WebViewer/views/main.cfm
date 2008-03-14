@@ -6,6 +6,7 @@
 	width = cfg.getPageSetting("width");
 	height = cfg.getPageSetting("height");
 	scrolling = cfg.getPageSetting("scrolling","auto");
+	title = cfg.getPageSetting("title");
 	if(arguments.url neq "") href = arguments.url;
 
 	if(scrolling eq "") scrolling = "auto";
@@ -31,9 +32,11 @@
 <cfoutput>
 	<cfif href neq "">
 		<iframe src="#href#" width="#width#" height="#height#" id="ifr#moduleID#" frameborder="0" scrolling="#scrolling#"></iframe>
-		<script>
-			h_setModuleContainerTitle("#moduleID#", "#jsstringformat(href)#");
-		</script>
+		<cfif title eq "" or title eq "WebViewer/WebViewer">
+			<script>
+				h_setModuleContainerTitle("#moduleID#", "#jsstringformat(href)#");
+			</script>
+		</cfif>
 	<cfelse>
 		Website URL not set.
 	</cfif>
