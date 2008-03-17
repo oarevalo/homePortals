@@ -289,6 +289,7 @@
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
 				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i].moduleType);
 				for(attr in aTemp[i]) {
+					bWriteAttribute = true;
 					
 					switch(attr) {
 						case "moduleType":
@@ -309,16 +310,15 @@
 								bWriteAttribute = (aTemp[i][attr] neq "");	// only write it if is not empty
 							break;
 						case "cache":
-							if(aTemp[i].moduleType eq "content") 
-								bWriteAttribute = (not aTemp[i][attr]);	// only write it if is false
+							bWriteAttribute = (aTemp[i].moduleType eq "content") and (not aTemp[i][attr]);	// only write it if is false
 							break;
 						case "resourceType":
 							if(aTemp[i].moduleType eq "content") 
 								bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_CONTENT_RESOURCE_TYPE and aTemp[i][attr] neq "");
 							break;
 						case "cacheTTL":
-							if(aTemp[i].moduleType eq "content") 
-								bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_CONTENT_CACHE_TTL and val(aTemp[i][attr]) neq 0);
+							bWriteAttribute = (aTemp[i].moduleType eq "content") and 
+												 (aTemp[i][attr] neq variables.DEFAULT_CONTENT_CACHE_TTL and val(aTemp[i][attr]) neq 0);
 							break;
 						case "name":
 							bWriteAttribute = (aTemp[i].moduleType eq "module");	// this attribute is only needed for type "module"
