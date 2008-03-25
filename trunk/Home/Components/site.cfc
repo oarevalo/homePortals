@@ -215,6 +215,44 @@
 
 
 	<!---------------------------------------->
+	<!--- setPageTitle		 		       --->
+	<!---------------------------------------->	
+	<cffunction name="setPageTitle" access="public" output="false" returntype="void" hint="Updates the title of a page">
+		<cfargument name="pageHREF" type="string" required="true" hint="The location of the page">
+		<cfargument name="pageTitle" type="string" required="true" hint="The title of the page. This title is only used for the Site object and may be different than the actual page title">
+		<cfscript>
+			var i = 1;
+			var tmpTitle = "";
+			var xmlPageDoc = 0;
+			var bFoundOnSite = false;
+			
+			// check that the page exists
+			if(fileExists(expandPath(arguments.pageHREF))) {
+				xmlPageDoc = xmlParse(expandPath(arguments.pageHREF));
+				if(structKeyExists(xmlPageDoc.xmlRoot,"title"))
+					tmpTitle = xmlPageDoc.xmlRoot.title.xmlText;
+				else
+					tmpTitle = replaceNoCase(getFileFromPath(arguments.pageHREF),".xml","");
+			} else {
+				throw("The page [#arguments.pageHREF#] was not found");
+			}
+			
+			// rename the page
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+				if(variables.aPages[i].href eq getFileFromPath(arguments.pageHREF)) {
+					variables.aPages[i].title = tmpTitle;
+					bFoundOnSite = true;
+					break;
+				}
+			}
+			if(Not bFoundOnSite) throw("The page [#arguments.pageHREF#] does not exist on this site.");
+			save();
+		</cfscript>
+	</cffunction>
+
+
+
+	<!---------------------------------------->
 	<!--- setDefaultPage	               --->
 	<!---------------------------------------->	
 	<cffunction name="setDefaultPage" access="public" output="false" returntype="void">
