@@ -178,11 +178,13 @@
 	<cffunction name="dump" access="private">
 		<cfargument name="var" type="any">
 		<cfargument name="console" type="boolean" required="false" default="false">
+		<!--- dump to console is disabled because of compatibility with Railo, uncomment for debugging in CF8 
 		<cfif arguments.console>
 			<cfdump var="#arguments.var#" output="console">
 		<cfelse>
 			<cfdump var="#arguments.var#">
-		</cfif>
+		</cfif> --->
+		<cfdump var="#arguments.var#">
 	</cffunction>
 
 	<cffunction name="abort" access="private">
