@@ -1,7 +1,7 @@
 <cfcomponent displayname="homePortalsConfigBean" hint="A bean to store the HomePortals configuration. Configuration is per-application">
 
 	<cfset variables.stConfig = StructNew()>
-	<cfset variables.hpEngineVersionTag = "3.0 beta">
+	<cfset variables.hpEngineBaseVersion = "3.0.x">
 	<cfset variables.stRenderTemplatesCache = structNew()>
 
 	<cffunction name="init" access="public" returntype="homePortalsConfigBean">
@@ -9,7 +9,7 @@
 					hint="The relative address of the config file. If not empty, then loads the config from the file">
 		<cfscript>
 			variables.stConfig = structNew();
-			variables.stConfig.version = "";
+			variables.stConfig.version = variables.hpEngineBaseVersion;
 			variables.stConfig.initialEvent = "";
 			variables.stConfig.layoutSections = "";
 			variables.stConfig.defaultPage = "";
@@ -59,6 +59,10 @@
 				throw("Configuration file not found [#configFilePath#]","","homePortals.config.configFileNotFound");
 			else
 				xmlConfigDoc = xmlParse(arguments.configFilePath);
+
+			// get version
+			if(structKeyExists(xmlConfigDoc.xmlRoot.xmlAttributes,"version")) 
+				variables.stConfig.version = xmlConfigDoc.xmlRoot.xmlAttributes.version;
 
 			// parse config doc		
 			for(i=1;i lte ArrayLen(xmlConfigDoc.xmlRoot.xmlChildren);i=i+1) {
@@ -120,7 +124,7 @@
 			// create a blank xml document and add the root node
 			xmlConfigDoc = xmlNew();
 			xmlConfigDoc.xmlRoot = xmlElemNew(xmlConfigDoc, "homePortals");		
-			xmlConfigDoc.xmlRoot.xmlAttributes["version"] = variables.hpEngineVersionTag;
+			xmlConfigDoc.xmlRoot.xmlAttributes["version"] = variables.stConfig.version;
 			
 			// save simple value settings
 			lstKeys = "initialEvent,layoutSections,defaultPage,bodyOnLoad,homePortalsPath,resourceLibraryPath,defaultAccount,SSLRoot,appRoot,accountsRoot,pageCacheSize,pageCacheTTL,contentCacheSize,contentCacheTTL";
@@ -168,7 +172,7 @@
 
 	<!--- Getters --->
 	<cffunction name="getVersion" access="public" returntype="string">
-		<cfreturn variables.hpEngineVersionTag>
+		<cfreturn variables.stConfig.version>
 	</cffunction>
 
 	<cffunction name="getInitialEvent" access="public" returntype="string">
