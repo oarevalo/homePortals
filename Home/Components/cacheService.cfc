@@ -2,7 +2,7 @@
 	
 	<!--- number of max items to store in the cache --->
 	<cfset variables.cacheSize = 10>
-	<!--- time to live in minutes for items in the cached (default value) --->
+	<!--- time to live in minutes for items in the cached (default value). A TTL of 0 means that the entry will be valid forever --->
 	<cfset variables.cacheTTL = 30>
 	<!--- structure where data will be stored --->
 	<cfset variables.stData = structNew()>
@@ -84,7 +84,7 @@
 
 		<!---check if the item exists in the cache and if it is still valid --->
 		<cfif structKeyExists(variables.stData, arguments.key)>
-			<cfif DateDiff("n", variables.stData[arguments.key].timestamp, now()) lt variables.stData[arguments.key].TTL>
+			<cfif variables.stData[arguments.key].TTL eq 0 or DateDiff("n", variables.stData[arguments.key].timestamp, now()) lt variables.stData[arguments.key].TTL>
 			
 				<!--- update hit count --->
                 <cfif variables.collectStats>
@@ -200,7 +200,7 @@
 		
 		<!--- cache size is too big, so get rid of old entries --->
         <cfloop list="#lstKeys#" index="memCacheKey">
-            <cfif DateDiff("n", variables.stData[memCacheKey].timestamp, now()) gt variables.stData[memCacheKey].TTL>
+            <cfif variables.stData[memCacheKey].TTL gt 0 and DateDiff("n", variables.stData[memCacheKey].timestamp, now()) gt variables.stData[memCacheKey].TTL>
                 <cfset structDelete(variables.stData, memCacheKey)>
             <cfelse>
                 <cfif DateCompare(variables.stData[memCacheKey].timestamp, tmpOldestTS) lt 0>
