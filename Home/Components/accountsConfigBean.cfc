@@ -134,6 +134,69 @@
 	</cffunction>				
 
 
+	<!--- Setters --->
+	<cffunction name="setAccountsRoot" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.accountsRoot = arguments.data>
+	</cffunction>
+
+	<cffunction name="setNewAccountTemplate" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.newAccountTemplate = arguments.data>
+	</cffunction>
+
+	<cffunction name="setNewPageTemplate" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.newPageTemplate = arguments.data>
+	</cffunction>
+
+	<cffunction name="setSiteTemplate" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.siteTemplate = arguments.data>
+	</cffunction>
+
+	<cffunction name="setStorageType" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.storageType = arguments.data>
+	</cffunction>
+
+	<cffunction name="setStorageCFC" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.storageCFC = arguments.data>
+	</cffunction>
+
+	<cffunction name="setAccountsTable" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.accountsTable = arguments.data>
+	</cffunction>
+	
+	<cffunction name="setDatasource" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.datasource = arguments.data>
+	</cffunction>
+	
+	<cffunction name="setUsername" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.username = arguments.data>
+	</cffunction>
+	
+	<cffunction name="setPassword" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.password = arguments.data>
+	</cffunction>
+
+	<cffunction name="setDBType" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.dbtype = arguments.data>
+	</cffunction>
+	
+	<cffunction name="setStorageFileHREF" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.storageFileHREF = arguments.data>
+	</cffunction>				
+
+
+
 	<cffunction name="XMLUnFormat" access="private" returntype="string">
 		<cfargument name="string" type="string" default="">
 		<cfscript>
