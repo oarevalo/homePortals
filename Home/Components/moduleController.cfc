@@ -33,6 +33,8 @@
 			var myConfigBeanStore = createObject("component", "configBeanStore");
 			var tmpModuleRoot = "";
 			var oModuleProperties = 0;
+			var oCacheRegistry = createObject("component","cacheRegistry").init();	
+			var oModPropsCache = oCacheRegistry.getCache("hpModuleProperties");
 		
 			// validate the module class name
 			if(arguments.moduleID eq "") throw("Module ID is empty.");
@@ -82,10 +84,14 @@
 			}
 
 			
+			// get module properties for this module (if any). Do this only on the first run of the module
 			if(arguments.execMode eq "local") {
-
-				// get module properties for this module (if any)
-				oModuleProperties = createObject("component","moduleProperties").init();
+				try {
+				 	oModuleProperties = oModPropsCache.retrieve("oModuleProperties");
+				} catch(homePortals.cacheService.itemNotFound e) {
+					throw("Module Properties not found in cache.");				
+				}
+				
 				stModuleProperties = oModuleProperties.getProperties(arguments.modulePageSettings.name);
 	
 				// copy module properties to the module config bean
@@ -93,7 +99,6 @@
 					// store all module properties on the module config bean
 					variables.oModuleConfigBean.setProperty(key, stModuleProperties[key]);
 				}
-			
 			}
 
 			// if this is a remote call, then get the module class location from the config bean

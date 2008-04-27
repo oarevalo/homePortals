@@ -73,9 +73,6 @@
 			// initialize resource catalog
 			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
 			
-			// load module properties
-			oModuleProperties = createObject("component","moduleProperties").init(true, arguments.appRoot);
-			
 			// initialize cache registry
 			oCacheRegistry = createObject("component","cacheRegistry").init();
 			oCacheRegistry.flush();		// clear registry
@@ -84,6 +81,12 @@
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
 																			variables.oHomePortalsConfigBean.getPageCacheTTL());
 			oCacheRegistry.register("hpPageCache", oCacheService);
+
+			// load module properties and store in cache
+			oModuleProperties = createObject("component","moduleProperties").init(variables.oHomePortalsConfigBean);
+			oCacheService = createObject("component","cacheService").init(1,0);
+			oCacheRegistry.register("hpModuleProperties", oCacheService);
+			oCacheService.store("oModuleProperties", oModuleProperties);
 
 			variables.stTimers.init = getTickCount()-start;
 			return this;
