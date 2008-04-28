@@ -7,11 +7,6 @@
 	
 	<!-- Root directory for account directories -->
 	<accountsRoot>/Home/Accounts</accountsRoot>
-	<homeRoot>/Home</homeRoot>
-
-	<!-- Mail settings -->
-	<mailServer></mailServer>
-	<emailAddress></emailAddress>
 
 	<!-- Default templates -->
 	<newAccountTemplate>/Home/Common/AccountTemplates/default.xml</newAccountTemplate>
@@ -19,8 +14,6 @@
 	<siteTemplate>/Home/Common/AccountTemplates/site.xml</siteTemplate>
 	
 	<!-- Account Storage -->
-	<allowRegisterAccount>true</allowRegisterAccount>
-	<version></version>
 	<storageType>xml</storageType>
 	<storageCFC></storageCFC>
 	<accountsTable>cfe_user</accountsTable>
