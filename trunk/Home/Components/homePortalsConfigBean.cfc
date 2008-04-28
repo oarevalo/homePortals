@@ -12,7 +12,6 @@
 			variables.stConfig.version = variables.hpEngineBaseVersion;
 			variables.stConfig.initialEvent = "";
 			variables.stConfig.layoutSections = "";
-			variables.stConfig.defaultPage = "";
 			variables.stConfig.bodyOnLoad = "";
 			variables.stConfig.homePortalsPath = "";
 			variables.stConfig.resourceLibraryPath = "";
@@ -24,16 +23,10 @@
 			variables.stConfig.pageCacheTTL = "";
 			variables.stConfig.contentCacheSize = "";
 			variables.stConfig.contentCacheTTL = "";
-
-			variables.stConfig.moduleIcons = ArrayNew(1);
+			variables.stConfig.baseResourceTypes = "";
 
 			variables.stConfig.renderTemplates = structNew();
-
 			variables.stConfig.resources = structNew();
-			variables.stConfig.resources.script = ArrayNew(1);
-			variables.stConfig.resources.style = ArrayNew(1);
-			variables.stConfig.resources.header = ArrayNew(1);
-			variables.stConfig.resources.footer = ArrayNew(1);
 			
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -87,12 +80,6 @@
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						variables.stConfig.renderTemplates[ xmlNode.xmlChildren[j].xmlAttributes.type ] = xmlNode.xmlChildren[j].xmlAttributes.href;
 					}
-		
-				} else if(xmlNode.xmlName eq "moduleIcons") {
-		
-					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
-						ArrayAppend(variables.stConfig.moduleIcons, duplicate(xmlNode.xmlChildren[j].xmlAttributes) );
-					}
 							
 				} else
 					variables.stConfig[xmlNode.xmlName] = xmlNode.xmlText;
@@ -112,13 +99,12 @@
 			var xmlConfigDoc = "";
 			var xmlOriginalConfigDoc = "";
 			var backupFileName = "";
-			var lstResourceTypes = "script,style,header,footer";
+			var lstResourceTypes = getBaseResourceTypes();
 			var lstKeys = "";
 			var i = 1;
 			var j = 1;
 			var thisKey = "";
 			var thisResourceType = "";
-			var tmpIndex = 1;
 			var tmpXmlNode = 0;
 
 			// create a blank xml document and add the root node
@@ -127,14 +113,13 @@
 			xmlConfigDoc.xmlRoot.xmlAttributes["version"] = variables.stConfig.version;
 			
 			// save simple value settings
-			lstKeys = "initialEvent,layoutSections,defaultPage,bodyOnLoad,homePortalsPath,resourceLibraryPath,defaultAccount,SSLRoot,appRoot,accountsRoot,pageCacheSize,pageCacheTTL,contentCacheSize,contentCacheTTL";
+			lstKeys = "initialEvent,layoutSections,bodyOnLoad,homePortalsPath,resourceLibraryPath,defaultAccount,SSLRoot,appRoot,accountsRoot,pageCacheSize,pageCacheTTL,contentCacheSize,contentCacheTTL,baseResourceTypes";
 			for(i=1;i lte ListLen(lstKeys);i=i+1) {
 				thisKey = ListGetAt(lstKeys,i);
 
 				tmpXmlNode = xmlElemNew(xmlConfigDoc,thisKey);
 				tmpXmlNode.xmlText = variables.stConfig[thisKey];
 				arrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, tmpXmlNode);
-				
 			}
 			
 			
@@ -144,27 +129,26 @@
 			for(i=1;i lte ListLen(lstResourceTypes);i=i+1) {
 				thisResourceType = ListGetAt(lstResourceTypes, i);
 				
-				for(j=1;j lte ArrayLen(variables.stConfig.resources[thisResourceType]);j=j+1) {
-					ArrayAppend(xmlConfigDoc.xmlRoot.baseResources.xmlChildren, xmlElemNew(xmlConfigDoc,"resource") );
-					tmpIndex = ArrayLen(xmlConfigDoc.xmlRoot.baseResources.xmlChildren);
-					xmlConfigDoc.xmlRoot.baseResources.xmlChildren[tmpIndex].xmlAttributes["href"] = variables.stConfig.resources[thisResourceType][j];
-					xmlConfigDoc.xmlRoot.baseResources.xmlChildren[tmpIndex].xmlAttributes["type"] = thisResourceType;
-				}		
-
+				if(structKeyExists(variables.stConfig.resources, thisResourceType)) {
+					for(j=1;j lte ArrayLen(variables.stConfig.resources[thisResourceType]);j=j+1) {
+						tmpXmlNode = xmlElemNew(xmlConfigDoc,"resource");
+						tmpXmlNode.xmlAttributes["type"] = thisResourceType;
+						tmpXmlNode.xmlAttributes["href"] = variables.stConfig.resources[thisResourceType][j];
+						ArrayAppend(xmlConfigDoc.xmlRoot.baseResources.xmlChildren, tmpXmlNode);
+					}		
+				}
 			}
 
+			// ****** [renderTemplates] *****
+			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"renderTemplates") );
 			
-			// ***** [moduleIcons] *****
-			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"moduleIcons") );
-			
-			for(i=1;i lte ArrayLen(variables.stConfig.moduleIcons);i=i+1) {
-				xmlConfigDoc.xmlRoot.moduleIcons.xmlChildren[i] = xmlElemNew(xmlConfigDoc,"icon");
-				xmlConfigDoc.xmlRoot.moduleIcons.xmlChildren[i].xmlAttributes["alt"] = variables.stConfig.moduleIcons[i].alt;
-				xmlConfigDoc.xmlRoot.moduleIcons.xmlChildren[i].xmlAttributes["image"] = variables.stConfig.moduleIcons[i].image;
-				xmlConfigDoc.xmlRoot.moduleIcons.xmlChildren[i].xmlAttributes["onClickFunction"] = variables.stConfig.moduleIcons[i].onClickFunction;
-			}		
-			
-			
+			for(thisKey in variables.stConfig.renderTemplates) {
+				tmpXmlNode = xmlElemNew(xmlConfigDoc,"renderTemplate");
+				tmpXmlNode.xmlAttributes["type"] = thisKey;
+				tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[thisKey];
+				ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
+			}
+
 			// return document
 			return xmlConfigDoc;
 		</cfscript>		
@@ -181,10 +165,6 @@
 
 	<cffunction name="getLayoutSections" access="public" returntype="string">
 		<cfreturn variables.stConfig.layoutSections>
-	</cffunction>
-
-	<cffunction name="getDefaultPage" access="public" returntype="string">
-		<cfreturn variables.stConfig.defaultPage>
 	</cffunction>
 
 	<cffunction name="getBodyOnLoad" access="public" returntype="string">
@@ -231,24 +211,23 @@
 		<cfreturn val(variables.stConfig.contentCacheTTL)>
 	</cffunction>
 
+	<cffunction name="getBaseResourceTypes" access="public" returntype="string" hint="List with allowed types of base resources">
+		<cfreturn variables.stConfig.baseResourceTypes>
+	</cffunction>	
 
 
-	<cffunction name="getBaseResourcesByType" access="public" returntype="array">
+	<cffunction name="getBaseResourcesByType" access="public" returntype="array" hint="Returns all base resources of the given type">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfset var aResources = arrayNew(1)>
-		<cfif ListFindNoCase( structKeyList(variables.stConfig.resources), arguments.resourceType )>
+		<cfif listFindNoCase(variables.stConfig.baseResourceTypes, arguments.resourceType) and structKeyExists( variables.stConfig.resources, arguments.resourceType )>
 			<cfset aResources = variables.stConfig.resources[arguments.resourceType]>
 		</cfif>
 		<cfreturn aResources>
 	</cffunction>
 
-	<cffunction name="getModuleIcons" access="public" returntype="array">
-		<cfreturn variables.stConfig.moduleIcons>
-	</cffunction>
-
 	<cffunction name="getRenderTemplate" access="public" returntype="string" hint="returns the location of the template that should be used to rendering a particular type of output">
 		<cfargument name="type" type="string" required="true">
-		<cfif ListFindNoCase( structKeyList(variables.stConfig.renderTemplates), arguments.type )>
+		<cfif structKeyExists( variables.stConfig.renderTemplates, arguments.type )>
 			<cfreturn variables.stConfig.renderTemplates[arguments.type]>
 		<cfelse>
 			<cfthrow message="Unknown render template type" type="homePortals.config.invalidRenderTemplateType">
@@ -268,6 +247,120 @@
 
 		<cfreturn templateBody>
 	</cffunction>
+
+
+	<!--- Setters --->
+	<cffunction name="setVersion" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.version = arguments.data>
+	</cffunction>
+
+	<cffunction name="setInitialEvent" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.initialEvent = arguments.data>
+	</cffunction>
+
+	<cffunction name="setLayoutSections" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.layoutSections = arguments.data>
+	</cffunction>
+
+	<cffunction name="setHomePortalsPath" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.homePortalsPath = arguments.data>
+	</cffunction>
+
+	<cffunction name="setResourceLibraryPath" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.resourceLibraryPath = arguments.data>
+	</cffunction>
+
+	<cffunction name="setDefaultAccount" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.defaultAccount = arguments.data>
+	</cffunction>
+
+	<cffunction name="setSSLRoot" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.SSLRoot = arguments.data>
+	</cffunction>
+
+	<cffunction name="setAppRoot" access="public" returnType="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.appRoot = arguments.data>
+	</cffunction>
+
+	<cffunction name="setAccountsRoot" access="public" returnType="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.accountsRoot = arguments.data>
+	</cffunction>
+
+	<cffunction name="setPageCacheSize" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.pageCacheSize = arguments.data>	
+	</cffunction>
+
+	<cffunction name="setPageCacheTTL" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.pageCacheTTL = arguments.data>
+	</cffunction>
+
+	<cffunction name="setContentCacheSize" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.contentCacheSize = arguments.data>	
+	</cffunction>
+
+	<cffunction name="setContentCacheTTL" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.contentCacheTTL = arguments.data>
+	</cffunction>
+
+	<cffunction name="setBaseResourceTypes" access="public" returnType="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.baseResourceTypes = arguments.data>
+	</cffunction>
+
+	<cffunction name="addBaseResource" access="public" returntype="void">
+		<cfargument name="type" type="string" required="true">
+		<cfargument name="href" type="string" required="true">
+		
+		<cfif listFindNoCase(variables.stConfig.baseResourceTypes, arguments.type)>
+			<cfif not structKeyExists(variables.stConfig.resources, arguments.type)>
+				<cfset variables.stConfig.resources[arguments.type] = arrayNew(1)>
+			</cfif>
+			<cfset arrayAppend(variables.stConfig.resources[arguments.type], arguments.href)>
+		<cfelse>
+			<cfthrow message="Resource type not allowed" type="homePortals.config.invalidBaseResourceType">		
+		</cfif>
+	</cffunction>
+
+	<cffunction name="removeBaseResource" access="public" returntype="void">
+		<cfargument name="type" type="string" required="true">
+		<cfargument name="href" type="string" required="true">
+		<cfset var aTmp = arrayNew(1)>
+		<cfset var i = 0>
+		<cfif structKeyExists(variables.stConfig.resources, arguments.type)>
+			<cfset aTmp = variables.stConfig.resources[arguments.type]>
+			<cfloop from="1" to="#arrayLen(aTmp)#" index="i">
+				<cfif aTmp[i] eq arguments.href>
+					<cfset arrayDeleteAt(variables.stConfig.resources[arguments.type], i)>
+					<cfreturn>
+				</cfif>
+			</cfloop>
+		</cfif>
+	</cffunction>
+
+	<cffunction name="setRenderTemplate" access="public" returntype="void">
+		<cfargument name="type" type="string" required="true">
+		<cfargument name="href" type="string" required="true">
+		<cfset variables.stConfig.renderTemplates[arguments.type] = arguments.href>
+	</cffunction>
+
+	<cffunction name="removeRenderTemplate" access="public" returntype="void">
+		<cfargument name="type" type="string" required="true">
+		<cfset structDelete(variables.stConfig.renderTemplates, arguments.type, false)>
+	</cffunction>
+
 	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
