@@ -81,7 +81,7 @@
 		</cfscript>		
 	</cffunction>
 
-	<cffunction name="addProperty" access="public" returntype="void" hint="Adds a property for a module">
+	<cffunction name="setProperty" access="public" returntype="void" hint="Sets a property for a module">
 		<cfargument name="moduleName" type="string" required="true">
 		<cfargument name="propertyName" type="string" required="true">
 		<cfargument name="propertyValue" type="string" required="true">
