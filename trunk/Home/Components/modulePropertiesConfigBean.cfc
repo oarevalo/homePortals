@@ -126,5 +126,23 @@
 		<cfargument name="moduleName" type="string" required="true">
 		<cfset structDelete(variables.stConfig, arguments.moduleName, false)>
 	</cffunction>
+	
+	<cffunction name="getPropertiesAsQuery" access="public" returntype="query" hint="Returns all properties for all modules as a query object">
+		<cfset var qry = queryNew("moduleName,propertyName,propertyValue")>
+		<cfset var key1 = "">
+		<cfset var key2 = "">
+		<cfset var stProps = structNew()>
+
+		<cfloop collection="#variables.stConfig#" item="key1">
+			<cfset stProps = variables.stConfig[key1]>
+			<cfloop collection="#stProps#" item="key2">
+				<cfset queryAddRow(qry)>
+				<cfset querySetCell(qry,"moduleName",key1)>
+				<cfset querySetCell(qry,"propertyName",key2)>
+				<cfset querySetCell(qry,"propertyValue",stProps[key2])>
+			</cfloop>
+		</cfloop>
+		<cfreturn qry>
+	</cffunction>
 
 </cfcomponent>	
