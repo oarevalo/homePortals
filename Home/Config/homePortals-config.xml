@@ -37,6 +37,9 @@
 	<!-- Default TTL in minutes for content items on the content cache. This can be overriden for individual entries. -->
 	<contentCacheTTL>60</contentCacheTTL>
 
+	<!-- List with allowed types of base resources -->
+	<baseResourceTypes>script,style,header,footer</baseResourceTypes>
+	
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>
 		<resource href="/Home/Common/CSS/Main.css" type="style"/>
@@ -45,8 +48,6 @@
 		<resource href="/Home/Common/JavaScript/moduleClient.js" type="script"/>
 	</baseResources>
 
-	<moduleIcons/>
-	
 	<!-- The following templates determine how homeportals will render the html content -->
 	<renderTemplates>
 		<renderTemplate type="module" href="/Home/Common/Templates/Render/module.xml" />
