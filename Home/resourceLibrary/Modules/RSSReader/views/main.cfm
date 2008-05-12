@@ -22,7 +22,7 @@
 <cfoutput>
 	<cfif rssURL neq "">
 		<cfif execMode neq "local">
-			#this.controller.render(view = 'feed', useLayout=false)#
+			#this.controller.renderView(view = 'feed', useLayout=false)#
 		<cfelse>
 			<p style="font-size:10px;">Loading feed. Please wait...</p>
 			
@@ -43,7 +43,7 @@
 		</cfif>
 	<cfelse>
 		<cfif stUser.isOwner>
-			#this.controller.render(view = 'config', useLayout=false)#
+			#this.controller.renderView(view = 'config', useLayout=false)#
 		<cfelse>
 			<em>No RSS feed has been set.</em>
 		</cfif>

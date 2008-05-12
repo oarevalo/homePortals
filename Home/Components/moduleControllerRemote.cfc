@@ -43,7 +43,7 @@
 			var tmpHTML = "";
 
 			// get view output
-			tmpHTMLView = mc.render(argumentCollection = arguments);
+			tmpHTMLView = mc.renderView(argumentCollection = arguments);
 			
 			// get code for any events to be raised
 			tmpHTMLEventsJS = mc.renderRaiseEvents();
