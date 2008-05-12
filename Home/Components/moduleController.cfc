@@ -327,6 +327,8 @@
 			var stSettings = cfg.getPageSettings();
 			var tmpField = "";
 			var myConfigBeanStore = createObject("component", "configBeanStore");
+			var i = 1;
+			var stXMLAttribs = structNew();
 
 			// read and parse layout page
 			xmlDoc = xmlParse(expandPath(href));
@@ -337,11 +339,16 @@
 				// when the current module is found, update module attributes
 				if(xmlDoc.xmlRoot.modules.xmlChildren[i].xmlAttributes.id eq id) {
 					xmlModuleNode = xmlDoc.xmlRoot.modules.xmlChildren[i];
+					stXMLAttribs = xmlElemNew(xmlDoc, "dummy").xmlattributes;
+					
 					// update all attributes sent
 					for(tmpField in stSettings) {
-						if(isSimpleValue(stSettings[tmpField]))
-							xmlModuleNode.xmlAttributes[tmpField] = stSettings[tmpField];
+						if(isSimpleValue(stSettings[tmpField])) 
+							stXMLAttribs[tmpField] = stSettings[tmpField]; 	
 					}	
+					
+					
+					xmlDoc.xmlRoot.modules.xmlChildren[i].xmlAttributes = duplicate(stXMLAttribs);
 					
 					// exit loop
 					break;
@@ -355,7 +362,6 @@
 			writeFile(expandPath(href), toString(xmlDoc));
 		</cfscript>
 	</cffunction>
-
 
 	<!---------------------------------------->
 	<!--- execute		                   --->
