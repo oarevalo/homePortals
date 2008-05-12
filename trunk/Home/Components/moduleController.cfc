@@ -371,7 +371,7 @@
 	<!---------------------------------------->
 	<!--- render	                       --->
 	<!---------------------------------------->		
-	<cffunction name="render" access="public" returntype="string"
+	<cffunction name="renderView" access="public" returntype="string"
 				hint="Rendes the selected view, or if no view is indicated, then returns the default view">
 		<cfargument name="view" type="string" required="no" default="">
 		<cfargument name="layout" type="string" required="no" default="">
@@ -435,7 +435,7 @@
 		<cfset var htmlHeadView = variables.oModuleConfigBean.getView("htmlHead")>
 		<cfset var tmpHTML = "">
 		<cfif htmlHeadview neq "">
-			<cfset tmpHTML = render(htmlHeadView,"",false)>
+			<cfset tmpHTML = renderView(htmlHeadView,"",false)>
 		</cfif>
 		<cfreturn tmpHTML>
 	</cffunction>
@@ -513,7 +513,7 @@
 		<cfset var stError = getErrorInfo()>
 		
 		<cfif errorView neq "">
-			<cfset tmpHTML = render(errorView,"",false)>
+			<cfset tmpHTML = renderView(errorView,"",false)>
 		<cfelse>
 			<cfparam name="stError.message" default="">
 			<cfparam name="stError.Detail" default="">

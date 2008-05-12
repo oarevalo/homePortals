@@ -287,7 +287,7 @@
 <cfelse>
 	<cfoutput>
 		<cfif stUser.isOwner>
-			#this.controller.render(view = 'config', useLayout=false)#
+			#this.controller.renderView(view = 'config', useLayout=false)#
 		<cfelse>
 			<em>No RSS feed has been set.</em>
 		</cfif>

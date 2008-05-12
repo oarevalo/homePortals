@@ -615,7 +615,7 @@
 				// render html content
 				appendpageBuffer("_htmlHead", moduleID, oModuleController.renderClientInit() );
 				appendpageBuffer("_htmlHead", moduleID, oModuleController.renderHTMLHead() );
-				appendpageBuffer("_htmlModule", moduleID, oModuleController.render() );
+				appendpageBuffer("_htmlModule", moduleID, oModuleController.renderView() );
 				
 				if(bIsFirstInClass) {
 					// append module name to list of loaded module classes to avoid initializing the same class twice
