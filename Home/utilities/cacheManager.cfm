@@ -4,9 +4,8 @@
 <cfparam name="action" default="">
 <cfparam name="cacheName" default="">
 
+<!--- get reference to cache registry --->
 <cfset oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init()>
-<cfset lstCaches = oCacheRegistry.getCacheNames()>
-<cfset hp = application.homePortals>
 <cfset tmpMsg = "">
 
 <!--- Process Actions --->
@@ -27,6 +26,11 @@
         <cfdump var="#oCache.list()#" label="#cacheName#">
     </cfcase>
 </cfswitch>
+
+
+<!--- get list of caches --->
+<cfset lstCaches = oCacheRegistry.getCacheNames()>
+<cfset hp = application.homePortals>
 
 <html>
 	<head>
@@ -60,7 +64,7 @@
 		</style>
 	</head>
 	<body>
-		<h1>Cache Manager</h1>
+		<h1>HomePortals Cache Manager</h1>
 		
 		<p>
 			This tool allows to view and perform operations on all internal caches used by HomePortals.<br>
@@ -89,7 +93,7 @@
 				</tr>
 				<tr>
 					<td width="130"><b>HP Engine Version:</b></td>
-					<td>#hp.getVersion()#</td>
+					<td>#hp.getConfig().getVersion()#</td>
 				</tr>
 			</table>
 			<br><br>			
