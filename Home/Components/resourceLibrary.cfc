@@ -51,7 +51,7 @@
 			
 			// check if there is a resource descriptor for the package
 			if(arguments.infoHREF eq "")
-				arguments.infoHREF = variables.resourcesRoot & "/" & arguments.resourceType & "s/" & arguments.packageName & "/" & variables.resourceDescriptorFile;
+				arguments.infoHREF = variables.resourcesRoot & "/" & getResourceTypeDirName(arguments.resourceType) & "/" & arguments.packageName & "/" & variables.resourceDescriptorFile;
 
 			if(fileExists(expandPath(arguments.infoHREF))) {
 				// resource descriptor exists, so read the resource from the descriptor
@@ -81,7 +81,7 @@
 			var start = getTickCount();
 			
 			// check if there is a resource descriptor for the package
-			tmpHREF = variables.resourcesRoot & "/" & arguments.resourceType & "s/" & arguments.packageName & "/" & variables.resourceDescriptorFile;
+			tmpHREF = variables.resourcesRoot & "/" & getResourceTypeDirName(arguments.resourceType) & "/" & arguments.packageName & "/" & variables.resourceDescriptorFile;
 
 			if(fileExists(expandPath(tmpHREF))) {
 				// resource descriptor exists, so read all resources on the descriptor
@@ -112,6 +112,7 @@
 			var rb = arguments.resourceBean;
 			var resType = rb.getType();
 			var filePath = "";
+			var resTypeDir = getResourceTypeDirName(resType);
 		
 			// validate bean			
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
@@ -120,7 +121,7 @@
 			if(not listFindNoCase(variables.lstAccessTypes, rb.getAccessType())) throw("The access type is invalid","homePortals.resourceLibrary.invalidAccessType");
 
 			// setup base directory
-			packageDir = variables.resourcesRoot & "/" & resType & "s/" & rb.getPackage();
+			packageDir = variables.resourcesRoot & "/" & resTypeDir & "/" & rb.getPackage();
 
 			// check if we need to create the package directory
 			if(not directoryExists(expandPath(packageDir))) {
@@ -132,7 +133,7 @@
 			// this is to make the resource more portable
 			href = rb.getHREF();
 			if(href eq "") {
-				href = resType & "s/" & rb.getPackage() & "/" & rb.getID() & "." & getResourceTypeExtension(resType);
+				href = resTypeDir & "/" & rb.getPackage() & "/" & rb.getID() & "." & getResourceTypeExtension(resType);
 				rb.setHREF(href); 
 			} 
 				
@@ -140,20 +141,20 @@
 			// check for file descriptor, if doesnt exist, then create one
 			if(fileExists(expandPath(packageDir & "/" & variables.resourceDescriptorFile))) {
 				xmlDoc = xmlParse(expandPath(packageDir & "/" & variables.resourceDescriptorFile));
-				if(not structKeyExists(xmlDoc.xmlRoot, resType & "s")) 
-					arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlElemNew(xmlDoc, resType & "s"));
+				if(not structKeyExists(xmlDoc.xmlRoot, resTypeDir)) 
+					arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlElemNew(xmlDoc, resTypeDir));
 				
 			} else {
 				// create file descriptor
 				xmlDoc = xmlNew();
 				xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "catalog");
-				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlElemNew(xmlDoc, resType & "s"));
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlElemNew(xmlDoc, resTypeDir));
 			}
 			
 			// check if we need to update the file descriptor
 			bFound = false;
-			for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resType & "s"].xmlChildren);i=i+1) {
-				xmlNode = xmlDoc.xmlRoot[resType & "s"].xmlChildren[i];
+			for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resTypeDir].xmlChildren);i=i+1) {
+				xmlNode = xmlDoc.xmlRoot[resTypeDir].xmlChildren[i];
 				if(xmlNode.xmlAttributes.id eq rb.getID()) {
 					bFound = true;
 					break;
@@ -174,7 +175,7 @@
 			xmlNode.xmlText = rb.getDescription();
 
 			if(Not bFound) {
-				arrayAppend(xmlDoc.xmlRoot[resType & "s"].xmlChildren, xmlNode);
+				arrayAppend(xmlDoc.xmlRoot[resTypeDir].xmlChildren, xmlNode);
 			}
 			
 			// save resource descriptor file
@@ -205,24 +206,27 @@
 		<cfscript>
 			var packageDir = "";
 			var resHref = "";
+			var resTypeDir = "";
 			
 			if(arguments.id eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(arguments.package eq "") throw("No folder has been specified","homePortals.resourceLibrary.validation");
 			if(not listFindNoCase(variables.lstResourceTypes, arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
+			
+			resTypeDir = getResourceTypeDirName(arguments.resourceType);
 
 			// remove from descriptor (if exists)
-			packageDir = resourcesRoot & "/" & arguments.resourceType & "s" & "/" & arguments.package;
+			packageDir = resourcesRoot & "/" & resTypeDir & "/" & arguments.package;
 			if(fileExists(expandPath(packageDir & "/" & variables.resourceDescriptorFile))) {
 				xmlDoc = xmlParse(expandPath(packageDir & "/" & variables.resourceDescriptorFile));
 
-				for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resourceType & "s"].xmlChildren);i=i+1) {
-					xmlNode = xmlDoc.xmlRoot[arguments.resourceType & "s"].xmlChildren[i];
+				for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resTypeDir].xmlChildren);i=i+1) {
+					xmlNode = xmlDoc.xmlRoot[resTypeDir].xmlChildren[i];
 					if(xmlNode.xmlAttributes.id eq id) {
 						if(structKeyExists(xmlNode.xmlAttributes, "href"))
 							resHref = xmlNode.xmlAttributes.href;
 					
 						// remove node from document
-						arrayDeleteAt(xmlDoc.xmlRoot[arguments.resourceType & "s"].xmlChildren, i);
+						arrayDeleteAt(xmlDoc.xmlRoot[resTypeDir].xmlChildren, i);
 						
 						// save modified resource descriptor file
 						saveFile(expandPath(packageDir & "/" & variables.resourceDescriptorFile), toString(xmlDoc));						
@@ -264,7 +268,7 @@
 			
 			for(i=1;i lte arrayLen(aResTypes);i=i+1) {
 				res = aResTypes[i];
-				tmpDir = ExpandPath("#variables.resourcesRoot#/#res#s");
+				tmpDir = ExpandPath(variables.resourcesRoot & "/" & getResourceTypeDirName(res));
 				
 				if(directoryExists(tmpDir)) {
 					aItems = createObject("java","java.io.File").init(tmpDir).list();
@@ -396,7 +400,7 @@
 			thisResTypeExt = getResourceTypeExtension(arguments.resourceType);
 				
 			// build the default name of the resource to register
-			tmpHREF = arguments.resourceType & "s/" & arguments.packageName & "/" & arguments.packageName & "." & thisResTypeExt;
+			tmpHREF = getResourceTypeDirName(arguments.resourceType) & "/" & arguments.packageName & "/" & arguments.packageName & "." & thisResTypeExt;
 
 			// if the file exists, then register it
 			if(fileExists(expandPath(variables.resourcesRoot & "/" & tmpHREF))) {
@@ -457,6 +461,20 @@
 		<cfargument name="path" type="string" required="true">
 		<cfdirectory action="delete" directory="#ExpandPath(arguments.path)#" recurse="true">
 	</cffunction>
+				
+	<!---------------------------------------->
+	<!--- getResourceTypeDirName		   --->
+	<!---------------------------------------->
+	<cffunction name="getResourceTypeDirName" access="public" output="false" returntype="string" hint="Returns the name of the directory on the resource library for the given resource type">
+		<cfargument name="resourceType" type="string" required="true">
+		
+		<cfif listFind(variables.lstResourceTypes, arguments.resourceType)>
+			<cfreturn ucase(left(arguments.resourceType,1)) & lcase(mid(arguments.resourceType,2,len(arguments.resourceType)-1)) & "s">
+		</cfif>
+		
+		<cfthrow message="Invalid resource type" type="homeportals.resourceLibrary.invalidResourceType">
+	</cffunction>
+					
 				
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
