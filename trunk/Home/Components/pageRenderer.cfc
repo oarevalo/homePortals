@@ -559,7 +559,7 @@
 						if(Not StructKeyExists(xmlNode.xmlAttributes,"id")) xmlNode.xmlAttributes.id = ""; 
 						
 						// get skin location from catalog 
-						oResourceBean = variables.oCatalog.getResourceNode("Skin", xmlNode.xmlAttributes.id);
+						oResourceBean = variables.oCatalog.getResourceNode("skin", xmlNode.xmlAttributes.id);
 						variables.stPage.page.skinHREF = oResourceBean.getHref();
 						
 						break;	
