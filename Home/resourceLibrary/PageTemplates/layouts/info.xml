@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <catalog>
 	<pageTemplates>
-		<pageTemplate href="PageTemplates/layouts/layout1.xml" id="3-col-wide-center"/>
-		<pageTemplate href="PageTemplates/layouts/layout2.xml" id="2-col-wide-right"/>
-		<pageTemplate href="PageTemplates/layouts/layout3.xml" id="2-col-wide-left"/>
-		<pageTemplate href="PageTemplates/layouts/layout4.xml" id="3-col-equal"/>
-		<pageTemplate href="PageTemplates/layouts/layout5.xml" id="2-col-header-wide-right"/>
-		<pageTemplate href="PageTemplates/layouts/layout6.xml" id="3-col-header-wide-center"/>
+		<pageTemplate href="Pagetemplates/layouts/layout1.xml" id="3-col-wide-center"/>
+		<pageTemplate href="Pagetemplates/layouts/layout2.xml" id="2-col-wide-right"/>
+		<pageTemplate href="Pagetemplates/layouts/layout3.xml" id="2-col-wide-left"/>
+		<pageTemplate href="Pagetemplates/layouts/layout4.xml" id="3-col-equal"/>
+		<pageTemplate href="Pagetemplates/layouts/layout5.xml" id="2-col-header-wide-right"/>
+		<pageTemplate href="Pagetemplates/layouts/layout6.xml" id="3-col-header-wide-center"/>
 	</pageTemplates>
 </catalog>
