@@ -8,7 +8,7 @@
 	<!---------------------------------------->		
 	<cffunction name="init" access="public" hint="constructor" returntype="moduleControllerRemote">
 		<cfargument name="moduleID" type="any" required="true">
-		<cfargument name="homePortalsConfigBean" type="homePortalsConfigBean" required="true" hint="homeportals settings">
+		<cfargument name="homePortals" type="homePortals" required="true" hint="homeportals application instance">
 		
 		<cfscript>
 			var myConfigBeanStore = createObject("component", "configBeanStore");
@@ -18,7 +18,7 @@
 				variables.oModuleController = createObject("component","moduleController");
 				variables.oModuleController.init(moduleID = arguments.moduleID,
 												execMode = 'remote',
-												homePortalsConfigBean = arguments.homePortalsConfigBean);
+												homePortals = arguments.homePortals);
 			} else {
 				throwSessionTimedOut();
 			}

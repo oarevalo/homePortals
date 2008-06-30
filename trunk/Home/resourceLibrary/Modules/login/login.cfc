@@ -22,8 +22,9 @@ Also processes cookie logins.
 		<cfargument name="rememberMe" default="false" type="boolean" required="no">
 
 		<cfset var qryUser = QueryNew("")>
-		<cfset var oAccountsService = application.homePortals.getAccountsService()>
-		<cfset var appRoot = this.controller.getHomePortalsConfigBean().getAppRoot()>	
+		<cfset var oHP = this.controller.getHomePortals()>
+		<cfset var oAccountsService = oHP.getAccountsService()>
+		<cfset var appRoot = oHP.getConfig().getAppRoot()>	
 		
 		<cftry>
 			<!--- check login --->
@@ -52,7 +53,7 @@ Also processes cookie logins.
 		<cfargument name="username" type="string" required="yes">
 		<cfargument name="userkey" type="string" required="yes">
 
-		<cfset var oAccountsService = application.homePortals.getAccountsService()>
+		<cfset var oAccountsService = this.controller.getHomePortals().getAccountsService()>
 		<cfset var decKey = "">
 		<cfset var qry = 0>
 		
@@ -77,9 +78,9 @@ Also processes cookie logins.
 	<!--- doLogoff        	               --->
 	<!---------------------------------------->	
 	<cffunction name="doLogoff" access="public" output="true">
-
-		<cfset var oAccounts = application.homePortals.getAccountsService()>
-		<cfset var appRoot = this.controller.getHomePortalsConfigBean().getAppRoot()>	
+		<cfset var oHP = this.controller.getHomePortals()>
+		<cfset var oAccounts = oHP.getAccountsService()>
+		<cfset var appRoot = oHP.getConfig().getAppRoot()>	
 
 		<cfset oAccounts.logoutUser()>
 

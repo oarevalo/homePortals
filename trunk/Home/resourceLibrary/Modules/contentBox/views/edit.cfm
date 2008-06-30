@@ -11,7 +11,7 @@
 	siteOwner = stUser.username;
 	
 	if(resourceID neq "") {
-		oResourceBean = application.homePortals.getCatalog().getResourceNode(getResourceType(),resourceID);
+		oResourceBean = this.controller.getHomePortals().getCatalog().getResourceNode(getResourceType(),resourceID);
 		access = oResourceBean.getAccessType();
 		name = oResourceBean.getName();
 		description = oResourceBean.getDescription();

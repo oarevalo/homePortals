@@ -44,7 +44,7 @@
 		<cfargument name="body" type="string" required="true" hint="resource body">
 		
         <cfset var oResourceBean = 0>
- 		<cfset var oHP = application.homePortals>
+ 		<cfset var oHP = this.controller.getHomePortals()>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = getResourceType()>
 		<cfset var siteOwner = "">
@@ -87,7 +87,7 @@
 	<cffunction name="deleteResource" access="public" returntype="void">
 		<cfargument name="resourceID" type="string" required="true" hint="resource id">
 	
- 		<cfset var oHP = application.homePortals>
+ 		<cfset var oHP = this.controller.getHomePortals()>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = getResourceType()>
 		<cfset var siteOwner = "">
@@ -123,7 +123,7 @@
 		<cfscript>
 			var aAccess = arrayNew(1);
 			var j = 1;
-			var oHP = application.homePortals;
+			var oHP = this.controller.getHomePortals();
 			var resourceType = getResourceType();
 		
 			var oFriendsService = oHP.getAccountsService().getFriendsService();

@@ -86,7 +86,7 @@ History:
 		<cfargument name="description" type="string" required="true" hint="resource description">
 				
         <cfset var oResourceBean = 0>
- 		<cfset var oHP = application.homePortals>
+ 		<cfset var oHP = this.controller.getHomePortals()>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = "feed">
 		<cfset var siteOwner = "">
@@ -129,7 +129,7 @@ History:
 	<cffunction name="deleteFeed" access="public" returntype="void">
 		<cfargument name="feedID" type="string" required="true" hint="resource id">
 	
- 		<cfset var oHP = application.homePortals>
+ 		<cfset var oHP = this.controller.getHomePortals()>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = "feed">
 		<cfset var siteOwner = "">
@@ -166,7 +166,7 @@ History:
 		<cfscript>
 			var aAccess = arrayNew(1);
 			var j = 1;
-			var oHP = application.homePortals;
+			var oHP = this.controller.getHomePortals();
 		
 			var oFriendsService = oHP.getAccountsService().getFriendsService();
 			var qryFriends = oFriendsService.getFriends(arguments.owner);

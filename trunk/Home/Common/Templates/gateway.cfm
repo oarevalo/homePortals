@@ -3,8 +3,22 @@
 This file is a gateway for calls to server-side components. 
 ---->
 
-<cfset moduleControllerRemotePath = "Home.Components.moduleControllerRemote">
-<cfset hpCommonTemplatesPath = "/Home/Common/Templates">
+<!--- this is a reference to the homeportals application instance,
+	it is done as a cfparam to allow the caller to override the reference
+	when storing in on a different place --->
+<cfparam name="HOMEPORTALS_INSTANCE" default="">
+
+<!--- this is the name of the mapping or directory where HomePortals is located --->
+<cfparam name="HOMEPORTALS_MAPPING" default="Home">
+
+
+<!--- references to homeportals resources --->
+<cfset moduleControllerRemotePath = HOMEPORTALS_MAPPING & ".Components.moduleControllerRemote">
+<cfset hpCommonTemplatesPath = "/" & HOMEPORTALS_MAPPING & "/Common/Templates">
+
+<cfif isSimpleValue(HOMEPORTALS_INSTANCE) and HOMEPORTALS_INSTANCE eq "" and structKeyExists(application,"homePortals")>
+	<cfset HOMEPORTALS_INSTANCE = application.homePortals>
+</cfif>
 
 <!--- Headers to avoid caching of content --->
 <meta http-equiv="Expires" content="0">
@@ -22,7 +36,7 @@ This file is a gateway for calls to server-side components.
 	<cfset structAppend(stRequest, url)>
 	
 	<!--- Initialize remote module controller --->
-	<cfset oModuleControllerRemote = CreateObject("component", moduleControllerRemotePath).init(moduleID, application.homePortals.getConfig())>
+	<cfset oModuleControllerRemote = CreateObject("component", moduleControllerRemotePath).init(moduleID, HOMEPORTALS_INSTANCE)>
 	
 	<!--- create and execute call --->
 	<cfinvoke   component="#oModuleControllerRemote#" 

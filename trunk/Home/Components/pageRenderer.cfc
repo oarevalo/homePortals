@@ -10,6 +10,7 @@
 		variables.homePortalsEngineDir = "/Home/";		// path to location of HomePortals engine
 		variables.errorTemplate = variables.homePortalsEngineDir & "/Common/Templates/error.cfm";	// template to display when errors occur while rendering page components
 		variables.pageHREF = "";		// path to the current page
+		variables.oHomePortals = 0;		// homeportals instance
 		variables.oHomePortalsConfigBean = 0;		// homeportals config
 		variables.stTimers = structNew();
 		variables.oCatalog = 0;			// reference to the current catalog
@@ -22,17 +23,17 @@
 	<!--------------------------------------->	
 	<cffunction name="init" access="public" returntype="pageRenderer">
 		<cfargument name="pageHREF" type="string" required="true" hint="The url of the page to load">
-		<cfargument name="configBean" type="homePortalsConfigBean" required="true" hint="HomePortals application settings">
-		<cfargument name="catalog" type="catalog" required="true" hint="Current resource catalog">
+		<cfargument name="homePortals" type="homePortals" required="true" hint="HomePortals application instance">
 		<cfset var start = getTickCount()>
-		
+
 		<cfif trim(arguments.pageHREF) eq "">
 			<cfthrow message="Page address cannot be empty" type="homePortals.pageRenderer.missingPageURL">
 		</cfif>
 
 		<cfset variables.pageHREF = arguments.pageHREF>
-		<cfset variables.oHomePortalsConfigBean = arguments.configBean>
-		<cfset variables.oCatalog = arguments.catalog>
+		<cfset variables.oHomePortals = arguments.homePortals>
+		<cfset variables.oHomePortalsConfigBean = variables.oHomePortals.getConfig()>
+		<cfset variables.oCatalog = variables.oHomePortals.getCatalog()>
 		
 		<cfset loadPage()>
 		
@@ -610,7 +611,7 @@
 				
 				// instantiate module controller and call constructor
 				oModuleController = createObject("component","moduleController");
-				oModuleController.init(moduleID, moduleName, arguments.moduleNode, bIsFirstInClass, "local", variables.oHomePortalsConfigBean);
+				oModuleController.init(moduleID, moduleName, arguments.moduleNode, bIsFirstInClass, "local", variables.oHomePortals);
 
 				// render html content
 				appendpageBuffer("_htmlHead", moduleID, oModuleController.renderClientInit() );

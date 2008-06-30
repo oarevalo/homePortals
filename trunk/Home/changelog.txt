@@ -1,0 +1,27 @@
+/****************************************/
+/*										*/
+/* ChangeLog							*/
+/*										*/
+/****************************************/
+
+
+-------------------------
+	06/30/08
+-------------------------
+- Modified gateway.cfm template to allow override of reference to HomePortals application instance variable. If
+the instance is anywhere other than application.homePortals, you can set the variable HOMEPORTALS_INSTANCE to 
+reference the actual instance before doing the <cfinclude> for gateway.cfm
+
+- Added method getHomePortals() to moduleController. This allows modules to obtain a reference to the current
+homePortals application in which they are being executed. From this instance they can access any part of the HomePortals
+environment.
+
+- Modified login, contentBox, htmlBox and RSSReader modules to use the getHomePortals() method instead of using
+ direct references to application.homeportals
+
+- Modified cacheManager so that it can used as a <cfinclude> like page.cfm and gateway.cfm. Can also accept the 
+variable HOMEPORTALS_INSTANCE to override the default location of the HomePortals application instance variable.
+
+- When adding a page resource to a site the new page has the name of the page resource added instead of just being
+named 'copy of xxx', unless the name property of the resource is blank.
+
