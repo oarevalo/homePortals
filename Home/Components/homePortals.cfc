@@ -225,7 +225,7 @@
 			
 			} catch(homePortals.cacheService.itemNotFound e) {
 				// page is not in cache, so load the page
-				oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, variables.oHomePortalsConfigBean, variables.oCatalog);
+				oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, this);
 			
 				// store page in cache
 				oCache.store(pageCacheKey, oPageRenderer);

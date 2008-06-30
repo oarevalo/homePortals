@@ -12,7 +12,7 @@
 		variables.stErrorInfo = structNew();
 		variables.script = "";
 		variables.execMode = "local";
-		variables.homePortalsConfigBean = 0;
+		variables.oHomePortals = 0;
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -25,7 +25,7 @@
 		<cfargument name="modulePageSettings" required="false" default="0">
 		<cfargument name="isFirstInClass" required="false" type="boolean" default="false">
 		<cfargument name="execMode" required="false" type="string" default="local" hint="Could be 'local' or 'remote', depending on under which context is being executed.">
-		<cfargument name="homePortalsConfigBean" type="homePortalsConfigBean" required="true" hint="homeportals settings">
+		<cfargument name="homePortals" type="homePortals" required="true" hint="reference to homeportals environment">
 	
 		<cfscript>
 			var contentStoreID = "";
@@ -44,7 +44,7 @@
 			variables.moduleID = arguments.moduleID;
 			variables.isFirstInClass = arguments.isFirstInClass;
 			variables.execMode  = arguments.execMode;
-			variables.homePortalsConfigBean = arguments.homePortalsConfigBean;
+			variables.oHomePortals = arguments.homePortals;
 
 			// create configBeans
 			variables.oModuleConfigBean = createObject("component", "moduleConfigBean");
@@ -72,7 +72,7 @@
 
 
 			// set the accounts root and the page owner on the content store
-			variables.oContentStoreConfigBean.setAccountsRoot( homePortalsConfigBean.getAccountsRoot() );
+			variables.oContentStoreConfigBean.setAccountsRoot( getHomePortalsConfigBean().getAccountsRoot() );
 			variables.oContentStoreConfigBean.setOwner( variables.oModuleConfigBean.getPageSetting("_page").owner );
 
 		
@@ -148,7 +148,15 @@
 	<!---------------------------------------->		
 	<cffunction name="getHomePortalsConfigBean" returntype="homePortalsConfigBean" access="public"
 				hint="Returns a bean with configuration settings for the HomePortals application">
-		<cfreturn variables.homePortalsConfigBean>
+		<cfreturn variables.oHomePortals.getConfig()>
+	</cffunction>
+
+	<!---------------------------------------->
+	<!--- getHomePortals			       --->
+	<!---------------------------------------->		
+	<cffunction name="getHomePortals" returntype="homePortals" access="public"
+				hint="Returns a reference to the current HomePortals application">
+		<cfreturn variables.oHomePortals>
 	</cffunction>
 		
 	<!---------------------------------------->

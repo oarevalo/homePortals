@@ -503,7 +503,7 @@
 		<cfargument name="pageResourceBean" required="true" type="resourceBean" hint="resource bean">
 		<cfargument name="resourceRoot" default="/Home/resourceLibrary/" type="string" required="true">
 		<cfset var href = arguments.resourceRoot & "/" & arguments.pageResourceBean.getHREF()>	
-		<cfset var newHREF = addPage("", href)>
+		<cfset var newHREF = addPage(arguments.pageResourceBean.getName(), href)>
 		<cfreturn newHREF>
 	</cffunction>
 

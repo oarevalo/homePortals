@@ -1,6 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
+<!--- this is a reference to the homeportals application instance,
+	it is done as a cfparam to allow the caller to override the reference
+	when storing in on a different place --->
+<cfparam name="HOMEPORTALS_INSTANCE" default="#application.homePortals#">
+
 <cfparam name="action" default="">
 <cfparam name="cacheName" default="">
 
@@ -30,7 +35,7 @@
 
 <!--- get list of caches --->
 <cfset lstCaches = oCacheRegistry.getCacheNames()>
-<cfset hp = application.homePortals>
+<cfset hp = HOMEPORTALS_INSTANCE>
 
 <html>
 	<head>
@@ -68,8 +73,8 @@
 		
 		<p>
 			This tool allows to view and perform operations on all internal caches used by HomePortals.<br>
-			<b>IMPORTANT:</b> To use this tool you must copy this file (cacheManager.cfm) into the application where the cache
-			is being used.
+			<b>IMPORTANT:</b> To use this tool you must include a reference to this file (cacheManager.cfm) 
+			into the application where the cache is being used.
 		</p>
 		
 		<cfoutput>
@@ -124,21 +129,21 @@
 							</cfif>
 						</td>
 						<td align="center">
-							[<a href="cacheManager.cfm?action=list&cacheName=#cacheName#">list</a>]
+							[<a href="#cgi.SCRIPT_NAME#?action=list&cacheName=#cacheName#">list</a>]
 							<cfif left(cacheName,2) neq "hp">
-								[<a href="cacheManager.cfm?action=clear&cacheName=#cacheName#">clear</a>]
+								[<a href="#cgi.SCRIPT_NAME#?action=clear&cacheName=#cacheName#">clear</a>]
 							</cfif>
-							[<a href="cacheManager.cfm?action=cleanup&cacheName=#cacheName#">reap</a>]
+							[<a href="#cgi.SCRIPT_NAME#?action=cleanup&cacheName=#cacheName#">reap</a>]
 						</td>
 					</tr>
 					<cfset index=index+1>
 				</cfloop>
 			</table>
-		</cfoutput>
 		
-		<p>
-			<a href="cacheManager.cfm">Refresh</a>
-		</p>
+			<p>
+				<a href="#cgi.SCRIPT_NAME#">Refresh</a>
+			</p>
+		</cfoutput>
 	</body>
 </html>
 		
