@@ -25,8 +25,6 @@
 		variables.hpEngineRoot = "/Home";		// root directory for the homeportals engine
 		variables.appRoot = "";					// Root directory of the application as a relative URL
 		variables.oHomePortalsConfigBean = 0;	// bean to store config settings
-		variables.stPageCache = structNew();	// a cache to store pages
-		variables.stSiteCache = structNew();	// a cache to store sites
 		variables.configFilePath = "Config/homePortals-config.xml";  
 												// path of the config file relative to the root of the application
 		
@@ -93,6 +91,29 @@
 		</cfscript>
 	</cffunction>
 	
+
+	<!--------------------------------------->
+	<!----  reinit	 					----->
+	<!--------------------------------------->
+	<cffunction name="reinit" access="public" returntype="homePortals" hint="Reinitializes the homeportals instance. This will re-read the configuration and clear all caches.">
+		<cfscript>
+			// clear up instance variables
+			variables.oHomePortalsConfigBean = 0;
+			variables.oAccountsService = 0;	
+			variables.oCatalog = 0;	
+			variables.stTimers = structNew();
+			
+			// clear caches
+			oCacheRegistry = createObject("component","cacheRegistry").init();
+			oCacheRegistry.flush();		// clear registry
+			
+			// initialize application
+			init(variables.appRoot);
+			
+			return this;
+		</cfscript>
+	</cffunction>
+
 	
 	<!--------------------------------------->
 	<!----  loadPage 					----->
