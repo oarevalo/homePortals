@@ -6,6 +6,16 @@
 
 
 -------------------------
+	07/02/08
+-------------------------
+- Added HomePortalsProxy component. This allows for remote interaction with the HomePortals instance on an
+application. To enable remote access on an application, create a component on the application that extends
+Home.Components.homePortalsProxy and override the variables APP_ROOT and HOMEPORTALS_INSTANCE_VAR as needed.
+
+- Added method reinit() to Home.Components.homePortals to reinitialize the application instance without 
+having to discard it.
+
+-------------------------
 	06/30/08
 -------------------------
 - Modified gateway.cfm template to allow override of reference to HomePortals application instance variable. If
