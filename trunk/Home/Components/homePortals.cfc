@@ -85,6 +85,11 @@
 			oCacheRegistry.register("hpModuleProperties", oCacheService);
 			oCacheService.store("oModuleProperties", oModuleProperties);
 
+			// create and register content store cache
+			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
+																			variables.oHomePortalsConfigBean.getPageCacheTTL());
+			oCacheRegistry.register("hpContentStoreCache", oCacheService);
+
 			variables.stTimers.init = getTickCount()-start;
 			return this;
 		</cfscript>
