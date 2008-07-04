@@ -6,17 +6,11 @@
 		variables.owner = "";
 		variables.type = "";
 		
-		// name of the cache service instance
-		variables.cacheServiceName = "_hpContentStoreCache";
-
-		// number of content store docs to cache in memory
-		variables.memCacheSize = 50;
-		
-		// time to live in minutes for content store docs cached in memory
-		variables.memCacheTTL = 30;
+		// name of the cache service used
+		variables.cacheServiceName = "hpContentStoreCache";
 		
 		// name of the lock to use when accessing the memory cache service
-		variables.lockName = "hp_contentStore_cache";
+		variables.lockName = "hpContentStoreCacheLock";
 	</cfscript>
 		
 	<!---------------------------------------->
@@ -37,10 +31,6 @@
 			variables.owner = variables.oContentStoreConfigBean.getOwner();
 			variables.type = variables.oContentStoreConfigBean.getType();
 			
-		 	// create cache service if not exists
-			if(Not structKeyExists(application, variables.cacheServiceName)) {
-				initCacheService();
-			}
 			
 			// get document file extension to use
 			ext = variables.oContentStoreConfigBean.getExtension();
@@ -147,15 +137,20 @@
 	<!-------------------------------------->
 	<cffunction name="saveStorageDoc" access="private">
 		<cfset var tmpURL = variables.oContentStoreConfigBean.getURL()>
+		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
+		<cfset var tmpName = "">
 		
 		<!--- write to file system --->
 		<cffile action="write" 
 				file="#ExpandPath(tmpURL)#" 
 				output="#toString(variables.xmlDoc)#">
-				
-		<!--- invalidate cache entry (if exists) --->		
-        <cflock type="exclusive" name="#variables.lockName#" timeout="30">
-			<cfset application[variables.cacheServiceName].flush(hash(tmpURL))>
+
+		<!--- create a name for the lock to single-thread access to this resource --->
+		<cfset tmpName = replace(hash(tmpURL),"-","")>
+		
+		<!--- invalidate cache entry (if exists) --->	
+        <cflock type="exclusive" name="#variables.lockName#_#tmpName#" timeout="30">
+			<cfset oCacheRegistry.getCache(variables.cacheServiceName).flush(hash(tmpURL))>	
         </cflock>
 	</cffunction>
 
@@ -167,7 +162,8 @@
 			var xmlDoc = 0;
 			var tmpURL = variables.oContentStoreConfigBean.getURL();
 			var memCacheKey = hash(tmpURL);
-			var oCacheService = application[variables.cacheServiceName];
+			var oCacheRegistry = createObject("component","cacheRegistry").init();
+			var oCacheService = oCacheRegistry.getCache(variables.cacheServiceName);
 
 			// retrieve the contentStore doc from memory cache if it exists and is still valid
 			try {
@@ -200,22 +196,18 @@
 			}
 		</cfscript>
 	</cffunction>
-
-
-	<cffunction name="initCacheService" access="private" returntype="void">
-		<cfset var oCacheService = createObject("component","cacheService").init(variables.memCacheSize, variables.memCacheTTL)>
-		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
-			<cfset application[variables.cacheServiceName]= oCacheService>
-		</cflock>
-	</cffunction>
     
 	<cffunction name="storeInCache" access="private" returntype="void">
     	<cfargument name="key" type="string" required="yes">
         <cfargument name="xmlDoc" type="xml" required="yes">
         
-    	<cfset var oCacheService = application[variables.cacheServiceName]>
-        
-		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
+		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
+    	<cfset var oCacheService = oCacheRegistry.getCache(variables.cacheServiceName)>
+
+		<!--- create a name for the lock to single-thread access to this resource --->
+		<cfset var tmpName = replace(hash(arguments.key),"-","")>
+
+		<cflock type="exclusive" name="#variables.lockName#_#tmpName#" timeout="30">
 			<cfset oCacheService.store(arguments.key, arguments.xmlDoc)>
 		</cflock>
     </cffunction>
