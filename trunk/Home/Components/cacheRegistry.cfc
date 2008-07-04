@@ -19,7 +19,7 @@
 		<cfset var st = structNew()>
 		<cfset checkRegistry()>
 		<cfset st = getRegistry()>
-		<cflock name="cacheRegistryLock" type="exclusive" timeout="10">
+		<cflock name="cacheRegistryLock_#arguments.cacheName#" type="exclusive" timeout="10">
 			<cfset st[arguments.cacheName] = arguments.cache>
 		</cflock>
 	</cffunction>
@@ -48,13 +48,16 @@
 		<cfset var st = structNew()>
 		<cfset checkRegistry()>
 		<cfset st = getRegistry()>
-		<cflock name="cacheRegistryLock" type="exclusive" timeout="10">
-			<cfif arguments.cacheName neq "">
+
+		<cfif arguments.cacheName neq "">
+			<cflock name="cacheRegistryLock_#arguments.cacheName#" type="exclusive" timeout="10">
 				<cfset structDelete(application[variables.CACHE_REGISTRY_NAME], arguments.cacheName, false)>
-			<cfelse>
+			</cflock>		
+		<cfelse>
+			<cflock name="cacheRegistryLock" type="exclusive" timeout="10">
 				<cfset structDelete(application, variables.CACHE_REGISTRY_NAME)>
-			</cfif>
-		</cflock>		
+			</cflock>		
+		</cfif>
 	</cffunction>
 
 
