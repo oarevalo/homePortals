@@ -16,14 +16,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 *****************************************************************************/
 //constructor for the main Epoch class (ENGLISH VERSION)
-function Epoch(name,mode,targetelement,multiselect,ownerID)
+function Epoch(name,mode,targetelement,multiselect)
 {
 	this.state = 0;
 	this.name = name;
 	this.curDate = new Date();
 	this.mode = mode;
 	this.selectMultiple = (multiselect == true); //'false' is not true or not set at all
-	this.ownerID = ownerID;
 	
 	//the various calendar variables
 	//this.selectedDate = this.curDate;
@@ -34,6 +33,8 @@ function Epoch(name,mode,targetelement,multiselect,ownerID)
 	this.rows;
 	this.cols;
 	this.cells = new Array();
+	
+	this.selectedDates.push(this.curDate);
 	
 	//The controls
 	this.monthSelect;
@@ -736,7 +737,7 @@ CalCell.prototype.onclick = function ()
 		// *** ADDED 9/29/06 - Oscar arevalo ****
 		// This was added for HomePortals integration
 		// this raises a HomePortals event notifying that a date has been selected
-		h_raiseEvent(this.ownerID,"onSelectDate",cell.date); 
+		h_raiseEvent(owner.name,"onSelectDate",cell.date); 
 	}
 };
 //-----------------------------------------------------------------------------
