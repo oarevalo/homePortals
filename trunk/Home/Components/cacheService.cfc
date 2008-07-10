@@ -222,7 +222,7 @@
 	<!-------------------------------------->
 	<!--- flush                        	  --->
 	<!-------------------------------------->	
-	<cffunction name="flush" access="public" returntype="any" hint="Removes an item from the cache">
+	<cffunction name="flush" access="public" returntype="void" hint="Removes an item from the cache">
 		<cfargument name="key" type="string" required="true">
 		<cfif structKeyExists(variables.stData, arguments.key)>
 			<cfset structDelete(variables.stData, arguments.key)>
