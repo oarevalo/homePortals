@@ -1,4 +1,4 @@
-<cfcomponent name="members">
+<cfcomponent name="xmlDataStore" hint="provides an abstraction for working with xml datafile as if they were a db table">
 
 	<cfset variables.xmlDocURL = "">
 	<cfset variables.xmlDoc = 0>
@@ -6,7 +6,7 @@
 	<cfset variables.pkName = "">
 	<cfset variables.xmlDocCopy = 0>
 
-	<cffunction name="init" returntype="members" access="public">
+	<cffunction name="init" returntype="xmlDataStore" access="public">
 		<cfargument name="xmlDocURL" type="string" required="true">
 		<cfargument name="lstFields" type="string" required="true">
 		<cfargument name="pkName" type="string" required="true">
