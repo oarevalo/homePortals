@@ -30,7 +30,7 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="getConfig" access="public" returntype="accountsConfigBean" 
+	<cffunction name="getConfig" access="public" returntype="modulePropertiesConfigBean" 
 				hint="Returns the effective module properties config bean for the application. This config bean contains any properties as the application sees them, properties may come from the config file in the application or the config file in the main Config dir in Home">
 		<cfreturn variables.oConfigBean>
 	</cffunction>
