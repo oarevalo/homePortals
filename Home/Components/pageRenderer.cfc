@@ -111,8 +111,7 @@
 	<!--------------------------------------->
 	<!----  renderPage					----->
 	<!--------------------------------------->
-	<cffunction name="renderPage" access="public" output="false" hint="Renders the entire page using the render template.">
-
+	<cffunction name="renderPage" access="public" output="false" hint="Renders the entire page using the render template." returntype="string">
 		<cfscript>
 			var renderTemplateBody = "";
 			var index = 1;
@@ -181,7 +180,7 @@
 	<!--------------------------------------->
 	<!----  renderLayoutSection			----->
 	<!--------------------------------------->
-	<cffunction name="renderLayoutSection" access="public" output="false" hint="Renders all modules in a given layout section. Optionally, the caller can pass the html tag to use to for the layout section.">
+	<cffunction name="renderLayoutSection" access="public" output="false" returntype="string" hint="Renders all modules in a given layout section. Optionally, the caller can pass the html tag to use to for the layout section.">
 		<cfargument name="layoutSection" type="string" required="yes">
 		<cfargument name="tagName" type="string" required="no" default="div">
 
