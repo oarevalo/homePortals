@@ -14,7 +14,7 @@
 	<cfset variables.APP_ROOT = "/Home">
 
 	
-	<cffunction name="init" access="public" returntype="abstractHomePortalsProxy" hint="constructor">
+	<cffunction name="init" access="public" returntype="homePortalsProxy" hint="constructor">
 		<cfreturn this>
 	</cffunction>
 
