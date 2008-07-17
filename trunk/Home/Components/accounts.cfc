@@ -190,7 +190,7 @@
 		<!--- validate username --->
 		<cfset qry = getAccountByUsername(arguments.username)>
 		<cfif qry.RecordCount gt 0>
-			<cfthrow message="That username is already taken. Please choose another." type="homeportals.accounts.usernameExists">
+			<cfthrow message="The given account name already exists. Please choose another." type="homeportals.accounts.usernameExists">
 		</cfif>
 		
 		<cftry>
