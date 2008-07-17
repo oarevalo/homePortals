@@ -102,7 +102,10 @@
 	<cffunction name="create" access="public" hint="Creates a new account record." returntype="string">
 		<cfargument name="username" type="string" required="yes">
 		<cfargument name="password" type="string" required="yes">
-		<cfargument name="email" type="string" required="yes">
+		<cfargument name="FirstName" type="string" required="no" default="">
+		<cfargument name="MiddleName" type="string" required="no" default="">
+		<cfargument name="LastName" type="string" required="no" default="">
+		<cfargument name="Email" type="string" required="no" default="">
 		
 		<cfset var newUserID = createUUID()>
 		<cfset var xmlDoc = getStorage()>
@@ -113,6 +116,9 @@
 		<cfset newNode.xmlAttributes["username"] = arguments.username>
 		<cfset newNode.xmlAttributes["password"] = hash(arguments.password)>
 		<cfset newNode.xmlAttributes["email"] = arguments.email>
+		<cfset newNode.xmlAttributes["firstName"] = arguments.firstName>
+		<cfset newNode.xmlAttributes["middleName"] = arguments.middleName>
+		<cfset newNode.xmlAttributes["lastName"] = arguments.lastName>
 		<cfset newNode.xmlAttributes["createDate"] = now()>
 		
 		<!--- append node to xml document --->

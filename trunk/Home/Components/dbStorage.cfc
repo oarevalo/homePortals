@@ -94,7 +94,10 @@
 	<cffunction name="create" access="public" hint="Creates a new account record." returntype="string">
 		<cfargument name="username" type="string" required="yes">
 		<cfargument name="password" type="string" required="yes">
-		<cfargument name="email" type="string" required="yes">
+		<cfargument name="FirstName" type="string" required="no" default="">
+		<cfargument name="MiddleName" type="string" required="no" default="">
+		<cfargument name="LastName" type="string" required="no" default="">
+		<cfargument name="Email" type="string" required="no" default="">
 
 		<cfset var newUserID = createUUID()>
 		
@@ -102,12 +105,15 @@
 		<cfquery name="qry" datasource="#oAccountsConfigBean.getDatasource()#" 
 						username="#oAccountsConfigBean.getUsername()#" 
 						password="#oAccountsConfigBean.getPassword()#">
-			INSERT INTO #oAccountsConfigBean.getAccountsTable()# (UserID, Username, Password, Email, CreateDate)
+			INSERT INTO #oAccountsConfigBean.getAccountsTable()# (UserID, Username, Password, Email, firstName, middleName, lastName, CreateDate)
 				VALUES (
 					<cfqueryparam cfsqltype="cf_sql_varchar" value="#newUserID#">,
 					<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.username#">,
 					<cfqueryparam cfsqltype="cf_sql_varchar" value="#Hash(Arguments.Password)#">,
 					<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.Email#">,
+					<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.firstName#">,
+					<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.middleName#">,
+					<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.lastName#">,
 					<cfqueryparam cfsqltype="cf_sql_timestamp" value="#Now()#">
 					)
 		</cfquery>

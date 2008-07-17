@@ -166,7 +166,10 @@
 	<cffunction name="createAccount" access="public" hint="Creates a new account" returntype="string">
 		<cfargument name="username" type="string" required="yes">
 		<cfargument name="Password" type="string" required="yes">
-		<cfargument name="Email" type="string" required="yes">
+		<cfargument name="FirstName" type="string" required="no" default="">
+		<cfargument name="MiddleName" type="string" required="no" default="">
+		<cfargument name="LastName" type="string" required="no" default="">
+		<cfargument name="Email" type="string" required="no" default="">
 		
 		<cfset var qry = 0>
 		<cfset var oHPConfig = 0>
@@ -192,7 +195,7 @@
 		
 		<cftry>
 			<!--- insert record in account storage --->
-			<cfset newUserID = objStorage.create(arguments.username, Arguments.Password, arguments.Email)>
+			<cfset newUserID = objStorage.create(arguments.username, Arguments.Password, arguments.firstName, arguments.middleName, arguments.lastName, arguments.email)>
 			
 			<!--- get homeportals settings --->
 			<cfset hpEngineRoot = oHomePortalsConfigBean.getHomePortalsPath()>
