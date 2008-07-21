@@ -19,7 +19,7 @@ to debug.cfm. Debug now shows cache information. Added JVM free memory stats to 
 - RSS Cache can now be configured from the main HomePortals config. The rss cache is now initialized when the Engine starts up.
 - Resources are no longer fully indexed at application startup time, they are indexed in memory as they are needed. This
 improves application startup time. Full indexing is still available programmatically.
-
+- Added default css class SectionSettings for config views of modules, modified modules to use the new class.
 
 -------------------------
 	07/16/08
