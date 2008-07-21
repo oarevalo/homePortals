@@ -37,6 +37,19 @@
 <cfset lstCaches = oCacheRegistry.getCacheNames()>
 <cfset hp = HOMEPORTALS_INSTANCE>
 
+<cfscript>
+	// get amount of free memory
+	jrt = CreateObject("java", "java.lang.Runtime");
+	freeMem = ( (jrt.getRuntime().freeMemory() / jrt.getRuntime().totalMemory() ) * 100 );
+	if(freeMem gt 50)
+		freeMemLabelColor = "green";
+	else if(freemem gt 15)
+		freeMemLabelColor = "orange";
+	else
+		freeMemLabelColor = "red";
+</cfscript>
+	
+
 <html>
 	<head>
 		<title>HomePortals - Cache Manager Tool</title>
@@ -100,6 +113,10 @@
 					<td width="130"><b>HP Engine Version:</b></td>
 					<td>#hp.getConfig().getVersion()#</td>
 				</tr>
+				<tr>
+					<td width="130"><b>Free JVM Memory:</b></td>
+					<td><span style="color:#freeMemLabelColor#">#decimalFormat(freeMem)#%</span></td>
+				</tr>
 			</table>
 			<br><br>			
 			
@@ -117,15 +134,20 @@
 				<cfloop list="#lstCaches#" index="cacheName">
 					<cfset oCache = oCacheRegistry.getCache(cacheName)>
 					<cfset stStats = oCache.getStats()>
-					<tr>
+					<cfset cacheWarning = (stStats.currentSize gt stStats.maxSize or
+											(stStats.maxSize gte stStats.currentSize 
+											and stStats.currentSize/stStats.maxSize gt 0.9))>
+					<tr <cfif cacheWarning>style="background-color:pink"</cfif>>
 						<td>#index#.</td>
 						<td>#cacheName#</td>
 						<td align="right">#stStats.currentSize#</td>
 						<td align="right">#stStats.maxSize#</td>
 						<td align="right">#stStats.hitCount#/#stStats.missCount#</td>
 						<td align="center">
-							<cfif stStats.lastReap neq "">
+							<cfif stStats.lastReap neq "" and stStats.lastReap neq "12/30/1899">
 								#lsDateFormat(stStats.lastReap)#<br>#lsTimeFormat(stStats.lastReap)#
+							<cfelse>
+								-
 							</cfif>
 						</td>
 						<td align="center">
