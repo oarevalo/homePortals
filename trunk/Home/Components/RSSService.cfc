@@ -1,9 +1,5 @@
 <cfcomponent displayname="RSSService" hint="provides rss retrieval, parsing and caching functionality">
 
-	<!--- this is the directory where the service will cache the retrieved rss feeds --->
-	<cfset variables.cacheDir = "/RSSReaderCache">
-	<!--- the time to live in minutes for a retrieved feed on the cache, this is the minumum time to wait before retrieving the feed from the source again --->
-	<cfset variables.timeToLive = 30>
 	<!--- number of feeds to cache in memory --->
 	<cfset variables.memCacheSize = 50>
 	<!--- time to live in minutes for feeds cached in memory --->
@@ -19,8 +15,6 @@
 	<!--- init                           --->
 	<!-------------------------------------->	
 	<cffunction name="init" access="public" returnType="RSSService">
-		<cfargument name="cacheDir" type="string" required="false" default="">
-		<cfargument name="timeToLive" type="numeric" required="false" default="#variables.timeToLive#">
 		<cfargument name="memCacheSize" type="numeric" required="false" default="#variables.memCacheSize#">
 		<cfargument name="memCacheTTL" type="numeric" required="false" default="#variables.memCacheTTL#">
 		<cfargument name="reloadCache" type="boolean" required="false" default="false">
@@ -29,10 +23,6 @@
 		<cfset var oCacheService = 0>
 
 		<!--- set instance variables --->
-		<cfif arguments.cacheDir neq "">
-			<cfset variables.cacheDir = arguments.cacheDir>
-		</cfif>
-		<cfset variables.timeToLive = arguments.timeToLive>
 		<cfset variables.memCacheSize = arguments.memCacheSize>
 		<cfset variables.memCacheTTL = arguments.memCacheTTL>
 		
@@ -174,11 +164,8 @@
 		
 		<cfset var xmlDoc = 0>
 		<cfset var xmlDoc_Cache = 0>
-		<cfset var fileCacheValid = false>
+		<cfset var memCacheKey = "">
 		<cfset var memCacheValid = false>
-		<cfset var cacheFileName = "">
-		<cfset var cacheFile = "">
-		<cfset var txtDoc = "">
 		<cfset var oCacheService = getCacheService()>
 		
 		<!--- replace "feed://" with "http://" --->
@@ -186,8 +173,6 @@
 		
 		<!--- set values for cache check--->
 		<cfset memCacheKey = hash(arguments.url)>
-		<cfset cacheFileName = ReplaceList(arguments.url,"/,:,?","_,_,_") & ".xml">
-		<cfset cacheFile = ExpandPath(variables.cacheDir & "/" & cacheFileName)> 
 		
 		<!---retrieve the feed from the memory cache if it exists is still valid --->
 		<cfif not arguments.forceRefresh>
@@ -201,41 +186,17 @@
 			</cftry>
 		</cfif>
 
-
 		<!--- if the mem cache is valid, then retrieve data from the memcache --->
 		<cfif memCacheValid>
 			<cfset xmlDoc = xmlDoc_Cache>
 		<cfelse>	
-			<!--- check if file cache directory exists, otherwise create it --->
-			<cfif not DirectoryExists(expandPath(variables.cacheDir))>
-				<cfdirectory action="create" directory="#expandPath(variables.cacheDir)#" mode="777">
-			</cfif>
-
-			<cfif not arguments.forceRefresh>
-				<!---check if the feed exists in the file cache and if it is still valid --->
-				<cfif fileExists(cacheFile)>
-					<cfdirectory action="list" directory="#ExpandPath(variables.cacheDir)#" name="qryDir" filter="#cacheFileName#">
-					<cfif DateDiff("n", qryDir.dateLastModified, now()) lt variables.timeToLive>
-						<cfset fileCacheValid = true>
-					</cfif>
-				</cfif>
-			</cfif>
-			
-			<!--- if file cached data is valid, get it from there, otherwise, get from web --->
-			<cfif fileCacheValid>
-				<cfset xmlDoc = XMLParse(cacheFile)>
-			<cfelse>
-				<cfset xmlDoc = getFromSource(arguments.url)>
-				
-				<!--- cache the retrieved document --->
-				<cffile action="write" file="#cacheFile#" output="#toString(xmlDoc)#">	
-			</cfif>		
+			<!--- get feed from external source --->
+			<cfset xmlDoc = getFromSource(arguments.url)>
 
 			<!--- update in-memory cache --->
             <cflock type="exclusive" name="#variables.lockName#" timeout="30">
 	            <cfset oCacheService.store(memCacheKey, xmlDoc)>
             </cflock>
-
 		</cfif>
 		
 		<cfreturn xmlDoc>
