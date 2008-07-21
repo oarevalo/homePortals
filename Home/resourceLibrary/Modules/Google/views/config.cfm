@@ -18,7 +18,7 @@
 </cfscript>
 
 <cfoutput>
-	<form name="frmSettings" action="##" method="post" >
+	<form name="frmSettings" action="##" method="post" class="SectionSettings">
 		<input type="hidden" name="searchers" value="#searchers#">
 		
 		<cfif Not stUser.isOwner>

@@ -35,7 +35,7 @@
 </cfscript>
 
 <cfoutput>
-	<form name="frmAppointmentsSettings" action="##" method="post" class="appointmentsSettings">
+	<form name="frmAppointmentsSettings" action="##" method="post" class="SectionSettings">
 		<cfif Not bIsContentOwner>
 			<div style="font-weight:bold;color:red;">Only the owner of this page can make changes.</div><br>
 		</cfif>

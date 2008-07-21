@@ -5,7 +5,6 @@
 			var cfg = this.controller.getModuleConfigBean();
 			cfg.setModuleClassName("flickrFeed");
 			cfg.setView("default", "main");
-			cfg.setView("htmlHead", "htmlHead");
 			
 			variables.apiKey = cfg.getProperty("API_Key");
 		</cfscript>	

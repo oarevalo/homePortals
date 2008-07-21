@@ -1,21 +1,3 @@
-
-
-<cfif this.controller.isFirstInClass()>
-<style type="text/css">
-	.Bookmarks2Settings {
-		background-color:#fefcd8;
-		padding:10px;
-		margin:0px;
-		border:1px solid #cccccc;
-	}
-	.Bookmarks2Settings input {
-		border:1px solid black;
-		font-size:11px;
-		padding:1px;
-	}	
-</style>
-</cfif>
-
 <cfoutput>		
 	<cfset instanceName = this.controller.getModuleID()>
 	<style type="text/css">
@@ -52,20 +34,3 @@
 		}
 	</script>	
 </cfoutput>
-
-<!---
-		###instanceName#_BodyRegion td a {
-			display:block;
-			width:100%;
-			
-			text-decoration:none;
-			padding:2px;
-			border:1px solid ##e5e5e5;
-		}
-		###instanceName#_BodyRegion td a:hover {
-			border:1px solid ##999999;
-			background-color:##E7F8FE;
-			text-decoration:none;
-		}
-
----->		
