@@ -7,6 +7,8 @@
 <cfparam name="account" default=""> 			<!--- HomePortals account --->
 <cfparam name="page" default=""> 				<!--- page to load within account --->
 <cfparam name="refreshApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
+<cfparam name="action" default="">
+<cfparam name="cacheName" default="">
 <!----------------------------------->
 
 <!------- Application Root ----------->
@@ -32,8 +34,44 @@
 	
 	stHPTimers = application.homePortals.getTimers();
 	stPRTimers = request.oPageRenderer.getTimers();
+	
+	// get amount of free memory
+	jrt = CreateObject("java", "java.lang.Runtime");
+	freeMem = ( (jrt.getRuntime().freeMemory() / jrt.getRuntime().totalMemory() ) * 100 );
+	if(freeMem gt 50)
+		freeMemLabelColor = "green";
+	else if(freemem gt 15)
+		freeMemLabelColor = "orange";
+	else
+		freeMemLabelColor = "red";
+		
+	// get reference to cache registry
+	oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init();
+	tmpMsg = "";
 </cfscript>
 </cfsilent>
+
+<!--- Process Actions --->
+<cfswitch expression="#action#">
+	<cfcase value="clear">
+		<cfset oCacheRegistry.flush(cacheName)>
+		<cfset tmpMsg = "Cache [#cacheName#] deleted.">
+    </cfcase>
+    
+    <cfcase value="cleanup">
+		<cfset oCache = oCacheRegistry.getCache(cacheName)>
+		<cfset oCache.cleanup()>    
+		<cfset tmpMsg = "Cache [#cacheName#] cleared.">
+    </cfcase>
+    
+	<cfcase value="list">
+		<cfset oCache = oCacheRegistry.getCache(cacheName)>
+        <cfdump var="#oCache.list()#" label="#cacheName#">
+    </cfcase>
+</cfswitch>
+
+<!--- get list of caches --->
+<cfset lstCaches = oCacheRegistry.getCacheNames()>
 
 <cfoutput>
 	<html>
@@ -57,13 +95,32 @@
 				td, th {
 					padding:2px;
 				}
+				.msg {
+					font-size:13px;
+					border:1px solid silver;
+					padding:8px;
+					background-color:##ffffe1;
+					margin-bottom:20px;
+				}
 			</style>
 		</head>
 		<body>
-			<h2>HP3 - Debug Panel</h2>
+			<h2>HomePortals - Debug Panel</h2>
+
+			<cfif tmpMsg neq "">
+				<div class="msg">#tmpMsg#</div>
+			</cfif>
 
 			<table border="1">
-				<tr><th colspan="2">Application:</th></tr>
+				<tr>
+					<th colspan="2">
+						<div style="float:right;">
+							<a href="#cgi.SCRIPT_NAME#?refreshapp=1&account=#account#&page=#page#">Reset App</a> |
+							<a href="#cgi.SCRIPT_NAME#?account=#account#&page=#page#">Reload Page</a>
+						</div>
+						Application:
+					</th>
+				</tr>
 				<tr>
 					<td width="130"><b>App Root:</b></td>
 					<td>#request.appRoot#</td>
@@ -80,6 +137,10 @@
 					<td width="130"><b>HP Engine Version:</b></td>
 					<td>#hp.getVersion()#</td>
 				</tr>
+				<tr>
+					<td width="130"><b>Free JVM Memory:</b></td>
+					<td><span style="color:#freeMemLabelColor#">#decimalFormat(freeMem)#%</span></td>
+				</tr>
 			</table>
 			<br><br>
 
@@ -91,7 +152,7 @@
 				</tr>
 				<tr>
 					<td><b>HREF:</b></td>
-					<td>#request.oPageRenderer.getPageHREF()#</td>
+					<td><a href="#request.oPageRenderer.getPageHREF()#" target="_blank">#request.oPageRenderer.getPageHREF()#</td>
 				</tr>
 				<tr>
 					<td><b>Owner:</b></td>
@@ -172,7 +233,51 @@
 					</cfif>
 				</cfloop>
 			</table>			
-
+			
+			<br><br>
+			<table border="1">
+				<tr><th colspan="7">Cache Registry:</th></tr>
+				<tr>
+					<th width="10">No.</th>
+					<th>Cache Name</th>
+					<th>Current<br>Size</th>
+					<th>Max<br>Size</th>
+					<th>Hit/Miss</th>
+					<th>Last Reap</th>
+					<th>Actions</th>
+				</tr>
+				<cfset index = 1>
+				<cfloop list="#lstCaches#" index="cacheName">
+					<cfset oCache = oCacheRegistry.getCache(cacheName)>
+					<cfset stStats = oCache.getStats()>
+					<cfset cacheWarning = (stStats.currentSize gt stStats.maxSize or
+											(stStats.maxSize gte stStats.currentSize 
+											and stStats.currentSize/stStats.maxSize gt 0.9))>
+					<tr <cfif cacheWarning>style="background-color:pink;"</cfif>>
+						<td>#index#.</td>
+						<td>#cacheName#</td>
+						<td align="right">#stStats.currentSize#</td>
+						<td align="right">#stStats.maxSize#</td>
+						<td align="right">#stStats.hitCount# / #stStats.missCount#</td>
+						<td align="center">
+							<cfif stStats.lastReap neq "" and stStats.lastReap neq "12/30/1899">
+								#lsDateFormat(stStats.lastReap)#<br>#lsTimeFormat(stStats.lastReap)#
+							<cfelse>
+								-
+							</cfif>
+						</td>
+						<td align="center">
+							[<a href="#cgi.SCRIPT_NAME#?action=list&cacheName=#cacheName#">list</a>]
+							<cfif left(cacheName,2) neq "hp">
+								[<a href="#cgi.SCRIPT_NAME#?action=clear&cacheName=#cacheName#">clear</a>]
+							</cfif>
+							[<a href="#cgi.SCRIPT_NAME#?action=cleanup&cacheName=#cacheName#">reap</a>]
+						</td>
+					</tr>
+					<cfset index=index+1>
+				</cfloop>
+			</table>
+					
 		</body>
 	</html>
 </cfoutput>
