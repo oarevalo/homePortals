@@ -68,6 +68,18 @@ h2 {
 	font-weight:bold;
 	font-size:10px;
 }
+.SectionSettings {
+	background-color:#f5f5f5;
+	color:#000;
+	font-size:11px;
+	padding:8px;
+	border:1px solid silver;
+}
+.SectionSettings input {
+	border:1px solid black;
+	font-size:11px;
+	padding:1px;
+}	
 #h_loading {
 	position:absolute;
 	border:1px solid silver;
