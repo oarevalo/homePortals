@@ -37,6 +37,12 @@
 	<!-- Default TTL in minutes for content items on the content cache. This can be overriden for individual entries. -->
 	<contentCacheTTL>60</contentCacheTTL>
 
+	<!-- The maximum number of items to hold in the rss feeds cache -->
+	<contentCacheSize>50</contentCacheSize>
+
+	<!-- Default TTL in minutes for rss feeds on the rss cache.  -->
+	<contentCacheTTL>60</contentCacheTTL>
+
 	<!-- List with allowed types of base resources -->
 	<baseResourceTypes>script,style,header,footer</baseResourceTypes>
 	
