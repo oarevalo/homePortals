@@ -12,7 +12,7 @@
 	<!------------------------------------------------->
 	<!--- init				                	   ---->
 	<!------------------------------------------------->
-	<cffunction name="init" returntype="resourceLibrary" access="public">
+	<cffunction name="init" returntype="resourceLibrary" access="public" hint="This is the constructor">
 		<cfargument name="resourceLibraryPath" type="string" required="true">
 		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
 		<cfreturn this>
@@ -101,7 +101,7 @@
 	<!------------------------------------------------->
 	<!--- saveResource	                       	   ---->
 	<!------------------------------------------------->
-	<cffunction name="saveResource">
+	<cffunction name="saveResource" access="public" returntype="void" hint="Adds or updates a resource in the library">
 		<cfargument name="resourceBean" type="resourceBean" required="true" hint="the resource to add or update"> 		
 		<cfargument name="resourceBody" type="string" required="false" default="" hint="For resources that have local content, this is the text to save as the body of the resource">
 		
@@ -198,7 +198,7 @@
 	<!------------------------------------------------->
 	<!--- deleteResource	                       ---->
 	<!------------------------------------------------->
-	<cffunction name="deleteResource" access="public" returntype="void">
+	<cffunction name="deleteResource" access="public" returntype="void" hint="Removes a resource from the library. If the resource has a related file then the file is deleted">
 		<cfargument name="ID" type="string" required="true">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="package" type="string" required="true">
@@ -210,6 +210,7 @@
 			
 			if(arguments.id eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(arguments.package eq "") throw("No folder has been specified","homePortals.resourceLibrary.validation");
+			if(arguments.resourceType eq "module") throw("Module resources must be deleted manually","homePortals.resourceLibrary.invalidResourceType");
 			if(not listFindNoCase(variables.lstResourceTypes, arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
 			
 			resTypeDir = getResourceTypeDirName(arguments.resourceType);
@@ -252,9 +253,8 @@
 	<!---------------------------------------->
 	<!--- getResourcePackagesList		   --->
 	<!---------------------------------------->	
-	<cffunction name="getResourcePackagesList" returntype="query" access="public"
-				hint="returns a query with the names of all resource packages">
-		
+	<cffunction name="getResourcePackagesList" returntype="query" access="public" hint="returns a query with the names of all resource packages">
+		<cfargument name="resourceType" type="string" required="false" default="">
 		<cfscript>
 			var qry = QueryNew("ResType,Name");
 			var tmpDir = "";
@@ -263,8 +263,13 @@
 			var aItems = arrayNew(1);
 			var i = 0;
 			var j = 0;
-			var aResTypes = listToArray(variables.lstResourceTypes);
+			var aResTypes = arrayNew(1);
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
+			
+			if(arguments.resourceType neq "")
+				aResTypes[1] = arguments.resourceType;
+			else
+				aResTypes = listToArray(variables.lstResourceTypes);
 			
 			for(i=1;i lte arrayLen(aResTypes);i=i+1) {
 				res = aResTypes[i];
@@ -468,11 +473,11 @@
 	<cffunction name="getResourceTypeDirName" access="public" output="false" returntype="string" hint="Returns the name of the directory on the resource library for the given resource type">
 		<cfargument name="resourceType" type="string" required="true">
 		
-		<cfif listFind(variables.lstResourceTypes, arguments.resourceType)>
+		<cfif listFindNoCase(variables.lstResourceTypes, arguments.resourceType)>
 			<cfreturn ucase(left(arguments.resourceType,1)) & lcase(mid(arguments.resourceType,2,len(arguments.resourceType)-1)) & "s">
 		</cfif>
 		
-		<cfthrow message="Invalid resource type" type="homeportals.resourceLibrary.invalidResourceType">
+		<cfthrow message="Invalid resource type. [#resourceType#]" type="homeportals.resourceLibrary.invalidResourceType">
 	</cffunction>
 					
 				
