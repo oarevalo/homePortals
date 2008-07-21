@@ -47,6 +47,7 @@
 			var start = getTickCount();
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
+			var oRSSService = 0;
 			
 			variables.appRoot = arguments.appRoot;
 
@@ -89,6 +90,12 @@
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
 																			variables.oHomePortalsConfigBean.getPageCacheTTL());
 			oCacheRegistry.register("hpContentStoreCache", oCacheService);
+
+
+			// initialize cache for RSSService
+			oRSSService = createObject("component","RSSService").init(variables.oHomePortalsConfigBean.getRSSCacheSize(), 
+																		variables.oHomePortalsConfigBean.getRSSCacheTTL());
+			
 
 			variables.stTimers.init = getTickCount()-start;
 			return this;

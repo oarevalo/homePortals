@@ -23,6 +23,8 @@
 			variables.stConfig.pageCacheTTL = "";
 			variables.stConfig.contentCacheSize = "";
 			variables.stConfig.contentCacheTTL = "";
+			variables.stConfig.rssCacheSize = "";
+			variables.stConfig.rssCacheTTL = "";
 			variables.stConfig.baseResourceTypes = "";
 
 			variables.stConfig.renderTemplates = structNew();
@@ -106,6 +108,7 @@
 			var thisKey = "";
 			var thisResourceType = "";
 			var tmpXmlNode = 0;
+			var lstKeysIgnore = "version,renderTemplates,resources";
 
 			// create a blank xml document and add the root node
 			xmlConfigDoc = xmlNew();
@@ -113,13 +116,15 @@
 			xmlConfigDoc.xmlRoot.xmlAttributes["version"] = variables.stConfig.version;
 			
 			// save simple value settings
-			lstKeys = "initialEvent,layoutSections,bodyOnLoad,homePortalsPath,resourceLibraryPath,defaultAccount,SSLRoot,appRoot,accountsRoot,pageCacheSize,pageCacheTTL,contentCacheSize,contentCacheTTL,baseResourceTypes";
+			lstKeys = structKeyList(variables.stConfig);
+
 			for(i=1;i lte ListLen(lstKeys);i=i+1) {
 				thisKey = ListGetAt(lstKeys,i);
-
-				tmpXmlNode = xmlElemNew(xmlConfigDoc,thisKey);
-				tmpXmlNode.xmlText = variables.stConfig[thisKey];
-				arrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, tmpXmlNode);
+				if(not listFindNoCase(lstKeysIgnore, thisKey)) {
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,thisKey);
+					tmpXmlNode.xmlText = variables.stConfig[thisKey];
+					arrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, tmpXmlNode);
+				}	
 			}
 			
 			
@@ -211,9 +216,18 @@
 		<cfreturn val(variables.stConfig.contentCacheTTL)>
 	</cffunction>
 
+	<cffunction name="getRSSCacheSize" access="public" returntype="numeric" hint="The maximum number of items to hold in the RSS cache">
+		<cfreturn val(variables.stConfig.rssCacheSize)>	
+	</cffunction>
+
+	<cffunction name="getRSSCacheTTL" access="public" returntype="numeric" hint="Default TTL in minutes for content items on the RSS cache. This can be overriden for individual entries">
+		<cfreturn val(variables.stConfig.rssCacheTTL)>
+	</cffunction>
+
 	<cffunction name="getBaseResourceTypes" access="public" returntype="string" hint="List with allowed types of base resources">
 		<cfreturn variables.stConfig.baseResourceTypes>
 	</cffunction>	
+
 
 
 	<cffunction name="getBaseResourcesByType" access="public" returntype="array" hint="Returns all base resources of the given type">
@@ -313,6 +327,16 @@
 	<cffunction name="setContentCacheTTL" access="public" returntype="void">
 		<cfargument name="data" type="numeric" required="true">
 		<cfset variables.stConfig.contentCacheTTL = arguments.data>
+	</cffunction>
+
+	<cffunction name="setRSSCacheSize" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.rssCacheSize = arguments.data>	
+	</cffunction>
+
+	<cffunction name="setRSSCacheTTL" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.rssCacheTTL = arguments.data>
 	</cffunction>
 
 	<cffunction name="setBaseResourceTypes" access="public" returnType="void">
