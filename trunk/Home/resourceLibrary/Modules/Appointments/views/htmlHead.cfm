@@ -2,17 +2,6 @@
 <cfset moduleID = this.controller.getModuleID()>
 
 <style type="text/css">
-	.appointmentsSettings {
-		background-color:#fefcd8;
-		padding:10px;
-		margin:0px;
-		border:1px solid #cccccc;
-	}
-	.appointmentsSettings input {
-		border:1px solid black;
-		font-size:11px;
-		padding:1px;
-	}		
 	.calendar_appointments {
 		width:100%;
 		border-collapse:collapse;

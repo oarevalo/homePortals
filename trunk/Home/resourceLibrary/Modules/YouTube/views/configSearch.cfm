@@ -18,7 +18,7 @@
 </cfscript>
 
 <cfoutput>
-	<form name="frmSettings" action="##" method="post" class="RSSSettings">
+	<form name="frmSettings" action="##" method="post" class="SectionSettings">
 		<cfif Not stUser.isOwner>
 			<div style="font-weight:bold;color:red;">Only the owner of this page can make changes.</div><br>
 		</cfif>

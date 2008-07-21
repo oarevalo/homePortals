@@ -46,7 +46,7 @@
 </cfscript>
 
 <cfoutput>
-	<form name="frmBookmarksSettings" action="##" method="post" class="Bookmarks2Settings">
+	<form name="frmBookmarksSettings" action="##" method="post" class="SectionSettings">
 		<cfif Not bIsContentOwner>
 			<div style="font-weight:bold;color:red;">Only the owner of this page can make changes.</div><br>
 		</cfif>
