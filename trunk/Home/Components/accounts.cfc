@@ -379,6 +379,14 @@
 		<cfreturn createObject("component","friends").init(oAccountsConfigBean)>
 	</cffunction>
 
+	<!--------------------------------------->
+	<!----  getSite  			----->
+	<!--------------------------------------->
+	<cffunction name="getSite" access="public" hint="Returns the account's site object." returntype="site">
+		<cfargument name="AccountName" type="string" required="yes">
+		<cfreturn createObject("component","site").init(arguments.AccountName, this)>
+	</cffunction>
+
 
 
 
