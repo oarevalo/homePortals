@@ -4,6 +4,31 @@
 /*										*/
 /****************************************/
 
+-------------------------
+	07/20/08
+-------------------------
+- Removed secondary file-based cache from RSSService component, now only uses a one level in memory cache of feeds.
+- RSS Cache can now be configured from the main HomePortals config. The rss cache is now initialized when the Engine starts up.
+- Resources are no longer fully indexed at application startup time, they are indexed in memory as they are needed. This
+improves application startup time. Full indexing is still available programmatically.
+
+
+-------------------------
+	07/16/08
+-------------------------
+- Email address is no longer required when creating/updating accounts. All account fields can now be
+used when creating an account.
+
+-------------------------
+	07/05/08
+-------------------------
+- Fixed bug in EpochCalendar module that prevented the onSelectDate event to be detected
+
+-------------------------
+	07/04/08
+-------------------------
+- Modified cache registry to allow concurrent access to individual caches (before all cache access was single-threaded)
+- added contentStore caching to be managed by the cacheRegistry
 
 -------------------------
 	07/02/08
