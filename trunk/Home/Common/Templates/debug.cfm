@@ -31,7 +31,6 @@
 	html = request.oPageRenderer.renderPage();
 	
 	stHPTimers = application.homePortals.getTimers();
-	stCTimers = application.homePortals.getCatalog().getTimers();
 	stPRTimers = request.oPageRenderer.getTimers();
 </cfscript>
 </cfsilent>
@@ -118,18 +117,6 @@
 						<td width="10" align="right"><b>#row#.</b></td>
 						<td><em><b>Engine Initialization</b></em></td>
 						<td align="right" width="50"><b>#stHPTimers.init#</b></td>
-					</tr>
-					<cfset row = row + 1>
-					<tr>
-						<td width="10" align="right"><b>#row#.</b></td>
-						<td>+----<em>Catalog Initialization</em></td>
-						<td align="right">#stCTimers.init#</td>
-					</tr>
-					<cfset row = row + 1>
-					<tr>
-						<td width="10" align="right"><b>#row#.</b></td>
-						<td>+--------<em>Rebuild Catalog</em></td>
-						<td align="right">#stCTimers.rebuildcatalog#</td>
 					</tr>
 					<cfset row = row + 1>
 					<cfset pageTotalTime = pageTotalTime + stHPTimers.init>
