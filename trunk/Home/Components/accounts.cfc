@@ -231,8 +231,10 @@
 			<!--- create default.htm --->
 			<cffile action="write" file="#tmpAccDefault#" output="#txtDefault#"> 
 			
-			<!--- create site definition --->
-			<cffile action="write" file="#tmpAccSite#" output="#txtSite#"> 
+			<!--- create site definition (only if a site template has been given) --->
+			<cfif txtSite neq "">
+				<cffile action="write" file="#tmpAccSite#" output="#txtSite#"> 
+			</cfif>
 			
 			<cfcatch type="any">
 				<cfset objStorage.delete(newUserID)>
@@ -248,42 +250,22 @@
 	<!----  getAccountDefaultPage	    ----->
 	<!--------------------------------------->
 	<cffunction name="getAccountDefaultPage" access="public" hint="Returns the address of the account's main page." returntype="string">
-		<cfargument name="username" type="string" required="yes">
+		<cfargument name="accountName" type="string" required="yes">
 
 		<cfset var defaultPageHREF = "">
-		<cfset var defaultPageURL = oHomePortalsConfigBean.getAppRoot()>	
-		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
+		<cfset var oSite = 0>
+		<cfset var defaultPageURL = "">	
 		
-		<!--- read site definition --->
-		<cfset var siteURL = accountsRoot & "/" & arguments.username & "/site.xml">
-		<cfset var xmlSiteDoc = xmlParse(ExpandPath(siteURL))>
-		
-		<!--- get site pages --->
-		<cfset var aPages = xmlSiteDoc.xmlRoot.pages>
-		
-		<!--- find default page (in case there is more than one, we use the first one we find) --->
-		<cfloop from="1" to="#arrayLen(aPages.xmlChildren)#" index="i">
-			<cfset thisPage = aPages.xmlChildren[i]>
-			<cfparam name="thisPage.xmlAttributes.default" default="false">
-			<cfparam name="thisPage.xmlAttributes.private" default="false">
-			<cfif isboolean(thisPage.xmlAttributes.default) and thisPage.xmlAttributes.default>
-				<cfset defaultPageHREF = thisPage.xmlAttributes.href>
-				<cfbreak>
-			</cfif>
-		</cfloop>
-		
-		<!--- if there is no default page defined for this account, go to the first one --->
-		<cfif defaultPageHREF eq "" and arrayLen(aPages.xmlChildren) gt 0>
-			<cfset defaultPageHREF = aPages.xmlChildren[1].xmlAttributes.href>
-		</cfif>
+		<cfset oSite = getSite(arguments.accountName)>
 
-		<!--- if we found a page within the account then go there --->
+		<cfset defaultPageHREF = oSite.getDefaultPage()>
+
 		<cfif defaultPageHREF neq "">
-			<cfset defaultPageURL = accountsRoot
-									& "/" & arguments.username & "/layouts/" 
+			<cfset defaultPageURL = variables.oAccountsConfigBean.getAccountsRoot()
+									& "/" 
+									& arguments.accountName 
+									& "/layouts/" 
 									& defaultPageHREF>
-		<cfelse>
-			<cfset defaultPageURL = defaultPageHREF>
 		</cfif>
 		
 		<cfreturn defaultPageURL>

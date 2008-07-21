@@ -4,6 +4,14 @@
 /*										*/
 /****************************************/
 
+
+-------------------------
+	07/21/08
+-------------------------
+- added getSite method to accounts.cfc
+- improved debug.cfm and cacheManager.cfm tools. Added control for resetting application and reloading current page
+to debug.cfm. Debug now shows cache information. Added JVM free memory stats to both
+
 -------------------------
 	07/20/08
 -------------------------
