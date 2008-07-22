@@ -74,7 +74,12 @@
 		<cfscript>
 			var stResourceInfo = structNew();
 			var oResourceLibrary = 0;
+			
+			// Make sure the resourceID does not have any XML escaped characters
+			arguments.resourceID = XMLUnformat(arguments.resourceID);
 
+			// check if the resource type has been loaded and that the requested resource is in memory,
+			// if not, then load the resource type to memory
 			if(not StructKeyExists(variables.mapResources, arguments.resourceType)
 				or not StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)) {
 				loadResourcesByType(arguments.resourceType);
@@ -373,5 +378,17 @@
 		<cfargument name="data" type="any">
 		<cfdump var="#arguments.data#">
 	</cffunction>
-		
+
+	<cffunction name="XMLUnformat" access="private" returntype="string">
+		<cfargument name="string" type="string" default="">
+		<cfscript>
+			var resultString=arguments.string;
+			resultString=ReplaceNoCase(resultString,"&apos;","'","ALL");
+			resultString=ReplaceNoCase(resultString,"&quot;","""","ALL");
+			resultString=ReplaceNoCase(resultString,"&lt;","<","ALL");
+			resultString=ReplaceNoCase(resultString,"&gt;",">","ALL");
+			resultString=ReplaceNoCase(resultString,"&amp;","&","ALL");
+		</cfscript>
+		<cfreturn resultString>
+	</cffunction>				
 </cfcomponent>
