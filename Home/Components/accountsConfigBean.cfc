@@ -1,7 +1,7 @@
 <cfcomponent displayname="accountsConfigBean" hint="A bean to store the HomePortals accounts configuration. Configuration is per-application">
 
 	<cfset variables.stConfig = StructNew()>
-	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,siteTemplate,storageType,storageCFC,accountsTable,datasource,username,password,dbtype,storageFileHREF">
+	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,storageType,storageCFC,accountsTable,datasource,username,password,dbtype,storageFileHREF">
 
 	<cffunction name="init" access="public" returntype="accountsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -11,7 +11,6 @@
 			variables.stConfig.accountsRoot = "";
 			variables.stConfig.newAccountTemplate = "";
 			variables.stConfig.newPageTemplate = "";
-			variables.stConfig.siteTemplate = "";
 			variables.stConfig.storageType = "xml";
 			variables.stConfig.storageCFC = "";
 			variables.stConfig.accountsTable = "";
@@ -97,10 +96,6 @@
 		<cfreturn variables.stConfig.newPageTemplate>
 	</cffunction>
 
-	<cffunction name="getSiteTemplate" access="public" returntype="string">
-		<cfreturn variables.stConfig.siteTemplate>
-	</cffunction>
-
 	<cffunction name="getStorageType" access="public" returntype="string">
 		<cfreturn variables.stConfig.storageType>
 	</cffunction>
@@ -148,11 +143,6 @@
 	<cffunction name="setNewPageTemplate" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.newPageTemplate = arguments.data>
-	</cffunction>
-
-	<cffunction name="setSiteTemplate" access="public" returntype="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.siteTemplate = arguments.data>
 	</cffunction>
 
 	<cffunction name="setStorageType" access="public" returntype="void">
