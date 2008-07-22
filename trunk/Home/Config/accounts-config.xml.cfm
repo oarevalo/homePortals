@@ -11,7 +11,6 @@
 	<!-- Default templates -->
 	<newAccountTemplate>/Home/Common/AccountTemplates/default.xml</newAccountTemplate>
 	<newPageTemplate>/Home/Common/AccountTemplates/newPage.xml</newPageTemplate>
-	<siteTemplate>/Home/Common/AccountTemplates/site.xml</siteTemplate>
 	
 	<!-- Account Storage -->
 	<storageType>xml</storageType>

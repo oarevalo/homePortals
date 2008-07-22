@@ -1,7 +1,6 @@
 <cfcomponent hint="This component is used to manipulate a user site">
 
 	<cfscript>
-		variables.userID = "";
 		variables.accounts = 0;
 		variables.siteURL = "";
 		variables.xmlDoc = 0;
@@ -508,21 +507,18 @@
 	<!---------------------------------------->
 	<!--- getPage			               --->
 	<!---------------------------------------->	
-	<cffunction name="getPage" access="public" returntype="pageBean" output="false">
+	<cffunction name="getPage" access="public" returntype="pageBean" output="false" hint="Returns a pageBean object representing a site page">
 		<cfargument name="pageHREF" type="string" required="true" hint="The page to get">
 		<cfscript>
 			var pageIndex = 0;
-			var i = 1;
 			var layoutsHREF = getDirectoryFromPath(variables.siteURL) & "/layouts";
+			var oPage = 0;
 	
-			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
-				if(variables.aPages[i].href eq arguments.pageHREF) {
-					pageIndex = i;
-					break;
-				}
-			}
-			if(pageIndex eq 0) throw("page not found.");
+			// find page info
+			pageIndex = getPageIndex(arguments.pageHREF);
+			if(pageIndex eq 0) throw("Page not found in site.");
 
+			// create page object
 			oPage = createObject("component","pageBean").init(layoutsHREF & "/" & arguments.pageHREF);
 			
 			return oPage;	
@@ -538,6 +534,11 @@
 		<cfset var xmlDoc = arguments.page.toXML()>
 		<!--- get page location --->
 		<cfset var href = arguments.page.getHREF()>	
+		<!--- check that page exists in site --->
+		<cfset var pageIndex = getPageIndex( getFileFromPath(href) )>
+		<cfif pageIndex eq 0>
+			<cfset throw("Page not found in site")>
+		</cfif>
 		<!--- store page --->
 		<cffile action="write" file="#expandpath(href)#" output="#toString(xmlDoc)#">
 		<!--- update page title in site --->
@@ -624,6 +625,19 @@
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" required="false" default="homePortals.site.error">
 		<cfthrow  message="#arguments.message#" type="#arguments.type#">
+	</cffunction>
+	
+	<cffunction name="getPageIndex" access="private" returntype="numeric" hint="Returns the index of the requested page in the local pages array. Returns 0 if page is not found">
+		<cfargument name="pageHREF" type="string" required="true">
+		<cfscript>
+			var i = 1;
+			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
+				if(variables.aPages[i].href eq arguments.pageHREF) {
+					return i;
+				}
+			}
+			return 0;
+		</cfscript>
 	</cffunction>
 	
 </cfcomponent>

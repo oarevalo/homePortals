@@ -164,7 +164,7 @@
 	<!----  createAccount				  ----->
 	<!--------------------------------------->
 	<cffunction name="createAccount" access="public" hint="Creates a new account" returntype="string">
-		<cfargument name="username" type="string" required="yes">
+		<cfargument name="accountName" type="string" required="yes">
 		<cfargument name="Password" type="string" required="yes">
 		<cfargument name="FirstName" type="string" required="no" default="">
 		<cfargument name="MiddleName" type="string" required="no" default="">
@@ -182,34 +182,32 @@
 		<cfset var tmpAccDefault = "">
 		<cfset var tmpAccSite = "">
 		<cfset var tmpAccContent = "">
-		<cfset var newUserID = createUUID()>
+		<cfset var newAccountID = createUUID()>
 		<cfset var objStorage = getAccountStorage()>
 		<cfset var stHPConfig = "">
 		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
 		
 		<!--- validate username --->
-		<cfset qry = getAccountByUsername(arguments.username)>
+		<cfset qry = getAccountByUsername(arguments.accountName)>
 		<cfif qry.RecordCount gt 0>
 			<cfthrow message="The given account name already exists. Please choose another." type="homeportals.accounts.usernameExists">
 		</cfif>
 		
 		<cftry>
 			<!--- insert record in account storage --->
-			<cfset newUserID = objStorage.create(arguments.username, Arguments.Password, arguments.firstName, arguments.middleName, arguments.lastName, arguments.email)>
+			<cfset newAccountID = objStorage.create(arguments.accountName, Arguments.Password, arguments.firstName, arguments.middleName, arguments.lastName, arguments.email)>
 			
 			<!--- get homeportals settings --->
 			<cfset hpEngineRoot = oHomePortalsConfigBean.getHomePortalsPath()>
 			
 			<!--- create user space --->
-			<cfset txtDefault = processTemplate(Arguments.Username,'#hpEngineRoot#/Common/AccountTemplates/index.txt')>
-			<cfset txtPublic = processTemplate(Arguments.Username, oAccountsConfigBean.getNewAccountTemplate())>
-			<cfset txtSite = processTemplate(Arguments.Username, oAccountsConfigBean.getSiteTemplate())>
+			<cfset txtDefault = processTemplate(Arguments.accountName,'#hpEngineRoot#/Common/AccountTemplates/index.txt')>
+			<cfset txtPublic = processTemplate(Arguments.accountName, oAccountsConfigBean.getNewAccountTemplate())>
 	
 			<!--- define locations for the default account files --->
-			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#Arguments.Username#/")>
-			<cfset tmpAccPublic = ExpandPath("#accountsRoot#/#Arguments.Username#/layouts/" & GetFileFromPath(oAccountsConfigBean.getNewAccountTemplate()))>
-			<cfset tmpAccDefault = ExpandPath("#accountsRoot#/#Arguments.Username#/index.cfm")>
-			<cfset tmpAccSite = ExpandPath("#accountsRoot#/#Arguments.Username#/site.xml")>
+			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#Arguments.accountName#/")>
+			<cfset tmpAccPublic = ExpandPath("#accountsRoot#/#Arguments.accountName#/layouts/" & GetFileFromPath(oAccountsConfigBean.getNewAccountTemplate()))>
+			<cfset tmpAccDefault = ExpandPath("#accountsRoot#/#Arguments.accountName#/index.cfm")>
 			
 			<!--- create directory structure --->
 			<cftry>
@@ -231,18 +229,13 @@
 			<!--- create default.htm --->
 			<cffile action="write" file="#tmpAccDefault#" output="#txtDefault#"> 
 			
-			<!--- create site definition (only if a site template has been given) --->
-			<cfif txtSite neq "">
-				<cffile action="write" file="#tmpAccSite#" output="#txtSite#"> 
-			</cfif>
-			
 			<cfcatch type="any">
-				<cfset objStorage.delete(newUserID)>
+				<cfset objStorage.delete(newAccountID)>
 				<cfrethrow>			
 			</cfcatch>
 		</cftry>
 		
-		<cfreturn newUserID>
+		<cfreturn newAccountID>
 	</cffunction>
 
 
