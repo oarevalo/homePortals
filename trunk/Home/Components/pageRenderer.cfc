@@ -676,7 +676,7 @@
 			var oCache = 0;
 			
 			try {
-				if(arguments.moduleNode.cache) {
+				if(isBoolean(arguments.moduleNode.cache) and arguments.moduleNode.cache) {
 					// get the content cache (this will initialize it, if needed)
 					oCache = getContentCache();
 
@@ -694,7 +694,10 @@
 						tmpHTML = retrieveContent( arguments.moduleNode );
 						
 						// update cache
-						oCache.store(cacheKey, tmpHTML, arguments.moduleNode.cacheTTL);
+						if(arguments.moduleNode.cacheTTL neq "" and val(arguments.moduleNode.cacheTTL) gte 0)
+							oCache.store(cacheKey, tmpHTML, val(arguments.moduleNode.cacheTTL));
+						else
+							oCache.store(cacheKey, tmpHTML);
 					}
 					
 				} else {
