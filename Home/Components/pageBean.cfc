@@ -155,8 +155,8 @@
 									if(Not structKeyExists(args, "resourceID")) args["resourceID"] = ""; 
 									if(Not structKeyExists(args, "resourceType")) args["resourceType"] = variables.DEFAULT_CONTENT_RESOURCE_TYPE; 
 									if(Not structKeyExists(args, "href")) args["href"] = ""; 
-									if(Not structKeyExists(args, "cache")) args["cache"] = variables.DEFAULT_CONTENT_CACHE; 
-									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = variables.DEFAULT_CONTENT_CACHE_TTL; 
+									if(Not structKeyExists(args, "cache")) args["cache"] = ""; 
+									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = ""; 
 									break;
 							}
 	
@@ -317,8 +317,7 @@
 								bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_CONTENT_RESOURCE_TYPE and aTemp[i][attr] neq "");
 							break;
 						case "cacheTTL":
-							bWriteAttribute = (aTemp[i].moduleType eq "content") and 
-												 (aTemp[i][attr] neq variables.DEFAULT_CONTENT_CACHE_TTL and val(aTemp[i][attr]) neq 0);
+							bWriteAttribute = (aTemp[i].moduleType eq "content" and aTemp[i][attr] neq "");
 							break;
 						case "name":
 							bWriteAttribute = (aTemp[i].moduleType eq "module");	// this attribute is only needed for type "module"
@@ -332,7 +331,6 @@
 				arrayAppend(xmlNode.xmlChildren, xmlNode2);
 			}
 			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
-			
 			
 			// add skin
 			if(variables.instance.skinID neq "") {
@@ -411,7 +409,7 @@
 	<!--- Stylesheets			           --->
 	<!---------------------------------------->			
 	<cffunction name="getStylesheets" access="public" returntype="array" hint="returns an array with all stylesheets on the page">
-		<cfreturn variables.instance.aStyles>
+		<cfreturn duplicate(variables.instance.aStyles)>
 	</cffunction>
 
 	<cffunction name="addStylesheet" access="public" returnType="void" hint="adds a stylesheet to the page">
@@ -450,7 +448,7 @@
 	<!--- Scripts				           --->
 	<!---------------------------------------->	
 	<cffunction name="getScripts" access="public" returntype="array">
-		<cfreturn variables.instance.aScripts>
+		<cfreturn duplicate(variables.instance.aScripts)>
 	</cffunction>
 
 	<cffunction name="addScript" access="public" returnType="void">
@@ -489,7 +487,7 @@
 	<!--- Event Listeners		           --->
 	<!---------------------------------------->	
 	<cffunction name="getEventListeners" access="public" returntype="array">
-		<cfreturn variables.instance.aEventListeners>
+		<cfreturn duplicate(variables.instance.aEventListeners)>
 	</cffunction>
 
 	<cffunction name="addEventListener" access="public" returnType="void">
@@ -533,7 +531,7 @@
 	<!--- Layout Regions		           --->
 	<!---------------------------------------->	
 	<cffunction name="getLayoutRegions" access="public" returntype="array">
-		<cfreturn variables.instance.aLayouts>
+		<cfreturn duplicate(variables.instance.aLayouts)>
 	</cffunction>
 
 	<cffunction name="addLayoutRegion" access="public" returnType="void">
@@ -593,12 +591,12 @@
 	<!--- Modules				           --->
 	<!---------------------------------------->	
 	<cffunction name="getModules" access="public" returntype="array">
-		<cfreturn variables.instance.aModules>
+		<cfreturn duplicate(variables.instance.aModules)>
 	</cffunction>
 
 	<cffunction name="getModule" access="public" returntype="struct">
 		<cfargument name="moduleID" type="string" required="true">
-		<cfreturn variables.instance.aModules[getModuleIndex(arguments.moduleID)]>
+		<cfreturn duplicate(variables.instance.aModules[getModuleIndex(arguments.moduleID)])>
 	</cffunction>
 
 	<cffunction name="setModule" access="public" returntype="void">
@@ -681,7 +679,7 @@
 	<!--- User-Defined Meta Tags           --->
 	<!---------------------------------------->	
 	<cffunction name="getMetaTags" access="public" returntype="array">
-		<cfreturn variables.instance.aMeta>
+		<cfreturn duplicate(variables.instance.aMeta)>
 	</cffunction>
 
 	<cffunction name="addMetaTag" access="public" returnType="void">
@@ -749,7 +747,7 @@
 	<!--- getMemento			           --->
 	<!---------------------------------------->	
 	<cffunction name="getMemento" access="public" returntype="struct" output="False">
-		<cfreturn variables.instance>
+		<cfreturn duplicate(variables.instance)>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -769,5 +767,15 @@
 			variables.instance.aMeta = ArrayNew(1);	
 		</cfscript>	
 	</cffunction>
+
+
+<cffunction name="dump">
+<cfargument name="data" type="any">
+<cfdump var="#arguments.data#">
+</cffunction>
+
+<cffunction name="abort">
+<Cfabort>
+</cffunction>
 
 </cfcomponent>
