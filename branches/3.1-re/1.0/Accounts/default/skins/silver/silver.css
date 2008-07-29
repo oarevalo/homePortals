@@ -1,0 +1,69 @@
+/********************* HomePortals Skins: Silver **********************/
+/* Show only to IE PC \*/
+* html .SectionTitle h2 {height: 1%;} /* For IE 5 PC */
+
+.Section {
+	margin: 3px;
+	/*width: 17em; *//* ems so it will grow */
+	background: url(/Accounts/default/skins/silver/bottom_right.gif) no-repeat bottom right;
+	/*font-size: 100%;*/
+	border:0px;
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+}
+.SectionTitle {
+	background: url(/Accounts/default/skins/silver/top_right.gif) no-repeat top right;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	width:100%;    /* IE only */
+}
+html>body .SectionTitle {
+	width:auto;  /* override IE only rule for other browsers */
+}
+
+.SectionTitle a {
+	color:#333333;
+}
+.SectionTitle h2 {
+	text-align: left;
+	background: url(/Accounts/default/skins/silver/top_left.gif) no-repeat top left;
+	margin: 0;
+	padding: 9px 9px 10px 9px;
+	color: #333333; 
+	font-weight: bold; 
+	font-size: 1.2em; 
+	line-height: 1em;
+	text-shadow: rgba(0,0,0,.4) 0px 2px 5px; /* Safari-only, but cool */
+	vertical-align:middle;
+	width:100%;    /* IE only */
+}
+html>body .SectionTitle h2 {
+	width:auto;  /* override IE only rule for other browsers */
+}
+
+.SectionBody {
+	background: url(/Accounts/default/skins/silver/bottom-left.gif) no-repeat bottom left;
+	margin: 0;
+	padding: 10px;
+	width:100%;    /* IE only */
+}
+html>body .SectionBody {
+	width:auto;  /* override IE only rule for other browsers */
+}
+#header_Body {
+	padding:0px;
+	margin:0px;
+}
+#header_BodyRegion {
+	padding:0px;
+	margin:0px;
+}
+
+.leftcolumn {
+	width:240px;
+}
+
+.rightcolumn {
+	width:250px;
+}

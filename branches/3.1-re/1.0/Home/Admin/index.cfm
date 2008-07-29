@@ -1,0 +1,1 @@
+<cfset GetPageContext().forward("home.cfm")>

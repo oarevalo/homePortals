@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this file is only used as an editable configuration file
+	to set the path to the actual updateSite config file
+	in case it needs to be changed -->
+<config>
+	<homeRoot>/home/</homeRoot>
+</config>

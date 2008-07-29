@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adminPlugin id="distManager" version="1.0">
+	<description>
+		This plugin adds the option to create and manage a HomePortals Update Site
+	</description>
+	
+	<menu optionGroupLabel="Library">
+		<option label="Publish" view="distManager/publish" />
+	</menu>
+	
+	<views>
+		<view id="distManager/publish" />
+		<view id="distManager/addPackage" />
+		<view id="distManager/editPackageInfo" />
+	</views>
+	
+	<events>
+		<event id="distManager.doSaveInfo" component="eventHandlers.distManager.ehDistribution" method="doSaveInfo" />
+		<event id="distManager.doAddPackage" component="eventHandlers.distManager.ehDistribution" method="doAddPackage" />
+		<event id="distManager.doRemovePackage" component="eventHandlers.distManager.ehDistribution" method="doRemovePackage" />
+		<event id="distManager.doSavePackageInfo" component="eventHandlers.distManager.ehDistribution" method="doSavePackageInfo" />
+	</events>
+
+</adminPlugin>

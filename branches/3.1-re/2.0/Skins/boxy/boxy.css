@@ -1,0 +1,27 @@
+/* CSS Document */
+
+body {
+	background-color:#FFFFFF;
+}
+.Section {
+	margin:10px;
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+	border:1px solid black;
+}
+.SectionTitle {
+	background-color:#CCCCCC;
+	color:#000000;
+	border-bottom:2px solid #000000;
+}	
+.leftcolumn {
+	width:250px;
+}
+
+.rightcolumn {
+	width:250px;
+}
+
+
+
+

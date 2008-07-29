@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+	<skins>
+		<skin id="Rounded" href="/accounts/default/skins/rounded/rounded.css">Gives rounded corners to modules.</skin>
+		<skin id="Rounded (green)" href="/home/modules/skins/rounded-green/rounded.css">Gives rounded corners to modules. Green background.</skin>
+		<skin id="thrashbox" href="/accounts/default/skins/thrashbox/thrashbox.css">Rounded corners with shadow and header of different color.</skin>
+	</skins>	
+</catalog>

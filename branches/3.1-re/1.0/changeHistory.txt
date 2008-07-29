@@ -1,0 +1,63 @@
+HomePortals Portal Server --- Change History
+
+4/12/06 - v 1.32
+- fixed: bug in zip/unzip of modules
+- added: file mgmnt features to Accounts Admin plugin
+
+4/8/06 - v 1.31
+- all config files are stored in Config directory
+- added setting to accounts to allow account creation by visitors
+- added plugin support for HomePortals Administrator
+- added account manager plugin
+- added library manager plugin
+- added updateSite plugin (allows to publish packages for other HomePortal servers to download)
+
+3/24/06 - v 1.3
+- added option to set any page on a user's site as default homeportals page to load
+- changed default.htm in to index.cfm for account's start page. 
+- templates for new account's main page, site definition file and new page are defined on the accounts config.xml
+- template to use for new pages added to an account is now defined centrally for all homeportals accounts. 
+	The template file is defined on the accounts conf xml
+
+3/21/06 - v 1.24
+- added "header" and "footer" to base resources. These are displayed on every page.
+- fixed error handling on flickr module
+- accounts functionality and nav menu are now defined as base resources. They no longer
+need to be added as modules, so it is transparent to the user.
+- improved visual appearance of sitemap, added links for common tasks. Tasks are dynamic according to context.
+
+3/10/06 - v 1.23
+- fixed owner check bug in bookmarks2 and editBox modules
+- fixed account object instantiation in admin (now uses instantiates via relative path)
+- added "silver" skin
+
+3/8/06 - v. 1.22
+- removed appController from admin (no longer used)
+- fixed bug: unable to transform file path into component path for admin app in Mac OSX. Changed component
+	instantiation to use java's TemplateProxyFactory object to instantiate using relative paths.
+
+2/22/06 - v. 1.21
+- changes to RSSReader and Bookmarks2 modules
+- add password for HomePortals admin, license is no longer needed to access it. Added change password option.
+
+2/6/06
+home.cfm
+- id for main table
+
+homeportals.cfc
+- added default id for locations
+- changed default id for module to not use random numbers
+- added h_enableModuleDrag() to onload events
+
+main.js
+- added h_enableModuleDrag() function
+
+general
+- added general resource scriptaculous
+- use prototype 1.4 final version
+
+siteMap.css
+- added z-index:9999; to #editContent_BodyRegion
+- fixed overflow problem on controlpanel
+
+

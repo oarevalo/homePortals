@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<modules>
+	<!-- ********   Image  ************ -->
+	<module access="general" id="Image" name="Image/image">
+		<description>
+			This modules displays an image.
+		</description>
+		<attributes>
+			<attribute description="Image source" name="src" required="true"/>
+			<attribute description="URL to visit when clicking on the image" name="href" required="false" default="" />
+			<attribute description="Image width" name="width" required="false" default="" />
+			<attribute description="Image height" name="height" required="false" default="" />
+			<attribute description="Image description" name="alt" required="false" default="" />
+ 		</attributes>
+	</module>
+</modules>
+</catalog>

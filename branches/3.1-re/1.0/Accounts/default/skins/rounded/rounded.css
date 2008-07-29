@@ -1,0 +1,54 @@
+/********************* HomePortals Skins: Rounded **********************/
+/* Show only to IE PC \*/
+* html .SectionTitle h2 {height: 1%;} /* For IE 5 PC */
+
+.Section {
+	margin: 0 auto; /* center for now */
+	/*width: 17em; *//* ems so it will grow */
+	background: url(/Accounts/default/skins/rounded/sbbody-r.gif) no-repeat bottom right;
+	/*font-size: 100%;*/
+	border:0px;
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+}
+.SectionTitle {
+	background: url(/Accounts/default/skins/rounded/sbhead-r.gif) no-repeat top right;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+}
+.SectionTitle a {
+	color:white;
+}
+.SectionTitle h2 {
+	text-align: left;
+	background: url(/Accounts/default/skins/rounded/sbhead-l.gif) no-repeat top left;
+	margin: 0;
+	padding: 22px 30px 5px;
+	color: white; 
+	font-weight: bold; 
+	font-size: 1.2em; 
+	line-height: 1em;
+	text-shadow: rgba(0,0,0,.4) 0px 2px 5px; /* Safari-only, but cool */
+}
+.SectionBody {
+	background: url(/Accounts/default/skins/rounded/sbbody-l.gif) no-repeat bottom left;
+	margin: 0;
+	padding: 5px 30px 31px;
+}
+#header_Body {
+	padding:0px;
+	margin:0px;
+}
+#header_BodyRegion {
+	padding:0px;
+	margin:0px;
+}
+
+.leftcolumn {
+	width:240px;
+}
+
+.rightcolumn {
+	width:250px;
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+<path>/Home/Modules/Blog/</path>
+<modules>
+	<!-- ********   blog  ************ -->
+	<module access="general" id="blog" name="Home.Modules.Blog.blog">
+		<description>
+			Module to allow a user to post comments or text. Can be displaed in 
+			readonly or edit modes.
+		</description>
+		<attributes>
+			<attribute description="[Optional] Indicates the URL of a document where to store the blog contents. Leave empty to use default storage." name="url" required="true"/>
+		</attributes>
+		<eventListeners>
+			<event eventHandler="$ID$.getPosts" eventName="PageLoaded" objectName="Framework"/>
+			<event eventHandler="$ID$.getPosts" eventName="PostSaved" objectName="Blog"/>
+		</eventListeners>		
+	</module>	
+</modules>
+</catalog>

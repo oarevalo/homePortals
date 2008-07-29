@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<homePortals version="1.31">
+	
+	<!-- base path for the HomePortals installation -->
+	<homePortalsPath>/Home/</homePortalsPath>
+
+	<!-- administrator email -->
+	<adminEmail />
+	
+	<!-- Default directory where HomePortals will look for modules,
+		unless a relative path or external URL is given in
+		the Name attribute of a module -->
+	<moduleLibraryPath>/Home/Modules/</moduleLibraryPath>
+	
+	<!-- Event raised when a HomePortals page finishes loading -->
+	<initialEvent>Framework.PageLoaded</initialEvent>
+	
+	<!-- layout section names -->
+	<layoutSections>header,column,footer</layoutSections>
+	
+	<!-- HomePortal page to load when no page has been provided -->
+	<defaultPage>/Accounts/default/layouts/public.xml</defaultPage>
+	
+	<!-- SSLRoot is the root path to be prepended to all page calls when using HTTPS -->
+	<SSLRoot>/</SSLRoot>
+
+	<!-- The following resources are included in every page rendered.
+		valid types for the Type attribute are: style, script, header and footer
+	 -->
+	<baseResources>
+		<resource href="/Home/Common/JavaScript/prototype-1.4.0.js" type="script"/>
+		<resource href="/Home/Common/JavaScript/Main.js" type="script"/>
+		<resource href="/home/modules/Accounts/controlPanel.js" type="script" />
+		<resource href="/Home/Common/CSS/Main.css" type="style"/>
+		<resource href="/Home/Modules/Accounts/siteMap.css" type="style" />
+		<resource href="/Home/Modules/Accounts/siteMap.cfm" type="header" />
+		<resource href="/Home/Common/Templates/footer.cfm" type="footer" />
+	</baseResources>
+
+	<!-- The following section contains the icons appear on each container on the page.
+		 The module id will be passed as the only parameter to the function given 
+		 in the onClickFunction attribute -->
+	<moduleIcons>
+		<icon alt="Print this module" image="/Home/Common/Images/print.gif" onClickFunction="h_Print"/>
+		<icon alt="Configure module" image="/Home/Common/Images/isettings.gif" onClickFunction="controlPanel.editModule"/>
+	</moduleIcons>
+		
+</homePortals>

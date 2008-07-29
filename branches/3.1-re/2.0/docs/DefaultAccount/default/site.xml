@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+	<title>HomePortals Portal Server</title>
+	<pages>
+		<page default="true" href="default.xml" showInNav="false" title="Home"/>
+	</pages>
+</site>

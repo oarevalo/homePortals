@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>HomePortals User Guide</title>
+<link rel="stylesheet" type="text/css" href="main.css"></head>
+
+<body>
+<div class="body">
+<h1>HomePortals User Guide </h1>
+
+<p><strong>Contents:</strong>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#modules">Modules</a></li>
+  <li><a href="#accounts">HomePortals Accounts</a></li>
+  <li><a href="#sitemap">SiteMap</a></li>
+  <li><a href="#controlpanel">Control Panel</a>
+    <ul>
+      <li><a href="#cp_addpage">Add Page...</a></li>
+      <li><a href="#cp_configpage">Config Page...</a></li>
+      <li><a href="#cp_deletepage">Delete This Page...</a></li>
+      <li><a href="#cp_publishpage">Publish Page...</a></li>
+      <li><a href="#cp_editpage">Edit Page XML...</a></li>
+      <li><a href="#cp_configmodules">Config Modules...</a></li>
+      <li><a href="#cp_addmodules">Add Modules...</a></li>
+      <li><a href="#cp_reloadpage">Reload Page</a></li>
+      <li><a href="#cp_logoff">Log Off         </a></li>
+    </ul>
+  </li>
+  <li><a href="#catalogs">Catalogs</a></li>
+  <li><a href="#events">Events</a></li>
+  <li><a href="#sharing">Sharing Pages</a></li>
+  <li><a href="#comments">Comments, Suggestions and Feedback.</a></li>
+</ul>
+
+
+<h2>Overview<a name="overview"></a></h2>
+<p>HomePortals is a free-form environment that allows you to create your own web pages by combining 
+the functionality of individual elements called modules.</p>
+
+
+
+<h2>Modules<a name="modules"></a></h2>
+<p>Each HomePortals page is made up of one or more elements called "Modules". Modules provide certain 
+functionalities, ranging from simple things such as displaying an image, or an RSS Feed, to more complex 
+elements like a blog or ToDo list.</p>
+<p>Modules can be used by themselves, or they can be combined via <a href="#events">Events</a> to achieve more complex functionalities.</p>
+<p>All modules have certain attributes or parameters that can be used to configure their appearance and functionality. 
+Some attributes, like the container title or location on the page are common to all modules in HomePortals, but others 
+are specific to the module. For example, a module to display an RSS feed, may require the URL of the actual feed.</p>
+<p>All module attributes can be set via the <a href="#controlpanel">Control Panel</a>.</p>
+<p>Even though modules usually include a visual component that is displayed on the screen, some modules may provide 
+some functionality that may not be directly visible. For example, a module can be used to apply a "skin" to a page, 
+meaning that it can be used to alter the visual appearance of all the other modules.</p>
+<p>In HomePortals, modules are actually a combination of several items, which may include CSS, Javascript, HTML, 
+Server-side code and XML documents. However, by using the Control Panel, users may add or remove modules without 
+having to worry about the individual files that compose each module.</p>
+
+
+<h2>HomePortals Accounts<a name="accounts"></a></h2>
+<p>HomePortals is a multi-user environment, meaning that individual users can have their own personal area which 
+they can configure to their liking. Each user or "Account" has a small site in which they can create their own 
+pages to fill with whatever content they want. All accounts are protected by a username and password, and have 
+their own space on the server where they can store their pages. Users can access individual account sites 
+directly by typing <em>http://&lt;your_server&gt;/accounts/&lt; account_name &gt;</em>.</p>
+<p>Only the owner of the account is allowed to modify page contents, add new pages or delete existing pages.</p>
+<p>Each page within an account can be either Private or Public. Public pages are visible by anyone that accesses 
+the page and are displayed on the account's <a href="#sitemap">SiteMap</a>. Private pages may only be accessed by the account owner, 
+and only after they have logged in with the account username and password. Private pages are only displayed 
+on the sitemap after the owner has logged in.</p>
+
+<h2>SiteMap<a name="sitemap"></a></h2>
+<p>One of most important modules in a HomePortals page is the "SiteMap". This is the blue bar that appears on top 
+of the screen on each HomePortals page. This module provides a navigation bar to quickly navigate through all 
+of a user's pages. Also, the SiteMap gives access to the page's <a href="#controlpanel">Control Panel</a>. To access the Control Panel for 
+the current page, just click on the big plus (+) sign on the right end of the SiteMap. This opens a panel where 
+you can control several aspects of the current page.</p>
+
+<h2>Control Panel<a name="controlpanel"></a></h2>
+<p>The Control Panel is the place where you can control almost every aspect of the HomePortals page currently being 
+displayed. You can access the Control Panel by making a click on the big plus (+) sign on the right end of the <a href="#sitemap">SiteMap</a>.</p>
+<p>In order to make changes to a page using the Control Panel, you must be signed in as the owner of the account where 
+the page is located. If you are not logged in, then you are prompted to enter the account's username and password. 
+However, if you are logged in and you are not the account owner, then a message stating so is displayed.</p>
+<p>Once you have access to the Control Panel, you will see a menu on the left side of the Control Panel with several 
+options and tasks that you can perforn. The right side displays, by default, the selection of available modules 
+that you can add to the current page. Modules are organized by <a href="#catalogs">Catalogs</a>. A catalog is just a collection of <a href="#modules">modules</a>, 
+along with their description and other necessary information.</p>
+
+<p>The options on the Control Panel are:</p>
+
+
+<h3><a name="cp_addpage"></a>Add Page...</h3>
+<p>This option allows you to add a new blank page to the current site. Just enter the name of the new page and click on 
+the "Create Page" button.&nbsp; You will be automatically redirected to the new page.</p>
+<p>You can also select from the list of published or shared pages stored on the registered catalogs. Refer to the<a href="#sharing">Sharing Pages</a> section for more information on this.</p>
+
+
+<h3><a name="cp_configpage"></a>Config Page...</h3>
+<p>This is perhaps one of the most complex areas of the Control Panel, because here you have very detailed control 
+of the page structure and because of the potential to make the page stop working properly. Some knowledge of the 
+structure of web pages is recommended before you attempt to modify any settings on this area.</p>
+<p>The Config Page area is divided in five tabs: General, Stylesheets, Scripts, Layouts and Events.</p>
+
+<p>The first tab, <span style="FONT-STYLE: italic"><strong>General</strong></span>, allows you to change the 
+title of the page. This is the text that appears on top of the browser's window whenever someone visits this 
+page. Also, here you control whether the current page is a private or public page. To make a page private, 
+that is, accessible only to you, then put a check on the checkbox next to the label "Private Page?". 
+The change is made immediately. If the checkbox is clear, then it means that the page is public. Anyone that 
+is not signed in as the account owner, will be redirected to the webserver's homepage.</p>
+
+<p>The second tab, <span style="FONT-STYLE: italic"><strong>Stylesheets</strong></span>, allows you to control 
+all the CSS (Cascading StyleSheets) resources used by the current page. Here you have individual control of 
+the stylesheets used. You can add, delete or modify the css files used by this page. Bear in mind that some 
+modules add their own stylesheets to control their appearance, so modifying the current set of stylesheets will 
+have an impact on how the page looks. When specifying a stylesheet to use, you only need to provide the URL of 
+the css file. This can be a relative path to a file stored on the current server, or a full URL pointing to any 
+accessible css file on another server.</p>
+
+<p>The third tab, <span style="FONT-STYLE: italic"><strong>Scripts</strong></span>, is used to control all 
+Javascript files called by the current page. You can add, delete or modify Javascript files. Like with the 
+stylesheets, please bear in mind that some modules require a particular Javascript file in order to work 
+properly. Removing the reference to a file on the page may cause a module (or the entire page) to stop 
+working properly.</p>
+
+<p>The fourth tab, <span style="FONT-STYLE: italic"><strong>Layouts</strong></span>, controls the layout 
+sections of the current page. These are the individual sections in which you can place modules. There are 
+three types of sections: headers, columns and footers. And are always displayed on that order in the page. 
+However a page may have several headers, several columns and several footers (or none of any of them). 
+Each layout section has a name, a type (header, column or footer) and a Class name. The Class name is optional 
+and should be the name of any CSS class available on any of the included CSS resources for the page. The default 
+style contains the following classes that may be used for layout sections: header, leftcolumn, middlecolumn, 
+rightcolumn and footer. Modules are placed according to the layout section name in which they were placed. 
+If you delete a layout section, or rename one to something different, then all modules formerly in that section 
+will not be displayed on the page until you either change the module attributes to place them in a different layout 
+section, or fix the modified layout section.</p>
+
+<p>The fifth tab, <span style="FONT-WEIGHT: bold; FONT-STYLE: italic">Events</span>, is perhaps the most interesting 
+one. This is where you can define the interaction between existing modules. Each event entry on this tab contains three elements: An Object, and Event Name and the Event Handler. 
+  The first two are used to indicate the event being raised, the first one tells who is raising the event 
+  (i.e. Framework) and the second is the actual event ("PageLoaded"). The Event Handler is the function that will be called whenever the given event occurs. Read the <a href="#events">Events</a> section to learn more about HomePortals Events. </p>
+<p>Changes to any of these areas will not cause an immediate reload to the current page, so you may have to use the "Reload Page" 
+option on the Control Panel to see the effect of the changes you made.</p>
+
+<h3><a name="cp_deletepage"></a>Delete This Page...</h3>
+<p>Use this option to delete the current page. Please note that once you delete the page there is no way to 
+undelete it. Deleting a page will not delete the modules contained in it, only the reference to them an the 
+values of any settings stored. The actual data used by the module, like for blogs, todo lists, and calendars, 
+will not be deleted if you delete the page.</p>
+
+<h3><a name="cp_publishpage"></a>Publish Page...</h3>
+<p>Publishing a page allows you to share the current page with other users. When you publish a page, it is added 
+to a catalog where others can make copies of your page and add it to their sites. Please note that when you publish 
+a page anyone will be able to make a exact copy of it, so please verify that there is nothing on the page that you 
+do not want to share with others.</p>
+<p>Certain modules, such as Blog, Appointments, and ToDo lists stores their data in files. Each of these modules have 
+an attribute called URL used to indicate the path to this file. However, when this attribute is empty (as is by default), 
+they will store their data on a file that is exclusive to the current account. This means that if you share a page that 
+has any of these modules, and the URL is empty, then when the other user adds the page to their account, they will not 
+be having access to your data file.</p>
+<p>When you publish a page, you must enter a brief description for the page you want to share.</p>
+
+
+<h3><a name="cp_editpage"></a>Edit Page XML...</h3>
+<p>Each HomePortals page is represented by an XML document. This option allows you to view and/or modify the actual 
+document for the page. Whenever you click on the "Save Changes" button, the document will be evaluated to see if it is 
+a proper XML document. If it is not, then it will not be saved.</p>
+<p>Please be very careful when editing this XML document, as you may cause the current page to be completely unusable 
+and the HomePortals server will not be able to display the page at all.</p>
+
+
+<h3><a name="cp_configmodules"></a>Config Modules...</h3>
+<p>This option is used to configure the attributes for all modules on the current page. When you click on this option, 
+you view a list of all modules on the page, sorted by the container's title and the module id in parenthesis. 
+Click on the module title to access the module attributes.</p>
+<p>Module attributes are divided in two sections: <span style="FONT-STYLE: italic">Base Attributes</span> a
+nd <span style="FONT-STYLE: italic">Other Attributes</span>. The first section are attributes common to all 
+HomePortals modules. The following table describes all base attributes.</p>
+
+<table border=0 cellpadding=3 cellspacing=0 style="WIDTH: 511px;">
+  <tbody>
+    <tr bgcolor=#cccccc>
+      <th width=28%>Attribute Name:</th>
+      <th width=72%>Description:</th>
+    </tr>
+    <tr>
+      <td> Title:</td>
+      <td> Container's title</td>
+    </tr>
+    <tr>
+      <td> Location:</td>
+      <td> Name of the layout location where the module will be displayed.</td>
+    </tr>
+    <tr>
+      <td style="VERTICAL-ALIGN: top"> Name</td>
+      <td style="VERTICAL-ALIGN: top"> Name of the actual module.</td>
+    </tr>
+    <tr>
+      <td style="VERTICAL-ALIGN: top"> Display:</td>
+      <td style="VERTICAL-ALIGN: top"> Indicates the initial state of the module's container: normal, collapsed or hidden.</td>
+    </tr>
+    <tr>
+      <td style="VERTICAL-ALIGN: top"> Container:</td>
+      <td style="VERTICAL-ALIGN: top"> Indicates whether the module will be displayed inside a container or not.</td>
+    </tr>
+    <tr>
+      <td style="VERTICAL-ALIGN: top"> Output:</td>
+      <td style="VERTICAL-ALIGN: top"> Indicates whether the output of the module will be displayed on the screen or not.</td>
+    </tr>
+    <tr>
+      <td style="VERTICAL-ALIGN: top"> Show Print:</td>
+      <td style="VERTICAL-ALIGN: top"> Controls whether to display the icons on the container's header or not.</td>
+    </tr>
+    <tr>
+      <td style="VERTICAL-ALIGN: top"> CSS Styles:</td>
+      <td style="VERTICAL-ALIGN: top"> CSS style rules to apply to the module contents.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The <span style="FONT-STYLE: italic">Other Attributes</span> section contains any other attribute that is specific to 
+this module. By changing the values of these attributes is how you configure how the module will behave on the current 
+page.</p>
+<p>You may also access this settings page directly for individual modules by clicking on the <img src=/home/common/images/isettings.gif width="20" height="20" title="Edit Module Settings Icon"> icon 
+that appears on the title bar of the module's container.</p> 
+<p>Also, the module settings page allows you to delete a module from the page. This will only remove the reference 
+to the module and not the module itself, however, the values you entered for all attributes will be lost. To delete 
+a module, only click on the "Delete Module" button.</p>
+
+<h3><a name="cp_addmodules"></a>Add Modules...</h3>
+<p>Use this option to add modules to the current page. This is the default screen displayed whenever accessing 
+the Control Panel through the SiteMap. This screen displays a list of all modules available on the registered 
+catalogs. Refer to the <a href="#catalogs">Catalogs</a> section for more information.</p>
+<p>This screen allows you to select a module from the available catalogs, subscribe to new catalogs and remove catalogs 
+from your site.</p>
+<p>To add a module, click on the module name. The description of the module will be displayed, you will also need to 
+select the layout section of the page where you want to place the module. You may change the location of the module 
+at a later time too. To confirm the addition of the module to the page, click on the "Yes" button. Click on "No" 
+to return to the Add Modules page.</p>
+<p>To subscribe to other catalogs, enter the catalog URL using the space provided below the "Add Catalog URL:" label. 
+The screen will now display all modules available on the new catalog.</p>
+<p>To remove a catalog from your site, click on the "Remove This Catalog" link below the module name. Removing the 
+catalog will not affect existing modules.</p>
+
+<h3><a name="cp_reloadpage"></a>Reload Page</h3>
+<p>This option closes the Control Panel and refreshes the current page.</p>
+
+<h3><a name="cp_logoff"></a>Log Off</h3>
+<p>Signs you off from your account and redirects you to your public page.</p>
+
+
+<h2>Catalogs<a name="catalogs"></a></h2>
+<p>In HomePortals modules are grouped into catalogs. Catalogs are documents that contains references to a collection 
+of modules along with their description and other information. Each account starts with a single catalog, which contains 
+a set of default modules available to any page within the account's site. However, you may subscribe to more catalogs, 
+expanding this way the modules available to you.</p>
+
+<p>Currently there are only two modules available:<br>
+<ul>
+  <li> Default (/home/modules/content/catalog.xml') - This is the module included by default.</li>
+  <li> Skins (/home/modules/skins/skins.xml') - Contains modules used to "skin" a page.</li>
+</ul>
+</p>
+
+<h2>Events<a name="sharing"></a></h2>
+<p>Certain actions in modules trigger "Events". For example, selecting a date on a calendar module triggers the 
+"calendar.OnSelectDate" event. On the other hand, some modules have actions or commands that they can perform. 
+For example, an appointments module has a command to make it load all appointments for a given date. </p>
+<p>The Events tab allows you to link an event raised by   one module (i.e. A user clicking on a date) with an 
+action performed by another module (i.e. displaying all appointments for the given date). The action performed in 
+response to raised event is called the "Event Hander". In this area you may enter all relations between events raised 
+and event handlers. What events are raised and the name of the event handlers are specific to individual modules. 
+Refer to each module's documentation for more information on its events. </p>
+<p>There is also a global event that is raised everytime a HomePortals page finishes loading: "Framework.PageLoaded". 
+This is useful when you want certain actions to be performed as soon as the page finishes loading. </p>
+<p>The parameters or information passed by the raised event to the event handler is specific to each module.</p>
+
+<h2>Sharing Pages<a name="sharing"></a></h2>
+<p>Publishing a page allows you to share the current page with other users. When you publish a page, it is added 
+to a catalog where others can make copies of your page and add it to their sites. See <a href="#cp_publishpage">Publish Page...</a> under the Control Panel section for more information on how to share a page with other users.</p>
+
+
+<h2>Comments, Suggestions and Feedback<a name="comments"></a></h2>
+<p>You can help us improve our product by sending us an email to <a href=mailto:homeportals-help@cfempire.com?subject=Feedback title=homeportals-help@cfempire.com>homeportals-help@cfempire.com</a> 
+with your comments, suggestions and general feedback.
+</p>
+
+</div>
+<p>&nbsp;</p>
+
+<p align="center" style="font-size:9px;">
+(c)2006 <A href="http://www.cfempire.com" target="_blank">CFEmpire</A>
+</p>
+</body>
+</html>

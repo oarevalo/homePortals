@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+
+<modules>
+
+	
+	<!-- ********   Bookmarks2  ************ -->
+	<module access="general" id="bookmarks2" name="Bookmarks2/bookmarks2">
+		<description>
+			Displays an interactive list of items and/or links. You can add/edit/delete items. Whenever an
+			option is selected the event bookmakrs.onClick is raised.
+		</description>
+		<attributes>
+			<attribute description="[Optional] Indicates the URL of a document where to store the bookmark entries. Leave empty to use default storage." name="url" required="true"/>
+			<attribute description="Must be either Yes or No. Indicates whether to go to the URL address in the bookmark when clicking on it" name="followLink" required="true"/>
+		</attributes>
+		<api>
+			<methods />
+			<events>
+				<event name="onClick" description="This event is raised when someone clicks on a bookmark" />
+				<event name="onSave" description="This event is raised when a bookmark is saved" />
+				<event name="onDelete" description="This event is raised when a bookmark is deleted" />
+			</events>
+		</api>
+		<moduleInfo>
+			<authorName>Oscar Arevalo</authorName>
+			<authorEmail>oarevalo@gmail.com</authorEmail>
+			<authorURL>http://www.homeportals.com</authorURL>
+			<screenshot/>
+		</moduleInfo>
+	</module>
+	
+</modules>
+</catalog>
