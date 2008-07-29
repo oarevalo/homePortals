@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <Page>
+      <title>YouTube Explorer</title>
+	  <skin id="silver"/>
+      <layout>
+        <location class="column_third" name="left" type="column"/>
+        <location class="column_third" name="middle" type="column"/>
+        <location class="column_third" name="right" type="column"/>
+      </layout>
+      <modules>
+        <module id="youTubeSearch1" location="left" mode="searchByTag" name="YouTube/youTubeSearch" onClickGotoURL="false" resultsPanelID="" term="" title="YouTube Search"/>
+        <module id="youTubeVideo1" location="middle" name="YouTube/youTubeVideo" title="Video" videoID=""/>
+        <module CONTAINER="false" id="button1" label="Add Video To My Favorites" location="middle" name="ui/button" onClick="" title="button1"/>
+        <module id="rssReader1" location="right" maxItems="10" name="RSSReader/RSSReader" rss="http://youtube.com/rss/global/top_favorites.rss" targetID="" title="Top Rated"/>
+        <module followLink="false" id="bookmarks1" location="right" name="Bookmarks/bookmarks" title="My Favorite Videos" url="MyYouTubeVideos"/>
+        <module id="simpleAdapter1" location="right" name="Adapters/simpleAdapter" outputs_text="title" outputs_url="URL" title="simpleAdapter1"/>
+        <module id="simpleAdapter2" location="right" name="Adapters/simpleAdapter" outputs_title="text" outputs_url="url" title="simpleAdapter2"/>
+      </modules>
+      <eventListeners>
+        <event eventHandler="simpleAdapter1.setInput" eventName="onClick" objectName="rssReader1"/>
+        <event eventHandler="youTubeVideo1.showVideo" eventName="onInputReceived" objectName="simpleAdapter1"/>
+        <event eventHandler="simpleAdapter1.fireOutput" eventName="onClick" objectName="button1"/>
+        <event eventHandler="bookmarks1.addItem" eventName="onOutputFired" objectName="simpleAdapter1"/>
+        <event eventHandler="simpleAdapter2.setInput" eventName="onSelectVideo" objectName="youTubeSearch1"/>
+        <event eventHandler="simpleAdapter1.setInput" eventName="onInputReceived" objectName="simpleAdapter2"/>
+        <event eventHandler="youTubeVideo1.showVideo" eventName="onClick" objectName="bookmarks1"/>
+      </eventListeners>
+    </Page>

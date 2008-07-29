@@ -1,0 +1,38 @@
+/* CSS Document */
+
+html{
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 11px;
+}
+
+body{
+	color: #333;
+	background:  url("bg.gif");
+}
+
+.Section {
+	margin: 5px;
+	border : 1px solid #79A7E2;
+	background-color: #FFF;
+	z-index: 1;
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 11px;	
+}
+.SectionTitle {
+	font-weight: bold;
+	background-color:#F7FEE7;
+	color: #00368F;
+	border-bottom:1px solid silver;
+}
+
+.leftcolumn {
+	width:250px;
+}
+.rightcolumn {
+	width:250px;
+}
+.header {
+	padding:0px;
+	margin:5px;
+	border:0px;
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<stylesheet href="/Home/resourceLibrary/Pagetemplates/layouts/layoutTemplates.css" />
+	
+	<layout>
+		<location class="column_third" name="left" type="column"/>
+		<location class="column_third" name="middle" type="column"/>
+		<location class="column_third" name="right" type="column"/>
+	</layout>		
+
+	<modules />
+
+</Page>
