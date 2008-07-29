@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<homePortalsLibrary version="1.0">
-	<registeredCatalogs>
-		<catalog href="/Home/Modules/Accounts/catalog.xml" name="default">Default Catalog</catalog>
-	</registeredCatalogs>
-	<updateSites>
-		<site url="http://www.wencho.net/Home/Modules/updateSite/update.cfc?wsdl">HomePortals Update Site</site>
-	</updateSites>
-</homePortalsLibrary>
