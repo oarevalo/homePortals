@@ -27,7 +27,8 @@
 
 <cfsilent>
 	<!------- Page parameters ----------->
-	<cfparam name="page" default=""> 				<!--- page to load --->
+	<cfparam name="account" default=""> 			<!--- HomePortals account --->
+	<cfparam name="page" default=""> 				<!--- page to load within account --->
 	<cfparam name="refreshApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
 	<!----------------------------------->
 	
@@ -44,7 +45,7 @@
 		}
 
 		// load and parse page
-		request.oPageRenderer = application.homePortals.loadPage(page);
+		request.oPageRenderer = application.homePortals.loadAccountPage(account, page);
 
 		// render page html
 		html = request.oPageRenderer.renderPage();

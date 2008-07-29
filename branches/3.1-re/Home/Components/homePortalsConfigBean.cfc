@@ -1,7 +1,7 @@
 <cfcomponent displayname="homePortalsConfigBean" hint="A bean to store the HomePortals configuration. Configuration is per-application">
 
 	<cfset variables.stConfig = StructNew()>
-	<cfset variables.hpEngineBaseVersion = "3.0.x">
+	<cfset variables.hpEngineBaseVersion = "3.1.x">
 	<cfset variables.stRenderTemplatesCache = structNew()>
 
 	<cffunction name="init" access="public" returntype="homePortalsConfigBean">
@@ -16,7 +16,7 @@
 			variables.stConfig.homePortalsPath = "";
 			variables.stConfig.resourceLibraryPath = "";
 			variables.stConfig.defaultAccount = "";
-			variables.stConfig.SSLRoot = "";		
+			variables.stConfig.defaultPage = "";
 			variables.stConfig.appRoot = "";
 			variables.stConfig.accountsRoot = "";
 			variables.stConfig.pageCacheSize = "";
@@ -26,6 +26,7 @@
 			variables.stConfig.rssCacheSize = "";
 			variables.stConfig.rssCacheTTL = "";
 			variables.stConfig.baseResourceTypes = "";
+			variables.stConfig.pageProviderClass = "";
 
 			variables.stConfig.renderTemplates = structNew();
 			variables.stConfig.resources = structNew();
@@ -184,12 +185,12 @@
 		<cfreturn variables.stConfig.resourceLibraryPath>
 	</cffunction>
 
-	<cffunction name="getDefaultAccount" access="public" returntype="string">
+	<cffunction name="getDefaultAccount" access="public" returntype="string" hint="The name of the account to load when no account has been specified">
 		<cfreturn variables.stConfig.defaultAccount>
 	</cffunction>
 
-	<cffunction name="getSSLRoot" access="public" returntype="string">
-		<cfreturn variables.stConfig.SSLRoot>
+	<cffunction name="getDefaultPage" access="public" returntype="string" hint="The name of the page to load when page has been specified">
+		<cfreturn variables.stConfig.defaultPage>
 	</cffunction>
 
 	<cffunction name="getAppRoot" access="public" returnType="string" hint="The root of the application">
@@ -227,6 +228,10 @@
 	<cffunction name="getBaseResourceTypes" access="public" returntype="string" hint="List with allowed types of base resources">
 		<cfreturn variables.stConfig.baseResourceTypes>
 	</cffunction>	
+
+	<cffunction name="getPageProviderClass" access="public" returntype="string" hint="Returns the component to use as the pageProvider">
+		<cfreturn variables.stConfig.pageProviderClass>
+	</cffunction>
 
 
 
@@ -294,9 +299,9 @@
 		<cfset variables.stConfig.defaultAccount = arguments.data>
 	</cffunction>
 
-	<cffunction name="setSSLRoot" access="public" returntype="void">
+	<cffunction name="setDefaultPage" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.SSLRoot = arguments.data>
+		<cfset variables.stConfig.defaultPage = arguments.data>
 	</cffunction>
 
 	<cffunction name="setAppRoot" access="public" returnType="void">
@@ -383,6 +388,11 @@
 	<cffunction name="removeRenderTemplate" access="public" returntype="void">
 		<cfargument name="type" type="string" required="true">
 		<cfset structDelete(variables.stConfig.renderTemplates, arguments.type, false)>
+	</cffunction>
+
+	<cffunction name="setPageProviderClass" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.PageProviderClass = arguments.data>
 	</cffunction>
 
 	

@@ -27,7 +27,8 @@
 
 			// load configuration settings for the application
 			configFilePath = listAppend(oHomePortalsConfigBean.getAppRoot(), variables.configFilePath, "/");
-			variables.oAccountsConfigBean.load(expandPath(configFilePath));
+			if(fileExists(expandPath(configFilePath)))
+				variables.oAccountsConfigBean.load(expandPath(configFilePath));
 		
 			return this;
 		</cfscript>
@@ -362,7 +363,25 @@
 		<cfreturn createObject("component","site").init(arguments.AccountName, this)>
 	</cffunction>
 
+	<!--------------------------------------->
+	<!----  getAccountPageURI  			----->
+	<!--------------------------------------->
+	<cffunction name="getAccountPageURI" access="public" hint="Returns the address of the page belonging to an account" returntype="string">
+		<cfargument name="account" type="string" required="false" default="" hint="Account name, if empty will load the default account">
+		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
+		<cfscript>
+			var pageHREF = "";
+						
+			// determine the page to load
+			if(arguments.account eq "") arguments.account = variables.oHomePortalsConfigBean.getDefaultAccount();
+			if(arguments.page eq "") 
+				pageHREF = getAccountDefaultPage(arguments.account);
+			else
+				pageHREF = variables.oHomePortalsConfigBean.getAccountsRoot() & "/" & arguments.account & "/layouts/" & arguments.page & ".xml";
 
+			return pageHREF;
+		</cfscript>	
+	</cffunction>
 
 
 	<!--- /*************************** Private Methods **********************************/ --->

@@ -2,7 +2,6 @@
 
 	<cfscript>
 		variables.instance = structNew();
-		variables.instance.href = "";
 		variables.instance.title = "";
 		variables.instance.owner = "";
 		variables.instance.skinID = "";
@@ -15,7 +14,6 @@
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
 		
-		variables.LAYOUT_REGION_TYPES = "header,column,footer";
 		variables.ACCESS_TYPES = "general,owner,friend";
 		variables.DEFAULT_CONTENT_CACHE_TTL = 60;
 		variables.DEFAULT_CONTENT_RESOURCE_TYPE = "content";
@@ -23,31 +21,30 @@
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
-		<cfargument name="href" type="string" required="false" default="">
-		
-		<cfif arguments.href neq "">
-			<cfif Not fileExists(expandPath(arguments.href))>
-				<cfthrow message="Page not found" type="homePortals.pageBean.fileNotFound">
-			</cfif>
-			<cfset load(expandPath(arguments.href))>
-			<cfset setHREF(arguments.href)>
+		<cfargument name="pageXML" type="any" required="true">
+		<cfif isXML(arguments.pageXML) or isXMLDoc(arguments.pageXML)>
+			<cfset loadXML(arguments.pageXML)>
 		<cfelse>
 			<cfset initPageProperties()>
 		</cfif>
-
 		<cfreturn this>		
 	</cffunction>
 	
-	<cffunction name="load" access="private" returntype="void" hint="load and parse xml file">
-		<cfargument name="pagePath" type="string" required="false" default="">
+	<cffunction name="loadXML" access="public" returntype="void" hint="Populates the bean from an XML object or string">
+		<cfargument name="pageXML" type="any" required="true">
 		<cfscript>
 			var xmlDoc = 0;
 			var st = structNew(); var xmlNode = 0;
 			var i = 0; var j = 0;
 			var args = structNew();
 				
-			// read page document
-			xmlDoc = xmlParse(arguments.pagePath);
+			if(isXML(arguments.pageXML)) 
+				xmlDoc = xmlParse(arguments.pageXML);
+			else if(isXMLDoc(arguments.pageXML))
+				xmlDoc = arguments.pageXML;
+			else
+				throw("Invalid argument. Argument must be either an xml string or an xml object","homePortals.pageBean.invalidArgument");
+				
 
 			// initialize default page properties
 			initPageProperties();
@@ -345,22 +342,6 @@
 
 
 	<!---------------------------------------->
-	<!--- HREF					           --->
-	<!---------------------------------------->	
-	<cffunction name="getHREF" access="public" returntype="string">
-		<cfreturn variables.instance.href>
-	</cffunction>
-
-	<cffunction name="setHREF" access="public" returntype="string">
-		<cfargument name="data" type="string" required="true">
-		<cfif arguments.data eq "">
-			<cfthrow message="Page href cannot be empty" type="homePortals.pageBean.hrefIsEmpty">
-		</cfif>
-		<cfset variables.instance.href = arguments.data>
-	</cffunction>
-
-
-	<!---------------------------------------->
 	<!--- Title					           --->
 	<!---------------------------------------->		
 	<cffunction name="getTitle" access="public" returntype="string">
@@ -545,8 +526,8 @@
 		<cfif arguments.name eq "">
 			<cfthrow message="Layout region name cannot be empty" type="homePortals.pageBean.invalidLayoutRegionName">
 		</cfif>
-		<cfif not listFindNoCase(variables.LAYOUT_REGION_TYPES, arguments.type)>
-			<cfthrow message="Invalid layout region type. Valid types are: #variables.LAYOUT_REGION_TYPES#" type="homePortals.pageBean.invalidLayoutRegionType">
+		<cfif arguments.type eq "">
+			<cfthrow message="Layout region type cannot be empty" type="homePortals.pageBean.invalidLayoutRegionType">
 		</cfif>
 		<cfif hasLayoutRegion(arguments.name)>
 			<cfthrow message="Layout region name already exists" type="homePortals.pageBean.duplicateLayoutRegionName">
@@ -728,14 +709,6 @@
 
 
 	<!---------------------------------------->
-	<!--- getLocationTypes		           --->
-	<!---------------------------------------->	
-	<cffunction name="getLocationTypes" access="public" returntype="array" output="False"
-				hint="Returns an array with possible values for layout location types">
-		<cfreturn listToArray(variables.LAYOUT_REGION_TYPES)>
-	</cffunction>
-
-	<!---------------------------------------->
 	<!--- getAccessTypes		           --->
 	<!---------------------------------------->	
 	<cffunction name="getAccessTypes" access="public" returntype="array" output="False"
@@ -769,13 +742,23 @@
 	</cffunction>
 
 
-<cffunction name="dump">
-<cfargument name="data" type="any">
-<cfdump var="#arguments.data#">
-</cffunction>
+	<!---------------------------------------->
+	<!--- Utilities					       --->
+	<!---------------------------------------->	
+	<cffunction name="dump" access="private" hint="facade for cfdump" returntype="void">
+		<cfargument name="data" type="any">
+		<cfdump var="#arguments.data#">
+	</cffunction>
 
-<cffunction name="abort">
-<Cfabort>
-</cffunction>
+	<cffunction name="abort" access="private" hint="facade for cfabort" returntype="void">
+		<Cfabort>
+	</cffunction>
+	
+	<cffunction name="throw" access="private" hint="facade for cfthrow" returntype="void">
+		<cfargument name="message" type="string" required="true">
+		<cfargument name="type" type="string" required="true"> 
+		<cfthrow message="#arguments.message#" type="#arguments.type#">
+	</cffunction>
+
 
 </cfcomponent>

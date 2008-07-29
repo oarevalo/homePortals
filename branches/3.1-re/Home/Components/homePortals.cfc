@@ -30,6 +30,7 @@
 		
 		variables.oAccountsService = 0;			// a handle to the accoutns service
 		variables.oCatalog = 0;					// a handle to the resources catalog 
+		variables.oPageProvider = 0;			// a handle to the provider of pages
 		
 		variables.stTimers = structNew();
 	</cfscript>
@@ -48,6 +49,7 @@
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
 			var oRSSService = 0;
+			var ppClass = "";
 			
 			variables.appRoot = arguments.appRoot;
 
@@ -70,6 +72,12 @@
 
 			// initialize resource catalog
 			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
+
+			// initialize page provider
+			ppClass = variables.oHomePortalsConfigBean.getPageProviderClass();
+			if(ppClass eq "") throw("PageProviderClass settings is missing or blank","","homePortals.engine.invalidPageProviderClass");
+			variables.oPageProvider = createObject("component",ppClass).init(variables.oHomePortalsConfigBean);
+
 			
 			// initialize cache registry
 			oCacheRegistry = createObject("component","cacheRegistry").init();
@@ -93,10 +101,11 @@
 
 
 			// initialize cache for RSSService
+			// (there is no need to register the service with the registry since it registers itself)
 			oRSSService = createObject("component","RSSService").init(variables.oHomePortalsConfigBean.getRSSCacheSize(), 
 																		variables.oHomePortalsConfigBean.getRSSCacheTTL());
 			
-
+			
 			variables.stTimers.init = getTickCount()-start;
 			return this;
 		</cfscript>
@@ -127,30 +136,56 @@
 
 	
 	<!--------------------------------------->
+	<!----  loadAccountPage 			----->
+	<!--------------------------------------->
+	<cffunction name="loadAccountPage" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page belonging to an account">
+		<cfargument name="account" type="string" required="false" default="" hint="Account name, if empty will load the default account">
+		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
+		<cfscript>
+			var oPageRenderer = 0;
+			var oPageLoader = 0;
+			var pageURI = "";
+			var start = getTickCount();
+					
+			// get location of page
+			pageURI = getAccountsService().getAccountPageURI(arguments.account, arguments.page);		
+			
+			// load page 
+			oPageLoader = createObject("component","pageLoader").init(this);
+			oPageRenderer = oPageLoader.load(pageURI);	
+
+			// validate access to page
+			validatePageAccess( oPageRenderer.getPage().getAccess() , oPageRenderer.getPage().getOwner() );
+
+			// clear persistent storage for module data
+			oConfigBeanStore = createObject("component","configBeanStore");
+			oConfigBeanStore.flushAll();
+	
+			// process modules on page		
+			oPageRenderer.processModules();
+			
+			variables.stTimers.loadAccountPage = getTickCount()-start;
+			return oPageRenderer;
+		</cfscript>
+	</cffunction>
+	
+	
+	<!--------------------------------------->
 	<!----  loadPage 					----->
 	<!--------------------------------------->
 	<cffunction name="loadPage" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page">
-		<cfargument name="account" type="string" required="true" hint="Account name, if empty will load the default account">
-		<cfargument name="page" type="string" required="true" hint="Page within the account, if empty will load the default page for the account">
+		<cfargument name="pageURI" type="string" required="true" hint="the page to load">
 		<cfscript>
 			var oPageRenderer = 0;
-			var oSite = 0;		
-			var pageHREF = "";
-			var pageAccessLevel = "";
+			var oPageLoader = 0;
 			var start = getTickCount();
+			
+			// if no page is given, then load default page
+			if(arguments.pageURI eq "") arguments.pageURI = getConfig().getDefaultPage();			
 						
-			// determine the page to load
-			if(arguments.account eq "") arguments.account = getConfig().getDefaultAccount();
-			if(arguments.page eq "") 
-				pageHREF = getAccountsService().getAccountDefaultPage(arguments.account);
-			else
-				pageHREF = getConfig().getAccountsRoot() & "/" & arguments.account & "/layouts/" & arguments.page & ".xml";
-
-			// load page from cache
-			oPageRenderer = loadPageRenderer(pageHREF);	
-
-			// validate access to page
-			validatePageAccess( oPageRenderer.getAccess() , oPageRenderer.getOwner() );
+			// load page 
+			oPageLoader = createObject("component","pageLoader").init(this);
+			oPageRenderer = oPageLoader.load(arguments.pageURI);	
 
 			// clear persistent storage for module data
 			oConfigBeanStore = createObject("component","configBeanStore");
@@ -163,6 +198,8 @@
 			return oPageRenderer;
 		</cfscript>
 	</cffunction>
+		
+	
 	
 	
 	<!--------------------------------------->
@@ -206,6 +243,14 @@
 	<cffunction name="getTimers" access="public" returntype="any" hint="Returns the timers for this object">
 		<cfreturn variables.stTimers>
 	</cffunction>	
+
+	<!--------------------------------------->
+	<!----  getPageProvider				----->
+	<!--------------------------------------->		
+	<cffunction name="getPageProvider" access="public" returntype="pageProvider">
+		<cfreturn variables.oPageProvider>
+	</cffunction>
+
 		
 	<!--------------------------------------->
 	<!----  Private Methods  			----->
@@ -231,41 +276,6 @@
 		<cfargument name="detail" type="string" default=""> 
 		<cfargument name="type" type="string" default="custom"> 
 		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
-	</cffunction>
-
-	<cffunction name="getFileLastModified" returntype="date" access="private" hint="Returns the date the file was last modified">
-		<cfargument name="fileName" type="string" required="true" hint="full path to the file">
-		<cfset var fileObj = createObject("java","java.io.File").init(arguments.fileName)>
-		<cfset var fileDate = createObject("java","java.util.Date").init(fileObj.lastModified())>		
-		<cfreturn fileDate>
-	</cffunction>
-				
-	<cffunction name="loadPageRenderer" access="private" returntype="pageRenderer">
-		<cfargument name="pageHREF" type="string" required="true">
-		<cfscript>
-			var oPageRenderer = 0;
-			var pageCacheKey = hash(arguments.pageHREF);
-			var start = getTickCount();
-			var oCacheRegistry = createObject("component","cacheRegistry").init();			
-			var oCache = oCacheRegistry.getCache("hpPageCache");
-			var fileLastModDate = getFileLastModified(expandPath(arguments.pageHREF));
-
-			// if the page exists on the cache, and the page hasnt been modified after
-			// storing it on the cache, then get it from the cache
-			try {
-				oPageRenderer = oCache.retrieveIfNewer(pageCacheKey, fileLastModDate);
-			
-			} catch(homePortals.cacheService.itemNotFound e) {
-				// page is not in cache, so load the page
-				oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, this);
-			
-				// store page in cache
-				oCache.store(pageCacheKey, oPageRenderer);
-			}
-			
-			variables.stTimers.loadPageRenderer = getTickCount()-start;
-			return oPageRenderer;
-		</cfscript>
 	</cffunction>
 
 	<cffunction name="validatePageAccess" access="private" returntype="void" hint="Validates access to a page">

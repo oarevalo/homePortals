@@ -16,14 +16,14 @@
 	<!-- HomePortals account to load when no page has been provided -->
 	<defaultAccount>default</defaultAccount>
 
+	<!-- HomePortals page to load when no page has been provided -->
+	<defaultAccount></defaultAccount>
+
 	<!-- Event raised when a HomePortals page finishes loading -->
 	<initialEvent>Framework.onPageLoaded</initialEvent>
 
 	<!-- layout section names -->
 	<layoutSections>header,column,footer</layoutSections>
-
-	<!-- SSLRoot is the root path to be prepended to all page calls when using HTTPS -->
-	<SSLRoot>/</SSLRoot>
 
 	<!-- The maximum number of homeportals pages to cache at any given time -->
 	<pageCacheSize>50</pageCacheSize>
@@ -45,6 +45,9 @@
 
 	<!-- List with allowed types of base resources -->
 	<baseResourceTypes>script,style,header,footer</baseResourceTypes>
+	
+	<!-- The class responsible for storing pages -->
+	<pageProviderClass>fsPageProvider</pageProviderClass>
 	
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>

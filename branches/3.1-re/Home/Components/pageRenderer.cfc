@@ -9,11 +9,10 @@
 		variables.loadedModuleClasses = "";		// this is a list of all module classes loaded in the current page
 		variables.homePortalsEngineDir = "/Home/";		// path to location of HomePortals engine
 		variables.errorTemplate = variables.homePortalsEngineDir & "/Common/Templates/error.cfm";	// template to display when errors occur while rendering page components
-		variables.pageHREF = "";		// path to the current page
+		variables.pageURI = "";		// path to the current page
 		variables.oHomePortals = 0;		// homeportals instance
-		variables.oHomePortalsConfigBean = 0;		// homeportals config
+		variables.oPage = 0;			// the page to render
 		variables.stTimers = structNew();
-		variables.oCatalog = 0;			// reference to the current catalog
 		
 		variables.HTTP_GET_TIMEOUT = 30;	// timeout for HTTP requests in content modules
 	</cfscript>
@@ -21,19 +20,15 @@
 	<!--------------------------------------->
 	<!----  init						----->
 	<!--------------------------------------->	
-	<cffunction name="init" access="public" returntype="pageRenderer">
-		<cfargument name="pageHREF" type="string" required="true" hint="The url of the page to load">
+	<cffunction name="init" access="public" returntype="pageRenderer" hint="This is the constructor">
+		<cfargument name="pageURI" type="string" required="true" hint="The identifier for the page">
+		<cfargument name="page" type="pageBean" required="true" hint="The page to render">
 		<cfargument name="homePortals" type="homePortals" required="true" hint="HomePortals application instance">
 		<cfset var start = getTickCount()>
 
-		<cfif trim(arguments.pageHREF) eq "">
-			<cfthrow message="Page address cannot be empty" type="homePortals.pageRenderer.missingPageURL">
-		</cfif>
-
-		<cfset variables.pageHREF = arguments.pageHREF>
+		<cfset variables.pageURI = arguments.pageURI>
+		<cfset variables.oPage = arguments.page>
 		<cfset variables.oHomePortals = arguments.homePortals>
-		<cfset variables.oHomePortalsConfigBean = variables.oHomePortals.getConfig()>
-		<cfset variables.oCatalog = variables.oHomePortals.getCatalog()>
 		
 		<cfset loadPage()>
 		
@@ -44,8 +39,7 @@
 	<!--------------------------------------->
 	<!----  processModules				----->
 	<!--------------------------------------->
-	<cffunction name="processModules" access="public" output="false" 
-				hint="processes all modules rendering its content. Generated content is saved for later.">
+	<cffunction name="processModules" access="public" output="false" hint="processes all modules rendering its content. Generated content is saved for later.">
 		<cfscript>
 			var stModules = variables.stPage.page.modules;
 			var aModules = arrayNew(1);
@@ -54,15 +48,14 @@
 			var j = 1;
 			var k = 1;
 			var location = "";
-			var aLayoutSectionTypes = listToArray( variables.oHomePortalsConfigBean.getLayoutSections() );
+			var aLayoutSectionTypes = listToArray( getHomePortals().getConfig().getLayoutSections() );
 			var sectionType = "";
 			var aSections = 0;
 			var start = getTickCount();
-			var moduleType = "";
 			
 			// reset the buffer
 			resetPageBuffer();
-			
+
 			// loop through the section types in render order
 			for(i=1;i lte ArrayLen(aLayoutSectionTypes);i=i+1) {
 				sectionType = aLayoutSectionTypes[i];
@@ -78,18 +71,11 @@
 						// loop through all modules in this location
 						for(k=1;k lte arrayLen(aModules);k=k+1) {
 							stModuleNode = stModules[location][k];
-							moduleType = stModuleNode.moduleType;
-							
-							switch(moduleType) {
-								
+
+							switch(stModuleNode.moduleType) {
 								case "module":	// render normal modules
-									if(stModuleNode.name neq "") {
-										if(left(stModuleNode.name,4) neq "http")
-											processModule(stModuleNode);
-										else
-											processRemoteModule(stModuleNode);
-										variables.lstModulesRender = listAppend(variables.lstModulesRender, stModuleNode.id);
-									}
+									processModule(stModuleNode);
+									variables.lstModulesRender = listAppend(variables.lstModulesRender, stModuleNode.id);
 									break;
 									
 								case "content": // render content modules
@@ -106,8 +92,6 @@
 		</cfscript>
 	</cffunction>
 
-
-
 	<!--------------------------------------->
 	<!----  renderPage					----->
 	<!--------------------------------------->
@@ -122,12 +106,12 @@
 			var arg2 = "";
 			var rendered = "";
 			var start = getTickCount();
-			
+
 			// get the render template for the full page
-			renderTemplateBody = variables.oHomePortalsConfigBean.getRenderTemplateBody("page");
+			renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("page");
 
 			// replace simple values
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", getPageTitle(), "ALL");
+			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", getPage().getTitle(), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_ONLOAD$", getBodyOnLoad(), "ALL");
 
@@ -223,7 +207,7 @@
 		<cfset var tmpHTML = "">
 
 		<!--- get an array with the resources of the give type --->
-		<cfset aResourceType = variables.oHomePortalsConfigBean.getBaseResourcesByType(arguments.resourceType)>
+		<cfset aResourceType = getHomePortals().getConfig().getBaseResourcesByType(arguments.resourceType)>
 
 		<!--- render each resource --->
 		<cfsavecontent variable="tmpHTML">
@@ -252,8 +236,9 @@
 		<cfset var stPageHeadContent = getpageBufferByType("_htmlHead")>
 		<cfset var moduleID = "">
 		<cfset var tmpHTML = "">
-		<cfset var appRoot = variables.oHomePortalsConfigBean.getAppRoot()>
-		<cfset var resRoot = variables.oHomePortalsConfigBean.getResourceLibraryPath()>
+		<cfset var tmpHTML2 = "">
+		<cfset var appRoot = getHomePortals().getConfig().getAppRoot()>
+		<cfset var resRoot = getHomePortals().getConfig().getResourceLibraryPath()>
 		
 		<!--- Add user-defined meta tags --->
 		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
@@ -280,7 +265,8 @@
 			<cfoutput>
 			<script type="text/javascript">
 				/*********** Set app root **********/
-				h_appRoot = "#appRoot#";
+				h_appRoot = "#jsStringFormat(appRoot)#";
+				h_pageURI = "#jsStringFormat(variables.pageURI)#";
 				
 				/*********** Raise events by modules *************/
 				function h_raiseEvent(objectName, eventName, args) {
@@ -312,39 +298,32 @@
 	</cffunction>
 	
 	<!--------------------------------------->
-	<!----  getPageTitle				----->
-	<!--------------------------------------->
-	<cffunction name="getPageTitle" access="public" returntype="string" output="false" hint="Returns the title of the page">
-		<cfreturn variables.stPage.page.title>
-	</cffunction>
-	
-	<!--------------------------------------->
 	<!----  getBodyOnLoad				----->
 	<!--------------------------------------->
 	<cffunction name="getBodyOnLoad" access="public" returntype="string" output="false" hint="Returns the javascript statement to run on the onLoad attribute of the body tag">
-		<cfreturn variables.oHomePortalsConfigBean.getBodyOnLoad()>
+		<cfreturn getHomePortals().getConfig().getBodyOnLoad()>
 	</cffunction>	
 	
+	<!--------------------------------------->
+	<!----  getPageURI					----->
+	<!--------------------------------------->
+	<cffunction name="getPageURI" access="public" returntype="string" output="false" hint="Returns the location of the page">
+		<cfreturn variables.pageURI>
+	</cffunction>	
+
 	<!--------------------------------------->
 	<!----  getPageHREF					----->
 	<!--------------------------------------->
 	<cffunction name="getPageHREF" access="public" returntype="string" output="false" hint="Returns the location of the page">
-		<cfreturn variables.pageHREF>
+		<cfreturn getPageURI()>
 	</cffunction>	
-	
+		
 	<!--------------------------------------->
-	<!----  getOwner					----->
+	<!----  getPage					----->
 	<!--------------------------------------->
-	<cffunction name="getOwner" access="public" returntype="string" output="false" hint="Returns the owner of the page">
-		<cfreturn variables.stPage.page.owner>
+	<cffunction name="getPage" access="public" returntype="pageBean" output="false" hint="Returns the current page">
+		<cfreturn variables.oPage>
 	</cffunction>
-	
-	<!--------------------------------------->
-	<!----  getAccess					----->
-	<!--------------------------------------->
-	<cffunction name="getAccess" access="public" returntype="string" output="false" hint="Returns the access level of the page">
-		<cfreturn variables.stPage.page.access>
-	</cffunction>		
 	
 	<!---------------------------------------->
 	<!--- getTimers						   --->
@@ -361,214 +340,90 @@
 	<!--------------------------------------->
 	<cffunction name="loadPage" access="private" returntype="void" hint="loads and parses a homeportals page">
 		<cfscript>
-			var tmpXML = "";
-			var xmlDoc = "";
 			var i = 0;
-			var j = 0;
-			var xmlNode = 0;
-			var xmlThisNode = 0;
 			var tmrStart = getTickCount();
-			var isHTTPS = (structKeyExists(cgi,"HTTPS") and cgi.https eq "ON");
-			var item = "";
+			var tmp = "";
+			var oHPConfig = getHomePortals().getConfig();
 			
-			var aScriptResources = variables.oHomePortalsConfigBean.getBaseResourcesByType("script");
-			var aStyleResources = variables.oHomePortalsConfigBean.getBaseResourcesByType("style");
-			var lstLayoutSections = variables.oHomePortalsConfigBean.getLayoutSections();
+			var aScriptResources = oHPConfig.getBaseResourcesByType("script");
+			var aStyleResources = oHPConfig.getBaseResourcesByType("style");
+			var lstLayoutSections = oHPConfig.getLayoutSections();
 			
 			var oResourceBean = 0;
-			var args = structNew();
 		
-			// check if we are on HTTPS and if we need to modify the root
-			if(isHTTPS and left(variables.pageHREF,1) eq "/")
-				variables.href = variables.oHomePortalsConfigBean.getSSLRoot() & variables.pageHREF;
-		
-			// ****** Read homePortals page ******
-			if(fileExists(expandPath(variables.pageHREF)))
-				xmlDoc = xmlParse(expandPath(variables.pageHREF));
-			else
-				throw("The requested page [#variables.pageHREF#] does not exist.","","homePortals.engine.pageNotFound");
 		
 			// ****** Parse homePortals page contents ******
+
 			// Structure to hold the page info
 			variables.stPage = StructNew();
-			variables.stPage.xml = toString(xmlDoc);		
 			variables.stPage.page = StructNew();
-			variables.stPage.page.title = "";
-			variables.stPage.page.basePath = "";
-			variables.stPage.page.href = variables.pageHREF;	// address of the page
-			variables.stPage.page.owner = "";					// the account to which the current page belongs to
-			variables.stPage.page.stylesheets = ArrayNew(1);
-			variables.stPage.page.scripts = ArrayNew(1);
-			variables.stPage.page.eventListeners = ArrayNew(1);
+			variables.stPage.page.uri = variables.pageURI;			// address of the page
+			variables.stPage.page.title = getPage().getTitle();		// page title
+			variables.stPage.page.owner = getPage().getOwner();		// the account to which the current page belongs to
+			variables.stPage.page.access = getPage().getAccess();	// page access level
+			variables.stPage.page.eventListeners = getPage().getEventListeners();
+			variables.stPage.page.meta = getPage().getMetaTags();			// holds html meta tags
+
+			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
+			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
 			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
 			variables.stPage.page.modules = StructNew();		// holds modules
-			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
 			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
 		
-			// set page owner
-			if(structKeyExists(xmlDoc.xmlRoot.xmlAttributes, "owner"))
-				variables.stPage.page.owner = xmlDoc.xmlRoot.xmlAttributes.owner;
-
-			// set page access level
-			if(structKeyExists(xmlDoc.xmlRoot.xmlAttributes, "access"))
-				variables.stPage.page.access = xmlDoc.xmlRoot.xmlAttributes.access;
-			else
-				variables.stPage.page.access = "general";
 		
-			// add base resources
+			// scripts
 			for(i=1;i lte ArrayLen(aScriptResources);i=i+1) {
 				ArrayAppend(variables.stPage.page.scripts, aScriptResources[i]);
 			}
+			tmp = getPage().getScripts();
+			for(i=1;i lte ArrayLen(tmp);i=i+1) {
+				ArrayAppend(variables.stPage.page.scripts, tmp[i]);
+			}
+			
+			
+			// styles
 			for(i=1;i lte ArrayLen(aStyleResources);i=i+1) {
 				ArrayAppend(variables.stPage.page.stylesheets, aStyleResources[i]);
 			}
-	
-			// set placeholders for layout sections
+			tmp = getPage().getStylesheets();
+			for(i=1;i lte ArrayLen(tmp);i=i+1) {
+				ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
+			}
+
+
+			// layout sections
 			for(i=1;i lte ListLen(lstLayoutSections);i=i+1) {
 				thisSection = ListGetAt(lstLayoutSections,i);
 				variables.stPage.page.layout[thisSection] = ArrayNew(1);
 			}
 			
-			// process top level nodes
-			for(i=1;i lte ArrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
-				
-				// get poiner to current node
-				xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
-				
-				switch(xmlNode.xmlName) {
-				
-					// title node
-					case "title":
-						variables.stPage.page.title = xmlNode.xmlText;
-						break;
-						
-					// stylesheets
-					case "stylesheet":
-						ArrayAppend(variables.stPage.page.stylesheets, xmlNode.xmlAttributes.Href);
-						break;
-						
-					// script
-					case "script":
-						ArrayAppend(variables.stPage.page.scripts, xmlNode.xmlAttributes.src);
-						break;
-				
-					// layout
-					case "layout":
-						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
-							if(xmlNode.xmlChildren[j].xmlName eq "location") {
-								xmlThisNode = xmlNode.xmlChildren[j];
-				
-								if(Not structKeyExists(xmlThisNode.xmlAttributes, "name")) 
-									throw("Invalid HomePortals xml. Location node does not have a Name.","","homePortals.engine.invalidPage");
-								if(Not structKeyExists(xmlThisNode.xmlAttributes, "type")) 
-									throw("Invalid HomePortals xml. Location node does not have a Type.","","homePortals.engine.invalidPage");
-								if(Not structKeyExists(xmlThisNode.xmlAttributes, "class")) xmlThisNode.xmlAttributes.class = ""; 
-								if(Not structKeyExists(xmlThisNode.xmlAttributes, "style")) xmlThisNode.xmlAttributes.style = ""; 
-								if(Not structKeyExists(xmlThisNode.xmlAttributes, "id")) xmlThisNode.xmlAttributes.id = "h_location_#xmlThisNode.xmlAttributes.type#_#j#"; 
-				
-								ArrayAppend(variables.stPage.page.layout[xmlThisNode.xmlAttributes.type], duplicate(xmlThisNode.xmlAttributes) );
-							}
-						}
-						break;	
-									
-					// modules
-					case "modules":
-						if(structKeyExists(xmlNode.xmlAttributes, "basePath"))
-							variables.stPage.page.basePath = xmlNode.xmlAttributes.basePath;
-	
-						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
+			tmp = getPage().getLayoutRegions();
 
-							xmlThisNode = xmlNode.xmlChildren[j];
+			for(i=1;i lte ArrayLen(tmp);i=i+1) {
+				if(listFindNoCase(lstLayoutSections, tmp[i].type))
+					ArrayAppend(variables.stPage.page.layout[tmp[i].type], tmp[i] );
+			}
 
-							args = structNew();	// this structure is used to hold the module attributes
-							args.moduleType = xmlThisNode.xmlName;	// store the "type" of module
-
-							// copy all attributes from the node into another struct
-							// (modified for Railo2 compatibility)
-							for(item in xmlThisNode.xmlAttributes) {
-								args[item] = xmlThisNode.xmlAttributes[item];
-							}
-							
-
-							// define common attributes for module tags
-							if(Not structKeyExists(args, "id")) args["id"] = ""; 
-							if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
-							if(Not structKeyExists(args, "container")) args["container"] = true; 
-							if(Not structKeyExists(args, "title")) args["title"] = ""; 
-							if(Not structKeyExists(args, "icon")) args["icon"] = ""; 
-							if(Not structKeyExists(args, "style")) args["style"] = ""; 
-							if(Not structKeyExists(args, "output")) args["output"] = true; 
-
-							// Provide a unique ID for each module 
-							if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
-
-
-							// handle child tags
-							switch(xmlThisNode.xmlName) {
-							
-								case "module":		// handle <module> tag
-
-									if(Not structKeyExists(args, "name")) args["name"] = "";
-									if(args.title eq "") args.title = args.name; 
-									break;
-
-							
-								case "content":		// handle <content> tag
-								
-									if(Not structKeyExists(args, "resourceID")) args["resourceID"] = ""; 
-									if(Not structKeyExists(args, "resourceType")) args["resourceType"] = "content"; 
-									if(Not structKeyExists(args, "href")) args["href"] = ""; 
-									if(Not structKeyExists(args, "cache")) args["cache"] = true; 
-									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = variables.oHomePortalsConfigBean.getContentCacheTTL(); 
-									break;
-							}
-							
-							// create structure for modules that belong to the same location
-							if(Not StructKeyExists(variables.stPage.page.modules, args.location) )
-								variables.stPage.page.modules[args.location] = ArrayNew(1);
-							
-							ArrayAppend(variables.stPage.page.modules[args.location], duplicate(args) );
-						}
-	
-						break;
-							
-					// event handlers
-					case "eventListeners":
-						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
-							if(xmlNode.xmlChildren[j].xmlName eq "event") {
-								xmlThisNode = xmlNode.xmlChildren[j];
-								if(Not StructKeyExists(xmlThisNode.xmlAttributes,"objectName")) xmlThisNode.xmlAttributes.objectName = ""; 
-								if(Not StructKeyExists(xmlThisNode.xmlAttributes,"eventName")) xmlThisNode.xmlAttributes.eventName = ""; 
-								if(Not StructKeyExists(xmlThisNode.xmlAttributes,"eventHandler")) xmlThisNode.xmlAttributes.eventHandler= ""; 
-								
-								ArrayAppend(variables.stPage.page.eventListeners, duplicate(xmlNode.xmlChildren[j].xmlAttributes));
-							}
-						}
-						break;	
-
-					// meta tags
-					case "meta":
-						if(Not StructKeyExists(xmlNode.xmlAttributes,"name")) xmlNode.xmlAttributes.name = ""; 
-						if(Not StructKeyExists(xmlNode.xmlAttributes,"content")) xmlNode.xmlAttributes.content = ""; 
-						
-						ArrayAppend(variables.stPage.page.meta, duplicate(xmlNode.xmlAttributes));
-						break;	
-
-					// skin	
-					case "skin":
-						if(Not StructKeyExists(xmlNode.xmlAttributes,"id")) xmlNode.xmlAttributes.id = ""; 
-						
-						// get skin location from catalog 
-						oResourceBean = variables.oCatalog.getResourceNode("skin", xmlNode.xmlAttributes.id);
-						variables.stPage.page.skinHREF = oResourceBean.getHref();
-						
-						break;	
-				}
-			}		
 			
+			// skin
+			if(getPage().getSkinID() neq "") {
+				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", getPage().getSkinID());
+				variables.stPage.page.skinHREF = oResourceBean.getHref();
+			}
+
+			
+			
+			// modules and content
+			tmp = getPage().getModules();
+			for(i=1;i lte ArrayLen(tmp);i=i+1) {
+				// create structure for modules that belong to the same location
+				if(Not StructKeyExists(variables.stPage.page.modules, tmp[i].location) )
+					variables.stPage.page.modules[tmp[i].location] = ArrayNew(1);
+				
+				ArrayAppend(variables.stPage.page.modules[tmp[i].location], tmp[i] );
+			}
 		</cfscript>	
 	</cffunction>
-		
 	
 	<!--------------------------------------->
 	<!----  processModule				----->
@@ -581,19 +436,10 @@
 			var moduleID = arguments.moduleNode.id;
 			var moduleName = arguments.moduleNode.name;
 			var tmpMsg = "";
-			var isHTTPS = (structKeyExists(cgi,"HTTPS") and cgi.https eq "ON");
 			var start = getTickCount();
 
-			// if we are on HTTPS then prefix the module with the SSL root
-			if(isHTTPS) moduleName = variables.oHomePortalsConfigBean.getSSLRoot() & moduleName;
-
 			try {
-				// if there is a base path then prepend it to the module name
-				// otherwise prepend the module library path
-				if(variables.stPage.page.basePath neq "")
-					moduleName = variables.stPage.page.basePath & moduleName;
-				else
-					moduleName = variables.oHomePortalsConfigBean.getResourceLibraryPath() & "/Modules/" & moduleName;
+				moduleName = getHomePortals().getConfig().getResourceLibraryPath() & "/Modules/" & moduleName;
 
 				// convert the moduleName into a dot notation path
 				moduleName = replace(moduleName,"/",".","ALL");
@@ -606,7 +452,7 @@
 				// add information about the page to moduleNode
 				arguments.moduleNode["_page"] = structNew();
 				arguments.moduleNode["_page"].owner =  variables.stPage.page.owner;
-				arguments.moduleNode["_page"].href =  variables.stPage.page.href;
+				arguments.moduleNode["_page"].href =  variables.stPage.page.uri;
 				
 				// instantiate module controller and call constructor
 				oModuleController = createObject("component","moduleController");
@@ -626,41 +472,9 @@
 				tmpMsg = "<b>An unexpected error ocurred while initializing module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
 				appendpageBuffer("_htmlModule", moduleID, tmpMsg );
 			}
-			
+
 			variables.stTimers["processModule_#moduleID#"] = getTickCount()-start;
 		</cfscript>		
-	</cffunction>	
-	
-	<!--------------------------------------->
-	<!----  processRemoteModule			----->
-	<!--------------------------------------->
-	<cffunction name="processRemoteModule" access="private" hint="processes modules that are located on a different server.">
-		<cfargument name="moduleNode" type="any" required="true">
-
-		<cfset var moduleID = arguments.moduleNode.id>
-		<cfset var moduleName = arguments.moduleNode.name>
-		<cfset var tmpHTML = "">
-		<cfset var arg = "">
-
-		<cftry>
-			<cfhttp method="get" url="#moduleName#" 
-					timeout="10" resolveurl="true" 
-					redirect="true" throwonerror="true">
-				<cfloop collection="#arguments.moduleNode#" item="arg">
-					<cfif IsSimpleValue(arguments.moduleNode[arg])>
-						<cfhttpparam type="url" name="#arg#" value="#arguments.moduleNode[arg]#">
-					</cfif>
-				</cfloop>
-			</cfhttp>
-			<cfset appendpageBuffer("_htmlModule", moduleID, cfhttp.FileContent )>
-
-			<cfcatch type="any">
-				<cfsavecontent variable="tmpHTML">
-					<cfinclude template="#variables.errorTemplate#">
-				</cfsavecontent>
-				<cfset appendpageBuffer("_htmlModule", moduleID, tmpHTML )>
-			</cfcatch>
-		</cftry>
 	</cffunction>	
 	
 	<!--------------------------------------->
@@ -717,8 +531,6 @@
 		</cfscript>
 	</cffunction>
 
-
-
 	<!--------------------------------------->
 	<!----  renderModule				----->
 	<!--------------------------------------->
@@ -734,9 +546,9 @@
 				tmpIconURL = "<img src='#arguments.moduleNode.icon#' width='16' height='16' align='absmiddle'>";
 			
 			if(arguments.moduleNode.Container)
-				renderTemplateBody = variables.oHomePortalsConfigBean.getRenderTemplateBody("module");
+				renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("module");
 			else
-				renderTemplateBody = variables.oHomePortalsConfigBean.getRenderTemplateBody("moduleNoContainer");
+				renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("moduleNoContainer");
 				
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ID$", moduleID, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_TITLE$", arguments.moduleNode.title, "ALL");
@@ -746,7 +558,6 @@
 		</cfscript>
 		<cfreturn renderTemplateBody>
 	</cffunction>
-
 	
 	<!--------------------------------------->
 	<!----  resetPageBuffer				----->
@@ -805,6 +616,73 @@
 		<cfreturn variables.pageBuffer[arguments.contentType]>
 	</cffunction>
 
+	<!---------------------------------------->
+	<!--- getContentCache                  --->
+	<!---------------------------------------->		
+	<cffunction name="getContentCache" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
+		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
+		<cfset var cacheName = "contentCacheService">
+		<cfset var oCacheService = 0>
+		<cfset var cacheSize = getHomePortals().getConfig().getContentCacheSize()>
+		<cfset var cacheTTL = getHomePortals().getConfig().getContentCacheTTL()>
+
+		<cflock type="exclusive" name="contentCacheLock" timeout="30">
+			<cfif not oCacheRegistry.isRegistered(cacheName)>
+				<!--- crate cache instance --->
+				<cfset oCacheService = createObject("component","cacheService").init(cacheSize, cacheTTL)>
+
+				<!--- add cache to registry --->
+				<cfset oCacheRegistry.register(cacheName, oCacheService)>
+			</cfif>
+		</cflock>
+		
+		<cfreturn oCacheRegistry.getCache(cacheName)>
+	</cffunction>
+	
+	<!---------------------------------------->
+	<!--- retrieveContent                  --->
+	<!---------------------------------------->		
+	<cffunction name="retrieveContent" access="private" returntype="string" hint="retrieves content from source for a content module">
+		<cfargument name="moduleNode" type="any" required="true">
+		<cfscript>
+			var oResourceBean = 0;
+			var contentSrc = "";
+			var tmpHTML = "";
+			var st = structNew();
+			var oCatalog = getHomePortals().getCatalog();
+			var oHPConfig = getHomePortals().getConfig();
+			
+			// define source of content (resource or external)
+			if(arguments.moduleNode.resourceID neq "") {
+				oResourceBean = oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
+				contentSrc = oHPConfig.getResourceLibraryPath() & "/" & oResourceBean.getHref();
+			
+			} else if(arguments.moduleNode.href neq "") {
+				contentSrc = arguments.moduleNode.href;
+			}
+
+			// retrieve content
+			if(contentSrc neq "") {
+				if(left(contentSrc,4) eq "http") {
+					st = httpget(contentSrc);
+					tmpHTML = st.fileContent;
+				} else {
+					tmpHTML = readFile( expandPath( contentSrc) );
+				}
+			}
+		</cfscript>
+		<cfreturn tmpHTML>
+	</cffunction>
+	
+	<!---------------------------------------->
+	<!--- getHomePortals                   --->
+	<!---------------------------------------->		
+	<cffunction name="getHomePortals" access="private" returntype="homePortals">
+		<cfreturn variables.oHomePortals>
+	</cffunction>
+
+
+
 	<!--------------------------------------->
 	<!----  Facades for cf tags			----->
 	<!--------------------------------------->
@@ -837,64 +715,11 @@
 		<cfreturn cfhttp>
 	</cffunction>	
 	
-	<!---------------------------------------->
-	<!--- readFile		                   --->
-	<!---------------------------------------->		
 	<cffunction name="readFile" access="private" returntype="string" hint="Reads a file from disk and returns the contents.">
 		<cfargument name="filePath" type="string" required="true">
 		<cfset var txtDoc = "">
 		<cffile action="read" file="#filePath#" variable="txtDoc">
 		<cfreturn txtDoc>
 	</cffunction>		
-	
-	<cffunction name="getContentCache" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
-		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
-		<cfset var cacheName = "contentCacheService">
-		<cfset var oCacheService = 0>
-		<cfset var cacheSize = variables.oHomePortalsConfigBean.getContentCacheSize()>
-		<cfset var cacheTTL = variables.oHomePortalsConfigBean.getContentCacheTTL()>
 
-		<cflock type="exclusive" name="contentCacheLock" timeout="30">
-			<cfif not oCacheRegistry.isRegistered(cacheName)>
-				<!--- crate cache instance --->
-				<cfset oCacheService = createObject("component","cacheService").init(cacheSize, cacheTTL)>
-
-				<!--- add cache to registry --->
-				<cfset oCacheRegistry.register(cacheName, oCacheService)>
-			</cfif>
-		</cflock>
-		
-		<cfreturn oCacheRegistry.getCache(cacheName)>
-	</cffunction>
-	
-	<cffunction name="retrieveContent" access="private" returntype="string" hint="retrieves content from source for a content module">
-		<cfargument name="moduleNode" type="any" required="true">
-		<cfscript>
-			var oResourceBean = 0;
-			var contentSrc = "";
-			var tmpHTML = "";
-			var st = structNew();
-			
-			// define source of content (resource or external)
-			if(arguments.moduleNode.resourceID neq "") {
-				oResourceBean = variables.oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
-				contentSrc = variables.oHomePortalsConfigBean.getResourceLibraryPath() & "/" & oResourceBean.getHref();
-			
-			} else if(arguments.moduleNode.href neq "") {
-				contentSrc = arguments.moduleNode.href;
-			}
-
-			// retrieve content
-			if(contentSrc neq "") {
-				if(left(contentSrc,4) eq "http") {
-					st = httpget(contentSrc);
-					tmpHTML = st.fileContent;
-				} else {
-					tmpHTML = readFile( expandPath( contentSrc) );
-				}
-			}
-		</cfscript>
-		<cfreturn tmpHTML>
-	</cffunction>
-	
 </cfcomponent>

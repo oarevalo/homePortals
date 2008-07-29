@@ -327,47 +327,35 @@
 	<!---------------------------------------->		
 	<cffunction name="savePageSettings" access="public" hint="saves page-level settings for this module">
 		<cfscript>
+			var oPageProvider = getHomePortals().getPageProvider();
 			var cfg = getModuleConfigBean();
 			var href = cfg.getPageHREF();
 			var id = getModuleID();
-			var xmlDoc = 0;
-			var xmlModuleNode = 0;
-			var stSettings = cfg.getPageSettings();
+			var oPage = 0;
+			var oConfigBeanStore = 0;
 			var tmpField = "";
-			var myConfigBeanStore = createObject("component", "configBeanStore");
-			var i = 1;
-			var stXMLAttribs = structNew();
+			var stSettings = structNew();
+			var stModule = structNew();
 
-			// read and parse layout page
-			xmlDoc = xmlParse(expandPath(href));
-
-
-			// loop through all page modules
-			for(i=1;i lte arrayLen(xmlDoc.xmlRoot.modules.xmlChildren);i=i+1) {
-				// when the current module is found, update module attributes
-				if(xmlDoc.xmlRoot.modules.xmlChildren[i].xmlAttributes.id eq id) {
-					xmlModuleNode = xmlDoc.xmlRoot.modules.xmlChildren[i];
-					stXMLAttribs = xmlElemNew(xmlDoc, "dummy").xmlattributes;
-					
-					// update all attributes sent
-					for(tmpField in stSettings) {
-						if(isSimpleValue(stSettings[tmpField])) 
-							stXMLAttribs[tmpField] = stSettings[tmpField]; 	
-					}	
-					
-					
-					xmlDoc.xmlRoot.modules.xmlChildren[i].xmlAttributes = duplicate(stXMLAttribs);
-					
-					// exit loop
-					break;
-				}	
-			}
+			// get container page			
+			oPage = getPage();
+				
+			stModule = oPage.getModule( id );
+			stSettings = cfg.getPageSettings();
+			
+			// update all attributes sent
+			for(tmpField in stSettings) {
+				if(isSimpleValue(stSettings[tmpField])) 
+					stModule[tmpField] = stSettings[tmpField]; 	
+			}			
+			oPage.setModule(id, stModule);
 
 			// save changes in configBean store
-			myConfigBeanStore.save(id, cfg);
+			oConfigBeanStore = createObject("component", "configBeanStore");
+			oConfigBeanStore.save(id, cfg);
 
-			// save layout page
-			writeFile(expandPath(href), toString(xmlDoc));
+			// save page
+			oPageProvider.save(href, oPage);
 		</cfscript>
 	</cffunction>
 
@@ -516,7 +504,6 @@
 		<cfreturn tmpHTML>
 	</cffunction>
 
-
 	<!---------------------------------------->
 	<!--- renderError                      --->
 	<!---------------------------------------->		
@@ -538,6 +525,31 @@
 		<cfset flushErrorInfo()>
 		<cfreturn tmpHTML>
 	</cffunction>
+
+	<!---------------------------------------->
+	<!--- getPage	                       --->
+	<!---------------------------------------->		
+	<cffunction name="getPage" access="public" returntype="pageBean" hint="returns the pageBean that contains this module">
+		<cfscript>
+			var oPage = 0;
+			var oPageRenderer = 0;
+			var oPageProvider = getHomePortals().getPageProvider();
+			var oCacheRegistry = createObject("component","cacheRegistry").init();			
+			var oCache = oCacheRegistry.getCache("hpPageCache");
+			var href = getModuleConfigBean().getPageHREF();
+
+			try {
+				oPageRenderer = oCache.retrieve(href);
+				oPage = oPageRenderer.getPage();
+			
+			} catch(homePortals.cacheService.itemNotFound e) {
+				oPage = oPageProvider.load(href);
+			}
+			
+			return oPage;
+		</cfscript>
+	</cffunction>
+
 
 
 	<!------------  P R I V A T E    M E T H O D S   -------------------------->
@@ -578,17 +590,6 @@
 		<cfabort>
 	</cffunction>	
 
-	<!-------------------------------------->
-	<!--- writeFile                      --->
-	<!-------------------------------------->
-	<cffunction name="writeFile" access="private" hint="saves a file to the filesystem">
-		<cfargument name="file" type="string">
-		<cfargument name="content" type="string" default="">
-		<cffile action="write" 
-				file="#arguments.file#" 
-				output="#toString(arguments.content)#">
-	</cffunction>
-	
 </cfcomponent>
 			 
 			 

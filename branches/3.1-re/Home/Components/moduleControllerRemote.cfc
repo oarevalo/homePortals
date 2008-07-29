@@ -7,6 +7,7 @@
 	<!--- init		                       --->
 	<!---------------------------------------->		
 	<cffunction name="init" access="public" hint="constructor" returntype="moduleControllerRemote">
+		<!--- <cfargument name="pageURI" type="any" required="true"> --->
 		<cfargument name="moduleID" type="any" required="true">
 		<cfargument name="homePortals" type="homePortals" required="true" hint="homeportals application instance">
 		
