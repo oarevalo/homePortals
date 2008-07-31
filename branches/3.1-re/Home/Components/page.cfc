@@ -3,6 +3,7 @@
 	<cfscript>
 		variables.oPageBean = 0;
 		variables.autoSave = true;
+		variables.pageHREF = "";
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -20,6 +21,7 @@
 			// page exists, so read from file system
 			xmlDoc = xmlParse(expandPath(arguments.pageHREF));
 
+			variables.pageHREF = arguments.pageHREF;
 			variables.autoSave = arguments.autoSave;
 			variables.oPageBean = createObject("Component","pageBean").init(xmlDoc);
 		</cfscript>
@@ -37,7 +39,7 @@
 	<!--- getHREF				           --->
 	<!---------------------------------------->	
 	<cffunction name="getHREF" access="public" returntype="string">
-		<cfreturn variables.oPageBean.getHREF()>
+		<cfreturn variables.pageHREF>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -45,7 +47,7 @@
 	<!---------------------------------------->	
 	<cffunction name="setHREF" access="public" returntype="string">
 		<cfargument name="pageHREF" type="string" required="true">
-		<cfset variables.oPageBean.setHREF(arguments.pageHREF)>
+		<cfset variables.pageHREF = arguments.pageHREF>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -700,7 +702,7 @@
 			var aTemp = arrayNew(1);
 			var hasLocalStyle = false;
 			var lstLocations = "";
-			var href = variables.oPageBean.getHREF();
+			var href = variables.pageHREF;
 			var pageTemplateHREF = "";
 			
 			// get page template
@@ -899,9 +901,8 @@
 	<cffunction name="save" access="public" hint="Saves the site xml">
 		<!--- check that is a valid xml file --->
 		<cfset var xmlDoc = variables.oPageBean.toXML()>
-		<cfset var href = variables.oPageBean.getHREF()>	
 		<!--- store page --->
-		<cffile action="write" file="#expandpath(href)#" output="#toString(xmlDoc)#">
+		<cffile action="write" file="#expandpath(variables.pageHREF)#" output="#toString(xmlDoc)#">
 	</cffunction>
 	
 	<!---------------------------------------->
