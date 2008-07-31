@@ -12,8 +12,16 @@
 		<cfargument name="pageHREF" type="string" required="false" default="" hint="The location of the page as a relative address. If not empty, then loads the page">
 		<cfargument name="autoSave" type="boolean" required="false" default="true" hint="This flag is to force a saving of the page everytime a change is made, if false then the save method must be called manually">		
 		<cfscript>
+			var xmlDoc = 0;
+			
+			// check that page exists
+			if(not fileExists(expandPath(arguments.pageHREF))) throw("Page does not exist","homePortals.page.pageNotFound");
+			
+			// page exists, so read from file system
+			xmlDoc = xmlParse(expandPath(arguments.pageHREF));
+
 			variables.autoSave = arguments.autoSave;
-			variables.oPageBean = createObject("Component","pageBean").init(arguments.pageHREF);
+			variables.oPageBean = createObject("Component","pageBean").init(xmlDoc);
 		</cfscript>
 		<cfreturn this>
 	</cffunction>

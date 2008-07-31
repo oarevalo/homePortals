@@ -28,15 +28,16 @@ This file is a gateway for calls to server-side components.
 <cfheader name="cache-control" value="no-cache, no-store, must-revalidate">
 
 <cftry>
-	<cfparam name="moduleID"> 
-	<cfparam name="method">
+	<cfparam name="pageURI">	<!--- the current page --->
+	<cfparam name="moduleID"> 	<!--- the requested module --->
+	<cfparam name="method">		<!--- the method to execute in the module --->
 	
 	<!--- Create a structure with form and url fields --->
 	<cfset stRequest = form>
 	<cfset structAppend(stRequest, url)>
 	
 	<!--- Initialize remote module controller --->
-	<cfset oModuleControllerRemote = CreateObject("component", moduleControllerRemotePath).init(moduleID, HOMEPORTALS_INSTANCE)>
+	<cfset oModuleControllerRemote = CreateObject("component", moduleControllerRemotePath).init(pageURI, moduleID, HOMEPORTALS_INSTANCE)>
 	
 	<!--- create and execute call --->
 	<cfinvoke   component="#oModuleControllerRemote#" 

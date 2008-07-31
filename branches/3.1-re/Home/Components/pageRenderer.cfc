@@ -456,7 +456,7 @@
 				
 				// instantiate module controller and call constructor
 				oModuleController = createObject("component","moduleController");
-				oModuleController.init(moduleID, moduleName, arguments.moduleNode, bIsFirstInClass, "local", variables.oHomePortals);
+				oModuleController.init(variables.stPage.page.uri, moduleID, moduleName, arguments.moduleNode, bIsFirstInClass, "local", variables.oHomePortals);
 
 				// render html content
 				appendpageBuffer("_htmlHead", moduleID, oModuleController.renderClientInit() );

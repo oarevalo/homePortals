@@ -3,6 +3,7 @@
 
 	<cfscript>
 		variables.isFirstInClass = false;
+		variables.pageURI = "";
 		variables.moduleID = 0;
 		variables.oModule = 0;
 		variables.oModuleConfigBean = 0;
@@ -20,6 +21,7 @@
 	<!---------------------------------------->		
 	<cffunction name="init" access="public" 
 				hint="This is the constructor. It is responsible for instantiating the module and configuring it properly.">
+		<cfargument name="pageURI" required="true">
 		<cfargument name="moduleID" required="true">
 		<cfargument name="moduleClassLocation" required="false" default="">
 		<cfargument name="modulePageSettings" required="false" default="0">
@@ -36,11 +38,13 @@
 			var oCacheRegistry = createObject("component","cacheRegistry").init();	
 			var oModPropsCache = oCacheRegistry.getCache("hpModuleProperties");
 		
-			// validate the module class name
-			if(arguments.moduleID eq "") throw("Module ID is empty.");
-			if(arguments.moduleClassLocation eq "" and arguments.execMode eq "local") throw("Module name is empty.");
+			// validate the module info
+			if(arguments.pageURI eq "") throw("Page URI cannot be blank","homePortals.moduleController.missingPageURI");
+			if(arguments.moduleID eq "") throw("Module ID cannot be blank","homePortals.moduleController.missingModuleID");
+			if(arguments.moduleClassLocation eq "" and arguments.execMode eq "local") throw("Module class location cannot be blank","homePortals.moduleController.missingModuleClassLocation");
 		
 			// initialize instance variables
+			variables.pageURI = arguments.pageURI;
 			variables.moduleID = arguments.moduleID;
 			variables.isFirstInClass = arguments.isFirstInClass;
 			variables.execMode  = arguments.execMode;
@@ -60,14 +64,14 @@
 			}
 
 			// get the moduleConfigBean from the configBeanStore
-			if(myConfigBeanStore.exists(variables.moduleID)) {
-				variables.oModuleConfigBean = myConfigBeanStore.load(variables.moduleID, variables.oModuleConfigBean);
+			if(myConfigBeanStore.exists(variables.pageURI, variables.moduleID)) {
+				variables.oModuleConfigBean = myConfigBeanStore.load(variables.pageURI, variables.moduleID, variables.oModuleConfigBean);
 			} else {
 				variables.oModuleConfigBean.setPageSettings(arguments.modulePageSettings);
 				variables.oModuleConfigBean.setPageHREF(arguments.modulePageSettings["_page"].href);
 				variables.oModuleConfigBean.setModuleClassLocation(arguments.moduleClassLocation);
 				variables.oModuleConfigBean.setModuleRoot(tmpModuleRoot);
-				myConfigBeanStore.save(variables.moduleID, variables.oModuleConfigBean);
+				myConfigBeanStore.save(variables.pageURI, variables.moduleID, variables.oModuleConfigBean);
 			}
 
 
@@ -77,10 +81,10 @@
 
 		
 			// check if the contentStoreConfigBean is already on the configBeanStore, otherwise add it
-			if(myConfigBeanStore.exists(contentStoreID)) {
-				variables.oContentStoreConfigBean = myConfigBeanStore.load(contentStoreID, variables.oContentStoreConfigBean);
+			if(myConfigBeanStore.exists(variables.pageURI, contentStoreID)) {
+				variables.oContentStoreConfigBean = myConfigBeanStore.load(variables.pageURI, contentStoreID, variables.oContentStoreConfigBean);
 			} else {
-				myConfigBeanStore.save(contentStoreID, variables.oContentStoreConfigBean);
+				myConfigBeanStore.save(variables.pageURI, contentStoreID, variables.oContentStoreConfigBean);
 			}
 
 			
@@ -112,8 +116,8 @@
 			variables.oModule.init();
 			
 			// save any changes to the configBeans since the module init code may have made some changes
-			myConfigBeanStore.save(variables.moduleID, variables.oModuleConfigBean);
-			myConfigBeanStore.save(contentStoreID, variables.oContentStoreConfigBean);
+			myConfigBeanStore.save(variables.pageURI, variables.moduleID, variables.oModuleConfigBean);
+			myConfigBeanStore.save(variables.pageURI, contentStoreID, variables.oContentStoreConfigBean);
 		</cfscript>
 	</cffunction>
 	
@@ -352,7 +356,7 @@
 
 			// save changes in configBean store
 			oConfigBeanStore = createObject("component", "configBeanStore");
-			oConfigBeanStore.save(id, cfg);
+			oConfigBeanStore.save(variables.pageURI, id, cfg);
 
 			// save page
 			oPageProvider.save(href, oPage);
@@ -572,7 +576,8 @@
 	<!---------------------------------------->
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string" required="yes">
-		<cfthrow message="#arguments.message#">
+		<cfargument name="type" type="string" required="no" default="homePortals.moduleController.exception">
+		<cfthrow message="#arguments.message#" type="#arguments.type#">
 	</cffunction>
 
 	<!---------------------------------------->

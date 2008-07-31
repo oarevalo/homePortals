@@ -50,6 +50,7 @@
 			var oCacheService = 0;
 			var oRSSService = 0;
 			var ppClass = "";
+			var oConfigBeanStore = 0;
 			
 			variables.appRoot = arguments.appRoot;
 
@@ -106,6 +107,10 @@
 																		variables.oHomePortalsConfigBean.getRSSCacheTTL());
 			
 			
+			// clear all stored pages/module contexts (configbeans)
+			oConfigBeanStore = createObject("component","configBeanStore");
+			oConfigBeanStore.flushAll();
+			
 			variables.stTimers.init = getTickCount()-start;
 			return this;
 		</cfscript>
@@ -157,10 +162,6 @@
 			// validate access to page
 			validatePageAccess( oPageRenderer.getPage().getAccess() , oPageRenderer.getPage().getOwner() );
 
-			// clear persistent storage for module data
-			oConfigBeanStore = createObject("component","configBeanStore");
-			oConfigBeanStore.flushAll();
-	
 			// process modules on page		
 			oPageRenderer.processModules();
 			
@@ -187,10 +188,6 @@
 			oPageLoader = createObject("component","pageLoader").init(this);
 			oPageRenderer = oPageLoader.load(arguments.pageURI);	
 
-			// clear persistent storage for module data
-			oConfigBeanStore = createObject("component","configBeanStore");
-			oConfigBeanStore.flushAll();
-	
 			// process modules on page		
 			oPageRenderer.processModules();
 			
