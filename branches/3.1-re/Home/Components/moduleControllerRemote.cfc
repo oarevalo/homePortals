@@ -12,7 +12,7 @@
 		<cfargument name="homePortals" type="homePortals" required="true" hint="homeportals application instance">
 		
 		<cfscript>
-			var myConfigBeanStore = createObject("component", "configBeanStore");
+			var myConfigBeanStore = createObject("component", "configBeanStore").init();
 			
 			// verify that the session still exists before initializing the module controller
 			if(myConfigBeanStore.exists(arguments.pageURI, arguments.moduleID)) {

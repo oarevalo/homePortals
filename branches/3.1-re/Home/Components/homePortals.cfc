@@ -31,6 +31,7 @@
 		variables.oAccountsService = 0;			// a handle to the accoutns service
 		variables.oCatalog = 0;					// a handle to the resources catalog 
 		variables.oPageProvider = 0;			// a handle to the provider of pages
+		variables.oModuleProperties = 0;		// a handle to the an object that provides properties for modules
 		
 		variables.stTimers = structNew();
 	</cfscript>
@@ -79,6 +80,8 @@
 			if(ppClass eq "") throw("PageProviderClass settings is missing or blank","","homePortals.engine.invalidPageProviderClass");
 			variables.oPageProvider = createObject("component",ppClass).init(variables.oHomePortalsConfigBean);
 
+			// load module properties
+			variables.oModuleProperties = createObject("component","moduleProperties").init(variables.oHomePortalsConfigBean);
 			
 			// initialize cache registry
 			oCacheRegistry = createObject("component","cacheRegistry").init();
@@ -89,11 +92,6 @@
 																			variables.oHomePortalsConfigBean.getPageCacheTTL());
 			oCacheRegistry.register("hpPageCache", oCacheService);
 
-			// load module properties and store in cache
-			oModuleProperties = createObject("component","moduleProperties").init(variables.oHomePortalsConfigBean);
-			oCacheService = createObject("component","cacheService").init(1,0);
-			oCacheRegistry.register("hpModuleProperties", oCacheService);
-			oCacheService.store("oModuleProperties", oModuleProperties);
 
 			// create and register content store cache
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
@@ -108,7 +106,7 @@
 			
 			
 			// clear all stored pages/module contexts (configbeans)
-			oConfigBeanStore = createObject("component","configBeanStore");
+			oConfigBeanStore = createObject("component","configBeanStore").init();
 			oConfigBeanStore.flushAll();
 			
 			variables.stTimers.init = getTickCount()-start;
@@ -246,6 +244,13 @@
 	<!--------------------------------------->		
 	<cffunction name="getPageProvider" access="public" returntype="pageProvider">
 		<cfreturn variables.oPageProvider>
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  getModuleProperties			----->
+	<!--------------------------------------->		
+	<cffunction name="getModuleProperties" access="public" returntype="moduleProperties">
+		<cfreturn variables.oModuleProperties>
 	</cffunction>
 
 		

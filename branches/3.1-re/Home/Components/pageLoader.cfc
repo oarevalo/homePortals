@@ -38,7 +38,7 @@
 				oCache.store(pageCacheKey, oPageRenderer);
 				
 				// clear persistent storage for module data
-				oConfigBeanStore = createObject("component","configBeanStore");
+				oConfigBeanStore = createObject("component","configBeanStore").init();
 				oConfigBeanStore.flushByPageURI(arguments.uri);
 				
 			}

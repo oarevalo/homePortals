@@ -32,11 +32,9 @@
 		<cfscript>
 			var contentStoreID = "";
 			var moduleName = "";
-			var myConfigBeanStore = createObject("component", "configBeanStore");
+			var myConfigBeanStore = createObject("component", "configBeanStore").init();
 			var tmpModuleRoot = "";
 			var oModuleProperties = 0;
-			var oCacheRegistry = createObject("component","cacheRegistry").init();	
-			var oModPropsCache = oCacheRegistry.getCache("hpModuleProperties");
 		
 			// validate the module info
 			if(arguments.pageURI eq "") throw("Page URI cannot be blank","homePortals.moduleController.missingPageURI");
@@ -90,12 +88,7 @@
 			
 			// get module properties for this module (if any). Do this only on the first run of the module
 			if(arguments.execMode eq "local") {
-				try {
-				 	oModuleProperties = oModPropsCache.retrieve("oModuleProperties");
-				} catch(homePortals.cacheService.itemNotFound e) {
-					throw("Module Properties not found in cache.");				
-				}
-				
+				oModuleProperties = getHomePortals().getModuleProperties();
 				stModuleProperties = oModuleProperties.getProperties(arguments.modulePageSettings.name);
 	
 				// copy module properties to the module config bean
@@ -355,7 +348,7 @@
 			oPage.setModule(id, stModule);
 
 			// save changes in configBean store
-			oConfigBeanStore = createObject("component", "configBeanStore");
+			oConfigBeanStore = createObject("component", "configBeanStore").init();
 			oConfigBeanStore.save(variables.pageURI, id, cfg);
 
 			// save page

@@ -3,6 +3,13 @@
 	<cfset variables.storeVarName = "_hpModuleConfigBeans">
 
 	<!---------------------------------------->
+	<!--- init		                       --->
+	<!---------------------------------------->		
+	<cffunction name="init" access="public" returntype="configBeanStore">
+		<cfreturn this>
+	</cffunction>
+
+	<!---------------------------------------->
 	<!--- load		                       --->
 	<!---------------------------------------->		
 	<cffunction name="load" access="public" returnType="configBean"
