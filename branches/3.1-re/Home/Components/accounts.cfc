@@ -1,8 +1,10 @@
-<cfcomponent displayname="accounts" hint="This components acts as a service to perform account-related functions. The same instance of this component can perform actions on multiple accounts.">
+<cfcomponent displayname="accountsService" hint="This components acts as a service to perform account-related functions. The same instance of this component can perform actions on multiple accounts.">
 	<cfscript>
 		variables.configFilePath = "Config/accounts-config.xml.cfm";  // path of the config file relative to the root of the application
 		variables.oAccountsConfigBean = 0;	// bean to store config settings
 		variables.oHomePortalsConfigBean = 0;	// reference to the application settings
+		variables.clientDAOPath = "Home.Components.db."; // here is where the DAO objects are located
+		variables.oDataProvider = 0;	// provides access to account data storage
 	</cfscript>
 
 	<!--------------------------------------->
@@ -10,74 +12,36 @@
 	<!--------------------------------------->
 	<cffunction name="init" access="public" returntype="accounts" hint="Constructor">
 		<cfargument name="configBean" type="homePortalsConfigBean" required="true" hint="HomePortals application settings">
-		
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
+			var oConfigBean = 0;
 			
 			// copy reference to homeportals config bean
-			variables.oHomePortalsConfigBean = arguments.configBean;
+			setHomePortalsConfigBean( arguments.configBean );
 
 			// create object to store configuration settings
-			variables.oAccountsConfigBean = createObject("component", "accountsConfigBean").init();
+			oConfigBean = createObject("component", "accountsConfigBean").init();
 
 			// load default configuration settings
 			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & pathSeparator & ".." & pathSeparator & "Config" & pathSeparator & "accounts-config.xml.cfm";
-			variables.oAccountsConfigBean.load(defaultConfigFilePath);
+			oConfigBean.load(defaultConfigFilePath);
 
 			// load configuration settings for the application
-			configFilePath = listAppend(oHomePortalsConfigBean.getAppRoot(), variables.configFilePath, "/");
+			configFilePath = listAppend(getHomePortalsConfigBean().getAppRoot(), variables.configFilePath, "/");
 			if(fileExists(expandPath(configFilePath)))
-				variables.oAccountsConfigBean.load(expandPath(configFilePath));
+				oConfigBean.load(expandPath(configFilePath));
+		
+			// set accounts config bean
+			setConfig( oConfigBean );
+		
+			// setup dataprovider
+			loadDataProvider();
 		
 			return this;
 		</cfscript>
 	</cffunction>
 	
-
-	<!--------------------------------------->
-	<!----  getConfig					----->
-	<!--------------------------------------->
-	<cffunction name="getConfig" access="public" returntype="accountsConfigBean" hint="Returns the accounts config bean for the application">
-		<cfreturn variables.oAccountsConfigBean>
-	</cffunction>
-				
-	<!--------------------------------------->
-	<!--- getAccountStorage  		        --->
-	<!--------------------------------------->
-	<cffunction name="getAccountStorage" access="public" returntype="storage"
-				hint="Returns the storage object for the type of storage selected">
-
-		<cfset var obj = createObject("component","storage")>
-		<cfset var storageType = oAccountsConfigBean.getStorageType()>
-		<cfset var storageCFC = oAccountsConfigBean.getStorageCFC()>
-				
-		<cfswitch expression="#storageType#">
-			<cfcase value="db">
-				<cfset storageCFC = "dbStorage">
-			</cfcase>
-			<cfcase value="xml">
-				<cfset storageCFC = "xmlStorage">
-			</cfcase>
-			<cfcase value="custom">
-				<cfset storageCFC = storageCFC>
-			</cfcase>
-			<cfdefaultcase>
-				<cfthrow message="Unknown storage type!" type="homePortals.accounts.invalidStorageType">
-			</cfdefaultcase>
-		</cfswitch>
-		
-		<cfset obj = createObject("component",storageCFC).init(oAccountsConfigBean)>
-		<cfreturn obj>
-	</cffunction>	
-
-	
-	<!--------------------------------------->
-	<!----  GetUsers					----->
-	<!--------------------------------------->
-	<cffunction name="GetUsers" access="public" returntype="query" hint="Returns a query with recently created accounts.">
-		<cfreturn getAccountStorage().search("","","","","createDate,username")>
-	</cffunction>
 
 	<!--------------------------------------->
 	<!----  loginUser					----->
@@ -89,7 +53,7 @@
 		
 		<cfset var pwdHSH = "">
 		<cfset var oUserRegistry = 0>
-		<cfset var qryUser = queryNew("")>
+		<cfset var qryAccount = queryNew("")>
 
 		<!--- hash the password --->
 		<cfif arguments.password eq "" and arguments.passwordHash neq "">
@@ -99,19 +63,19 @@
 		</cfif>
 		
 		<!--- retrieve user information from the accounts storage --->
-		<cfset qryUser = getAccountByUsername(arguments.username)>
+		<cfset qryAccount = getAccountByName(arguments.username)>
 
 		<!--- validate the password --->
-		<cfif (qryUser.recordCount eq 0) or (qryUser.password[1] neq pwdHSH)>
-			<cfthrow message="Invalid username or password" type="homePortals.accounts.invalidLogin">
+		<cfif (qryAccount.recordCount eq 0) or (qryAccount.password[1] neq pwdHSH)>
+			<cfthrow message="Invalid account name or password" type="homePortals.accounts.invalidLogin">
 		</cfif>			
 
 		<!--- register user information into the user registry --->
 		<!--- (this is to allow other components to access the current user information) --->
 		<cfset oUserRegistry = createObject("component","userRegistry").init()>
-		<cfset oUserRegistry.setUserInfo( qryUser.userID, qryUser.userName, qryUser )>
+		<cfset oUserRegistry.setUserInfo( qryAccount.accountID, qryAccount.userName, qryAccount )>
 		
-		<cfreturn qryUser>
+		<cfreturn qryAccount>
 	</cffunction>
 	
 	<!--------------------------------------->
@@ -126,37 +90,49 @@
 	</cffunction>
 
 
-
 	<!--------------------------------------->
-	<!----  SearchUsers				  ----->
+	<!----  getAccounts					----->
 	<!--------------------------------------->
-	<cffunction name="SearchUsers" access="public" returntype="query" hint="Searches account records.">
-		<cfargument name="username" type="string" required="yes">
-		<cfargument name="lastname" type="string" required="yes">
-		<cfargument name="email" type="string" required="yes">
-		<cfreturn getAccountStorage().search("",arguments.username & "%", arguments.lastName & "%", arguments.email & "%")>
+	<cffunction name="getAccounts" access="public" returntype="query" hint="Returns a query with all created accounts.">
+		<cfset var oDAO = getDAO("Accounts")>
+		<cfreturn oDAO.getAll()>
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  getAccountByUsername		----->
+	<!----  search		 			    ----->
 	<!--------------------------------------->
-	<cffunction name="getAccountByUsername" access="public" returntype="query" hint="Returns info on a user.">
-		<cfargument name="username" type="string" required="yes">
-		<cfreturn getAccountStorage().search("",arguments.username)>
+	<cffunction name="search" access="public" returntype="query" hint="Searches account records.">
+		<cfargument name="accountname" type="string" required="no" default="">
+		<cfargument name="lastname" type="string" required="no" default="">
+		<cfargument name="email" type="string" required="no" default="">
+		<cfset var oDAO = getDAO("Accounts")>
+		<cfreturn oDAO.search(accountName = arguments.accountname, 
+								lastName = arguments.lastName, 
+								email = arguments.email)>
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  getAccountByUserID		    ----->
+	<!----  getAccountByName			----->
 	<!--------------------------------------->
-	<cffunction name="getAccountByUserID" access="public" returntype="query" hint="Retrieves an account by the UserID.">
-		<cfargument name="UserID" type="string" required="yes">
+	<cffunction name="getAccountByName" access="public" returntype="query" hint="Returns information about an account using the account name">
+		<cfargument name="accountName" type="string" required="yes">
+		<cfset var oDAO = getDAO("Accounts")>
+		<cfreturn oDAO.search(accountName = arguments.accountname)>
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  getAccountByID			    ----->
+	<!--------------------------------------->
+	<cffunction name="getAccountByID" access="public" returntype="query" hint="Returns information about an account using the account ID">
+		<cfargument name="accountID" type="string" required="yes">
+		<cfset var oDAO = getDAO("Accounts")>
 		
-		<!--- if the userID is empty, then replace with -1 to avoid returning anything else --->
-		<cfif arguments.userID eq "">
-			<cfset arguments.userID = "-1">
+		<!--- if the accountID is empty, then replace with -1 to avoid returning anything else --->
+		<cfif arguments.accountID eq "">
+			<cfset arguments.accountID = "-1">
 		</cfif>
 		
-		<cfreturn getAccountStorage().search(arguments.UserID)>
+		<cfreturn oDAO.get(arguments.accountID)>
 	</cffunction>
 
 
@@ -173,30 +149,29 @@
 		<cfargument name="Email" type="string" required="no" default="">
 		
 		<cfset var qry = 0>
-		<cfset var oHPConfig = 0>
 		<cfset var txtDefault = "">
 		<cfset var txtPublic = "">
-		<cfset var txtSite = "">
-		<cfset var txtContent = "">
 		<cfset var tmpAccoutDir = "">
 		<cfset var tmpAccPublic = "">
 		<cfset var tmpAccDefault = "">
-		<cfset var tmpAccSite = "">
-		<cfset var tmpAccContent = "">
-		<cfset var newAccountID = createUUID()>
-		<cfset var objStorage = getAccountStorage()>
-		<cfset var stHPConfig = "">
+		<cfset var newAccountID = "">
+		<cfset var oDAO = getDAO("Accounts")>
 		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
 		
 		<!--- validate username --->
-		<cfset qry = getAccountByUsername(arguments.accountName)>
+		<cfset qry = getAccountByName(arguments.accountName)>
 		<cfif qry.RecordCount gt 0>
 			<cfthrow message="The given account name already exists. Please choose another." type="homeportals.accounts.usernameExists">
 		</cfif>
 		
 		<cftry>
 			<!--- insert record in account storage --->
-			<cfset newAccountID = objStorage.create(arguments.accountName, Arguments.Password, arguments.firstName, arguments.middleName, arguments.lastName, arguments.email)>
+			<cfset newAccountID = oDAO.save(accountName = arguments.accountName, 
+											Password = arguments.Password, 
+											firstName = arguments.firstName, 
+											middleName = arguments.middleName, 
+											lastName = arguments.lastName, 
+											email = arguments.email)>
 			
 			<!--- get homeportals settings --->
 			<cfset hpEngineRoot = oHomePortalsConfigBean.getHomePortalsPath()>
@@ -231,7 +206,7 @@
 			<cffile action="write" file="#tmpAccDefault#" output="#txtDefault#"> 
 			
 			<cfcatch type="any">
-				<cfset objStorage.delete(newAccountID)>
+				<cfset oDAO.delete(newAccountID)>
 				<cfrethrow>			
 			</cfcatch>
 		</cftry>
@@ -239,91 +214,36 @@
 		<cfreturn newAccountID>
 	</cffunction>
 
-
-	<!--------------------------------------->
-	<!----  getAccountDefaultPage	    ----->
-	<!--------------------------------------->
-	<cffunction name="getAccountDefaultPage" access="public" hint="Returns the address of the account's main page." returntype="string">
-		<cfargument name="accountName" type="string" required="yes">
-
-		<cfset var defaultPageHREF = "">
-		<cfset var oSite = 0>
-		<cfset var defaultPageURL = "">	
-		
-		<cfset oSite = getSite(arguments.accountName)>
-
-		<cfset defaultPageHREF = oSite.getDefaultPage()>
-
-		<cfif defaultPageHREF neq "">
-			<cfset defaultPageURL = variables.oAccountsConfigBean.getAccountsRoot()
-									& "/" 
-									& arguments.accountName 
-									& "/layouts/" 
-									& defaultPageHREF>
-		</cfif>
-		
-		<cfreturn defaultPageURL>
-	</cffunction>
-
-
-	<!--------------------------------------->
-	<!--- processTemplate				    --->
-	<!--------------------------------------->
-	<cffunction name="processTemplate" returntype="string" access="package">
-		<cfargument name="UserName" type="string" required="yes">
-		<cfargument name="TemplateName" type="string" required="yes">
-
-		<cfset var tmpDoc = "">
-		<cfset var tmpDocPath = ExpandPath(Arguments.TemplateName)>
-
-		<cfset var homeURL = oHomePortalsConfigBean.getAppRoot()>
-		<cfset var ModulesRoot = oHomePortalsConfigBean.getResourceLibraryPath() & "/Modules/">
-		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
-
-		<!--- read template file --->
-		<cffile action="read" file="#tmpDocPath#" variable="tmpDoc">
-
-		<!--- replace tokens --->
-		<cfset tmpDoc = ReplaceList(tmpDoc,
-									"$USERNAME$,$HOME$,$ACCOUNTS_ROOT$,$MODULES_ROOT$,$HOME_ROOT$",
-									"#Arguments.Username#,#homeURL#,#AccountsRoot#,#ModulesRoot#,#homeURL#")>
-		<cfreturn tmpDoc>
-	</cffunction>
-
-
-
-
 	<!--------------------------------------->
 	<!----  updateAccount   			  ----->
 	<!--------------------------------------->
 	<cffunction name="updateAccount" access="public" hint="Updates account data.">
-		<cfargument name="UserID" type="string" required="yes">
+		<cfargument name="accountID" type="string" required="yes">
 		<cfargument name="FirstName" type="string" required="yes">
 		<cfargument name="MiddleName" type="string" required="yes">
 		<cfargument name="LastName" type="string" required="yes">
 		<cfargument name="Email" type="string" required="yes">
-		
-		<cfset var obj = getAccountStorage()>
-		<cfset obj.update(arguments.userID, 
-							arguments.FirstName, 
-							arguments.MiddleName, 
-							arguments.LastName, 
-							arguments.Email)>
+		<cfset var oDAO = getDAO("Accounts")>
+		<cfset oDAO.save(accountID = arguments.accountID,
+							firstName = arguments.firstName, 
+							middleName = arguments.middleName, 
+							lastName = arguments.lastName, 
+							email = arguments.email)>
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  delete          			----->
+	<!----  deleteAccount      			----->
 	<!--------------------------------------->
-	<cffunction name="delete" access="public" hint="Deletes an account record and removes all files and account directory.">
-		<cfargument name="UserID" type="string" required="yes">
+	<cffunction name="deleteAccount" access="public" hint="Deletes an account record and removes all files and account directory.">
+		<cfargument name="accountID" type="string" required="yes">
 		
-		<cfset var objStorage = getAccountStorage()>
-		<cfset var qryAccount = objStorage.search(arguments.userID)>
+		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var qryAccount = oDAO.get(arguments.accountID)>
 		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
 		
 		<cfif qryAccount.recordCount gt 0>
 			<!--- delete record in table --->
-			<cfset objStorage.delete(arguments.UserID)>
+			<cfset oDAO.delete(arguments.accountID)>
 	
 			<!--- delete directory and files --->
 			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#qryAccount.Username#/")>
@@ -338,14 +258,40 @@
 	<!----  changePassword   			----->
 	<!--------------------------------------->
 	<cffunction name="changePassword" access="public" hint="Change accont password.">
-		<cfargument name="UserID" type="string" required="yes">
+		<cfargument name="accountID" type="string" required="yes">
 		<cfargument name="NewPassword" type="string" required="yes">
-
-		<cfset var objStorage = getAccountStorage()>
-		<cfset objStorage.changePassword(arguments.UserID, arguments.NewPassword)>
+		<cfset var oDAO = getDAO("Accounts")>
+		<cfset oDAO.save(accountID = arguments.accountID,
+							password = arguments.NewPassword)>
 	</cffunction>
 
+	<!--------------------------------------->
+	<!----  getAccountDefaultPage	    ----->
+	<!--------------------------------------->
+	<cffunction name="getAccountDefaultPage" access="public" hint="Returns the address of the account's main page." returntype="string">
+		<cfargument name="accountName" type="string" required="yes">
+		<cfset var oSite = 0>
+		<cfset var defaultPageHREF = "">
+		<cfset var defaultPageURL = "">	
+		
+		<!--- get the site object for this account --->
+		<cfset oSite = getSite(arguments.accountName)>
 
+		<!--- get the default page from the site --->
+		<cfset defaultPageHREF = oSite.getDefaultPage()>
+
+		<cfif defaultPageHREF neq "">
+			<!--- if the default page contains the xml extension, then remove it --->
+			<cfif right(defaultPageHREF,4) eq ".xml">
+				<cfset defaultPageHREF = left(defaultPageHREF, len(defaultPageHREF)-4)>
+			</cfif>
+			
+			<!--- get the location of the page --->
+			<cfset defaultPageURL = getAccountPageURI(arguments.accountName, defaultPageHREF)>
+		</cfif>
+		
+		<cfreturn defaultPageURL>
+	</cffunction>
 
 
 	<!--------------------------------------->
@@ -384,13 +330,118 @@
 	</cffunction>
 
 
+
+
+	<!--- /*************************** getters / setters **********************************/ ---->
+	<cffunction name="getConfig" access="public" returntype="accountsConfigBean">
+		<cfreturn variables.oAccountsConfigBean>
+	</cffunction>
+
+	<cffunction name="setConfig" access="public" returntype="void">
+		<cfargument name="data" type="accountsConfigBean" required="true">
+		<cfset variables.oAccountsConfigBean = arguments.data>
+	</cffunction>
+	
+	<cffunction name="getHomePortalsConfigBean" access="public" returntype="homePortalsConfigBean">
+		<cfreturn variables.oHomePortalsConfigBean>
+	</cffunction>
+
+	<cffunction name="setHomePortalsConfigBean" access="public" returntype="void">
+		<cfargument name="data" type="homePortalsConfigBean" required="true">
+		<cfset variables.oHomePortalsConfigBean = arguments.data>
+	</cffunction>
+
+	<cffunction name="getDataProvider" access="public" returntype="Home.Components.lib.DAOFactory.dataProvider">
+		<cfreturn variables.oDataProvider>
+	</cffunction>
+
+	<cffunction name="setDataProvider" access="public" returntype="void">
+		<cfargument name="data" type="Home.Components.lib.DAOFactory.dataProvider" required="true">
+		<cfset variables.oDataProvider = arguments.data>
+	</cffunction>
+
+
+
 	<!--- /*************************** Private Methods **********************************/ --->
-	<cffunction name="dump" access="private">
+	
+	<!--------------------------------------->
+	<!--- loadDataProvider 	        	  --->
+	<!--------------------------------------->
+	<cffunction name="loadDataProvider" access="private" returntype="void" hint="Loads and configures the instance of the dataprovider to be used">
+		<cfset var obj = createObject("component","storage")>
+		<cfset var storageType = oAccountsConfigBean.getStorageType()>
+		<cfset var pkgPath = "Home.Components.lib.DAOFactory.">
+		<cfset var oConfigBean = 0>
+				
+		<cfscript>
+			// check that dataprovider exists
+			if(not fileExists("/Home/Components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc"))
+				throw("Accounts storage type [#storageType#] is not supported","","homePortals.accounts.invalidStorageType");
+					
+			// create config		
+			oConfigBean = createObject("component", pkgPath & storageType & "DataProviderConfigBean").init();
+			
+			// configure bean
+			switch(storageType) {
+				case "db":
+					oConfigBean.setDSN( getConfig().getDatasource() );
+					oConfigBean.setUsername( getConfig().getUsername() );
+					oConfigBean.setPassword( getConfig().getPassword() );
+					oConfigBean.setDBType( getConfig().getDBType() );
+					break;
+					
+				case "xml":
+					oConfigBean.setDataRoot( getConfig().getAccountsRoot() );
+					break;
+			}
+
+			// initialize dataProvider
+			variables.oDataProvider = createObject("component", pkgPath & storageType & "DataProvider").init(oConfigBean);
+		</cfscript>	
+	</cffunction>	
+
+	<!--------------------------------------->
+	<!--- getDAO		 	        	  --->
+	<!--------------------------------------->
+	<cffunction name="getDAO" access="private" returntype="DAO" hint="returns a properly configured instance of a DAO">
+		<cfargument name="entity" type="string" required="true">
+		<cfset var oDAO = createObject("component", variables.clientDAOPath & arguments.entity & "DAO")>
+		<cfset oDAO.init(variables.oDataProvider)>
+		<cfreturn oDAO>
+	</cffunction>	
+
+	<!--------------------------------------->
+	<!--- processTemplate				    --->
+	<!--------------------------------------->
+	<cffunction name="processTemplate" returntype="private" access="package">
+		<cfargument name="accountName" type="string" required="yes">
+		<cfargument name="TemplateName" type="string" required="yes">
+
+		<cfset var tmpDoc = "">
+		<cfset var tmpDocPath = ExpandPath(Arguments.TemplateName)>
+
+		<cfset var homeURL = oHomePortalsConfigBean.getAppRoot()>
+		<cfset var ModulesRoot = oHomePortalsConfigBean.getResourceLibraryPath() & "/Modules/">
+		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
+
+		<!--- read template file --->
+		<cffile action="read" file="#tmpDocPath#" variable="tmpDoc">
+
+		<!--- replace tokens --->
+		<cfset tmpDoc = ReplaceList(tmpDoc,
+									"$USERNAME$,$HOME$,$ACCOUNTS_ROOT$,$MODULES_ROOT$,$HOME_ROOT$",
+									"#Arguments.accountName#,#homeURL#,#AccountsRoot#,#ModulesRoot#,#homeURL#")>
+		<cfreturn tmpDoc>
+	</cffunction>
+
+	
+	
+	<cffunction name="dump" access="private" hint="facade for cfdump">
 		<cfargument name="var" type="any">
 		<cfdump var="#arguments.var#">
 	</cffunction>
 	
-	<cffunction name="throw" access="private">
+	<cffunction name="throw" access="private" hint="facade for cfthrow">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 
 		<cfargument name="type" type="string" default="custom"> 
