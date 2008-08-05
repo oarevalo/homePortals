@@ -158,7 +158,7 @@
 			oPageRenderer = oPageLoader.load(pageURI);	
 
 			// validate access to page
-			validatePageAccess( oPageRenderer.getPage().getAccess() , oPageRenderer.getPage().getOwner() );
+			getAccountsService().validatePageAccess( oPageRenderer.getPage() );
 
 			// process modules on page		
 			oPageRenderer.processModules();
@@ -280,50 +280,6 @@
 		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
 	</cffunction>
 
-	<cffunction name="validatePageAccess" access="private" returntype="void" hint="Validates access to a page">
-		<cfargument name="accessLevel" type="string" required="true">
-		<cfargument name="owner" type="string" required="true">
-
-		<cfscript>
-			var oUserRegistry = 0;
-			var stUserInfo = 0;
-			var oFriendsService = 0;
-			var start = getTickCount();
-			
-			if(arguments.accessLevel eq "friend" or arguments.accessLevel eq "owner") {
-				// access to this page is restricted, so we must
-				// check who is the current user
-				oUserRegistry = createObject("component","userRegistry").init();
-				stUserInfo = oUserRegistry.getUserInfo();
-				
-				// if not user logged in, then get out
-				if(stUserInfo.userID eq "")
-					throw("Access to this page is restricted. Please sign-in to validate access","","homePortals.engine.unauthorizedAccess");	
-
-				// if logged in is the owner, then we are good
-				if(stUserInfo.userName eq arguments.owner) 
-					return;
-
-				// validate owner-only page
-				if(arguments.accessLevel eq "owner") 
-					throw("Access to this page is restricted to the page owner.","","homePortals.engine.unauthorizedAccess");	
-					
-				// check that user is friend	
-				if(arguments.accessLevel eq "friend") {
-					
-					// check if current friend is a friend of the owner
-					oFriendsService = variables.oAccountsService.getFriendsService();
-					
-					if( not oFriendsService.isFriend(arguments.owner, stUserInfo.username) ) {
-						throw("You must be a friend of the owner to access this page.","","homePortals.engine.unauthorizedAccess");	
-					}
-				
-				}	
-			} 
-			
-			variables.stTimers.validatePageAccess = getTickCount()-start;
-		</cfscript>
-	</cffunction>
 
 </cfcomponent>
 

@@ -293,6 +293,53 @@
 		<cfreturn defaultPageURL>
 	</cffunction>
 
+	<!--------------------------------------->
+	<!----  validatePageAccess		    ----->
+	<!--------------------------------------->
+	<cffunction name="validatePageAccess" access="public" returntype="void" hint="Validates access to a page">
+		<cfargument name="page" type="pageBean" required="true">
+
+		<cfscript>
+			var oUserRegistry = 0;
+			var stUserInfo = 0;
+			var oFriendsService = 0;
+			var accessLevel = arguments.page.getAccess();
+			var owner = arguments.page.getOwner();
+			
+			if(accessLevel eq "friend" or accessLevel eq "owner") {
+				// access to this page is restricted, so we must
+				// check who is the current user
+				oUserRegistry = createObject("component","userRegistry").init();
+				stUserInfo = oUserRegistry.getUserInfo();
+				
+				// if not user logged in, then get out
+				if(stUserInfo.userID eq "")
+					throw("Access to this page is restricted. Please sign-in to validate access","","homePortals.engine.unauthorizedAccess");	
+
+				// if logged in is the owner, then we are good
+				if(stUserInfo.userName eq owner) 
+					return;
+
+				// validate owner-only page
+				if(accessLevel eq "owner") 
+					throw("Access to this page is restricted to the page owner.","","homePortals.engine.unauthorizedAccess");	
+					
+				// check that user is friend	
+				if(accessLevel eq "friend") {
+					
+					// check if current friend is a friend of the owner
+					oFriendsService = getFriendsService();
+					
+					if( not oFriendsService.isFriend(owner, stUserInfo.username) ) {
+						throw("You must be a friend of the owner to access this page.","","homePortals.engine.unauthorizedAccess");	
+					}
+				
+				}	
+			} 
+		</cfscript>
+	</cffunction>
+
+
 
 	<!--------------------------------------->
 	<!----  getFriendsService  			----->
@@ -368,14 +415,14 @@
 	<!--- loadDataProvider 	        	  --->
 	<!--------------------------------------->
 	<cffunction name="loadDataProvider" access="private" returntype="void" hint="Loads and configures the instance of the dataprovider to be used">
-		<cfset var obj = createObject("component","storage")>
-		<cfset var storageType = oAccountsConfigBean.getStorageType()>
-		<cfset var pkgPath = "Home.Components.lib.DAOFactory.">
-		<cfset var oConfigBean = 0>
-				
 		<cfscript>
+			var obj = createObject("component","storage");
+			var storageType = oAccountsConfigBean.getStorageType();
+			var pkgPath = "Home.Components.lib.DAOFactory.";
+			var oConfigBean = 0;
+
 			// check that dataprovider exists
-			if(not fileExists("/Home/Components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc"))
+			if(not fileExists(expandPath("/Home/Components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc")))
 				throw("Accounts storage type [#storageType#] is not supported","","homePortals.accounts.invalidStorageType");
 					
 			// create config		
@@ -403,7 +450,7 @@
 	<!--------------------------------------->
 	<!--- getDAO		 	        	  --->
 	<!--------------------------------------->
-	<cffunction name="getDAO" access="private" returntype="DAO" hint="returns a properly configured instance of a DAO">
+	<cffunction name="getDAO" access="package" returntype="DAO" hint="returns a properly configured instance of a DAO">
 		<cfargument name="entity" type="string" required="true">
 		<cfset var oDAO = createObject("component", variables.clientDAOPath & arguments.entity & "DAO")>
 		<cfset oDAO.init(variables.oDataProvider)>

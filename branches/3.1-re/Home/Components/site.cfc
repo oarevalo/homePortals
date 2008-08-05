@@ -5,6 +5,7 @@
 		variables.siteURL = "";
 		variables.xmlDoc = 0;
 		variables.owner = 0;
+		variables.accountID = 0;
 		
 		variables.aPages = arrayNew(1);
 		variables.siteTitle = "";
@@ -16,21 +17,20 @@
 	<cffunction name="init" access="public" returntype="site">
 		<cfargument name="owner" type="string" required="true" hint="The owner of the site to load. this is the username of a homeportals account">
 		<cfargument name="accounts" type="accounts" required="true" hint="This is a reference to the Accounts object">
-		
 		<cfscript>
-			var oAccountsConfigBean = arguments.accounts.getConfig();
-			var accountsRoot = oAccountsConfigBean.getAccountsRoot();
-			
-			variables.accounts = arguments.accounts;
-			variables.owner = arguments.owner;
+			// set properties
+			setAccountsService( arguments.accounts );
+			setOwner( arguments.owner );
 
-			variables.siteURL = accountsRoot & "/" & arguments.owner & "/site.xml";
-			if(fileExists(expandPath(variables.siteURL)))
-				load();
-			else
-				indexPages();
+			// get the accountID for this account (will speedup future lookups)
+			qry = getAccountsService().getAccountByName(getOwner());
+			variables.accountID = qry.accountID;
+
+			// load pages			
+			load();
+			
+			return this;
 		</cfscript>
-		<cfreturn this>
 	</cffunction>
 	
 	<cffunction name="indexPages" access="public" returntype="void" hint="Builds the site index by examining all pages in the current account">
@@ -70,43 +70,6 @@
 		<cfset save()>
 	</cffunction>
 	
-	<cffunction name="toXML" access="public" returnType="xml" hint="Returns the site information as an XML document">
-		<cfscript>
-			var xmlDoc = 0;
-			var xmlNode = 0;
-			var tmpPage = structNew();
-			var i = 0;
-
-			// create a blank xml document and add the root node
-			xmlDoc = xmlNew();
-			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "site");	
-			
-			// add title node
-			xmlNode = xmlElemNew(xmlDoc, "title");
-			xmlNode.xmlText = xmlFormat(variables.siteTitle);
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
-			
-			// add pages node
-			xmlNode = xmlElemNew(xmlDoc, "pages");
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
-			
-			// add page nodes
-			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
-			
-				tmpPage = variables.aPages[i];
-			
-				xmlNode = xmlElemNew(xmlDoc, "page");
-				xmlNode.xmlAttributes["title"] = xmlFormat(tmpPage.title);
-				xmlNode.xmlAttributes["href"] = xmlFormat(tmpPage.href);
-				xmlNode.xmlAttributes["default"] = xmlFormat(tmpPage.default);
-			
-				arrayAppend(xmlDoc.xmlRoot.pages.xmlChildren, xmlNode);	
-			
-			}
-			
-		</cfscript>
-		<cfreturn xmlDoc>
-	</cffunction>
 	
 	
 
@@ -115,8 +78,9 @@
 	<!---------------------------------------->	
 	<cffunction name="setSiteTitle" access="public" output="false" returntype="void">
 		<cfargument name="title" type="string" required="true" hint="The new title for the site">
-		<cfset variables.siteTitle = arguments.title>
-		<cfset save()>
+		<cfset var oDAO = getAccountsService().getDAO("Accounts")>
+		<cfset oDAO.save(accountID = variables.accountID,
+							siteTitle = arguments.title)
 	</cffunction>
 
 
@@ -124,7 +88,7 @@
 	<!--- getSiteTitle			           --->
 	<!---------------------------------------->	
 	<cffunction name="getSiteTitle" access="public" returntype="string">
-		<cfreturn variables.siteTitle>
+		<cfreturn getAccountsService().getAccountByID(variables.accountID).siteTitle>
 	</cffunction>
 
 
@@ -132,31 +96,10 @@
 	<!--- getPages				           --->
 	<!---------------------------------------->	
 	<cffunction name="getPages" access="public" returntype="array">
+		<cfset var oDAO = getAccountsService().getDAO("Accounts")>
 		<cfreturn variables.aPages>
 	</cffunction>
 
-	<!---------------------------------------->
-	<!--- getUserID				           --->
-	<!---------------------------------------->	
-	<cffunction name="getUserID" access="public" returntype="string">
-		<cfset var qryUser = 0>
-		<cfset qryUser = variables.accounts.getAccountByUserName(variables.owner)>
-		<cfreturn qryUser.userID>
-	</cffunction>
-	
-	<!---------------------------------------->
-	<!--- getAccount			           --->
-	<!---------------------------------------->	
-	<cffunction name="getAccount" access="public" returntype="accounts">
-		<cfreturn variables.accounts>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- getOwner				           --->
-	<!---------------------------------------->	
-	<cffunction name="getOwner" access="public" returntype="any">
-		<cfreturn variables.owner>
-	</cffunction>
 
 	<!---------------------------------------->
 	<!--- setPageHREF			           --->
@@ -269,61 +212,6 @@
 			
 			// if no page is default then return the first one on the site
 			return variables.aPages[1].href;
-		</cfscript>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- movePageUp		               --->
-	<!---------------------------------------->	
-	<cffunction name="movePageUp" access="public" output="false" returntype="void">
-		<cfargument name="pageHREF" type="string" required="true" hint="The page to move">
-		<cfscript>
-			var targetIndex = 0;
-			var originalIndex = 0;
-			var i = 1;
-	
-			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
-				if(variables.aPages[i].href eq arguments.pageHREF) {
-					originalIndex = i;
-					break;
-				}
-			}
-			if(originalIndex eq 0) throw("page not found.");
-			
-			targetIndex = originalIndex - 1;
-			if(targetIndex gt 0) {
-				arraySwap(variables.aPages,originalIndex,targetIndex);
-				save();
-			} else {
-				throw("Page could not be moved.");
-			}
-		</cfscript>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- movePageDown		               --->
-	<!---------------------------------------->	
-	<cffunction name="movePageDown" access="public" output="false" returntype="void">
-		<cfargument name="pageHREF" type="string" required="true" hint="The page to move">
-		<cfscript>
-			var targetIndex = 0;
-			var originalIndex = 0;
-			var i = 1;
-	
-			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
-				if(variables.aPages[i].xmlAttributes.href eq arguments.pageHREF) {
-					originalIndex = i;
-					break;
-				}
-			}
-			
-			targetIndex = originalIndex + 1;
-			if(targetIndex lte arrayLen(variables.aPages)) {
-				arraySwap(variables.aPages,originalIndex,targetIndex);
-				save();
-			} else {
-				throw("Page could not be moved.");
-			}
 		</cfscript>
 	</cffunction>
 
@@ -544,6 +432,31 @@
 		<!--- update page title in site --->
 		<cfset setPageTitle(href, arguments.page.getTitle())>
 	</cffunction>
+	
+	
+	
+	<!---------------------------------------->
+	<!--- G E T T E R S  /  S E T T E R S  --->
+	<!---------------------------------------->
+	<cffunction name="getAccountsService" access="public" returntype="accounts">
+		<cfreturn variables.accounts>
+	</cffunction>
+
+	<cffunction name="setAccountsService" access="public" returntype="void">
+		<cfargument name="data" type="accounts" required="true">
+		<cfset variables.accounts = arguments.data>
+	</cffunction>
+
+	<cffunction name="getOwner" access="public" returntype="string">
+		<cfreturn variables.Owner>
+	</cffunction>
+
+	<cffunction name="setOwner" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.Owner = arguments.data>
+	</cffunction>
+
+	
 	
 	
 	<!---------------------------------------->
