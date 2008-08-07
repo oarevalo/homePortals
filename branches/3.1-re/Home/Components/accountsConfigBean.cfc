@@ -1,7 +1,7 @@
 <cfcomponent displayname="accountsConfigBean" hint="A bean to store the HomePortals accounts configuration. Configuration is per-application">
 
 	<cfset variables.stConfig = StructNew()>
-	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,storageType,storageCFC,accountsTable,datasource,username,password,dbtype,storageFileHREF">
+	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,storageType,datasource,username,password,dbtype">
 
 	<cffunction name="init" access="public" returntype="accountsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -12,13 +12,10 @@
 			variables.stConfig.newAccountTemplate = "";
 			variables.stConfig.newPageTemplate = "";
 			variables.stConfig.storageType = "xml";
-			variables.stConfig.storageCFC = "";
-			variables.stConfig.accountsTable = "";
 			variables.stConfig.datasource = "";
 			variables.stConfig.username = "";
 			variables.stConfig.password = "";
 			variables.stConfig.dbtype = "";
-			variables.stConfig.storageFileHREF = "";
 						
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -100,14 +97,6 @@
 		<cfreturn variables.stConfig.storageType>
 	</cffunction>
 
-	<cffunction name="getStorageCFC" access="public" returntype="string">
-		<cfreturn variables.stConfig.storageCFC>
-	</cffunction>
-
-	<cffunction name="getAccountsTable" access="public" returntype="string">
-		<cfreturn variables.stConfig.accountsTable>
-	</cffunction>
-	
 	<cffunction name="getDatasource" access="public" returntype="string">
 		<cfreturn variables.stConfig.datasource>
 	</cffunction>
@@ -124,10 +113,6 @@
 		<cfreturn variables.stConfig.dbtype>
 	</cffunction>
 	
-	<cffunction name="getStorageFileHREF" access="public" returntype="string">
-		<cfreturn variables.stConfig.storageFileHREF>
-	</cffunction>				
-
 
 	<!--- Setters --->
 	<cffunction name="setAccountsRoot" access="public" returntype="void">
@@ -150,16 +135,6 @@
 		<cfset variables.stConfig.storageType = arguments.data>
 	</cffunction>
 
-	<cffunction name="setStorageCFC" access="public" returntype="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.storageCFC = arguments.data>
-	</cffunction>
-
-	<cffunction name="setAccountsTable" access="public" returntype="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.accountsTable = arguments.data>
-	</cffunction>
-	
 	<cffunction name="setDatasource" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.datasource = arguments.data>
@@ -180,11 +155,6 @@
 		<cfset variables.stConfig.dbtype = arguments.data>
 	</cffunction>
 	
-	<cffunction name="setStorageFileHREF" access="public" returntype="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.storageFileHREF = arguments.data>
-	</cffunction>				
-
 
 
 	<cffunction name="XMLUnFormat" access="private" returntype="string">

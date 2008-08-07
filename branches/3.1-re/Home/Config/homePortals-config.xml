@@ -46,9 +46,6 @@
 	<!-- List with allowed types of base resources -->
 	<baseResourceTypes>script,style,header,footer</baseResourceTypes>
 	
-	<!-- The class responsible for storing pages -->
-	<pageProviderClass>fsPageProvider</pageProviderClass>
-	
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>
 		<resource href="/Home/Common/CSS/Main.css" type="style"/>

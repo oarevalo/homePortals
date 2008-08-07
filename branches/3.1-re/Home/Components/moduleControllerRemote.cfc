@@ -7,7 +7,7 @@
 	<!--- init		                       --->
 	<!---------------------------------------->		
 	<cffunction name="init" access="public" hint="constructor" returntype="moduleControllerRemote">
-		<cfargument name="pageURI" type="any" required="true">
+		<cfargument name="pageHREF" type="any" required="true">
 		<cfargument name="moduleID" type="any" required="true">
 		<cfargument name="homePortals" type="homePortals" required="true" hint="homeportals application instance">
 		
@@ -15,9 +15,9 @@
 			var myConfigBeanStore = createObject("component", "configBeanStore").init();
 			
 			// verify that the session still exists before initializing the module controller
-			if(myConfigBeanStore.exists(arguments.pageURI, arguments.moduleID)) {
+			if(myConfigBeanStore.exists(arguments.pageHREF, arguments.moduleID)) {
 				variables.oModuleController = createObject("component","moduleController");
-				variables.oModuleController.init(pageURI = arguments.pageURI,
+				variables.oModuleController.init(pageHREF = arguments.pageHREF,
 												moduleID = arguments.moduleID,
 												execMode = 'remote',
 												homePortals = arguments.homePortals);

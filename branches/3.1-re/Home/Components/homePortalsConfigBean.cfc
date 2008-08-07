@@ -26,7 +26,6 @@
 			variables.stConfig.rssCacheSize = "";
 			variables.stConfig.rssCacheTTL = "";
 			variables.stConfig.baseResourceTypes = "";
-			variables.stConfig.pageProviderClass = "";
 
 			variables.stConfig.renderTemplates = structNew();
 			variables.stConfig.resources = structNew();
@@ -229,12 +228,6 @@
 		<cfreturn variables.stConfig.baseResourceTypes>
 	</cffunction>	
 
-	<cffunction name="getPageProviderClass" access="public" returntype="string" hint="Returns the component to use as the pageProvider">
-		<cfreturn variables.stConfig.pageProviderClass>
-	</cffunction>
-
-
-
 	<cffunction name="getBaseResourcesByType" access="public" returntype="array" hint="Returns all base resources of the given type">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfset var aResources = arrayNew(1)>
@@ -390,12 +383,7 @@
 		<cfset structDelete(variables.stConfig.renderTemplates, arguments.type, false)>
 	</cffunction>
 
-	<cffunction name="setPageProviderClass" access="public" returntype="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.PageProviderClass = arguments.data>
-	</cffunction>
 
-	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 

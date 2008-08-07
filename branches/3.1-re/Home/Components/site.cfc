@@ -5,7 +5,6 @@
 		variables.siteURL = "";
 		variables.xmlDoc = 0;
 		variables.owner = 0;
-		variables.accountID = 0;
 		
 		variables.aPages = arrayNew(1);
 		variables.siteTitle = "";
@@ -18,21 +17,24 @@
 		<cfargument name="owner" type="string" required="true" hint="The owner of the site to load. this is the username of a homeportals account">
 		<cfargument name="accounts" type="accounts" required="true" hint="This is a reference to the Accounts object">
 		<cfscript>
-			// set properties
 			setAccountsService( arguments.accounts );
 			setOwner( arguments.owner );
 
-			// get the accountID for this account (will speedup future lookups)
-			qry = getAccountsService().getAccountByName(getOwner());
-			variables.accountID = qry.accountID;
+			variables.siteURL = getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner() & "/site.xml";
 
-			// load pages			
-			load();
-			
+			if(fileExists(expandPath(variables.siteURL)))
+				load();
+			else
+				indexPages();
+				
 			return this;
 		</cfscript>
 	</cffunction>
 	
+
+	<!---------------------------------------->
+	<!--- indexPages			           --->
+	<!---------------------------------------->	
 	<cffunction name="indexPages" access="public" returntype="void" hint="Builds the site index by examining all pages in the current account">
 		<cfset var xmlDoc = "">
 		<cfset var qryPages = "">
@@ -71,16 +73,13 @@
 	</cffunction>
 	
 	
-	
-
 	<!---------------------------------------->
 	<!--- setSiteTitle			           --->
 	<!---------------------------------------->	
 	<cffunction name="setSiteTitle" access="public" output="false" returntype="void">
 		<cfargument name="title" type="string" required="true" hint="The new title for the site">
-		<cfset var oDAO = getAccountsService().getDAO("Accounts")>
-		<cfset oDAO.save(accountID = variables.accountID,
-							siteTitle = arguments.title)
+		<cfset variables.siteTitle = arguments.title>
+		<cfset save()>
 	</cffunction>
 
 
@@ -88,7 +87,7 @@
 	<!--- getSiteTitle			           --->
 	<!---------------------------------------->	
 	<cffunction name="getSiteTitle" access="public" returntype="string">
-		<cfreturn getAccountsService().getAccountByID(variables.accountID).siteTitle>
+		<cfreturn variables.siteTitle>
 	</cffunction>
 
 
@@ -96,10 +95,8 @@
 	<!--- getPages				           --->
 	<!---------------------------------------->	
 	<cffunction name="getPages" access="public" returntype="array">
-		<cfset var oDAO = getAccountsService().getDAO("Accounts")>
 		<cfreturn variables.aPages>
-	</cffunction>
-
+	</cffunction>	
 
 	<!---------------------------------------->
 	<!--- setPageHREF			           --->

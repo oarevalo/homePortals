@@ -9,7 +9,7 @@
 		variables.loadedModuleClasses = "";		// this is a list of all module classes loaded in the current page
 		variables.homePortalsEngineDir = "/Home/";		// path to location of HomePortals engine
 		variables.errorTemplate = variables.homePortalsEngineDir & "/Common/Templates/error.cfm";	// template to display when errors occur while rendering page components
-		variables.pageURI = "";		// path to the current page
+		variables.pageHREF = "";		// path to the current page
 		variables.oHomePortals = 0;		// homeportals instance
 		variables.oPage = 0;			// the page to render
 		variables.stTimers = structNew();
@@ -21,12 +21,12 @@
 	<!----  init						----->
 	<!--------------------------------------->	
 	<cffunction name="init" access="public" returntype="pageRenderer" hint="This is the constructor">
-		<cfargument name="pageURI" type="string" required="true" hint="The identifier for the page">
+		<cfargument name="pageHREF" type="string" required="true" hint="The identifier for the page">
 		<cfargument name="page" type="pageBean" required="true" hint="The page to render">
 		<cfargument name="homePortals" type="homePortals" required="true" hint="HomePortals application instance">
 		<cfset var start = getTickCount()>
 
-		<cfset variables.pageURI = arguments.pageURI>
+		<cfset variables.pageHREF = arguments.pageHREF>
 		<cfset variables.oPage = arguments.page>
 		<cfset variables.oHomePortals = arguments.homePortals>
 		
@@ -266,7 +266,7 @@
 			<script type="text/javascript">
 				/*********** Set app root **********/
 				h_appRoot = "#jsStringFormat(appRoot)#";
-				h_pageURI = "#jsStringFormat(variables.pageURI)#";
+				h_pageHREF = "#jsStringFormat(variables.pageHREF)#";
 				
 				/*********** Raise events by modules *************/
 				function h_raiseEvent(objectName, eventName, args) {
@@ -305,17 +305,10 @@
 	</cffunction>	
 	
 	<!--------------------------------------->
-	<!----  getPageURI					----->
-	<!--------------------------------------->
-	<cffunction name="getPageURI" access="public" returntype="string" output="false" hint="Returns the location of the page">
-		<cfreturn variables.pageURI>
-	</cffunction>	
-
-	<!--------------------------------------->
 	<!----  getPageHREF					----->
 	<!--------------------------------------->
 	<cffunction name="getPageHREF" access="public" returntype="string" output="false" hint="Returns the location of the page">
-		<cfreturn getPageURI()>
+		<cfreturn variables.pageHREF>
 	</cffunction>	
 		
 	<!--------------------------------------->
@@ -357,7 +350,7 @@
 			// Structure to hold the page info
 			variables.stPage = StructNew();
 			variables.stPage.page = StructNew();
-			variables.stPage.page.uri = variables.pageURI;			// address of the page
+			variables.stPage.page.href = variables.pageHREF;			// address of the page
 			variables.stPage.page.title = getPage().getTitle();		// page title
 			variables.stPage.page.owner = getPage().getOwner();		// the account to which the current page belongs to
 			variables.stPage.page.access = getPage().getAccess();	// page access level
@@ -452,11 +445,11 @@
 				// add information about the page to moduleNode
 				arguments.moduleNode["_page"] = structNew();
 				arguments.moduleNode["_page"].owner =  variables.stPage.page.owner;
-				arguments.moduleNode["_page"].href =  variables.stPage.page.uri;
+				arguments.moduleNode["_page"].href =  variables.stPage.page.href;
 				
 				// instantiate module controller and call constructor
 				oModuleController = createObject("component","moduleController");
-				oModuleController.init(variables.stPage.page.uri, moduleID, moduleName, arguments.moduleNode, bIsFirstInClass, "local", variables.oHomePortals);
+				oModuleController.init(variables.stPage.page.href, moduleID, moduleName, arguments.moduleNode, bIsFirstInClass, "local", variables.oHomePortals);
 
 				// render html content
 				appendpageBuffer("_htmlHead", moduleID, oModuleController.renderClientInit() );

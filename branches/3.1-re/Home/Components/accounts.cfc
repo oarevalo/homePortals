@@ -287,7 +287,7 @@
 			</cfif>
 			
 			<!--- get the location of the page --->
-			<cfset defaultPageURL = getAccountPageURI(arguments.accountName, defaultPageHREF)>
+			<cfset defaultPageURL = getAccountPageHREF(arguments.accountName, defaultPageHREF)>
 		</cfif>
 		
 		<cfreturn defaultPageURL>
@@ -357,9 +357,9 @@
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  getAccountPageURI  			----->
+	<!----  getAccountPageHREF 			----->
 	<!--------------------------------------->
-	<cffunction name="getAccountPageURI" access="public" hint="Returns the address of the page belonging to an account" returntype="string">
+	<cffunction name="getAccountPageHREF" access="public" hint="Returns the address of the page belonging to an account" returntype="string">
 		<cfargument name="account" type="string" required="false" default="" hint="Account name, if empty will load the default account">
 		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
 		<cfscript>

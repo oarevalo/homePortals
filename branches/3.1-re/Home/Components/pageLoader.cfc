@@ -10,17 +10,17 @@
 	</cffunction>
 
 	<cffunction name="load" access="public" returntype="pageRenderer" hint="returns the page renderer for the requested page">
-		<cfargument name="uri" type="string" hint="an identifier for the page">
+		<cfargument name="href" type="string" hint="the location of the page document">
 		<cfscript>
 			var oPageRenderer = 0;
 			var oPage = 0;
-			var pageCacheKey = arguments.uri;
+			var pageCacheKey = arguments.href;
 			var oCacheRegistry = createObject("component","cacheRegistry").init();			
 			var oCache = oCacheRegistry.getCache("hpPageCache");
 			var oPageProvider = getHomePortals().getPageProvider();
 
 			// get information about the page
-			stInfo = oPageProvider.query(arguments.uri);
+			stInfo = oPageProvider.query(arguments.href);
 
 			// if the page exists on the cache, and the page hasnt been modified after
 			// storing it on the cache, then get it from the cache
@@ -29,17 +29,17 @@
 			
 			} catch(homePortals.cacheService.itemNotFound e) {
 				// page is not in cache, so load the page
-				oPage = oPageProvider.load(arguments.uri);
+				oPage = oPageProvider.load(arguments.href);
 				
 				// create a page renderer for this page
-				oPageRenderer = createObject("component","pageRenderer").init(arguments.uri, oPage, getHomePortals());
+				oPageRenderer = createObject("component","pageRenderer").init(arguments.href, oPage, getHomePortals());
 			
 				// store page in cache
 				oCache.store(pageCacheKey, oPageRenderer);
 				
 				// clear persistent storage for module data
 				oConfigBeanStore = createObject("component","configBeanStore").init();
-				oConfigBeanStore.flushByPageURI(arguments.uri);
+				oConfigBeanStore.flushByPageHREF(arguments.href);
 				
 			}
 			

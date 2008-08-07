@@ -10,7 +10,6 @@
 		<cfset addColumn("lastName", "cf_sql_varchar")>
 		<cfset addColumn("email", "cf_sql_varchar")>
 		<cfset addColumn("createdOn", "cf_sql_varchar")>
-		<cfset addColumn("siteTitle", "cf_sql_varchar")>
 	</cffunction>
 
 </cfcomponent>

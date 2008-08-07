@@ -14,8 +14,5 @@
 	
 	<!-- Account Storage -->
 	<storageType>xml</storageType>
-	<storageCFC></storageCFC>
-	<accountsTable>cfe_user</accountsTable>
 	<dbtype>MSSQL</dbtype>
-	<storageFileHREF>/Home/Accounts/accounts.xml</storageFileHREF>
 </homePortalsAccounts>

@@ -76,9 +76,7 @@
 			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
 
 			// initialize page provider
-			ppClass = variables.oHomePortalsConfigBean.getPageProviderClass();
-			if(ppClass eq "") throw("PageProviderClass settings is missing or blank","","homePortals.engine.invalidPageProviderClass");
-			variables.oPageProvider = createObject("component",ppClass).init(variables.oHomePortalsConfigBean);
+			variables.oPageProvider = createObject("component","pageProvider").init(variables.oHomePortalsConfigBean);
 
 			// load module properties
 			variables.oModuleProperties = createObject("component","moduleProperties").init(variables.oHomePortalsConfigBean);
@@ -147,15 +145,15 @@
 		<cfscript>
 			var oPageRenderer = 0;
 			var oPageLoader = 0;
-			var pageURI = "";
+			var pageHREF = "";
 			var start = getTickCount();
 					
 			// get location of page
-			pageURI = getAccountsService().getAccountPageURI(arguments.account, arguments.page);		
+			pageHREF = getAccountsService().getAccountPageHREF(arguments.account, arguments.page);		
 			
 			// load page 
 			oPageLoader = createObject("component","pageLoader").init(this);
-			oPageRenderer = oPageLoader.load(pageURI);	
+			oPageRenderer = oPageLoader.load(pageHREF);	
 
 			// validate access to page
 			getAccountsService().validatePageAccess( oPageRenderer.getPage() );
@@ -173,18 +171,18 @@
 	<!----  loadPage 					----->
 	<!--------------------------------------->
 	<cffunction name="loadPage" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page">
-		<cfargument name="pageURI" type="string" required="true" hint="the page to load">
+		<cfargument name="pageHREF" type="string" required="true" hint="the page to load">
 		<cfscript>
 			var oPageRenderer = 0;
 			var oPageLoader = 0;
 			var start = getTickCount();
 			
 			// if no page is given, then load default page
-			if(arguments.pageURI eq "") arguments.pageURI = getConfig().getDefaultPage();			
+			if(arguments.pageHREF eq "") arguments.pageHREF = getConfig().getDefaultPage();			
 						
 			// load page 
 			oPageLoader = createObject("component","pageLoader").init(this);
-			oPageRenderer = oPageLoader.load(arguments.pageURI);	
+			oPageRenderer = oPageLoader.load(arguments.pageHREF);	
 
 			// process modules on page		
 			oPageRenderer.processModules();
