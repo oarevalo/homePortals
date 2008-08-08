@@ -1,5 +1,5 @@
 var h_appRoot = "";	// points to the current application root
-var h_pageURI = ""; // points to the current page loaded
+var h_pageHREF = ""; // points to the current page loaded
 
 function h_setModuleContainerTitle(moduleID,title) {
 	var d = $(moduleID + '_Title');
@@ -63,7 +63,7 @@ function h_callModuleController(moduleID,method,sec,params,rcv) {
 		pars = pars + "&moduleID=" + moduleID;
 		
 		// add the current page
-		pars = pars + "&pageURI=" + h_pageURI;
+		pars = pars + "&pageHREF=" + h_pageHREF;
 
 		// do the AJAX call
 		if(rcv==null) 
