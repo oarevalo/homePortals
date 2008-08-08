@@ -1,13 +1,14 @@
 <cfcomponent hint="This component is used to manipulate a user site">
 
 	<cfscript>
-		variables.accounts = 0;
-		variables.siteURL = "";
-		variables.xmlDoc = 0;
-		variables.owner = 0;
+		variables.instance = structNew();
+		variables.instance.accounts = 0;
+		variables.instance.siteURL = "";
+		variables.instance.xmlDoc = 0;
+		variables.instance.owner = 0;
 		
-		variables.aPages = arrayNew(1);
-		variables.siteTitle = "";
+		variables.instance.aPages = arrayNew(1);
+		variables.instance.siteTitle = "";
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -17,18 +18,23 @@
 		<cfargument name="owner" type="string" required="true" hint="The owner of the site to load. this is the username of a homeportals account">
 		<cfargument name="accounts" type="accounts" required="true" hint="This is a reference to the Accounts object">
 		<cfscript>
+			var href = "";
+			
 			setAccountsService( arguments.accounts );
 			setOwner( arguments.owner );
 
-			variables.siteURL = getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner() & "/site.xml";
-
-			if(fileExists(expandPath(variables.siteURL)))
+			href = getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner() & "/site.xml";
+			setSiteURL( href );
+			
+			if(fileExists(expandPath(href)))
 				load();
 			else
 				indexPages();
 				
-			return this;
+			//return this;
 		</cfscript>
+		<cfdump var="#variables.siteURL#">
+		<cfabort>
 	</cffunction>
 	
 
@@ -39,63 +45,90 @@
 		<cfset var xmlDoc = "">
 		<cfset var qryPages = "">
 		<cfset var st = "">
+		<cfset var aPages = arrayNew(1)>
+		<cfset var oPage = 0>
 		
-		<cfset var accountHREF = getDirectoryFromPath(variables.siteURL)>
+		<cfset var accountHREF = getDirectoryFromPath( getSiteURL() )>
 		<cfset var layoutsHREF = accountHREF & "/layouts">
 		
 		<!--- set site title --->
-		<cfset variables.siteTitle = variables.owner>
+		<cfset setSiteTitle( getOwner() )>
 
-		<!--- initialize pages array --->
-		<cfset variables.aPages = arrayNew(1)>
-		
 		<!--- get list of pages --->
 		<cfdirectory action="list" directory="#expandPath(layoutsHREF)#" name="qryPages" filter="*.xml">
 		
 		<cfloop query="qryPages">
 			<cfset xmlDoc = xmlParse(expandPath(layoutsHREF & "/" & qryPages.name))>
 
+			<cfset oPage = createObject("component","pageBean").init(xmlDoc)>
+
 			<cfset st = structNew()>
 			<cfset st.default = false>
 			<cfset st.href = qryPages.name>	
+			<cfset st.title = oPage.getTitle()>
 
-			<cfif structKeyExists(xmlDoc.xmlRoot,"title")>
-				<cfset st.title = xmlDoc.xmlRoot.title.xmlText>
-			<cfelse>
+			<cfif st.title eq "">
 				<cfset st.title = replaceNoCase(qryPages.name,".xml","")>
 			</cfif>
 			
-			<cfset arrayAppend(variables.aPages, st)>
+			<cfset arrayAppend(aPages, st)>
 		</cfloop>
+		
+		<cfset variables.instance.aPages = aPages>
 		
 		<!--- save site --->
 		<cfset save()>
 	</cffunction>
 	
+
+	<!---------------------------------------->
+	<!--- toXML					           --->
+	<!---------------------------------------->	
+	<cffunction name="toXML" access="public" returnType="xml" hint="Returns the site information as an XML document">
+		<cfscript>
+			var xmlDoc = 0;
+			var xmlNode = 0;
+			var tmpPage = structNew();
+			var i = 0;
+			var aPages = getPages();
+
+			// create a blank xml document and add the root node
+			xmlDoc = xmlNew();
+			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "site");	
+			
+			// add title node
+			xmlNode = xmlElemNew(xmlDoc, "title");
+			xmlNode.xmlText = xmlFormat(variables.siteTitle);
+			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
+			
+			// add pages node
+			xmlNode = xmlElemNew(xmlDoc, "pages");
+			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
+			
+			// add page nodes
+			for(i=1;i lte arrayLen(aPages);i=i+1) {
+			
+				tmpPage = aPages[i];
+			
+				xmlNode = xmlElemNew(xmlDoc, "page");
+				xmlNode.xmlAttributes["title"] = xmlFormat(tmpPage.title);
+				xmlNode.xmlAttributes["href"] = xmlFormat(tmpPage.href);
+				xmlNode.xmlAttributes["default"] = xmlFormat(tmpPage.default);
+			
+				arrayAppend(xmlDoc.xmlRoot.pages.xmlChildren, xmlNode);	
+			
+			}
+			
+		</cfscript>
+		<cfreturn xmlDoc>
+	</cffunction>
 	
-	<!---------------------------------------->
-	<!--- setSiteTitle			           --->
-	<!---------------------------------------->	
-	<cffunction name="setSiteTitle" access="public" output="false" returntype="void">
-		<cfargument name="title" type="string" required="true" hint="The new title for the site">
-		<cfset variables.siteTitle = arguments.title>
-		<cfset save()>
-	</cffunction>
-
-
-	<!---------------------------------------->
-	<!--- getSiteTitle			           --->
-	<!---------------------------------------->	
-	<cffunction name="getSiteTitle" access="public" returntype="string">
-		<cfreturn variables.siteTitle>
-	</cffunction>
-
 
 	<!---------------------------------------->
 	<!--- getPages				           --->
 	<!---------------------------------------->	
 	<cffunction name="getPages" access="public" returntype="array">
-		<cfreturn variables.aPages>
+		<cfreturn variables.instance.aPages>
 	</cffunction>	
 
 	<!---------------------------------------->
@@ -198,7 +231,7 @@
 			var i = 1;
 			
 			// make sure we have at least one page on the site
-			if(not arrayLen(variables.aPages)) return;
+			if(not arrayLen(variables.aPages)) return "";
 			
 			// get the page marked as the default page
 			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
@@ -436,23 +469,40 @@
 	<!--- G E T T E R S  /  S E T T E R S  --->
 	<!---------------------------------------->
 	<cffunction name="getAccountsService" access="public" returntype="accounts">
-		<cfreturn variables.accounts>
+		<cfreturn variables.instance.accounts>
 	</cffunction>
 
 	<cffunction name="setAccountsService" access="public" returntype="void">
 		<cfargument name="data" type="accounts" required="true">
-		<cfset variables.accounts = arguments.data>
+		<cfset variables.instance.accounts = arguments.data>
 	</cffunction>
 
 	<cffunction name="getOwner" access="public" returntype="string">
-		<cfreturn variables.Owner>
+		<cfreturn variables.instance.Owner>
 	</cffunction>
 
 	<cffunction name="setOwner" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
-		<cfset variables.Owner = arguments.data>
+		<cfset variables.instance.Owner = arguments.data>
 	</cffunction>
 
+	<cffunction name="getSiteURL" access="public" returntype="string">
+		<cfreturn variables.instance.SiteURL>
+	</cffunction>
+
+	<cffunction name="setSiteURL" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.instance.SiteURL = arguments.data>
+	</cffunction>
+	
+	<cffunction name="getSiteTitle" access="public" returntype="string">
+		<cfreturn variables.instance.siteTitle>
+	</cffunction>
+	
+	<cffunction name="setSiteTitle" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.instance.siteTitle = arguments.title>
+	</cffunction>
 	
 	
 	

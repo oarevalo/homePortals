@@ -416,7 +416,6 @@
 	<!--------------------------------------->
 	<cffunction name="loadDataProvider" access="private" returntype="void" hint="Loads and configures the instance of the dataprovider to be used">
 		<cfscript>
-			var obj = createObject("component","storage");
 			var storageType = oAccountsConfigBean.getStorageType();
 			var pkgPath = "Home.Components.lib.DAOFactory.";
 			var oConfigBean = 0;
