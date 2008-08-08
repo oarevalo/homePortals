@@ -39,7 +39,7 @@
 		<cfset var aPages = arrayNew(1)>
 		<cfset var oPage = 0>
 		
-		<cfset var accountHREF = getDirectoryFromPath( getSiteURL() )>
+		<cfset var accountHREF = getDirectoryFromPath( getSiteHREF() )>
 		<cfset var layoutsHREF = accountHREF & "/layouts">
 		
 		<!--- set site title --->
@@ -425,7 +425,7 @@
 	<!--- P R I V A T E     M E T H O D S  --->
 	<!---------------------------------------->
 
-	<cffunction name="getSiteURL" access="public" returntype="string" hint="Returns the path to the file where the site information is stored">
+	<cffunction name="getSiteHREF" access="public" returntype="string" hint="Returns the path to the file where the site information is stored">
 		<cfreturn getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner() & "/site.xml";>
 	</cffunction>
 	
@@ -447,7 +447,7 @@
 		<cfargument name="checkIfExists" type="boolean" required="false" default="true" hint="Flag to indicate whether to check that the file exists on the site">
 		<cfscript>
 			var pageIndex = 0;
-			var layoutsHREF = getDirectoryFromPath(getSiteURL()) & "/layouts";
+			var layoutsHREF = getDirectoryFromPath(getSiteHREF()) & "/layouts";
 			var href = "";
 			
 			// make sure the pagename contains the .xml extension
@@ -478,7 +478,7 @@
 			var st = structNew(); 
 			var xmlNode = 0;
 			var i = 0;
-			var siteDocPath = expandPath(getSiteURL());
+			var siteDocPath = expandPath(getSiteHREF());
 				
 			// read configuration file
 			if(Not fileExists(siteDocPath))
@@ -521,7 +521,7 @@
 				
 	<cffunction name="saveSite" access="private" hint="Saves the site xml">
 		<cfset var xmlDoc = toXML()>
-		<cfset var siteHREF = getSiteURL()>
+		<cfset var siteHREF = getSiteHREF()>
 		<cffile action="write" file="#expandpath(siteHREF)#" output="#toString(xmlDoc)#">
 	</cffunction>
 
