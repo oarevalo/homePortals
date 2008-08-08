@@ -10,14 +10,8 @@
 	<!-- base path for the current application -->
 	<appRoot>/Home/</appRoot>
 
-	<!-- Directory where account files are stored -->
-	<accountsRoot>/Home/Accounts/</accountsRoot>
-
-	<!-- HomePortals account to load when no page has been provided -->
-	<defaultAccount>default</defaultAccount>
-
 	<!-- HomePortals page to load when no page has been provided -->
-	<defaultAccount></defaultAccount>
+	<defaultPage></defaultPage>
 
 	<!-- Event raised when a HomePortals page finishes loading -->
 	<initialEvent>Framework.onPageLoaded</initialEvent>

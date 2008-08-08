@@ -239,7 +239,7 @@
 		
 		<cfset var oDAO = getDAO("Accounts")>
 		<cfset var qryAccount = oDAO.get(arguments.accountID)>
-		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
+		<cfset var accountsRoot = getConfig().getAccountsRoot()>
 		
 		<cfif qryAccount.recordCount gt 0>
 			<!--- delete record in table --->
@@ -366,16 +366,44 @@
 			var pageHREF = "";
 						
 			// determine the page to load
-			if(arguments.account eq "") arguments.account = variables.oHomePortalsConfigBean.getDefaultAccount();
+			if(arguments.account eq "") arguments.account = getConfig().getDefaultAccount();
+			
 			if(arguments.page eq "") 
 				pageHREF = getAccountDefaultPage(arguments.account);
 			else
-				pageHREF = variables.oHomePortalsConfigBean.getAccountsRoot() & "/" & arguments.account & "/layouts/" & arguments.page & ".xml";
+				pageHREF = getConfig().getAccountsRoot() & "/" & arguments.account & "/layouts/" & arguments.page & ".xml";
 
 			return pageHREF;
 		</cfscript>	
 	</cffunction>
 
+	<!--------------------------------------->
+	<!----  getNewPage		 			----->
+	<!--------------------------------------->
+	<cffunction name="getNewPage" access="public" hint="Returns a page object for a new page based on the newPage template" returntype="pageBean">
+		<cfargument name="AccountName" type="string" required="yes">
+		<cfscript>
+			var oConfig = getConfig();
+			var oPage = 0;
+			var xmlStr = "";
+			
+			// if a template for new pages has been defined then use that for the new page
+			if(oConfig.getNewPageTemplate() eq "") {
+
+				// get new page and process tokens
+				xmlStr = processTemplate(arguments.accountName, oConfig.getNewPageTemplate());
+	
+				// convert into xml document
+				oPage = createObject("component","pageBean").init(xmlStr);
+			
+			} else {
+				// no template defined, so just get a blank page
+				oPage = createObject("component","pageBean").init();
+			}
+
+			return oPage;
+		</cfscript>
+	</cffunction>
 
 
 
@@ -466,9 +494,9 @@
 		<cfset var tmpDoc = "">
 		<cfset var tmpDocPath = ExpandPath(Arguments.TemplateName)>
 
-		<cfset var homeURL = oHomePortalsConfigBean.getAppRoot()>
-		<cfset var ModulesRoot = oHomePortalsConfigBean.getResourceLibraryPath() & "/Modules/">
-		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
+		<cfset var homeURL = getHomePortalsConfigBean().getAppRoot()>
+		<cfset var ModulesRoot = getHomePortalsConfigBean().getResourceLibraryPath() & "/Modules/">
+		<cfset var accountsRoot = getConfig().getAccountsRoot()>
 
 		<!--- read template file --->
 		<cffile action="read" file="#tmpDocPath#" variable="tmpDoc">
@@ -486,7 +514,11 @@
 		<cfargument name="var" type="any">
 		<cfdump var="#arguments.var#">
 	</cffunction>
-	
+
+	<cffunction name="abort" access="private" hint="facade for cfabort">
+		<cfabort>
+	</cffunction>
+		
 	<cffunction name="throw" access="private" hint="facade for cfthrow">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 

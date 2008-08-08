@@ -21,7 +21,7 @@
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
-		<cfargument name="pageXML" type="any" required="true">
+		<cfargument name="pageXML" type="any" required="false" default="">
 		<cfif isXML(arguments.pageXML) or isXMLDoc(arguments.pageXML)>
 			<cfset loadXML(arguments.pageXML)>
 		<cfelse>

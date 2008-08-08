@@ -11,20 +11,22 @@
 	<!---------------------------------------->
 	<!--- init					           --->
 	<!---------------------------------------->	
-	<cffunction name="init" access="public" returntype="site">
-		<cfargument name="owner" type="string" required="true" hint="The owner of the site to load. this is the username of a homeportals account">
+	<cffunction name="init" access="public" returntype="site" hint="constructor">
+		<cfargument name="owner" type="string" required="true" hint="The owner of the site to load. this is the name of a homeportals account">
 		<cfargument name="accounts" type="accounts" required="true" hint="This is a reference to the Accounts object">
 		<cfscript>
-			var href = "";
+			if(arguments.owner eq "") throw("Page owner is missing or blank","homePortals.site.pageOwnerMissing");
 			
 			setAccountsService( arguments.accounts );
 			setOwner( arguments.owner );
 
-			if(fileExists(expandPath(href)))
+			try {
 				loadSite();
-			else
-				indexSite();
 				
+			} catch(homePortals.site.missingSiteXML e) {
+				indexSite();
+			}
+
 			return this;
 		</cfscript>
 	</cffunction>
@@ -108,7 +110,6 @@
 			return xmlDoc;
 		</cfscript>
 	</cffunction>
-	
 
 	<!---------------------------------------->
 	<!--- renamePage			           --->
@@ -141,13 +142,12 @@
 			saveSite();
 		</cfscript>
 	</cffunction>
-	
 
 	<!---------------------------------------->
 	<!--- updatePageTitle	 		       --->
 	<!---------------------------------------->	
 	<cffunction name="updatePageTitle" access="public" output="false" returntype="void" hint="Updates the title of a page">
-		<cfargument name="pageHREF" type="string" required="true" hint="The location of the page">
+		<cfargument name="pageName" type="string" required="true" hint="The name of the page">
 		<cfargument name="pageTitle" type="string" required="false" default="" hint="The title of the page. This title is only used for the Site object and may be different than the actual page title">
 		<cfscript>
 			var i = 1;
@@ -156,13 +156,13 @@
 			var pageIndex = false;
 
 			// find page in site
-			pageIndex = getPageIndex(arguments.pageHREF);
+			pageIndex = getPageIndex(arguments.pageName);
 			if(pageIndex eq 0) throw("Page not found in site.","homePortals.site.pageNotFound");
 			
 			// if not page title is given then get the actual title from the page
 			// this allows to have a different title on the site than on the page
 			if(arguments.pageTitle eq "") {
-				oPage = getPage(arguments.pageHREF);
+				oPage = getPage(arguments.pageName);
 				tmpTitle = oPage.getTitle();
 			} else 
 				tmpTitle = arguments.pageTitle;
@@ -177,13 +177,21 @@
 	<!--- setDefaultPage	               --->
 	<!---------------------------------------->	
 	<cffunction name="setDefaultPage" access="public" output="false" returntype="void" hint="Sets a page as the default page for the current account">
-		<cfargument name="pageHREF" type="string" required="true" hint="The page to set as default">
+		<cfargument name="pageName" type="string" required="true" hint="The page to set as default">
 		<cfscript>
 			var i = 1;
+			var index = 0;
 			
-			for(i=1;i lte arrayLen(variables.instance.aPages);i=i+1) {
-				variables.instance.aPages[i]["default"] = (variables.instance.aPages[i].href eq arguments.pageHREF);
-			}
+			// check that the page exists
+			index = getPageHREF(arguments.pageName);
+			
+			// clear the default setting of all pages
+			for(i=1;i lte arrayLen(variables.instance.aPages);i=i+1) 
+				variables.instance.aPages[i]["default"] = false;
+			
+			// set the new default page
+			variables.instance.aPages[index]["default"] = true;
+			
 			saveSite();
 		</cfscript>
 	</cffunction>
@@ -215,19 +223,19 @@
 	<!--- deletePage		               --->
 	<!---------------------------------------->	
 	<cffunction name="deletePage" access="public" output="false" returntype="void">
-		<cfargument name="pageHREF" type="string" required="true">
+		<cfargument name="pageName" type="string" required="true">
 		<cfscript>
 			var tmpPageHREF = "";
 			var pageIndex = 0;
 			var aPages = getPages();
 
 			// find page in site
-			pageIndex = getPageIndex(arguments.pageHREF);
+			pageIndex = getPageIndex(arguments.pageName);
 			
-			if(pageIndex gt 0 and aPages[pageIndex].href neq "") {
+			if(pageIndex gt 0) {
 				
 				// get location of file
-				tmpPageHREF = getPageHREF(aPages[pageIndex].href);
+				tmpPageHREF = getPageHREF(aPages[pageIndex].href,false);
 
 				// delete file				
 				if(fileExists(expandpath(tmpPageHREF))) 
@@ -246,75 +254,50 @@
 	<!--- addPage			               --->
 	<!---------------------------------------->	
 	<cffunction name="addPage" access="public" output="false" returntype="string" hint="This method creates a new page and adds it to the site. The new page can be completely new or can be an existing page">
-		<cfargument name="pageName" required="true" type="string" hint="the name of the new page. If no extension is given, then .xml will be appended. The name is ignored if a pageHREF is given">
+		<cfargument name="pageName" required="true" type="string" hint="the name of the new page. If no extension is given, then .xml will be appended.">
 		<cfargument name="pageHREF" required="false" default="" type="string" hint="Optional. The page to copy, if pageHREF is only the document name (without path), then assumes it is a local page on the current account">
 		<cfscript>
-			var tmpHTML = "add";
-			var pname = Arguments.pageName;
-			var newPageURL = "";
-			var tmpPageURL = "";
-			var stUser = structNew();
-			var oAccountsConfigBean = 0;
-			var xmlSite = 0;
-			var	bFound = false;
-			var txtDoc = "";
-			var i = 1;
 			var originalName = "";
+			var oPage = 0;
+			var xmlPage = 0;
+			var pname = "";
 			var currIndex = 0;
-			var thisPageHREF = "";
-			var accountsRoot = "";
+			var	bFound = true;
+			var i = 1;
+			var newPageHREF = "";
+			var newNode = structNew();
+			var aPages = getPages();
 
-			// get account info
-			oAccountsConfigBean = getAccountsService().getConfig();
-			accountsRoot = oAccountsConfigBean.getAccountsRoot();
-			
-			// get site definition as xml object
-			xmlSite = variables.xmlDoc;
+			// check that pagename is not empty 
+			if(arguments.pageName eq "") 
+				throw("Please enter a name for the new page","homePortals.site.pageNameMissing");
 
+			// remove extension from page name
+			originalName = replaceNoCase(arguments.pageName,".xml","","ALL");		
+
+
+			// get the new page
 			if(arguments.pageHREF eq "") {
-				// no pageHREF is given, so we add a blank page 
-				if(arguments.pageName eq "") throw("Please enter a name for the new page.");
-				
-				// check that a template for new pages has been defined, if empty, users cannot add pages
-				if(oAccountsConfigBean.getNewPageTemplate() eq "")
-					throw("A template for new user pages has not been defined.");
-
-				// get new page and process tokens
-				txtDoc = getAccountsService().processTemplate(variables.owner, oAccountsConfigBean.getNewPageTemplate());
-
-				// convert into xml document
-				xmlPage = xmlParse(txtDoc);
+				// get a new page for this account
+				oPage = getAccountsService().getNewPage( getOwner() );
 
 			} else {
 				// we have a pageHREF, so we are copying an existing page 
 				if(left(arguments.pageHREF,1) neq "/")
-					tmpPageURL = getPageHREF(arguments.pageHREF, false);
-				else
-					tmpPageURL = arguments.pageHREF;
+					arguments.pageHREF = getPageHREF(arguments.pageHREF);
 
-				// check that page exists				
-				if(Not FileExists(ExpandPath(tmpPageURL)))
-					throw("The page you wish to duplicate does not exist. Please select an existing page.");
-				
-				// set a default name for the new page
-				if(pname eq "") {
-					pName = replaceNoCase(getFileFromPath(arguments.pageHREF),".xml","");
-					pName = "Copy of " & pName;
-				}
-
-				// get the page to copy
-				xmlPage = xmlParse(expandpath(tmpPageURL));
+				// load page
+				xmlPage = xmlParse(expandPath(arguments.pageHREF));
+				oPage = createObject("component","pageBean").init(xmlPage);
 			}
 			
 		
-			// check if a page of the same name is already on the site
-			originalName = pName;
-			bFound = true;
+			// make sure the page has a unique name within the account
+			pName = originalName;
 			while(bFound) {
 				bFound = false;
-				for(i=1;i lte arrayLen(variables.instance.aPages);i=i+1) {
-					thisPageHREF = variables.aPages[i].href; 
-					if(replaceNoCase(thisPageHREF,".xml","") eq pName) {
+				for(i=1;i lte arrayLen(aPages);i=i+1) {
+					if(replaceNoCase(aPages[i].href,".xml","","ALL") eq pName) {
 						currIndex = currIndex + 1;
 						pName = originalName & currIndex;
 						bFound = true;
@@ -322,43 +305,45 @@
 				}
 			}
 
-			// set page title
-			xmlPage.page.title.xmlText = pname;
+			// if page has no title, then use the unique pagename as a title
+			if(oPage.getTitle() eq "")
+				oPage.setTitle(pName);
 
 			// set page owner
-			xmlPage.xmlRoot.xmlAttributes["owner"] = variables.owner;
+			oPage.setOwner(getOwner());
 			
 			// get location of new page
-			newPageURL = getPageHREF(pname, false);
+			newPageHREF = getPageHREF(pname, false);
 			
 			// save page
-			writeFile(expandPath(newPageURL), toString(xmlPage));
+			writeFile(expandPath(newPageHREF), toString(xmlPage));
 
 			// append new page name to site definition
 			newNode = structNew();
-			newNode.title = Replace(pname,".xml","");
-			newNode.href = pname;
+			newNode.title = oPage.getTitle();
+			newNode.href = getFileFromPath(newPageHREF);
 			newNode.default = false;
-			ArrayAppend(variables.isntance.aPages, newNode);
+			ArrayAppend(variables.instance.aPages, newNode);
 			
 			// save changes to site
 			saveSite();
+			
+			return newPageHREF;
 		</cfscript>
-		<cfreturn newPageURL>
 	</cffunction>
 
 	<!---------------------------------------->
 	<!--- getPage			               --->
 	<!---------------------------------------->	
 	<cffunction name="getPage" access="public" returntype="pageBean" output="false" hint="Returns a pageBean object representing a site page">
-		<cfargument name="pageHREF" type="string" required="true" hint="The page to get">
+		<cfargument name="pageName" type="string" required="true" hint="The name of the page document">
 		<cfscript>
 			var href = "";
 			var xmlDoc = 0;
 			var oPage = 0;
 	
 			// find and load page 
-			href = getPageHREF(arguments.pageHREF);
+			href = getPageHREF(arguments.pageName);
 			xmlDoc = xmlParse(expandPath(href));
 			
 			// create page object
@@ -372,12 +357,12 @@
 	<!--- savePage				           --->
 	<!---------------------------------------->	
 	<cffunction name="savePage" access="public" hint="Updates a site page" returntype="void">
-		<cfargument name="pageHREF" type="string" required="true" hint="The name of the page document">
+		<cfargument name="pageName" type="string" required="true" hint="The name of the page document">
 		<cfargument name="page" type="pageBean" required="true" hint="The page object">
 		<!--- get page in xml format --->
 		<cfset var xmlDoc = arguments.page.toXML()>
 		<!--- get page location --->
-		<cfset var href =  getPageHREF(arguments.pageHREF)>	
+		<cfset var href =  getPageHREF(arguments.pageName)>	
 		<!--- store page --->
 		<cfset writeFile(expandpath(href), toString(xmlDoc))>
 		<!--- update page title in site --->
@@ -413,7 +398,7 @@
 	
 	<cffunction name="setSiteTitle" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
-		<cfset variables.instance.siteTitle = arguments.title>
+		<cfset variables.instance.siteTitle = arguments.data>
 	</cffunction>
 	
 	<cffunction name="getPages" access="public" returntype="array">
@@ -426,15 +411,20 @@
 	<!---------------------------------------->
 
 	<cffunction name="getSiteHREF" access="public" returntype="string" hint="Returns the path to the file where the site information is stored">
-		<cfreturn getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner() & "/site.xml";>
+		<cfreturn getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner() & "/site.xml">
 	</cffunction>
 	
 	<cffunction name="getPageIndex" access="private" returntype="numeric" hint="Returns the index of the requested page in the local pages array. Returns 0 if page is not found">
-		<cfargument name="pageHREF" type="string" required="true">
+		<cfargument name="pageName" type="string" required="true">
 		<cfscript>
 			var i = 1;
+			
+			// make sure the pagename contains the .xml extension
+			if(right(arguments.pageName,4) neq ".xml")
+				arguments.pageName = arguments.pageName & ".xml";
+			
 			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
-				if(variables.aPages[i].href eq arguments.pageHREF) {
+				if(variables.aPages[i].href eq arguments.pageName) {
 					return i;
 				}
 			}

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <homePortalsAccounts>
+	<!-- Directory where account files are stored -->
+	<accountsRoot>/Home/Accounts/</accountsRoot>
+
+	<!-- Account to load when no page has been provided -->
+	<defaultAccount>default</defaultAccount>
+
 	<!-- Account Storage 
 	xml : stores account data in xml files in the accountsRoot dir
 	db : stores account data in tables in a database
@@ -14,9 +20,6 @@
 	<password></password>
 	<dbtype></dbtype>	<!-- mysql, mssql -->
 	
-	<!-- Root directory for account directories -->
-	<accountsRoot>/Home/Accounts</accountsRoot>
-
 	<!-- Default templates 
 	newAccountTemplate : used as the template for the initial page when creating a new account
 	newPageTemplate : used as the template when adding a new page to an account

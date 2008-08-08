@@ -85,6 +85,10 @@
 		<cfreturn variables.stConfig.accountsRoot>
 	</cffunction>
 
+	<cffunction name="getDefaultAccount" access="public" returntype="string" hint="The name of the account to load when no account has been specified">
+		<cfreturn variables.stConfig.defaultAccount>
+	</cffunction>
+
 	<cffunction name="getNewAccountTemplate" access="public" returntype="string">
 		<cfreturn variables.stConfig.newAccountTemplate>
 	</cffunction>
@@ -118,6 +122,11 @@
 	<cffunction name="setAccountsRoot" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.accountsRoot = arguments.data>
+	</cffunction>
+
+	<cffunction name="setDefaultAccount" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.defaultAccount = arguments.data>
 	</cffunction>
 
 	<cffunction name="setNewAccountTemplate" access="public" returntype="void">

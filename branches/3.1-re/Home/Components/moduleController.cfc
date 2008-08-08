@@ -74,7 +74,7 @@
 
 
 			// set the accounts root and the page owner on the content store
-			variables.oContentStoreConfigBean.setAccountsRoot( getHomePortalsConfigBean().getAccountsRoot() );
+			variables.oContentStoreConfigBean.setAccountsRoot( getHomePortals().getAccountsService().getConfig().getAccountsRoot() );
 			variables.oContentStoreConfigBean.setOwner( variables.oModuleConfigBean.getPageSetting("_page").owner );
 
 		

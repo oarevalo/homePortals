@@ -15,10 +15,8 @@
 			variables.stConfig.bodyOnLoad = "";
 			variables.stConfig.homePortalsPath = "";
 			variables.stConfig.resourceLibraryPath = "";
-			variables.stConfig.defaultAccount = "";
 			variables.stConfig.defaultPage = "";
 			variables.stConfig.appRoot = "";
-			variables.stConfig.accountsRoot = "";
 			variables.stConfig.pageCacheSize = "";
 			variables.stConfig.pageCacheTTL = "";
 			variables.stConfig.contentCacheSize = "";
@@ -184,20 +182,12 @@
 		<cfreturn variables.stConfig.resourceLibraryPath>
 	</cffunction>
 
-	<cffunction name="getDefaultAccount" access="public" returntype="string" hint="The name of the account to load when no account has been specified">
-		<cfreturn variables.stConfig.defaultAccount>
-	</cffunction>
-
 	<cffunction name="getDefaultPage" access="public" returntype="string" hint="The name of the page to load when page has been specified">
 		<cfreturn variables.stConfig.defaultPage>
 	</cffunction>
 
 	<cffunction name="getAppRoot" access="public" returnType="string" hint="The root of the application">
 		<cfreturn variables.stConfig.appRoot>
-	</cffunction>
-
-	<cffunction name="getAccountsRoot" access="public" returnType="string" hint="The path to the directory where account files are stored">
-		<cfreturn variables.stConfig.accountsRoot>
 	</cffunction>
 
 	<cffunction name="getPageCacheSize" access="public" returntype="numeric" hint="The maximum number of homeportals pages to cache at any given time">
@@ -287,11 +277,6 @@
 		<cfset variables.stConfig.resourceLibraryPath = arguments.data>
 	</cffunction>
 
-	<cffunction name="setDefaultAccount" access="public" returntype="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.defaultAccount = arguments.data>
-	</cffunction>
-
 	<cffunction name="setDefaultPage" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.defaultPage = arguments.data>
@@ -300,11 +285,6 @@
 	<cffunction name="setAppRoot" access="public" returnType="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.appRoot = arguments.data>
-	</cffunction>
-
-	<cffunction name="setAccountsRoot" access="public" returnType="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.accountsRoot = arguments.data>
 	</cffunction>
 
 	<cffunction name="setPageCacheSize" access="public" returntype="void">

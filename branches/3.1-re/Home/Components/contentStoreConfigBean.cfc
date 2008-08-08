@@ -3,7 +3,7 @@
 				hint="Represents the configuration properties for a content store.">
 
 	<cfscript>
-		variables.data.accountsRoot = "/Accounts";
+		variables.data.accountsRoot = "";
 		variables.data.defaultName = "myContentStore";
 		variables.data.description = "";
 		variables.data.rootNode = "dataStore";
