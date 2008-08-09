@@ -70,7 +70,7 @@
 			}
 			
 			// initialize accounts service
-			variables.oAccountsService = CreateObject("Component","accounts").init(variables.oHomePortalsConfigBean);
+			variables.oAccountsService = CreateObject("Component","Home.Components.accounts.accounts").init(variables.oHomePortalsConfigBean);
 
 			// initialize resource catalog
 			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
@@ -219,7 +219,7 @@
 	<!--------------------------------------->
 	<!----  getAccountsService			----->
 	<!--------------------------------------->
-	<cffunction name="getAccountsService" access="public" returntype="accounts" hint="Returns the accounts service">
+	<cffunction name="getAccountsService" access="public" returntype="Home.Components.accounts.accounts" hint="Returns the accounts service">
 		<cfreturn variables.oAccountsService>
 	</cffunction>
 

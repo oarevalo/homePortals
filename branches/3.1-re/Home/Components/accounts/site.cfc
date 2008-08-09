@@ -53,7 +53,7 @@
 		<cfloop query="qryPages">
 			<cfset xmlDoc = xmlParse(expandPath(layoutsHREF & "/" & qryPages.name))>
 
-			<cfset oPage = createObject("component","pageBean").init(xmlDoc)>
+			<cfset oPage = createObject("component","Home.Components.pageBean").init(xmlDoc)>
 
 			<cfset st = structNew()>
 			<cfset st.default = false>
@@ -288,7 +288,7 @@
 
 				// load page
 				xmlPage = xmlParse(expandPath(arguments.pageHREF));
-				oPage = createObject("component","pageBean").init(xmlPage);
+				oPage = createObject("component","Home.Components.pageBean").init(xmlPage);
 			}
 			
 		
@@ -347,7 +347,7 @@
 			xmlDoc = xmlParse(expandPath(href));
 			
 			// create page object
-			oPage = createObject("component","pageBean").init(xmlDoc);
+			oPage = createObject("component","Home.Components.pageBean").init(xmlDoc);
 			
 			return oPage;	
 		</cfscript>		
@@ -358,7 +358,7 @@
 	<!---------------------------------------->	
 	<cffunction name="savePage" access="public" hint="Updates a site page" returntype="void">
 		<cfargument name="pageName" type="string" required="true" hint="The name of the page document">
-		<cfargument name="page" type="pageBean" required="true" hint="The page object">
+		<cfargument name="page" type="Home.Components.pageBean" required="true" hint="The page object">
 		<!--- get page in xml format --->
 		<cfset var xmlDoc = arguments.page.toXML()>
 		<!--- get page location --->
