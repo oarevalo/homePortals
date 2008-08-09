@@ -489,13 +489,12 @@
 	<!--------------------------------------->
 	<cffunction name="processTemplate" returntype="private" access="package">
 		<cfargument name="accountName" type="string" required="yes">
-		<cfargument name="TemplateName" type="string" required="yes">
+		<cfargument name="templateName" type="string" required="yes">
 
 		<cfset var tmpDoc = "">
 		<cfset var tmpDocPath = ExpandPath(Arguments.TemplateName)>
 
-		<cfset var homeURL = getHomePortalsConfigBean().getAppRoot()>
-		<cfset var ModulesRoot = getHomePortalsConfigBean().getResourceLibraryPath() & "/Modules/">
+		<cfset var appRoot = getHomePortalsConfigBean().getAppRoot()>
 		<cfset var accountsRoot = getConfig().getAccountsRoot()>
 
 		<!--- read template file --->
@@ -503,8 +502,8 @@
 
 		<!--- replace tokens --->
 		<cfset tmpDoc = ReplaceList(tmpDoc,
-									"$USERNAME$,$HOME$,$ACCOUNTS_ROOT$,$MODULES_ROOT$,$HOME_ROOT$",
-									"#Arguments.accountName#,#homeURL#,#AccountsRoot#,#ModulesRoot#,#homeURL#")>
+									"$ACCOUNT_NAME$,$ACCOUNTS_ROOT$,$APP_ROOT$",
+									"#Arguments.accountName#,#AccountsRoot#,#appRoot#")>
 		<cfreturn tmpDoc>
 	</cffunction>
 

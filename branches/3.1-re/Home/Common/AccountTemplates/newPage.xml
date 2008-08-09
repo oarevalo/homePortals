@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<?xml-stylesheet type="text/xsl" href="$HOME_ROOT$/pageLoader.xsl"?>
-<Page owner="$USERNAME$">
+<Page owner="$ACCOUNT_NAME$">
 	<title/>
 	<layout>
 		<location class="leftcolumn" name="left" type="column"/>

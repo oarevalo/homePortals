@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Page owner="$USERNAME$">
+<Page owner="$ACCOUNT_NAME$">
 	<title>
-		HomePortals - $USERNAME$ Home
+		HomePortals - $ACCOUNT_NAME$ Home
 	</title>
 	<layout>
 		<location class="leftcolumn" name="left" type="column" />
