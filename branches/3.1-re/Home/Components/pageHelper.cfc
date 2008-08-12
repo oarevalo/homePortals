@@ -10,7 +10,7 @@
 	<!---------------------------------------->
 	<!--- init					           --->
 	<!---------------------------------------->	
-	<cffunction name="init" access="public" returntype="page" hint="constructor">
+	<cffunction name="init" access="public" returntype="pageHelper" hint="constructor">
 		<cfargument name="pageHREF" type="string" required="false" default="" hint="The location of the page as a relative address. If not empty, then loads the page">
 		<cfargument name="autoSave" type="boolean" required="false" default="true" hint="This flag is to force a saving of the page everytime a change is made, if false then the save method must be called manually">		
 		<cfscript>
