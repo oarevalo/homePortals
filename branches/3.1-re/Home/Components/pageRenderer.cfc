@@ -2,19 +2,17 @@
 	
 	<cfscript>
 		variables.stPage = StructNew();
-		variables.pageBuffer = structNew();
-		variables.pageBuffer["_htmlHead"] = structNew();
-		variables.pageBuffer["_htmlModule"] = structNew();
-		variables.lstModulesRender = ""; 		// list with the order in which the modules are rendered
-		variables.loadedModuleClasses = "";		// this is a list of all module classes loaded in the current page
+		variables.lstRenderedContent = ""; 		// list with the order in which the content tags are rendered
 		variables.homePortalsEngineDir = "/Home/";		// path to location of HomePortals engine
 		variables.errorTemplate = variables.homePortalsEngineDir & "/Common/Templates/error.cfm";	// template to display when errors occur while rendering page components
 		variables.pageHREF = "";		// path to the current page
 		variables.oHomePortals = 0;		// homeportals instance
 		variables.oPage = 0;			// the page to render
 		variables.stTimers = structNew();
-		
-		variables.HTTP_GET_TIMEOUT = 30;	// timeout for HTTP requests in content modules
+
+		variables.contentBuffer = structNew();	// the content buffers are used to temporarily store the generated output
+		variables.contentBuffer.head = 0;
+		variables.contentBuffer.body = 0;
 	</cfscript>
 
 	<!--------------------------------------->
@@ -30,6 +28,7 @@
 		<cfset variables.oPage = arguments.page>
 		<cfset variables.oHomePortals = arguments.homePortals>
 		
+		<cfset resetPageContentBuffer()>
 		<cfset loadPage()>
 		
 		<cfset variables.stTimers.init = getTickCount()-start>
@@ -53,8 +52,8 @@
 			var aSections = 0;
 			var start = getTickCount();
 			
-			// reset the buffer
-			resetPageBuffer();
+			// reset the content output buffer
+			resetPageContentBuffer();
 
 			// loop through the section types in render order
 			for(i=1;i lte ArrayLen(aLayoutSectionTypes);i=i+1) {
@@ -72,16 +71,13 @@
 						for(k=1;k lte arrayLen(aModules);k=k+1) {
 							stModuleNode = stModules[location][k];
 
-							switch(stModuleNode.moduleType) {
-								case "module":	// render normal modules
-									processModule(stModuleNode);
-									variables.lstModulesRender = listAppend(variables.lstModulesRender, stModuleNode.id);
-									break;
-									
-								case "content": // render content modules
-									processContent(stModuleNode);
-									break;
-							}
+							oContentTagRenderer = getContentTagRenderer(stModuleNode.moduleType, stModuleNode);
+							oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stModuleNode.id, variables.contentBuffer.head),
+																createObject("component","singleContentBuffer").init(stModuleNode.id, variables.contentBuffer.body)
+															);
+
+							// keep an ordered list with all content tags rendered
+							variables.lstRenderedContent = listAppend(variables.lstRenderedContent, stModuleNode.id);
 							
 						}
 					}
@@ -186,7 +182,7 @@
 				<cfloop from="1" to="#ArrayLen(aModules)#" index="j">
 					<cfset stModuleNode = variables.stPage.page.modules[aLocations[i].name][j]>
 					<cfif stModuleNode.output>
-						<cfset tmpHTML = tmpHTML & renderModule(stModuleNode)>
+						<cfset tmpHTML = tmpHTML & renderContentTag(stModuleNode)>
 					</cfif>
 				</cfloop>
 			</cfif>
@@ -233,7 +229,6 @@
 		<cfset var aScripts = variables.stPage.page.scripts>
 		<cfset var aEventListeners = variables.stPage.page.eventListeners>
 		<cfset var aMeta = variables.stPage.page.meta>
-		<cfset var stPageHeadContent = getpageBufferByType("_htmlHead")>
 		<cfset var moduleID = "">
 		<cfset var tmpHTML = "">
 		<cfset var tmpHTML2 = "">
@@ -281,10 +276,10 @@
 		</cfsavecontent>
 		<cfset tmpHTML = tmpHTML & tmpHTML2>
 		
-		<!--- Add html head code rendered by modules --->
-		<cfloop list="#variables.lstModulesRender#" index="moduleID">
-			<cfif structKeyExists(stPageHeadContent, moduleID)>
-				<cfset tmpHTML = tmpHTML & trim(stPageHeadContent[moduleID])>
+		<!--- Add html head code rendered by content tags --->
+		<cfloop list="#variables.lstRenderedContent#" index="moduleID">
+			<cfif variables.contentBuffer.head.containsID(moduleID)>
+				<cfset tmpHTML = tmpHTML & trim(variables.contentBuffer.head.get(moduleID))>
 			</cfif>
 		</cfloop>
 
@@ -317,6 +312,13 @@
 	<cffunction name="getPage" access="public" returntype="pageBean" output="false" hint="Returns the current page">
 		<cfreturn variables.oPage>
 	</cffunction>
+	
+	<!---------------------------------------->
+	<!--- getHomePortals                   --->
+	<!---------------------------------------->		
+	<cffunction name="getHomePortals" access="public" returntype="homePortals">
+		<cfreturn variables.oHomePortals>
+	</cffunction>	
 	
 	<!---------------------------------------->
 	<!--- getTimers						   --->
@@ -419,261 +421,53 @@
 	</cffunction>
 	
 	<!--------------------------------------->
-	<!----  processModule				----->
+	<!----  renderContentTag			----->
 	<!--------------------------------------->
-	<cffunction name="processModule" access="private" hint="Executes a module">
-		<cfargument name="moduleNode" type="any" required="true">
+	<cffunction name="renderContentTag" access="private" returntype="string" hint="Initializes and renders a content tag instance." output="false">
+		<cfargument name="contentTagNode" type="struct" required="true">
 		<cfscript>
-			var bIsFirstInClass = false;
-			var oModuleController = 0;
-			var moduleID = arguments.moduleNode.id;
-			var moduleName = arguments.moduleNode.name;
-			var tmpMsg = "";
-			var start = getTickCount();
-
-			try {
-				moduleName = getHomePortals().getConfig().getResourceLibraryPath() & "/Modules/" & moduleName;
-
-				// convert the moduleName into a dot notation path
-				moduleName = replace(moduleName,"/",".","ALL");
-				moduleName = replace(moduleName,"..",".","ALL");
-				if(left(moduleName,1) eq ".") moduleName = right(moduleName, len(moduleName)-1);
-
-				// check if this module is the first of its class to be rendered on the page
-				bIsFirstInClass = (Not listFind(variables.loadedModuleClasses, moduleName));
-				
-				// add information about the page to moduleNode
-				arguments.moduleNode["_page"] = structNew();
-				arguments.moduleNode["_page"].owner =  variables.stPage.page.owner;
-				arguments.moduleNode["_page"].href =  variables.stPage.page.href;
-				
-				// instantiate module controller and call constructor
-				oModuleController = createObject("component","moduleController");
-				oModuleController.init(variables.stPage.page.href, moduleID, moduleName, arguments.moduleNode, bIsFirstInClass, "local", variables.oHomePortals);
-
-				// render html content
-				appendpageBuffer("_htmlHead", moduleID, oModuleController.renderClientInit() );
-				appendpageBuffer("_htmlHead", moduleID, oModuleController.renderHTMLHead() );
-				appendpageBuffer("_htmlModule", moduleID, oModuleController.renderView() );
-				
-				if(bIsFirstInClass) {
-					// append module name to list of loaded module classes to avoid initializing the same class twice
-					variables.loadedModuleClasses = listAppend(variables.loadedModuleClasses, moduleName);
-				}
-
-			} catch(any e) {
-				tmpMsg = "<b>An unexpected error ocurred while initializing module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
-				appendpageBuffer("_htmlModule", moduleID, tmpMsg );
-			}
-
-			variables.stTimers["processModule_#moduleID#"] = getTickCount()-start;
-		</cfscript>		
-	</cffunction>	
-	
-	<!--------------------------------------->
-	<!----  processContent				----->
-	<!--------------------------------------->
-	<cffunction name="processContent" access="private" hint="Retrieves content to display in the page">
-		<cfargument name="moduleNode" type="any" required="true">
-		<cfscript>
-			var moduleID = arguments.moduleNode.id;
-			var start = getTickCount();
-			var tmpHTML = "";
-			var cacheKey = "";
-			var oCache = 0;
-			
-			try {
-				if(isBoolean(arguments.moduleNode.cache) and arguments.moduleNode.cache) {
-					// get the content cache (this will initialize it, if needed)
-					oCache = getContentCache();
-
-					// generate a key for the cache entry
-					cacheKey = arguments.moduleNode.resourceID & "/" 
-								& arguments.moduleNode.resourceType & "/" 
-								& arguments.moduleNode.href;
-					
-					try {
-						// read from cache
-						tmpHTML = oCache.retrieve(cacheKey);
-					
-					} catch(homePortals.cacheService.itemNotFound e) {
-						// read from source
-						tmpHTML = retrieveContent( arguments.moduleNode );
-						
-						// update cache
-						if(arguments.moduleNode.cacheTTL neq "" and val(arguments.moduleNode.cacheTTL) gte 0)
-							oCache.store(cacheKey, tmpHTML, val(arguments.moduleNode.cacheTTL));
-						else
-							oCache.store(cacheKey, tmpHTML);
-					}
-					
-				} else {
-					// retrieve from source
-					tmpHTML = retrieveContent( arguments.moduleNode );
-				}
-
-				// add rendered content to buffer
-				appendpageBuffer("_htmlModule", moduleID, tmpHTML );
-
-			} catch(any e) {
-				tmpHTML = "<b>An unexpected error ocurred while retrieving content for content module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
-				appendpageBuffer("_htmlModule", moduleID, tmpHTML );
-			}
-
-			variables.stTimers["processContent_#moduleID#"] = getTickCount()-start;
-		</cfscript>
-	</cffunction>
-
-	<!--------------------------------------->
-	<!----  renderModule				----->
-	<!--------------------------------------->
-	<cffunction name="renderModule" access="private" returntype="string" hint="Initializes and renders a HomePortals module instance." output="false">
-		<cfargument name="moduleNode" type="struct" required="true">
-
-		<cfscript>
-			var moduleID = arguments.moduleNode.id;
+			var id = arguments.contentTagNode.id;
 			var renderTemplateBody = "";
 			var tmpIconURL = "";
 
-			if(arguments.moduleNode.icon neq "") 
-				tmpIconURL = "<img src='#arguments.moduleNode.icon#' width='16' height='16' align='absmiddle'>";
+			if(arguments.contentTagNode.icon neq "") 
+				tmpIconURL = "<img src='#arguments.contentTagNode.icon#' width='16' height='16' align='absmiddle'>";
 			
-			if(arguments.moduleNode.Container)
+			if(arguments.contentTagNode.Container)
 				renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("module");
 			else
 				renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("moduleNoContainer");
 				
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ID$", moduleID, "ALL");
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_TITLE$", arguments.moduleNode.title, "ALL");
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_STYLE$", arguments.moduleNode.style, "ALL");
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", getpageBuffer("_htmlModule", moduleID),  "ALL");	
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ID$", id, "ALL");
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_TITLE$", arguments.contentTagNode.title, "ALL");
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_STYLE$", arguments.contentTagNode.style, "ALL");
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", variables.contentBuffer.body.get(id),  "ALL");	
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
 		</cfscript>
 		<cfreturn renderTemplateBody>
 	</cffunction>
 	
 	<!--------------------------------------->
-	<!----  resetPageBuffer				----->
+	<!----  resetPageContentBuffer		----->
 	<!--------------------------------------->
-	<cffunction name="resetPageBuffer" access="private" returntype="void" hint="This function resets the generated page contents in the buffer">
+	<cffunction name="resetPageContentBuffer" access="private" returntype="void" hint="This function resets the generated page contents in the buffer">
 		<cfscript>
-			variables.pageBuffer = structNew();
-			variables.pageBuffer["_htmlHead"] = structNew();
-			variables.pageBuffer["_htmlModule"] = structNew();
-			variables.lstModulesRender = ""; 		
-			variables.loadedModuleClasses = "";		
+			variables.contentBuffer.head = createObject("component","contentBuffer").init();
+			variables.contentBuffer.body = createObject("component","contentBuffer").init();
+			variables.lstRenderedContent = ""; 		
 		</cfscript>
 	</cffunction>	
 	
-	<!--------------------------------------->
-	<!----  appendPageBuffer			----->
-	<!--------------------------------------->
-	<cffunction name="appendPageBuffer" access="private">
-		<cfargument name="contentType" required="true">
-		<cfargument name="contentKey" required="true" default="">
-		<cfargument name="content" required="true">
-
-		<cfset var stTemp = structNew()>
-		
-		<cfif not structKeyExists(variables.pageBuffer, arguments.contentType)>
-			<cfset variables.pageBuffer[arguments.contentType] = structNew()>
-		</cfif>
-		
-		<cfif not structKeyExists(variables.pageBuffer[arguments.contentType], arguments.contentKey)>
-			<cfset variables.pageBuffer[arguments.contentType][arguments.contentKey] = arguments.content>
-		<cfelse>
-			<cfset variables.pageBuffer[arguments.contentType][arguments.contentKey] = variables.pageBuffer[arguments.contentType][arguments.contentKey] & arguments.content>
-		</cfif>		
-		
-	</cffunction>
-	
-	<!--------------------------------------->
-	<!----  getPageBuffer				----->
-	<!--------------------------------------->
-	<cffunction name="getPageBuffer" access="private" returntype="string">
-		<cfargument name="contentType" required="true">
-		<cfargument name="contentKey" required="true">
-		<cfset var tmpHTML = "">
-		<cfif structKeyExists(variables.pageBuffer[arguments.contentType], arguments.contentKey)>
-			<cfset tmpHTML = variables.pageBuffer[arguments.contentType][arguments.contentKey]>
-		</cfif>
-		<cfset tmpHTML = REReplace(tmpHTML, "[[:space:]]{2,}"," ","ALL")>
-		<cfreturn tmpHTML>
-	</cffunction>
-
-	<!--------------------------------------->
-	<!----  getPageBufferByType			----->
-	<!--------------------------------------->
-	<cffunction name="getPageBufferByType" access="private" returntype="any">
-		<cfargument name="contentType" required="true">
-		<cfreturn variables.pageBuffer[arguments.contentType]>
-	</cffunction>
-
 	<!---------------------------------------->
-	<!--- getContentCache                  --->
+	<!--- getContentTagRenderer            --->
 	<!---------------------------------------->		
-	<cffunction name="getContentCache" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
-		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
-		<cfset var cacheName = "contentCacheService">
-		<cfset var oCacheService = 0>
-		<cfset var cacheSize = getHomePortals().getConfig().getContentCacheSize()>
-		<cfset var cacheTTL = getHomePortals().getConfig().getContentCacheTTL()>
-
-		<cflock type="exclusive" name="contentCacheLock" timeout="30">
-			<cfif not oCacheRegistry.isRegistered(cacheName)>
-				<!--- crate cache instance --->
-				<cfset oCacheService = createObject("component","cacheService").init(cacheSize, cacheTTL)>
-
-				<!--- add cache to registry --->
-				<cfset oCacheRegistry.register(cacheName, oCacheService)>
-			</cfif>
-		</cflock>
-		
-		<cfreturn oCacheRegistry.getCache(cacheName)>
+	<cffunction name="getContentTagRenderer" access="private" returntype="contentTagRenderer">
+		<cfargument name="contentTagType" type="string" required="true">
+		<cfargument name="contentTagNode" type="struct" required="true">
+		<cfset var oContentTag = createObject("component", "contentTag").init(arguments.contentTagNode)>
+		<cfset var oContentTagRenderer = createObject("component", "Home.Components.contentTagRenderers." & arguments.contentTagType).init(this, oContentTag)>
+		<cfreturn oContentTagRenderer>
 	</cffunction>
-	
-	<!---------------------------------------->
-	<!--- retrieveContent                  --->
-	<!---------------------------------------->		
-	<cffunction name="retrieveContent" access="private" returntype="string" hint="retrieves content from source for a content module">
-		<cfargument name="moduleNode" type="any" required="true">
-		<cfscript>
-			var oResourceBean = 0;
-			var contentSrc = "";
-			var tmpHTML = "";
-			var st = structNew();
-			var oCatalog = getHomePortals().getCatalog();
-			var oHPConfig = getHomePortals().getConfig();
-			
-			// define source of content (resource or external)
-			if(arguments.moduleNode.resourceID neq "") {
-				oResourceBean = oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
-				contentSrc = oHPConfig.getResourceLibraryPath() & "/" & oResourceBean.getHref();
-			
-			} else if(arguments.moduleNode.href neq "") {
-				contentSrc = arguments.moduleNode.href;
-			}
-
-			// retrieve content
-			if(contentSrc neq "") {
-				if(left(contentSrc,4) eq "http") {
-					st = httpget(contentSrc);
-					tmpHTML = st.fileContent;
-				} else {
-					tmpHTML = readFile( expandPath( contentSrc) );
-				}
-			}
-		</cfscript>
-		<cfreturn tmpHTML>
-	</cffunction>
-	
-	<!---------------------------------------->
-	<!--- getHomePortals                   --->
-	<!---------------------------------------->		
-	<cffunction name="getHomePortals" access="private" returntype="homePortals">
-		<cfreturn variables.oHomePortals>
-	</cffunction>
-
 
 
 	<!--------------------------------------->
@@ -699,20 +493,5 @@
 		<cfargument name="type" type="string" default="custom"> 
 		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
 	</cffunction>
-
-	<cffunction name="httpget" access="private" returntype="struct">
-		<cfargument name="href" type="string">
-		<cfhttp url="#arguments.href#" method="get" throwonerror="true" 
-				resolveurl="true" redirect="true" 
-				timeout="#variables.HTTP_GET_TIMEOUT#">
-		<cfreturn cfhttp>
-	</cffunction>	
-	
-	<cffunction name="readFile" access="private" returntype="string" hint="Reads a file from disk and returns the contents.">
-		<cfargument name="filePath" type="string" required="true">
-		<cfset var txtDoc = "">
-		<cffile action="read" file="#filePath#" variable="txtDoc">
-		<cfreturn txtDoc>
-	</cffunction>		
 
 </cfcomponent>
