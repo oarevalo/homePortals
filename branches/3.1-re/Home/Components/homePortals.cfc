@@ -158,9 +158,6 @@
 			// validate access to page
 			getAccountsService().validatePageAccess( oPageRenderer.getPage() );
 
-			// process modules on page		
-			oPageRenderer.processModules();
-			
 			variables.stTimers.loadAccountPage = getTickCount()-start;
 			return oPageRenderer;
 		</cfscript>
@@ -184,9 +181,6 @@
 			oPageLoader = createObject("component","pageLoader").init(this);
 			oPageRenderer = oPageLoader.load(arguments.pageHREF);	
 
-			// process modules on page		
-			oPageRenderer.processModules();
-			
 			variables.stTimers.loadPage = getTickCount()-start;
 			return oPageRenderer;
 		</cfscript>

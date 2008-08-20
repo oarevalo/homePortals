@@ -36,59 +36,6 @@
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  processModules				----->
-	<!--------------------------------------->
-	<cffunction name="processModules" access="public" output="false" hint="processes all modules rendering its content. Generated content is saved for later.">
-		<cfscript>
-			var stModules = variables.stPage.page.modules;
-			var aModules = arrayNew(1);
-			var stModuleNode = structNew();
-			var i = 1;
-			var j = 1;
-			var k = 1;
-			var location = "";
-			var aLayoutSectionTypes = listToArray( getHomePortals().getConfig().getLayoutSections() );
-			var sectionType = "";
-			var aSections = 0;
-			var start = getTickCount();
-			
-			// reset the content output buffer
-			resetPageContentBuffer();
-
-			// loop through the section types in render order
-			for(i=1;i lte ArrayLen(aLayoutSectionTypes);i=i+1) {
-				sectionType = aLayoutSectionTypes[i];
-				aSections = variables.stPage.page.layout[sectionType];
-				
-				// loop through all locations in this section type
-				for(j=1;j lte ArrayLen(aSections);j=j+1) {
-					location = aSections[j].name;
-
-					if(structKeyExists(stModules,location)) {
-						aModules = stModules[location];
-						
-						// loop through all modules in this location
-						for(k=1;k lte arrayLen(aModules);k=k+1) {
-							stModuleNode = stModules[location][k];
-
-							oContentTagRenderer = getContentTagRenderer(stModuleNode.moduleType, stModuleNode);
-							oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stModuleNode.id, variables.contentBuffer.head),
-																createObject("component","singleContentBuffer").init(stModuleNode.id, variables.contentBuffer.body)
-															);
-
-							// keep an ordered list with all content tags rendered
-							variables.lstRenderedContent = listAppend(variables.lstRenderedContent, stModuleNode.id);
-							
-						}
-					}
-				}
-			}
-			
-			variables.stTimers.processModules = getTickCount()-start;
-		</cfscript>
-	</cffunction>
-
-	<!--------------------------------------->
 	<!----  renderPage					----->
 	<!--------------------------------------->
 	<cffunction name="renderPage" access="public" output="false" hint="Renders the entire page using the render template." returntype="string">
@@ -102,6 +49,9 @@
 			var arg2 = "";
 			var rendered = "";
 			var start = getTickCount();
+
+			// pre-render output of all content tags on page		
+			processContentTags();
 
 			// get the render template for the full page
 			renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("page");
@@ -419,6 +369,59 @@
 			}
 		</cfscript>	
 	</cffunction>
+	
+	<!--------------------------------------->
+	<!----  processContentTags			----->
+	<!--------------------------------------->
+	<cffunction name="processContentTags" access="private" output="false" hint="processes all content tags rendering its content. Generated content is saved for later.">
+		<cfscript>
+			var stTags = variables.stPage.page.modules;
+			var aTags = arrayNew(1);
+			var stTageNode = structNew();
+			var i = 1;
+			var j = 1;
+			var k = 1;
+			var location = "";
+			var aLayoutSectionTypes = listToArray( getHomePortals().getConfig().getLayoutSections() );
+			var sectionType = "";
+			var aSections = 0;
+			var start = getTickCount();
+			
+			// reset the content output buffer
+			resetPageContentBuffer();
+
+			// loop through the section types in render order
+			for(i=1;i lte ArrayLen(aLayoutSectionTypes);i=i+1) {
+				sectionType = aLayoutSectionTypes[i];
+				aSections = variables.stPage.page.layout[sectionType];
+				
+				// loop through all locations in this section type
+				for(j=1;j lte ArrayLen(aSections);j=j+1) {
+					location = aSections[j].name;
+
+					if(structKeyExists(stTags,location)) {
+						aTags = stTags[location];
+						
+						// loop through all modules in this location
+						for(k=1;k lte arrayLen(aTags);k=k+1) {
+							stTagNode = stTags[location][k];
+
+							oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, stTagNode);
+							oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.head),
+																createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body)
+															);
+
+							// keep an ordered list with all content tags rendered
+							variables.lstRenderedContent = listAppend(variables.lstRenderedContent, stTagNode.id);
+							
+						}
+					}
+				}
+			}
+			
+			variables.stTimers.processModules = getTickCount()-start;
+		</cfscript>
+	</cffunction>	
 	
 	<!--------------------------------------->
 	<!----  renderContentTag			----->
