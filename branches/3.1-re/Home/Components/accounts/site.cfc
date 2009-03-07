@@ -183,7 +183,7 @@
 			var index = 0;
 			
 			// check that the page exists
-			index = getPageHREF(arguments.pageName);
+			index = getPageIndex(arguments.pageName);
 			
 			// clear the default setting of all pages
 			for(i=1;i lte arrayLen(variables.instance.aPages);i=i+1) 
@@ -335,7 +335,7 @@
 	<!---------------------------------------->
 	<!--- getPage			               --->
 	<!---------------------------------------->	
-	<cffunction name="getPage" access="public" returntype="pageBean" output="false" hint="Returns a pageBean object representing a site page">
+	<cffunction name="getPage" access="public" returntype="Home.Components.pageBean" output="false" hint="Returns a pageBean object representing a site page">
 		<cfargument name="pageName" type="string" required="true" hint="The name of the page document">
 		<cfscript>
 			var href = "";
@@ -423,8 +423,8 @@
 			if(right(arguments.pageName,4) neq ".xml")
 				arguments.pageName = arguments.pageName & ".xml";
 			
-			for(i=1;i lte arrayLen(variables.aPages);i=i+1) {
-				if(variables.aPages[i].href eq arguments.pageName) {
+			for(i=1;i lte arrayLen(variables.instance.aPages);i=i+1) {
+				if(variables.instance.aPages[i].href eq arguments.pageName) {
 					return i;
 				}
 			}
@@ -445,7 +445,7 @@
 				arguments.pageName = arguments.pageName & ".xml";
 	
 			// build file location
-			href = layoutsHREF & "/" & arguments.pageHREF;
+			href = layoutsHREF & "/" & arguments.pageName;
 	
 			if(arguments.checkIfExists) {
 				// check if page exists on site

@@ -94,7 +94,7 @@
 	<!----  getAccounts					----->
 	<!--------------------------------------->
 	<cffunction name="getAccounts" access="public" returntype="query" hint="Returns a query with all created accounts.">
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		<cfreturn oDAO.getAll()>
 	</cffunction>
 
@@ -105,7 +105,7 @@
 		<cfargument name="accountname" type="string" required="no" default="">
 		<cfargument name="lastname" type="string" required="no" default="">
 		<cfargument name="email" type="string" required="no" default="">
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		<cfreturn oDAO.search(accountName = arguments.accountname, 
 								lastName = arguments.lastName, 
 								email = arguments.email)>
@@ -116,7 +116,7 @@
 	<!--------------------------------------->
 	<cffunction name="getAccountByName" access="public" returntype="query" hint="Returns information about an account using the account name">
 		<cfargument name="accountName" type="string" required="yes">
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		<cfreturn oDAO.search(accountName = arguments.accountname)>
 	</cffunction>
 
@@ -125,7 +125,7 @@
 	<!--------------------------------------->
 	<cffunction name="getAccountByID" access="public" returntype="query" hint="Returns information about an account using the account ID">
 		<cfargument name="accountID" type="string" required="yes">
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		
 		<!--- if the accountID is empty, then replace with -1 to avoid returning anything else --->
 		<cfif arguments.accountID eq "">
@@ -144,7 +144,6 @@
 		<cfargument name="accountName" type="string" required="yes">
 		<cfargument name="Password" type="string" required="yes">
 		<cfargument name="FirstName" type="string" required="no" default="">
-		<cfargument name="MiddleName" type="string" required="no" default="">
 		<cfargument name="LastName" type="string" required="no" default="">
 		<cfargument name="Email" type="string" required="no" default="">
 		
@@ -155,7 +154,7 @@
 		<cfset var tmpAccPublic = "">
 		<cfset var tmpAccDefault = "">
 		<cfset var newAccountID = "">
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
 		
 		<!--- validate username --->
@@ -169,9 +168,9 @@
 			<cfset newAccountID = oDAO.save(accountName = arguments.accountName, 
 											Password = arguments.Password, 
 											firstName = arguments.firstName, 
-											middleName = arguments.middleName, 
 											lastName = arguments.lastName, 
-											email = arguments.email)>
+											email = arguments.email,
+											createdOn = now())>
 			
 			<!--- get homeportals settings --->
 			<cfset hpEngineRoot = oHomePortalsConfigBean.getHomePortalsPath()>
@@ -220,13 +219,11 @@
 	<cffunction name="updateAccount" access="public" hint="Updates account data.">
 		<cfargument name="accountID" type="string" required="yes">
 		<cfargument name="FirstName" type="string" required="yes">
-		<cfargument name="MiddleName" type="string" required="yes">
 		<cfargument name="LastName" type="string" required="yes">
 		<cfargument name="Email" type="string" required="yes">
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		<cfset oDAO.save(accountID = arguments.accountID,
 							firstName = arguments.firstName, 
-							middleName = arguments.middleName, 
 							lastName = arguments.lastName, 
 							email = arguments.email)>
 	</cffunction>
@@ -237,7 +234,7 @@
 	<cffunction name="deleteAccount" access="public" hint="Deletes an account record and removes all files and account directory.">
 		<cfargument name="accountID" type="string" required="yes">
 		
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		<cfset var qryAccount = oDAO.get(arguments.accountID)>
 		<cfset var accountsRoot = getConfig().getAccountsRoot()>
 		
@@ -260,7 +257,7 @@
 	<cffunction name="changePassword" access="public" hint="Change accont password.">
 		<cfargument name="accountID" type="string" required="yes">
 		<cfargument name="NewPassword" type="string" required="yes">
-		<cfset var oDAO = getDAO("Accounts")>
+		<cfset var oDAO = getAccountsDAO()>
 		<cfset oDAO.save(accountID = arguments.accountID,
 							password = arguments.NewPassword)>
 	</cffunction>
@@ -477,7 +474,7 @@
 	<!--------------------------------------->
 	<!--- getDAO		 	        	  --->
 	<!--------------------------------------->
-	<cffunction name="getDAO" access="package" returntype="DAO" hint="returns a properly configured instance of a DAO">
+	<cffunction name="getDAO" access="package" returntype="Home.Components.lib.DAOFactory.DAO" hint="returns a properly configured instance of a DAO">
 		<cfargument name="entity" type="string" required="true">
 		<cfset var oDAO = createObject("component", variables.clientDAOPath & arguments.entity & "DAO")>
 		<cfset oDAO.init(variables.oDataProvider)>
@@ -487,7 +484,7 @@
 	<!--------------------------------------->
 	<!--- processTemplate				    --->
 	<!--------------------------------------->
-	<cffunction name="processTemplate" returntype="private" access="package">
+	<cffunction name="processTemplate" returntype="string" access="package">
 		<cfargument name="accountName" type="string" required="yes">
 		<cfargument name="templateName" type="string" required="yes">
 
@@ -507,6 +504,12 @@
 		<cfreturn tmpDoc>
 	</cffunction>
 
+	<!--------------------------------------->
+	<!--- getAccountsDAO 	        	  --->
+	<!--------------------------------------->
+	<cffunction name="getAccountsDAO" access="private" returntype="Home.Components.lib.DAOFactory.DAO" hint="returns the accounts DAO">
+		<cfreturn getDAO("accounts")>
+	</cffunction>	
 	
 	
 	<cffunction name="dump" access="private" hint="facade for cfdump">

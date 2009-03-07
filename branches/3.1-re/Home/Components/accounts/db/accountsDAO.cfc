@@ -1,7 +1,7 @@
 <cfcomponent extends="Home.Components.lib.DAOFactory.DAO">
 
 	<cffunction name="initTableParams" access="package" returntype="void" hint="setup table specific settings">
-		<cfset setTableName("account")>
+		<cfset setTableName("accounts")>
 		<cfset setPrimaryKey("accountID","cf_sql_varchar")>
 		
 		<cfset addColumn("accountName", "cf_sql_varchar")>
