@@ -222,7 +222,7 @@
 		<cfargument name="LastName" type="string" required="yes">
 		<cfargument name="Email" type="string" required="yes">
 		<cfset var oDAO = getAccountsDAO()>
-		<cfset oDAO.save(accountID = arguments.accountID,
+		<cfset oDAO.save(ID = arguments.accountID,
 							firstName = arguments.firstName, 
 							lastName = arguments.lastName, 
 							email = arguments.email)>
@@ -258,7 +258,7 @@
 		<cfargument name="accountID" type="string" required="yes">
 		<cfargument name="NewPassword" type="string" required="yes">
 		<cfset var oDAO = getAccountsDAO()>
-		<cfset oDAO.save(accountID = arguments.accountID,
+		<cfset oDAO.save(ID = arguments.accountID,
 							password = arguments.NewPassword)>
 	</cffunction>
 
