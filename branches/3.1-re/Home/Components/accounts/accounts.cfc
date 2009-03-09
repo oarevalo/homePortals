@@ -243,7 +243,7 @@
 			<cfset oDAO.delete(arguments.accountID)>
 	
 			<!--- delete directory and files --->
-			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#qryAccount.Username#/")>
+			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#qryAccount.accountName#/")>
 			<cfif DirectoryExists(tmpAccoutDir)>
 				<cfdirectory action="delete" directory="#tmpAccoutDir#" recurse="true">
 			</cfif>
