@@ -175,8 +175,8 @@
 				<cfset oSite = createObject("component","Home.components.accounts.site").create(Arguments.accountName, this)>
 				
 				<!--- create initial page --->
-				<cfset xmlDoc = processTemplate(arguments.accountName, )>
-				<cfset oPage = createObject("component","Home.Components.pageBean").init(xmlDoc, newPageTemplate)>
+				<cfset xmlDoc = processTemplate(arguments.accountName, newPageTemplate)>
+				<cfset oPage = createObject("component","Home.Components.pageBean").init(xmlDoc)>
 				<cfset oSite.addPage( pageName = GetFileFromPath(newPageTemplate),
 									  pageBean = oPage )>
 
