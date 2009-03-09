@@ -24,6 +24,7 @@
 			variables.stConfig.rssCacheSize = "";
 			variables.stConfig.rssCacheTTL = "";
 			variables.stConfig.baseResourceTypes = "";
+			variables.stConfig.pageProviderClass = "";
 
 			variables.stConfig.renderTemplates = structNew();
 			variables.stConfig.resources = structNew();
@@ -250,6 +251,10 @@
 		<cfreturn templateBody>
 	</cffunction>
 
+	<cffunction name="getPageProviderClass" access="public" returntype="string" hint="Returns the path in dot notation for the class responsible for storing/retrieving HomePortals pages">
+		<cfreturn variables.stConfig.pageProviderClass>
+	</cffunction>	
+
 
 	<!--- Setters --->
 	<cffunction name="setVersion" access="public" returntype="void">
@@ -361,6 +366,11 @@
 	<cffunction name="removeRenderTemplate" access="public" returntype="void">
 		<cfargument name="type" type="string" required="true">
 		<cfset structDelete(variables.stConfig.renderTemplates, arguments.type, false)>
+	</cffunction>
+
+	<cffunction name="setPageProviderClass" access="public" returnType="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.pageProviderClass = arguments.data>
 	</cffunction>
 
 

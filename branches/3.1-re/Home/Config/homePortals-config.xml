@@ -37,6 +37,9 @@
 	<!-- Default TTL in minutes for rss feeds on the rss cache.  -->
 	<contentCacheTTL>60</contentCacheTTL>
 
+	<!-- Path in dot notation for the class responsible for storing/retrieving HomePortals pages -->
+	<pageProviderClass>Home.Components.defaultPageProvider</pageProviderClass>
+
 	<!-- List with allowed types of base resources -->
 	<baseResourceTypes>script,style,header,footer</baseResourceTypes>
 	

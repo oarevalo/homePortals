@@ -3,7 +3,6 @@
 	<cfscript>
 		variables.instance = structNew();
 		variables.instance.pageBean = 0;
-		variables.instance.autoSave = true;
 		variables.instance.pageHREF = "";
 	</cfscript>
 	
@@ -11,35 +10,10 @@
 	<!--- init					           --->
 	<!---------------------------------------->	
 	<cffunction name="init" access="public" returntype="pageHelper" hint="constructor">
-		<cfargument name="pageHREF" type="string" required="false" default="" hint="The location of the page as a relative address. If not empty, then loads the page">
-		<cfargument name="autoSave" type="boolean" required="false" default="true" hint="This flag is to force a saving of the page everytime a change is made, if false then the save method must be called manually">		
-		<cfscript>
-			var xmlDoc = 0;
-			var oPage = 0;
-			
-			if(arguments.pageHREF neq "") {
-			
-				// check that page exists
-				if(not fileExists(expandPath(arguments.pageHREF))) throw("Page does not exist","homePortals.page.pageNotFound");
-				
-				// page exists, so read from file system
-				xmlDoc = xmlParse(expandPath(arguments.pageHREF));
-			
-				// initialize page
-				oPage = createObject("Component","pageBean").init(xmlDoc);
-			
-			} else {
-				// create empty page
-				oPage = createObject("Component","pageBean").init();
-			}
-
-			// set properties
-			setPageHREF(arguments.pageHREF);
-			setAutoSave(arguments.autoSave);
-			setPage(oPage);
-			
-			return this;
-		</cfscript>
+		<cfargument name="page" type="pageBean" required="true" hint="A page object instance on which to operate">
+		<cfargument name="pageHREF" type="string" required="false" default="" hint="The location of the page as a relative address">
+		<cfset setPageHREF(arguments.pageHREF)>
+		<cfset setPage(arguments.page)>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -133,9 +107,6 @@
 			}
 
 
-			// save page			
-			if(getAutoSave()) savePage();		
-			
 			return moduleID;		
 		</cfscript>
 	</cffunction>
@@ -189,9 +160,6 @@
 			for(i=1;i lte arrayLen(aNewModules);i=i+1) {
 				oPage.addModule(aNewModules[i].id, aNewModules[i]);
 			}
-
-			// save page
-			if(getAutoSave()) savePage();	
 		</cfscript>
 	</cffunction>
 
@@ -260,9 +228,6 @@
 			if(hasLocalStyle) {
 				oPage.addStylesheet(localStyleHREF);
 			}
-			
-			// save page
-			if(getAutoSave()) savePage();	
 		</cfscript>
 	</cffunction>
 
@@ -290,10 +255,6 @@
 
 			<!--- add the style to the page --->
 			<cfset getPage().addStylesheet(localStyleHREF)>
-			
-			<cfif getAutoSave()>
-				<cfset savePage()>
-			</cfif>
 		<cfelse>
 			<!--- if local css exists, then delete it --->
 			<cfif fileExists(expandpath(localStyleHREF))>
@@ -323,67 +284,6 @@
 		<cfreturn getPageHREF() & ".css">
 	</cffunction>
 
-	
-	<!---------------------------------------->
-	<!--- F I L E   O P E R A T I O N S    --->
-	<!---------------------------------------->	
-
-	<!---------------------------------------->
-	<!--- savePage				           --->
-	<!---------------------------------------->	
-	<cffunction name="savePage" access="public" hint="Saves the page document">
-		<cfset var xmlDoc = getPage().toXML()>
-		<cfset var href = getPageHREF()>
-		
-		<!--- check that there is a location where to save the page --->
-		<cfif href eq "">
-			<cfthrow message="Cannot save page because page location is empty" type="homePortals.page.pageLocationEmpty">
-		</cfif>
-		
-		<!--- store page --->
-		<cffile action="write" file="#expandpath(href)#" output="#toString(xmlDoc)#">
-	</cffunction>
-	
-	<!---------------------------------------->
-	<!--- renamePage			           --->
-	<!---------------------------------------->	
-	<cffunction name="renamePage" access="public" returntype="void" output="false" hint="Changes the page name">
-		<cfargument name="pageName" type="string" required="true">
-
-		<cfset var short_name = "">
-		<cfset var full_name = "">
-		<cfset var newPageHREF = "">
-		<cfset var href = getPageHREF()>
-
-		<!--- get the name with and without extension (in case user gave one) --->
-		<cfset short_name = replaceNoCase(arguments.pageName,".xml","")>
-		<cfset full_name = short_name & ".xml">
-
-		<!--- build the full path to the new page --->
-		<cfset newPageHREF = replaceNoCase(href, getFileFromPath(href), full_name)>
-					
-		<!--- rename file --->
-		<cffile action="rename" source="#expandPath(href)#" destination="#expandPath(newPageHREF)#">
-
-		<!--- update instance --->
-		<cfset setHREF(newPageHREF)>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- deletePage			           --->
-	<!---------------------------------------->	
-	<cffunction name="deletePage" access="public" hint="Deletes the page document">
-		<!--- get the location of the page --->
-		<cfset var href = getPageHREF()>
-		
-		<!--- check that there is a location where to save the page --->
-		<cfif href eq "">
-			<cfthrow message="Cannot delete page because page location is empty" type="homePortals.page.pageLocationEmpty">
-		</cfif>
-		
-		<!--- store page --->
-		<cffile action="delete" file="#expandpath(href)#">
-	</cffunction>
 
 
 
@@ -408,14 +308,6 @@
 		<cfset variables.instance.Page = arguments.data>
 	</cffunction>
 
-	<cffunction name="getAutoSave" access="public" returntype="boolean">
-		<cfreturn variables.instance.AutoSave>
-	</cffunction>
-
-	<cffunction name="setAutoSave" access="public" returntype="void">
-		<cfargument name="data" type="boolean" required="true">
-		<cfset variables.instance.AutoSave = arguments.data>
-	</cffunction>
 	
 	
 	<!---------------------------------------->

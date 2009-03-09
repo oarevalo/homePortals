@@ -2,7 +2,7 @@
 	<cfscript>
 		variables.configFilePath = "Config/accounts-config.xml.cfm";  // path of the config file relative to the root of the application
 		variables.oAccountsConfigBean = 0;	// bean to store config settings
-		variables.oHomePortalsConfigBean = 0;	// reference to the application settings
+		variables.oHomePortals = 0;	// reference to the application instance
 		variables.clientDAOPath = "Home.Components.accounts.db."; // here is where the DAO objects are located
 		variables.oDataProvider = 0;	// provides access to account data storage
 	</cfscript>
@@ -11,14 +11,14 @@
 	<!----  init	 					----->
 	<!--------------------------------------->
 	<cffunction name="init" access="public" returntype="accounts" hint="Constructor">
-		<cfargument name="configBean" type="Home.Components.homePortalsConfigBean" required="true" hint="HomePortals application settings">
+		<cfargument name="homePortals" type="Home.Components.homePortals" required="true" hint="HomePortals application engine">
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
 			var oConfigBean = 0;
 			
-			// copy reference to homeportals config bean
-			setHomePortalsConfigBean( arguments.configBean );
+			// copy reference to homePortals app
+			setHomePortals( arguments.homePortals );
 
 			// create object to store configuration settings
 			oConfigBean = createObject("component", "accountsConfigBean").init();
@@ -28,7 +28,7 @@
 			oConfigBean.load(defaultConfigFilePath);
 
 			// load configuration settings for the application
-			configFilePath = listAppend(getHomePortalsConfigBean().getAppRoot(), variables.configFilePath, "/");
+			configFilePath = listAppend(getHomePortals().getConfig().getAppRoot(), variables.configFilePath, "/");
 			if(fileExists(expandPath(configFilePath)))
 				oConfigBean.load(expandPath(configFilePath));
 		
@@ -148,14 +148,12 @@
 		<cfargument name="Email" type="string" required="no" default="">
 		
 		<cfset var qry = 0>
-		<cfset var txtDefault = "">
-		<cfset var txtPublic = "">
-		<cfset var tmpAccoutDir = "">
-		<cfset var tmpAccPublic = "">
-		<cfset var tmpAccDefault = "">
 		<cfset var newAccountID = "">
 		<cfset var oDAO = getAccountsDAO()>
-		<cfset var accountsRoot = oAccountsConfigBean.getAccountsRoot()>
+		<cfset var oSite = 0>
+		<cfset var oPage = 0>
+		<cfset var xmlDoc = 0>
+		<cfset var newPageTemplate = oAccountsConfigBean.getNewAccountTemplate()>
 		
 		<!--- validate username --->
 		<cfset qry = getAccountByName(arguments.accountName)>
@@ -172,37 +170,20 @@
 											email = arguments.email,
 											createdOn = now())>
 			
-			<!--- get homeportals settings --->
-			<cfset hpEngineRoot = oHomePortalsConfigBean.getHomePortalsPath()>
-			
-			<!--- create user space --->
-			<cfset txtDefault = processTemplate(Arguments.accountName,'#hpEngineRoot#/Common/AccountTemplates/index.txt')>
-			<cfset txtPublic = processTemplate(Arguments.accountName, oAccountsConfigBean.getNewAccountTemplate())>
-	
-			<!--- define locations for the default account files --->
-			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#Arguments.accountName#/")>
-			<cfset tmpAccPublic = ExpandPath("#accountsRoot#/#Arguments.accountName#/layouts/" & GetFileFromPath(oAccountsConfigBean.getNewAccountTemplate()))>
-			<cfset tmpAccDefault = ExpandPath("#accountsRoot#/#Arguments.accountName#/index.cfm")>
-			
-			<!--- create directory structure --->
 			<cftry>
-				<cfif Not DirectoryExists(tmpAccoutDir)>
-					<cfdirectory action="create" directory="#tmpAccoutDir#">
-				</cfif>
-				<cfif Not DirectoryExists(tmpAccoutDir & "/layouts")>
-					<cfdirectory action="create" directory="#tmpAccoutDir#/layouts">
-				</cfif>
+				<!--- create directory structure --->
+				<cfset oSite = createObject("component","Home.components.accounts.site").create(Arguments.accountName, this)>
 				
+				<!--- create initial page --->
+				<cfset xmlDoc = processTemplate(arguments.accountName, )>
+				<cfset oPage = createObject("component","Home.Components.pageBean").init(xmlDoc, newPageTemplate)>
+				<cfset oSite.addPage( pageName = GetFileFromPath(newPageTemplate),
+									  pageBean = oPage )>
+
 				<cfcatch type="any">
 					<cfthrow message="Could not create directory structure for new account. Account was not created. #cfcatch.message#" type="homePortals.accounts.directoryCreationException">			
 				</cfcatch>
 			</cftry>
-	
-			<!--- create public page --->
-			<cffile action="write" file="#tmpAccPublic#" output="#txtPublic#"> 
-
-			<!--- create default.htm --->
-			<cffile action="write" file="#tmpAccDefault#" output="#txtDefault#"> 
 			
 			<cfcatch type="any">
 				<cfset oDAO.delete(newAccountID)>
@@ -278,13 +259,7 @@
 		<cfset defaultPageHREF = oSite.getDefaultPage()>
 
 		<cfif defaultPageHREF neq "">
-			<!--- if the default page contains the xml extension, then remove it --->
-			<cfif right(defaultPageHREF,4) eq ".xml">
-				<cfset defaultPageHREF = left(defaultPageHREF, len(defaultPageHREF)-4)>
-			</cfif>
-			
-			<!--- get the location of the page --->
-			<cfset defaultPageURL = getAccountPageHREF(arguments.accountName, defaultPageHREF)>
+			<cfset defaultPageURL = oSite.getPageHREF(defaultPageHREF, true)>
 		</cfif>
 		
 		<cfreturn defaultPageURL>
@@ -361,14 +336,19 @@
 		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
 		<cfscript>
 			var pageHREF = "";
+			var oSite = 0;
 						
 			// determine the page to load
 			if(arguments.account eq "") arguments.account = getConfig().getDefaultAccount();
 			
 			if(arguments.page eq "") 
 				pageHREF = getAccountDefaultPage(arguments.account);
-			else
-				pageHREF = getConfig().getAccountsRoot() & "/" & arguments.account & "/layouts/" & arguments.page & ".xml";
+			else {
+				oSite = createObject("component","site");	// dont call init to avoid loading/reading the site- we dont need that right now
+				oSite.setAccountsService(this);
+				oSite.setOwner(arguments.account);
+				pageHREF = oSite.getPageHREF(arguments.page, false);	// turn off page checking because since we didnt read the site, there is no index
+			}
 
 			return pageHREF;
 		</cfscript>	
@@ -414,13 +394,13 @@
 		<cfset variables.oAccountsConfigBean = arguments.data>
 	</cffunction>
 	
-	<cffunction name="getHomePortalsConfigBean" access="public" returntype="Home.Components.homePortalsConfigBean">
-		<cfreturn variables.oHomePortalsConfigBean>
+	<cffunction name="getHomePortals" access="public" returntype="Home.Components.homePortals">
+		<cfreturn variables.oHomePortals>
 	</cffunction>
 
-	<cffunction name="setHomePortalsConfigBean" access="public" returntype="void">
-		<cfargument name="data" type="Home.Components.homePortalsConfigBean" required="true">
-		<cfset variables.oHomePortalsConfigBean = arguments.data>
+	<cffunction name="setHomePortals" access="public" returntype="void">
+		<cfargument name="data" type="Home.Components.homePortals" required="true">
+		<cfset variables.oHomePortals = arguments.data>
 	</cffunction>
 
 	<cffunction name="getDataProvider" access="public" returntype="Home.Components.accounts.lib.DAOFactory.dataProvider">
@@ -491,7 +471,7 @@
 		<cfset var tmpDoc = "">
 		<cfset var tmpDocPath = ExpandPath(Arguments.TemplateName)>
 
-		<cfset var appRoot = getHomePortalsConfigBean().getAppRoot()>
+		<cfset var appRoot = getHomePortals().getConfig().getAppRoot()>
 		<cfset var accountsRoot = getConfig().getAccountsRoot()>
 
 		<!--- read template file --->

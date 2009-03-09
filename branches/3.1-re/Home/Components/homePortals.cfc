@@ -70,13 +70,13 @@
 			}
 			
 			// initialize accounts service
-			variables.oAccountsService = CreateObject("Component","Home.Components.accounts.accounts").init(variables.oHomePortalsConfigBean);
+			variables.oAccountsService = CreateObject("Component","Home.Components.accounts.accounts").init(this);
 
 			// initialize resource catalog
 			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
 
 			// initialize page provider
-			variables.oPageProvider = createObject("component","pageProvider").init(variables.oHomePortalsConfigBean);
+			variables.oPageProvider = createObject("component", variables.oHomePortalsConfigBean.getPageProviderClass() ).init(variables.oHomePortalsConfigBean);
 
 			// load module properties
 			variables.oModuleProperties = createObject("component","moduleProperties").init(variables.oHomePortalsConfigBean);
