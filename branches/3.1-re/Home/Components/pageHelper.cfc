@@ -204,6 +204,7 @@
 
  		<cfscript>
 			var oPageTemplateBean = 0;
+			var xmlDoc = 0;
 			var localStyleHREF = getPageCSSHREF();
 			var i=0;
 			var aTemp = arrayNew(1);
@@ -215,7 +216,8 @@
 			
 			// get page template
 			pageTemplateHREF = resourceRoot & "/" & pageTemplateResourceBean.getHREF();
-			oPageTemplateBean = createObject("component","pageBean").init(pageTemplateHREF);
+			xmlDoc = xmlParse(expandPath(pageTemplateHREF));
+			oPageTemplateBean = createObject("component","pageBean").init(xmlDoc);
 
 			// local style
 			hasLocalStyle = oPage.hasStylesheet(localStyleHREF);
@@ -245,10 +247,12 @@
 			
 			// if a module location no longer exist, then move the module to the first location 
 			aTemp = oPage.getModules();
-			for(i=1;i lte arrayLen(aTemp);i=i+1) {
-				if(not listFind(lstLocations, aTemp[i].location)) {
-					aTemp[i]["location"] = listFirst(lstLocations);
-					oPage.setModule(aTemp[i].id, aTemp[i]);
+			if(lstLocations neq "") {
+				for(i=1;i lte arrayLen(aTemp);i=i+1) {
+					if(not listFind(lstLocations, aTemp[i].location)) {
+						aTemp[i]["location"] = listFirst(lstLocations);
+						oPage.setModule(aTemp[i].id, aTemp[i]);
+					}
 				}
 			}
 			
