@@ -366,7 +366,7 @@
 		<!--- store page --->
 		<cfset writeFile(expandpath(href), toString(xmlDoc))>
 		<!--- update page title in site --->
-		<cfset updatePageTitle(href, arguments.page.getTitle())>
+		<cfset updatePageTitle(arguments.pageName, arguments.page.getTitle())>
 	</cffunction>
 	
 
