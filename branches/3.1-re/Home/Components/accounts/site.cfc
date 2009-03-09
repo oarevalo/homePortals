@@ -472,7 +472,7 @@
 				
 			// read configuration file
 			if(Not fileExists(siteDocPath))
-				throw("Site descriptor file not found [#siteDocPath#]","homePortals.site.missingSiteXML");
+				indexSite(); // if site index file does not exist, then create one automatically
 			else
 				xmlDoc = xmlParse(siteDocPath);
 

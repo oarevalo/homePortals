@@ -377,7 +377,7 @@
 	<!--------------------------------------->
 	<!----  getNewPage		 			----->
 	<!--------------------------------------->
-	<cffunction name="getNewPage" access="public" hint="Returns a page object for a new page based on the newPage template" returntype="pageBean">
+	<cffunction name="getNewPage" access="public" hint="Returns a page object for a new page based on the newPage template" returntype="Home.Components.pageBean">
 		<cfargument name="AccountName" type="string" required="yes">
 		<cfscript>
 			var oConfig = getConfig();
