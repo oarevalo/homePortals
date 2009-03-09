@@ -110,7 +110,7 @@
 				} 
 			}			
 
-			if(val(theID) eq 0) {
+			if(theID eq 0 or theID eq "") {
 				st = _insert(stColumns, xmlDoc);
 				theID = st.ID;
 				xmlDoc = st.xmlDoc;
