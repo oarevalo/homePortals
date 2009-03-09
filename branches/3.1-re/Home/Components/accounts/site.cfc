@@ -367,7 +367,7 @@
 		<cfargument name="pageName" type="string" required="true" hint="The name of the page document">
 		<cfscript>
 			var href = getPageHREF(arguments.pageName);
-			var oPage = getPageProvider().load(newPageHREF);
+			var oPage = getPageProvider().load(href);
 			return oPage;	
 		</cfscript>		
 	</cffunction>

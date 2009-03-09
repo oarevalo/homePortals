@@ -14,6 +14,7 @@
 		<cfargument name="pageHREF" type="string" required="false" default="" hint="The location of the page as a relative address">
 		<cfset setPageHREF(arguments.pageHREF)>
 		<cfset setPage(arguments.page)>
+		<cfreturn this>
 	</cffunction>
 
 	<!---------------------------------------->
