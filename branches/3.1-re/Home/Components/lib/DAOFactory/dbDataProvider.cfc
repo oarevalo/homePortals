@@ -79,7 +79,7 @@
 				} 
 			}
 
-			if(val(theID) eq 0)
+			if(theID eq 0 or theID eq "")
 				theID = _insert(stColumns, stTableInfo);
 			else
 				_update(theID, stColumns, stTableInfo);
