@@ -470,11 +470,12 @@
 			var i = 0;
 			var siteDocPath = expandPath(getSiteHREF());
 				
-			// read configuration file
+			// if site index file does not exist, then create one automatically	
 			if(Not fileExists(siteDocPath))
-				indexSite(); // if site index file does not exist, then create one automatically
-			else
-				xmlDoc = xmlParse(siteDocPath);
+				indexSite(); 
+
+			// read configuration file
+			xmlDoc = xmlParse(siteDocPath);
 
 			// set initial values
 			setSiteTitle("");
