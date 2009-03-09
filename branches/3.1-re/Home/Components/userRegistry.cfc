@@ -10,11 +10,11 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="reinit" access="package" returntype="void" hint="clears the registry of the logged-in user">
+	<cffunction name="reinit" access="public" returntype="void" hint="clears the registry of the logged-in user">
 		<cfset session[variables.registryVarName] = getEmptyUserStruct()>
 	</cffunction>
 
-	<cffunction name="setUserInfo" access="package" returntype="void" hint="adds a user to the registry">
+	<cffunction name="setUserInfo" access="public" returntype="void" hint="adds a user to the registry">
 		<cfargument name="userID" type="string" required="true">
 		<cfargument name="userName" type="string" required="true">
 		<cfargument name="userData" type="Any" required="false" hint="Any additional data about the user">

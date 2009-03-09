@@ -73,7 +73,7 @@
 		<!--- register user information into the user registry --->
 		<!--- (this is to allow other components to access the current user information) --->
 		<cfset oUserRegistry = createObject("component","Home.Components.userRegistry").init()>
-		<cfset oUserRegistry.setUserInfo( qryAccount.accountID, qryAccount.userName, qryAccount )>
+		<cfset oUserRegistry.setUserInfo( qryAccount.accountID, qryAccount.accountName, qryAccount )>
 		
 		<cfreturn qryAccount>
 	</cffunction>
