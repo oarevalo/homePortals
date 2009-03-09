@@ -316,7 +316,7 @@
 			newPageHREF = getPageHREF(pname, false);
 			
 			// save page
-			writeFile(expandPath(newPageHREF), toString(xmlPage));
+			writeFile(expandPath(newPageHREF), toString(oPage.toXML()));
 
 			// append new page name to site definition
 			newNode = structNew();
