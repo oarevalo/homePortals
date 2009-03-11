@@ -193,11 +193,10 @@
 	<!--- addPage			               --->
 	<!---------------------------------------->	
 	<cffunction name="addPage" access="public" output="false" returntype="string" hint="This method creates a new page and adds it to the site. The new page can be completely new or can be an existing page">
-		<cfargument name="pageName" required="true" type="string" hint="the name of the new page. If no extension is given, then .xml will be appended.">
+		<cfargument name="pageName" required="true" type="string" hint="the name of the new page.">
 		<cfargument name="pageHREF" required="false" default="" type="string" hint="Optional. The page to copy, if pageHREF is only the document name (without path), then assumes it is a local page on the current account">
 		<cfargument name="pageBean" required="false" type="Home.Components.pageBean" hint="Optional. The pageBean object to add to the site. Mutually exclusive with the pageHREF argument">
 		<cfscript>
-			var originalName = "";
 			var oPage = 0;
 			var xmlPage = 0;
 			var pname = "";
@@ -211,10 +210,6 @@
 			// check that pagename is not empty 
 			if(arguments.pageName eq "") 
 				throw("Please enter a name for the new page","homePortals.site.pageNameMissing");
-
-			// remove extension from page name
-			originalName = replaceNoCase(arguments.pageName,".xml","","ALL");		
-
 
 			// get the new page
 			if(arguments.pageHREF eq "") {
@@ -236,7 +231,7 @@
 			
 		
 			// make sure the page has a unique name within the account
-			pName = originalName;
+			pName = arguments.pageName;
 			while(bFound) {
 				bFound = false;
 				for(i=1;i lte arrayLen(aPages);i=i+1) {
@@ -336,35 +331,29 @@
 	</cffunction>	
 	
 	<cffunction name="getSiteHREF" access="public" returntype="string" hint="Returns the path to the account site">
-		<cfreturn getAccountsService().getHomePortals().getConfig().getContentRoot() 
-					& "/" 
-					& getAccountsService().getConfig().getAccountsRoot() 
+		<cfreturn getAccountsService().getConfig().getAccountsRoot() 
 					& "/" 
 					& getOwner()>
 	</cffunction>
 
 	<cffunction name="getPageHREF" access="public" returntype="string" hint="Returns the path to a page document contained in the current site">
-		<cfargument name="pageName" type="string" required="true" hint="The page name, with or without the .xml extension">
+		<cfargument name="pageName" type="string" required="true" hint="The name of the page">
 		<cfargument name="checkIfExists" type="boolean" required="false" default="true" hint="Flag to indicate whether to check that the file exists on the site">
 		<cfscript>
 			var pageIndex = 0;
 			var href = "";
 			
-			// make sure the pagename contains the .xml extension
-			if(right(arguments.pageName,4) neq ".xml")
-				arguments.pageName = arguments.pageName & ".xml";
-	
 			// build file location
 			href = getSiteHREF() & "/" & arguments.pageName;
 	
 			if(arguments.checkIfExists) {
 				// check if page exists on site
 				pageIndex = getPageIndex(arguments.pageName);
-				if(pageIndex eq 0) throw("Page not found in site.","homePortals.site.pageNotFound");
+				if(pageIndex eq 0) throw("Page not found in site [#arguments.pageName#].","homePortals.site.pageNotFound");
 
 				// check if page exists on file system
 				if(not getPageProvider().pageExists(href))
-					throw("Page not found in storage [#expandPath(href)#].","homePortals.site.pageNotFound");
+					throw("Page not found in storage [#href#].","homePortals.site.pageNotFound");
 			}
 
 			// create page location
@@ -385,10 +374,6 @@
 		<cfargument name="pageName" type="string" required="true">
 		<cfscript>
 			var i = 1;
-			
-			// make sure the pagename contains the .xml extension
-			if(right(arguments.pageName,4) neq ".xml")
-				arguments.pageName = arguments.pageName & ".xml";
 			
 			for(i=1;i lte arrayLen(variables.instance.aPages);i=i+1) {
 				if(variables.instance.aPages[i].href eq arguments.pageName) {
@@ -437,13 +422,10 @@
 			<!--- set site title --->
 			<cfset setSiteTitle( qrySite.title )>
 		</cfif>
-
-		<!--- get list of pages --->
-		<cfset qryPages = oPageProvider.listFolder( getSiteHREF() )>
 		
 		<cfloop query="qryPages">
 			<cfif qryPages.type eq "page">
-				<cfset oPage = oPageProvider.load( getSiteHREF() & "/" & qryPages.name )>
+				<cfset oPage = oPageProvider.load( getPageHREF(qryPages.name, false) )>
 	
 				<cfset st = structNew()>
 				<cfset st.default = (qrySite.defaultPage eq qryPages.name)>

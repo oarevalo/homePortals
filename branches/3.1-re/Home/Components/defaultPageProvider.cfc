@@ -117,7 +117,9 @@
 	
 	<cffunction name="resolvePath" access="private" returntype="string">
 		<cfargument name="path" type="string" hint="the location of the page document">
-		<cfset var rtn = expandPath( variables.contentRoot & arguments.path )>
+		<cfset var rtn = "">
+		<cfset arguments.path = reReplace(arguments.path,"//*","/","all")>
+		<cfset rtn = expandPath( variables.contentRoot & arguments.path )>
 		<cfreturn rtn>
 	</cffunction>
 	
