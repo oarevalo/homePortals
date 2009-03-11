@@ -12,7 +12,7 @@
 		<cfargument name="path" type="string" hint="the location of the page document">
 
 		<cfscript>
-			var fileObj = createObject("java","java.io.File").init(resolvePath(arguments.path));
+			var fileObj = createObject("java","java.io.File").init(resolvePath(normalizeFilePath(arguments.path)));
 			var stInfo = structNew();
 			
 			stInfo.lastModified = createObject("java","java.util.Date").init(fileObj.lastModified());
@@ -28,7 +28,7 @@
 
 	<cffunction name="pageExists" access="public" returntype="boolean" hint="returns whether the page exists in the storage">
 		<cfargument name="path" type="string" hint="the location of the page document">
-		<cfreturn createObject("java","java.io.File").init(resolvePath(arguments.path)).exists()>
+		<cfreturn createObject("java","java.io.File").init(resolvePath(normalizeFilePath(arguments.path))).exists()>
 	</cffunction>
 
 	<cffunction name="load" access="public" returntype="pageBean" hint="loads a page from the storage">
@@ -37,10 +37,10 @@
 		<cfset var oPage = 0>
 
 		<cfif not pageExists(arguments.path)>
-			<cfthrow message="Page not found. #arguments.path#" type="pageProvider.pageNotFound">
+			<cfthrow message="Page not found. [#arguments.path#]" type="pageProvider.pageNotFound">
 		</cfif>
 
-		<cfset xmlDoc = xmlParse(resolvePath(arguments.path))>
+		<cfset xmlDoc = xmlParse(resolvePath(normalizeFilePath(arguments.path)))>
 
 		<cfset oPage = createObject("component","pageBean").init(xmlDoc)>
 
@@ -51,20 +51,20 @@
 		<cfargument name="path" type="string" hint="the location of the page document">
 		<cfargument name="page" type="pageBean" hint="the page to save">
 		<cfset var xmlDoc = arguments.page.toXML()>
-		<cffile action="write" file="#resolvePath(arguments.path)#" output="#toString(xmlDoc)#">
+		<cffile action="write" file="#resolvePath(normalizeFilePath(arguments.path))#" output="#toString(xmlDoc)#">
 	</cffunction>
 
 	<cffunction name="delete" access="public" returntype="void" hint="deletes a page from the storage">
 		<cfargument name="path" type="string" hint="the location of the page document">
 		<cfif pageExists(arguments.path)>
-			<cffile action="delete" file="#resolvePath(arguments.path)#">
+			<cffile action="delete" file="#resolvePath(normalizeFilePath(arguments.path))#">
 		</cfif>
 	</cffunction>
 
 	<cffunction name="move" access="public" returntype="void" hint="moves a page from one location to another">
 		<cfargument name="srcpath" type="string" hint="the source location of the page document">
 		<cfargument name="tgtpath" type="string" hint="the target location of the page document">
-		<cffile action="rename" source="#resolvePath(arguments.srcpath)#" destination="#resolvePath(arguments.tgtpath)#">
+		<cffile action="rename" source="#resolvePath(normalizeFilePath(arguments.srcpath))#" destination="#resolvePath(normalizeFilePath(arguments.tgtpath))#">
 	</cffunction>
 	
 	<cffunction name="createFolder" access="public" returntype="void" hint="creates a folder that can contain other pages or folders">
@@ -117,7 +117,17 @@
 	
 	<cffunction name="resolvePath" access="private" returntype="string">
 		<cfargument name="path" type="string" hint="the location of the page document">
-		<cfreturn expandPath( variables.contentRoot & arguments.path )>
+		<cfset var rtn = expandPath( variables.contentRoot & arguments.path )>
+		<cfreturn rtn>
+	</cffunction>
+	
+	<cffunction name="normalizeFilePath" access="private" returntype="string">
+		<cfargument name="path" type="string" hint="the location of the page document">
+		<cfif right(arguments.path,4) neq ".xml">
+			<cfreturn arguments.path & ".xml">
+		<cfelse>
+			<cfreturn arguments.path>
+		</cfif>
 	</cffunction>
 	
 </cfcomponent>

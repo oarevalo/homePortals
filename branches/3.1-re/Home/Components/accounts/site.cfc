@@ -336,7 +336,11 @@
 	</cffunction>	
 	
 	<cffunction name="getSiteHREF" access="public" returntype="string" hint="Returns the path to the account site">
-		<cfreturn getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner()>
+		<cfreturn getAccountsService().getHomePortals().getConfig().getContentRoot() 
+					& "/" 
+					& getAccountsService().getConfig().getAccountsRoot() 
+					& "/" 
+					& getOwner()>
 	</cffunction>
 
 	<cffunction name="getPageHREF" access="public" returntype="string" hint="Returns the path to a page document contained in the current site">
@@ -398,6 +402,7 @@
 	<cffunction name="loadSite" access="private" returntype="void" hint="Populates the site information">
 		<cfset var qryPages = 0>
 		<cfset var qrySite = 0>
+		<cfset var aPages = arrayNew(1)>
 		<cfset var st = "">
 		<cfset var oPage = 0>
 		<cfset var oPageProvider = getPageProvider()>
@@ -421,7 +426,7 @@
 
 			<cfif qryPages.recordCount gt 0>
 				<!--- lets take the first page as the default page --->
-				<cfset defaultPage = qryPages[1].name>
+				<cfset defaultPage = qryPages.name[1]>
 			</cfif>
 
 			<cfset oDAO.save(accountID = qryAccountInfo.accountID,
