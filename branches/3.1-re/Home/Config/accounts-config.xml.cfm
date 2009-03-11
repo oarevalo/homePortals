@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <homePortalsAccounts>
-	<!-- Directory where account files are stored -->
-	<accountsRoot>/Home/Accounts/</accountsRoot>
+	<!-- Directory where account files are stored
+		(relative to contentRoot)
+	 -->
+	<accountsRoot>/</accountsRoot>
 
 	<!-- Account to load when no page has been provided -->
 	<defaultAccount>default</defaultAccount>
@@ -12,6 +14,11 @@
 	-->
 	<storageType>xml</storageType>
 
+	<!-- File-based storage info 
+	** only applicable when storageType is xml
+	-->
+	<dataRoot>/Home/data</dataRoot>
+	
 	<!-- Database connection info 
 	** only applicable when storageType is db
 	-->

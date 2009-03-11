@@ -1,7 +1,7 @@
 <cfcomponent displayname="accountsConfigBean" hint="A bean to store the HomePortals accounts configuration. Configuration is per-application">
 
 	<cfset variables.stConfig = StructNew()>
-	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,storageType,datasource,username,password,dbtype">
+	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,storageType,datasource,username,password,dbtype,dataRoot">
 
 	<cffunction name="init" access="public" returntype="accountsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -16,6 +16,7 @@
 			variables.stConfig.username = "";
 			variables.stConfig.password = "";
 			variables.stConfig.dbtype = "";
+			variables.stConfig.dataRoot = "";
 						
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -116,6 +117,11 @@
 	<cffunction name="getDBType" access="public" returntype="string">
 		<cfreturn variables.stConfig.dbtype>
 	</cffunction>
+
+	<cffunction name="getDataRoot" access="public" returntype="string">
+		<cfreturn variables.stConfig.dataRoot>
+	</cffunction>
+	
 	
 
 	<!--- Setters --->
@@ -164,6 +170,10 @@
 		<cfset variables.stConfig.dbtype = arguments.data>
 	</cffunction>
 	
+	<cffunction name="setDataRoot" access="public" returntype="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.dataRoot = arguments.data>
+	</cffunction>
 
 
 	<cffunction name="XMLUnFormat" access="private" returntype="string">

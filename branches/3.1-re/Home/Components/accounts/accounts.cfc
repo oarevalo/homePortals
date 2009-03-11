@@ -442,7 +442,7 @@
 					break;
 					
 				case "xml":
-					oConfigBean.setDataRoot( getConfig().getAccountsRoot() );
+					oConfigBean.setDataRoot( getConfig().getDataRoot() );
 					break;
 			}
 
@@ -464,7 +464,7 @@
 	<!--------------------------------------->
 	<!--- processTemplate				    --->
 	<!--------------------------------------->
-	<cffunction name="processTemplate" returntype="string" access="package">
+	<cffunction name="processTemplate" returntype="string" access="package" hint="replaces tokens on template documents for new pages">
 		<cfargument name="accountName" type="string" required="yes">
 		<cfargument name="templateName" type="string" required="yes">
 

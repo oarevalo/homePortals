@@ -20,13 +20,8 @@
 			setAccountsService( arguments.accounts );
 			setOwner( arguments.owner );
 
-			try {
-				loadSite();
+			loadSite();
 				
-			} catch(homePortals.site.missingSiteXML e) {
-				indexSite();
-			}
-
 			return this;
 		</cfscript>
 	</cffunction>
@@ -38,102 +33,27 @@
 		<cfargument name="owner" type="string" required="true" hint="The owner of the site to load. this is the name of a homeportals account">
 		<cfargument name="accounts" type="accounts" required="true" hint="This is a reference to the Accounts object">
 
-		<cfset var accountDir = "">
+		<cfset var oPageProvider = 0>
 		
 		<cfset setAccountsService( arguments.accounts )>
 		<cfset setOwner( arguments.owner )>
 
-		<cfset accountDir = ExpandPath( getAccountsService().getAccountsRoot() & "/" & getOwner() )>
+		<cfset oPageProvider = getPageProvider()>
 
-		<!--- create directory structure --->
-		<cfif Not DirectoryExists(accountDir)>
-			<cfdirectory action="create" directory="#accountDir#">
+		<!--- check that the accounts directory exists, if not lets create it --->
+		<cfif not oPageProvider.folderExists( getAccountsService().getAccountsRoot() )>
+			<cfset oPageProvider.createFolder( "", getAccountsService().getAccountsRoot() )>
 		</cfif>
-		<cfif Not DirectoryExists(accountDir & "/layouts")>
-			<cfdirectory action="create" directory="#accountDir#/layouts">
+
+		<!--- create directory for account (if doesnt exist already) ---->
+		<cfif Not oPageProvider.folderExists( getAccountsService().getAccountsRoot() & "/" & getOwner() )>
+			<cfset oPageProvider.createFolder( getAccountsService().getAccountsRoot(), getOwner() )>
 		</cfif>
 		
 		<!--- create site index --->
-		<cfset indexSite()>
+		<cfset loadSite()>
 		
 		<cfreturn this>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- indexSite				           --->
-	<!---------------------------------------->	
-	<cffunction name="indexSite" access="public" returntype="void" hint="Builds the site index by examining all pages in the current account">
-		<cfset var qryPages = "">
-		<cfset var st = "">
-		<cfset var aPages = arrayNew(1)>
-		<cfset var oPage = 0>
-		
-		<cfset var accountHREF = getDirectoryFromPath( getSiteHREF() )>
-		<cfset var layoutsHREF = accountHREF & "/layouts">
-		
-		<!--- set site title --->
-		<cfset setSiteTitle( getOwner() )>
-
-		<!--- get list of pages --->
-		<cfdirectory action="list" directory="#expandPath(layoutsHREF)#" name="qryPages" filter="*.xml">
-		
-		<cfloop query="qryPages">
-			<cfset oPage = getPageProvider().load( layoutsHREF & "/" & qryPages.name )>
-
-			<cfset st = structNew()>
-			<cfset st.default = false>
-			<cfset st.href = qryPages.name>	
-			<cfset st.title = oPage.getTitle()>
-
-			<cfset arrayAppend(aPages, st)>
-		</cfloop>
-		
-		<cfset variables.instance.aPages = aPages>
-		
-		<!--- save site --->
-		<cfset saveSite()>
-	</cffunction>
-	
-	<!---------------------------------------->
-	<!--- toXML					           --->
-	<!---------------------------------------->	
-	<cffunction name="toXML" access="public" returnType="xml" hint="Returns the site information as an XML document">
-		<cfscript>
-			var xmlDoc = 0;
-			var xmlNode = 0;
-			var tmpPage = structNew();
-			var i = 0;
-			var aPages = getPages();
-
-			// create a blank xml document and add the root node
-			xmlDoc = xmlNew();
-			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "site");	
-			
-			// add title node
-			xmlNode = xmlElemNew(xmlDoc, "title");
-			xmlNode.xmlText = xmlFormat(getSiteTitle());
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
-			
-			// add pages node
-			xmlNode = xmlElemNew(xmlDoc, "pages");
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);	
-			
-			// add page nodes
-			for(i=1;i lte arrayLen(aPages);i=i+1) {
-			
-				tmpPage = aPages[i];
-			
-				xmlNode = xmlElemNew(xmlDoc, "page");
-				xmlNode.xmlAttributes["title"] = xmlFormat(tmpPage.title);
-				xmlNode.xmlAttributes["href"] = xmlFormat(tmpPage.href);
-				xmlNode.xmlAttributes["default"] = xmlFormat(tmpPage.default);
-			
-				arrayAppend(xmlDoc.xmlRoot.pages.xmlChildren, xmlNode);	
-			
-			}
-			
-			return xmlDoc;
-		</cfscript>
 	</cffunction>
 
 	<!---------------------------------------->
@@ -164,7 +84,6 @@
 			
 			// update site info
 			variables.instance.aPages[pageIndex].href = getFileFromPath(newHref);
-			saveSite();
 		</cfscript>
 	</cffunction>
 
@@ -194,7 +113,6 @@
 			
 			// update site info
 			variables.instance.aPages[pageIndex].title = tmpTitle;
-			saveSite();
 		</cfscript>
 	</cffunction>
 
@@ -267,9 +185,6 @@
 
 				// delete from site
 				arrayDeleteAt(variables.instance.aPages, pageIndex);
-				
-				// save site
-				saveSite();
 			}
 		</cfscript>
 	</cffunction>
@@ -353,9 +268,6 @@
 			newNode.default = false;
 			ArrayAppend(variables.instance.aPages, newNode);
 			
-			// save changes to site
-			saveSite();
-			
 			return newPageHREF;
 		</cfscript>
 	</cffunction>
@@ -416,23 +328,53 @@
 	<cffunction name="setSiteTitle" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.instance.siteTitle = arguments.data>
+		<cfset saveSite()>
 	</cffunction>
 	
 	<cffunction name="getPages" access="public" returntype="array">
 		<cfreturn variables.instance.aPages>
 	</cffunction>	
-
-	<cffunction name="getPageProvider" access="private" returntype="Home.Components.pageProvider" hint="Retrieves an instance of the pageProvider object responsible for page persistance">
-		<cfreturn getAccountsService().getHomePortals().getPageProvider()>
-	</cffunction>
 	
+	<cffunction name="getSiteHREF" access="public" returntype="string" hint="Returns the path to the account site">
+		<cfreturn getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner()>
+	</cffunction>
+
+	<cffunction name="getPageHREF" access="public" returntype="string" hint="Returns the path to a page document contained in the current site">
+		<cfargument name="pageName" type="string" required="true" hint="The page name, with or without the .xml extension">
+		<cfargument name="checkIfExists" type="boolean" required="false" default="true" hint="Flag to indicate whether to check that the file exists on the site">
+		<cfscript>
+			var pageIndex = 0;
+			var href = "";
+			
+			// make sure the pagename contains the .xml extension
+			if(right(arguments.pageName,4) neq ".xml")
+				arguments.pageName = arguments.pageName & ".xml";
+	
+			// build file location
+			href = getSiteHREF() & "/" & arguments.pageName;
+	
+			if(arguments.checkIfExists) {
+				// check if page exists on site
+				pageIndex = getPageIndex(arguments.pageName);
+				if(pageIndex eq 0) throw("Page not found in site.","homePortals.site.pageNotFound");
+
+				// check if page exists on file system
+				if(not getPageProvider().pageExists(href))
+					throw("Page not found in storage [#expandPath(href)#].","homePortals.site.pageNotFound");
+			}
+
+			// create page location
+			return href;	
+		</cfscript>		
+	</cffunction>
+
 	
 	<!---------------------------------------->
 	<!--- P R I V A T E     M E T H O D S  --->
 	<!---------------------------------------->
 
-	<cffunction name="getSiteHREF" access="public" returntype="string" hint="Returns the path to the file where the site information is stored">
-		<cfreturn getAccountsService().getConfig().getAccountsRoot() & "/" & getOwner() & "/site.xml">
+	<cffunction name="getPageProvider" access="private" returntype="Home.Components.pageProvider" hint="Retrieves an instance of the pageProvider object responsible for page persistance">
+		<cfreturn getAccountsService().getHomePortals().getPageProvider()>
 	</cffunction>
 	
 	<cffunction name="getPageIndex" access="private" returntype="numeric" hint="Returns the index of the requested page in the local pages array. Returns 0 if page is not found">
@@ -452,92 +394,88 @@
 			return 0;
 		</cfscript>
 	</cffunction>	
-
-	<cffunction name="getPageHREF" access="public" returntype="string" hint="Returns the path to a page document contained in the current site">
-		<cfargument name="pageName" type="string" required="true" hint="The page name, with or without the .xml extension">
-		<cfargument name="checkIfExists" type="boolean" required="false" default="true" hint="Flag to indicate whether to check that the file exists on the site">
-		<cfscript>
-			var pageIndex = 0;
-			var layoutsHREF = getDirectoryFromPath(getSiteHREF()) & "/layouts";
-			var href = "";
-			
-			// make sure the pagename contains the .xml extension
-			if(right(arguments.pageName,4) neq ".xml")
-				arguments.pageName = arguments.pageName & ".xml";
 	
-			// build file location
-			href = layoutsHREF & "/" & arguments.pageName;
+	<cffunction name="loadSite" access="private" returntype="void" hint="Populates the site information">
+		<cfset var qryPages = 0>
+		<cfset var qrySite = 0>
+		<cfset var st = "">
+		<cfset var oPage = 0>
+		<cfset var oPageProvider = getPageProvider()>
+		<cfset var oDAO = getSitesDAO()>
+		<cfset var qryAccountInfo = getAccountsService().getAccountByName( getOwner() )>
+		<cfset var defaultPage = "">
+
+		<!--- check that there is a corresponding account --->
+		<cfif qryAccountInfo.recordCount eq 0>
+			<cfthrow message="Account [#getOwner()#] does not exist" type="HomePortals.site.accountNotFound">
+		</cfif>
+
+		<!--- get list of pages --->
+		<cfset qryPages = oPageProvider.listFolder( getSiteHREF() )>
+
+		<!--- check if there is a record for the site --->
+		<cfset qrySite = oDAO.search(accountID = qryAccountInfo.accountID)>
+		
+		<!--- if not found, then create record --->
+		<cfif qrySite.recordCount eq 0>
+
+			<cfif qryPages.recordCount gt 0>
+				<!--- lets take the first page as the default page --->
+				<cfset defaultPage = qryPages[1].name>
+			</cfif>
+
+			<cfset oDAO.save(accountID = qryAccountInfo.accountID,
+							 title = getOwner(),
+							 defaultPage = defaultPage,
+							 createdOn = now())>
+		<cfelse>
+			<!--- set site title --->
+			<cfset setSiteTitle( qrySite.title )>
+		</cfif>
+
+		<!--- get list of pages --->
+		<cfset qryPages = oPageProvider.listFolder( getSiteHREF() )>
+		
+		<cfloop query="qryPages">
+			<cfif qryPages.type eq "page">
+				<cfset oPage = oPageProvider.load( getSiteHREF() & "/" & qryPages.name )>
 	
-			if(arguments.checkIfExists) {
-				// check if page exists on site
-				pageIndex = getPageIndex(arguments.pageName);
-				if(pageIndex eq 0) throw("Page not found in site.","homePortals.site.pageNotFound");
-
-				// check if page exists on file system
-				if(not getPageProvider().pageExists(href))
-					throw("Page not found in storage [#expandPath(href)#].","homePortals.site.pageNotFound");
-			}
-
-			// create page location
-			return href;	
-		</cfscript>		
-	</cffunction>
+				<cfset st = structNew()>
+				<cfset st.default = (qrySite.defaultPage eq qryPages.name)>
+				<cfset st.href = qryPages.name>	
+				<cfset st.title = oPage.getTitle()>
 	
-	<cffunction name="loadSite" access="private" returntype="void" hint="Reads the site information from a file">
-		<cfscript>
-			var xmlDoc = 0;
-			var st = structNew(); 
-			var xmlNode = 0;
-			var i = 0;
-			var siteDocPath = expandPath(getSiteHREF());
-				
-			// if site index file does not exist, then create one automatically	
-			if(Not fileExists(siteDocPath))
-				indexSite(); 
-
-			// read configuration file
-			xmlDoc = xmlParse(siteDocPath);
-
-			// set initial values
-			setSiteTitle("");
-			variables.instance.aPages = arrayNew(1);
-
-			// get site title
-			if(structKeyExists(xmlDoc.site,"title")) 
-				setSiteTitle(xmlDoc.xmlRoot.title.xmlText);
-			
-			// read pages
-			if(structKeyExists(xmlDoc.xmlRoot,"pages")) {
-			
-				for(i=1;i lte arrayLen(xmlDoc.xmlRoot.pages.xmlChildren); i=i+1) {
-				
-					xmlNode = xmlDoc.xmlRoot.pages.xmlChildren[i]; 
-					
-					// build default page struct
-					st = structNew();
-					st.default = false;
-					st.href = "";
-					st.title = "";
-									
-					if(structKeyExists(xmlNode.xmlAttributes, "default") and isBoolean(xmlNode.xmlAttributes.default)) st.default = xmlNode.xmlAttributes.default;
-					if(structKeyExists(xmlNode.xmlAttributes, "href")) st.href = xmlNode.xmlAttributes.href;
-					if(structKeyExists(xmlNode.xmlAttributes, "title")) st.title = xmlNode.xmlAttributes.title;
-					
-					// append to pages array
-					arrayAppend(variables.instance.aPages, st);
-					
-				}
-			}
-		</cfscript>
+				<cfset arrayAppend(aPages, st)>
+			</cfif>
+		</cfloop>
+		
+		<cfset variables.instance.aPages = aPages>
 	</cffunction>
 				
 	<cffunction name="saveSite" access="private" hint="Saves the site xml">
-		<cfset var xmlDoc = toXML()>
-		<cfset var siteHREF = getSiteHREF()>
-		<cffile action="write" file="#expandpath(siteHREF)#" output="#toString(xmlDoc)#">
+		<cfset var oDAO = getSitesDAO()>
+		<cfset var qrySite = 0>
+		<cfset var qryAccountInfo = getAccountsService().getAccountByName( getOwner() )>
+
+		<!--- check if there is a record for the site --->
+		<cfset qrySite = oDAO.search(accountID = qryAccountInfo.accountID)>
+		
+		<!--- if not found, then index site --->
+		<cfif qrySite.recordCount eq 0>
+			<cfset loadSite()>
+		<cfelse>
+			<!--- update title and default page--->
+			<cfset oDAO.save(ID = qrySite.siteID,
+							 title = getSiteTitle(),
+							 defaultPage = getDefaultPage())>
+		</cfif>
 	</cffunction>
 
-
+	<cffunction name="getSitesDAO" access="private" returntype="Home.Components.lib.DAOFactory.DAO" hint="returns the sites DAO">
+		<cfreturn getAccountsService().getDAO("sites")>
+	</cffunction>	
+	
+	
 	<!---------------------------------------->
 	<!--- U T I L I T Y     M E T H O D S  --->
 	<!---------------------------------------->
@@ -547,11 +485,5 @@
 		<cfargument name="type" type="string" required="false" default="homePortals.site.error">
 		<cfthrow  message="#arguments.message#" type="#arguments.type#">
 	</cffunction>
-	
-	<cffunction name="writeFile" access="private" hint="Facade for cffile write">
-		<cfargument name="path" type="string" required="true">
-		<cfargument name="content" type="string" required="true">
-		<cffile action="write" file="#arguments.path#" 	output="#arguments.content#">
-	</cffunction>
-	
+		
 </cfcomponent>

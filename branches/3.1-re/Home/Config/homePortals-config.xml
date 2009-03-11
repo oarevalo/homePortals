@@ -10,6 +10,9 @@
 	<!-- base path for the current application -->
 	<appRoot>/Home/</appRoot>
 
+	<!-- Directory where content pages will be stored -->
+	<contentRoot>/Home/Accounts/</contentRoot>
+
 	<!-- HomePortals page to load when no page has been provided -->
 	<defaultPage></defaultPage>
 

@@ -17,6 +17,7 @@
 			variables.stConfig.resourceLibraryPath = "";
 			variables.stConfig.defaultPage = "";
 			variables.stConfig.appRoot = "";
+			variables.stConfig.contentRoot = "";
 			variables.stConfig.pageCacheSize = "";
 			variables.stConfig.pageCacheTTL = "";
 			variables.stConfig.contentCacheSize = "";
@@ -191,6 +192,10 @@
 		<cfreturn variables.stConfig.appRoot>
 	</cffunction>
 
+	<cffunction name="getContentRoot" access="public" returnType="string" hint="The root where content pages will be stored">
+		<cfreturn variables.stConfig.contentRoot>
+	</cffunction>
+
 	<cffunction name="getPageCacheSize" access="public" returntype="numeric" hint="The maximum number of homeportals pages to cache at any given time">
 		<cfreturn val(variables.stConfig.pageCacheSize)>	
 	</cffunction>
@@ -290,6 +295,11 @@
 	<cffunction name="setAppRoot" access="public" returnType="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.appRoot = arguments.data>
+	</cffunction>
+
+	<cffunction name="setContentRoot" access="public" returnType="void">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.contentRoot = arguments.data>
 	</cffunction>
 
 	<cffunction name="setPageCacheSize" access="public" returntype="void">
