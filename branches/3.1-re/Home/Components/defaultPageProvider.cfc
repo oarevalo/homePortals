@@ -1,6 +1,8 @@
 <cfcomponent implements="pageProvider">
 
 	<cfset variables.contentRoot = "">
+	<cfset variables.EXCLUDED_DIR_NAMES = "_res,.svn">
+	<cfset variables.EXCLUDED_FILE_NAMES = "">
 
 	<cffunction name="init" access="public" returntype="pageProvider" hint="constructor">
 		<cfargument name="config" type="homePortalsConfigBean" hint="main configuration bean for the application">
@@ -89,14 +91,16 @@
 		<cfloop query="qryDir">
 			<cfset queryAddRow(qryRet)>
 			<cfif qryDir.type eq "file">
-				<cfif findNoCase(".xml",qryDir.name)>
+				<cfif findNoCase(".xml",qryDir.name) and not listFindNoCase(variables.EXCLUDED_FILE_NAMES,qryDir.name)>
 					<cfset querySetCell(qryRet,"type","page")>
 					<cfset querySetCell(qryRet,"name",replaceNoCase(qryDir.name,".xml",""))>
 				</cfif>
 			</cfif>
 			<cfif qryDir.type eq "dir">
-				<cfset querySetCell(qryRet,"type","folder")>
-				<cfset querySetCell(qryRet,"name",qryDir.name)>
+				<cfif not listFindNoCase(variables.EXCLUDED_DIR_NAMES,qryDir.name)>
+					<cfset querySetCell(qryRet,"type","folder")>
+					<cfset querySetCell(qryRet,"name",qryDir.name)>
+				</cfif>
 			</cfif>
 		</cfloop>
 		

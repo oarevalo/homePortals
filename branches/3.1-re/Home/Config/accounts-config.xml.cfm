@@ -17,7 +17,7 @@
 	<!-- File-based storage info 
 	** only applicable when storageType is xml
 	-->
-	<dataRoot>/Home/data</dataRoot>
+	<dataRoot>/Home/Accounts</dataRoot>
 	
 	<!-- Database connection info 
 	** only applicable when storageType is db

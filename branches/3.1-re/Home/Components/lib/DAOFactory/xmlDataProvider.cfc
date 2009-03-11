@@ -153,7 +153,7 @@
 		
 		<cfset var xmlDoc = xmlNew()>
 		<cfset var tableName = arguments._mapTableInfo.tableName>
-		<cfset var xmlDocURL = variables.oConfigBean.getDataRoot() & "/" & tableName & ".xml">
+		<cfset var xmlDocURL = variables.oConfigBean.getDataRoot() & "/" & tableName & ".xml.dat">
 		
 		<cfif fileExists(expandPath(xmlDocURL))>
 			<cflock name="#hash(xmlDocURL)#" type="exclusive" timeout="10">
@@ -170,7 +170,7 @@
 		<cfargument name="_mapTableInfo" type="struct" required="true">
 		<cfargument name="xmlDoc" type="xml" required="true">
 		<cfset var tableName = arguments._mapTableInfo.tableName>
-		<cfset var xmlDocURL = variables.oConfigBean.getDataRoot() & "/" & tableName & ".xml">
+		<cfset var xmlDocURL = variables.oConfigBean.getDataRoot() & "/" & tableName & ".xml.dat">
 		<cflock name="#hash(xmlDocURL)#" type="exclusive" timeout="10">
 			<cffile action="write" file="#expandPath(xmlDocURL)#" output="#toString(arguments.xmlDoc)#">
 		</cflock>
