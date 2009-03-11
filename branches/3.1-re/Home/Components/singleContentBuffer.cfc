@@ -13,14 +13,14 @@
 	</cffunction>
 
 	<cffunction name="append" access="public" returntype="void" hint="appends content">
+		<cfargument name="content" type="string" required="true" hint="the content to store">
 		<cfargument name="class" type="string" required="false" default="" hint="an identifier for the type or class of content">
-		<cfargument name="content" type="string" required="false" default="" hint="the content to store">
 		<cfset variables.instance.contentBuffer.append(variables.instance.id, arguments.class, arguments.content)>
 	</cffunction>	
 	
 	<cffunction name="set" access="public" returntype="void" hint="stores a content entry">
+		<cfargument name="content" type="string" required="true" hint="the content to store">
 		<cfargument name="class" type="string" required="false" default="" hint="an identifier for the type or class of content">
-		<cfargument name="content" type="string" required="false" default="" hint="the content to store">
 		<cfset variables.instance.contentBuffer.set(variables.instance.id, arguments.class, arguments.content)>
 	</cffunction>
 

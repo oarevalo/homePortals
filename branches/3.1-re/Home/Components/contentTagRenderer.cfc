@@ -1,8 +1,8 @@
 <cfcomponent>
 	
-	<cfset variables.instance = structNew()>
-	<cfset variables.instance.pageRenderer = 0>
-	<cfset variables.instance.contentTag = 0>
+	<cfset variables._instance = structNew()>
+	<cfset variables._instance.pageRenderer = 0>
+	<cfset variables._instance.contentTag = 0>
 	
 	<cffunction name="init" access="public" returntype="contentTagRenderer">
 		<cfargument name="pageRenderer" type="pageRenderer" required="true">
@@ -19,21 +19,25 @@
 	</cffunction>
 
 	<cffunction name="getPageRenderer" access="public" returntype="pageRenderer">
-		<cfreturn variables.instance.pageRenderer>
+		<cfreturn variables._instance.pageRenderer>
 	</cffunction>
 	
 	<cffunction name="setPageRenderer" access="public" returntype="void">
 		<cfargument name="data" type="pageRenderer" required="true">
-		<cfset variables.instance.pageRenderer = arguments.data>
+		<cfset variables._instance.pageRenderer = arguments.data>
 	</cffunction>	
 
 	<cffunction name="getContentTag" access="public" returntype="contentTag">
-		<cfreturn variables.instance.contentTag>
+		<cfreturn variables._instance.contentTag>
 	</cffunction>
 
 	<cffunction name="setContentTag" access="public" returntype="void">
 		<cfargument name="data" type="contentTag" required="true">
-		<cfset variables.instance.contentTag = arguments.data>
+		<cfset variables._instance.contentTag = arguments.data>
 	</cffunction>	
 
+	<cffunction name="getHomePortals" access="public" returntype="homePortals">
+		<cfreturn getPageRenderer().getHomePortals()>
+	</cffunction>
+	
 </cfcomponent>

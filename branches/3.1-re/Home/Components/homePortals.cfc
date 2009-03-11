@@ -142,6 +142,7 @@
 	</cffunction>
 
 	
+	
 	<!--------------------------------------->
 	<!----  loadAccountPage 			----->
 	<!--------------------------------------->
@@ -164,12 +165,11 @@
 			// validate access to page
 			getAccountsService().validatePageAccess( oPageRenderer.getPage() );
 
-			variables.stTimers.loadAccountPage = getTickCount()-start;
+			variables.stTimers.loadPage = getTickCount()-start;
 			return oPageRenderer;
 		</cfscript>
 	</cffunction>
-	
-	
+		
 	<!--------------------------------------->
 	<!----  loadPage 					----->
 	<!--------------------------------------->
@@ -205,7 +205,7 @@
 			
 			oPageRenderer = createObject("component","pageRenderer").init(pageUUID, arguments.page, this);
 			
-			variables.stTimers.loadPageBean = getTickCount()-start;
+			variables.stTimers.loadPage = getTickCount()-start;
 
 			// clear persistent storage for module data
 			oConfigBeanStore = createObject("component","configBeanStore").init();
@@ -214,6 +214,7 @@
 			return oPageRenderer;
 		</cfscript>
 	</cffunction>	
+	
 	
 	
 	<!--------------------------------------->

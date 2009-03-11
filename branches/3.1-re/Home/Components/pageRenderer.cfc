@@ -386,6 +386,7 @@
 			var sectionType = "";
 			var aSections = 0;
 			var start = getTickCount();
+			var startTag = 0;
 			
 			// reset the content output buffer
 			resetPageContentBuffer();
@@ -405,15 +406,25 @@
 						// loop through all modules in this location
 						for(k=1;k lte arrayLen(aTags);k=k+1) {
 							stTagNode = stTags[location][k];
+							startTag = getTickCount();
 
-							oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, stTagNode);
-							oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.head),
-																createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body)
-															);
+							try {
+								oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, stTagNode);
+								oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.head),
+																	createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body)
+																);
+							} catch(any e) {
+								// show error
+								createObject("component","singleContentBuffer")
+									.init(stTagNode.id, variables.contentBuffer.body)
+									.set(e.message & e.detail);
+							}
 
 							// keep an ordered list with all content tags rendered
 							variables.lstRenderedContent = listAppend(variables.lstRenderedContent, stTagNode.id);
 							
+							// record time
+							variables.stTimers[stTagNode.moduleType & "_" & stTagNode.id] = getTickCount()-startTag;
 						}
 					}
 				}
@@ -467,9 +478,12 @@
 	<cffunction name="getContentTagRenderer" access="private" returntype="contentTagRenderer">
 		<cfargument name="contentTagType" type="string" required="true">
 		<cfargument name="contentTagNode" type="struct" required="true">
-		<cfset var oContentTag = createObject("component", "contentTag").init(arguments.contentTagNode)>
-		<cfset var oContentTagRenderer = createObject("component", "Home.Components.contentTagRenderers." & arguments.contentTagType).init(this, oContentTag)>
-		<cfreturn oContentTagRenderer>
+		<cfscript>
+			var oContentTag = createObject("component", "contentTag").init(arguments.contentTagNode);
+			var contentTagRendererClassName = getHomePortals().getConfig().getContentRenderer( arguments.contentTagType );
+			var oContentTagRenderer = createObject("component", contentTagRendererClassName).init(this, oContentTag);
+			return oContentTagRenderer;
+		</cfscript>
 	</cffunction>
 
 

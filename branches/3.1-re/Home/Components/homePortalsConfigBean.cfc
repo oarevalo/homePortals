@@ -29,6 +29,7 @@
 
 			variables.stConfig.renderTemplates = structNew();
 			variables.stConfig.resources = structNew();
+			variables.stConfig.contentRenderers = structNew();
 			
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -81,6 +82,12 @@
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						variables.stConfig.renderTemplates[ xmlNode.xmlChildren[j].xmlAttributes.type ] = xmlNode.xmlChildren[j].xmlAttributes.href;
+					}
+
+				} else if(xmlNode.xmlName eq "contentRenderers") {
+		
+					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+						variables.stConfig.contentRenderers[ xmlNode.xmlChildren[j].xmlAttributes.moduleType ] = xmlNode.xmlChildren[j].xmlAttributes.path;
 					}
 							
 				} else
@@ -152,6 +159,16 @@
 				tmpXmlNode.xmlAttributes["type"] = thisKey;
 				tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[thisKey];
 				ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
+			}
+
+			// ****** [contentRenderers] *****
+			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"contentRenderers") );
+			
+			for(thisKey in variables.stConfig.contentRenderers) {
+				tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentRenderer");
+				tmpXmlNode.xmlAttributes["moduleType"] = thisKey;
+				tmpXmlNode.xmlAttributes["path"] = variables.stConfig.contentRenderers[thisKey];
+				ArrayAppend(xmlConfigDoc.xmlRoot.contentRenderers.xmlChildren, tmpXmlNode );
 			}
 
 			// return document
@@ -260,6 +277,15 @@
 		<cfreturn variables.stConfig.pageProviderClass>
 	</cffunction>	
 
+	<cffunction name="getContentRenderer" access="public" returntype="string" hint="returns the path to the given content renderer cfc">
+		<cfargument name="name" type="string" required="true">
+		<cfif structKeyExists( variables.stConfig.contentRenderers, arguments.name )>
+			<cfreturn variables.stConfig.contentRenderers[arguments.name]>
+		<cfelse>
+			<cfthrow message="Unknown content renderer" type="homePortals.config.invalidContentRendererName">
+		</cfif>
+	</cffunction>
+	
 
 	<!--- Setters --->
 	<cffunction name="setVersion" access="public" returntype="void">
@@ -383,6 +409,11 @@
 		<cfset variables.stConfig.pageProviderClass = arguments.data>
 	</cffunction>
 
+	<cffunction name="setContentRenderer" access="public" returntype="void">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="path" type="string" required="true">
+		<cfset variables.stConfig.contentRenderers[arguments.name] = arguments.path>
+	</cffunction>
 
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">

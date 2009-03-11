@@ -4,11 +4,14 @@
 <cfsetting showdebugoutput="true">
 
 <!------- Page parameters ----------->
-<cfparam name="account" default=""> 			<!--- HomePortals account --->
-<cfparam name="page" default=""> 				<!--- page to load within account --->
-<cfparam name="refreshApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
 <cfparam name="action" default="">
 <cfparam name="cacheName" default="">
+<cfparam name="refreshApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
+
+<cfparam name="account" default=""> 			<!--- HomePortals account --->
+<cfparam name="page" default=""> 				<!--- page to load within account --->
+
+<cfparam name="pageHREF" default="">			<!--- Path to a homeportals account --->
 <!----------------------------------->
 
 <!------- Application Root ----------->
@@ -27,7 +30,10 @@
 	hp = application.homePortals;
 
 	// load and parse page
-	request.oPageRenderer = hp.loadPage(account, page);
+	if(pageHREF neq "")	
+		request.oPageRenderer = hp.loadPage(pageHREF);
+	else
+		request.oPageRenderer = hp.loadAccountPage(account, page);
 
 	// render page html
 	html = request.oPageRenderer.renderPage();
@@ -139,7 +145,7 @@
 				</tr>
 				<tr>
 					<td width="130"><b>Free JVM Memory:</b></td>
-					<td><span style="color:#freeMemLabelColor#">#decimalFormat(freeMem)#%</span></td>
+					<td><span style="color:#freeMemLabelColor#;font-weight:bold;">#decimalFormat(freeMem)#%</span></td>
 				</tr>
 			</table>
 			<br><br>
@@ -148,7 +154,7 @@
 				<tr><th colspan="2">Current Page:</th></tr>
 				<tr>
 					<td width="130"><b>Title:</b></td>
-					<td>#request.oPageRenderer.getPageTitle()#</td>
+					<td>#request.oPageRenderer.getPage().getTitle()#</td>
 				</tr>
 				<tr>
 					<td><b>HREF:</b></td>
@@ -156,11 +162,11 @@
 				</tr>
 				<tr>
 					<td><b>Owner:</b></td>
-					<td>#request.oPageRenderer.getOwner()#</td>
+					<td>#request.oPageRenderer.getPage().getOwner()#</td>
 				</tr>
 				<tr>
 					<td><b>Access:</b></td>
-					<td>#request.oPageRenderer.getAccess()#</td>
+					<td>#request.oPageRenderer.getPage().getAccess()#</td>
 				</tr>
 			</table>
 			<br><br>
@@ -185,16 +191,18 @@
 				<tr>
 					<td width="10" align="right"><b>#row#.</b></td>
 					<td><b><em>Page Loading</em></b></td>
-					<td align="right"><b>#stHPTimers.loadpage#</b></td>
+					<td align="right"><b>#stHPTimers.loadPage#</b></td>
 				</tr>
 				<cfset row = row + 1>
-				<cfset pageTotalTime = pageTotalTime + stHPTimers.loadpage>
+				<cfset pageTotalTime = pageTotalTime + stHPTimers.loadPage>
+<!--- 				
 				<tr>
 					<td width="10" align="right"><b>#row#.</b></td>
 					<td>+----<em>Load Page Renderer</em></td>
 					<td align="right">#stHPTimers.loadPageRenderer#</td>
 				</tr>
 				<cfset row = row + 1>
+ --->			
 				<tr>
 					<td width="10" align="right"><b>#row#.</b></td>
 					<td>+----<em>Process Modules</em></td>
@@ -222,6 +230,7 @@
 					<th width="100">Time (ms)</th>
 				</tr>
 				<cfset row = 1>
+				<cfset tmpTime = 0>
 				<cfloop collection="#stPRTimers#" item="key">
 					<cfif listLen(key,"_") gt 1>
 						<tr>
@@ -230,8 +239,13 @@
 							<td align="right">#stPRTimers[key]#</td>
 						</tr>
 						<cfset row = row + 1>
+						<cfset tmpTime = tmpTime + stPRTimers[key]>
 					</cfif>
 				</cfloop>
+				<tr>
+					<td colspan="2" align="right"><b>TOTAL TIME:</b></td>
+					<td align="right"><b>#tmpTime#</b></td>
+				</tr>
 			</table>			
 			
 			<br><br>
@@ -250,9 +264,13 @@
 				<cfloop list="#lstCaches#" index="cacheName">
 					<cfset oCache = oCacheRegistry.getCache(cacheName)>
 					<cfset stStats = oCache.getStats()>
-					<cfset cacheWarning = (stStats.currentSize gt stStats.maxSize or
-											(stStats.maxSize gte stStats.currentSize 
-											and stStats.currentSize/stStats.maxSize gt 0.9))>
+					<cfif stStats.maxSize gt 0>
+						<cfset cacheWarning = (stStats.currentSize gt stStats.maxSize or
+												(stStats.maxSize gte stStats.currentSize 
+												and stStats.currentSize/stStats.maxSize gt 0.9))>
+					<cfelse>
+						<cfset cacheWarning = false>
+					</cfif>
 					<tr <cfif cacheWarning>style="background-color:pink;"</cfif>>
 						<td>#index#.</td>
 						<td>#cacheName#</td>

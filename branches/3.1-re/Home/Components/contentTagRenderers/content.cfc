@@ -12,7 +12,7 @@
 			var tmpHTML = "";
 			var cacheKey = "";
 			var oCache = 0;
-			var cache = getContentTag().getAttribute("cache");
+			var cache = getContentTag().getAttribute("cache",false);
 			var cacheTTL = getContentTag().getAttribute("cacheTTL");
 			
 			try {
@@ -46,11 +46,11 @@
 				}
 
 				// add rendered content to buffer
-				arguments.bodyContentBuffer.set(id = moduleID, content = tmpHTML );
+				arguments.bodyContentBuffer.set( tmpHTML );
 
 			} catch(any e) {
 				tmpHTML = "<b>An unexpected error ocurred while retrieving content for content module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
-				arguments.bodyContentBuffer.set(id = moduleID, content = tmpHTML );
+				arguments.bodyContentBuffer.set( tmpHTML );
 			}
 		</cfscript>		
 	</cffunction>
@@ -118,7 +118,7 @@
 	<!--- httpget		                   --->
 	<!---------------------------------------->		
 	<cffunction name="httpget" access="private" returntype="struct">
-		<cfargument name="href" type="string">
+		<cfargument name="href" type="string" required="true">
 		<cfhttp url="#arguments.href#" method="get" throwonerror="true" 
 				resolveurl="true" redirect="true" 
 				timeout="#variables.HTTP_GET_TIMEOUT#">

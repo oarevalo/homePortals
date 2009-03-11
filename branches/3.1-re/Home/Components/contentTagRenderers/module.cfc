@@ -39,16 +39,14 @@
 										getPageRenderer().getHomePortals());
 
 				// render html content
-				arguments.headContentBuffer.append(id = moduleID, content = oModuleController.renderClientInit() );
-				arguments.headContentBuffer.append(id = moduleID, content = oModuleController.renderHTMLHead() );
-				arguments.bodyContentBuffer.set(id = moduleID, 
-												class = moduleName, 
+				arguments.headContentBuffer.append( oModuleController.renderClientInit() );
+				arguments.headContentBuffer.append( oModuleController.renderHTMLHead() );
+				arguments.bodyContentBuffer.set(  class = moduleName, 
 												content = oModuleController.renderView() );
 								
 			} catch(any e) {
 				tmpMsg = "<b>An unexpected error ocurred while initializing module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
-				arguments.bodyContentBuffer.set(id = moduleID, 
-												class = moduleName, 
+				arguments.bodyContentBuffer.set(  class = moduleName, 
 												content = tmpMsg );
 			}
 		</cfscript>	

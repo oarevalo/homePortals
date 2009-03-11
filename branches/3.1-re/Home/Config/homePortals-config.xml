@@ -60,4 +60,12 @@
 		<renderTemplate type="moduleNoContainer" href="/Home/Common/Templates/Render/moduleNoContainer.xml" />
 		<renderTemplate type="page" href="/Home/Common/Templates/Render/page.xml" />
 	</renderTemplates>
+	
+	<!-- The following are the different types of modules or content renderers that will be supported on a page -->
+	<contentRenderers>
+		<contentRenderer moduleType="content" path="Home.Components.contentTagRenderers.content" />
+		<contentRenderer moduleType="module" path="Home.Components.contentTagRenderers.module" />
+		<contentRenderer moduleType="view" path="Home.Components.contentTagRenderers.view" />
+	</contentRenderers>
+	
 </homePortals>
