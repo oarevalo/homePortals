@@ -18,6 +18,7 @@
 			var oCacheRegistry = createObject("component","cacheRegistry").init();			
 			var oCache = oCacheRegistry.getCache("hpPageCache");
 			var oPageProvider = getHomePortals().getPageProvider();
+			var oConfigBeanStore = 0;
 
 			// get information about the page
 			stInfo = oPageProvider.query(arguments.href);

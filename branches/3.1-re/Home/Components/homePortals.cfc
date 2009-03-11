@@ -64,10 +64,16 @@
 
 			// load configuration settings for the application (overrides specific settings)
 			if(arguments.appRoot neq "") {
-				variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & "/" & variables.configFilePath));
+				if(fileExists(expandPath(variables.appRoot & "/" & variables.configFilePath))) {
+					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & "/" & variables.configFilePath));
+				}
 			} else {
 				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
 			}
+			
+			// set the appRoot to the given parameter, this way, we can get away without having a local config 
+			// and only pass the appRoot on the constructor
+			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
 			
 			// initialize accounts service
 			variables.oAccountsService = CreateObject("Component","Home.Components.accounts.accounts").init(this);
@@ -186,7 +192,28 @@
 		</cfscript>
 	</cffunction>
 		
-	
+	<!--------------------------------------->
+	<!----  loadPageBean				----->
+	<!--------------------------------------->
+	<cffunction name="loadPageBean" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page. This method accepts an instance of a pageBean component.">
+		<cfargument name="page" type="pageBean" required="true" hint="the page to load">
+		<cfscript>
+			var oPageRenderer = 0;
+			var oConfigBeanStore = 0;
+			var pageUUID = createUUID();
+			var start = getTickCount();
+			
+			oPageRenderer = createObject("component","pageRenderer").init(pageUUID, arguments.page, this);
+			
+			variables.stTimers.loadPageBean = getTickCount()-start;
+
+			// clear persistent storage for module data
+			oConfigBeanStore = createObject("component","configBeanStore").init();
+			oConfigBeanStore.flushByPageHREF(pageUUID);
+
+			return oPageRenderer;
+		</cfscript>
+	</cffunction>	
 	
 	
 	<!--------------------------------------->

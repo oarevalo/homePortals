@@ -87,7 +87,7 @@
 			}
 
 			// add module to page
-			oPage.addModule(moduleID, stModule);
+			oPage.addModule(moduleID, arguments.locationID, stModule);
 
 
 			// add resources used by this module
@@ -159,7 +159,7 @@
 
 			// attach all modules again in the new order
 			for(i=1;i lte arrayLen(aNewModules);i=i+1) {
-				oPage.addModule(aNewModules[i].id, aNewModules[i]);
+				oPage.addModule(aNewModules[i].id, aNewModules[i].location, aNewModules[i]);
 			}
 		</cfscript>
 	</cffunction>

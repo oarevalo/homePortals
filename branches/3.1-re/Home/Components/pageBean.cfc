@@ -158,7 +158,7 @@
 							}
 	
 							// add module to instance
-							addModule(args.id, args);
+							addModule(args.id, args.location, args);
 						
 						}
 						
@@ -344,45 +344,48 @@
 	<!---------------------------------------->
 	<!--- Title					           --->
 	<!---------------------------------------->		
-	<cffunction name="getTitle" access="public" returntype="string">
+	<cffunction name="getTitle" access="public" returntype="string" hint="Returns the page title">
 		<cfreturn variables.instance.title>
 	</cffunction>
 
-	<cffunction name="setTitle" access="public" returnType="void">
+	<cffunction name="setTitle" access="public" returnType="pageBean" hint="Sets the page title">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.instance.title = trim(arguments.data)>
+		<cfreturn this>
 	</cffunction>
 
 
 	<!---------------------------------------->
 	<!--- Owner					           --->
 	<!---------------------------------------->	
-	<cffunction name="getOwner" access="public" returntype="string">
+	<cffunction name="getOwner" access="public" returntype="string" hint="Returns the name of the page owner">
 		<cfreturn variables.instance.owner>
 	</cffunction>
 	
-	<cffunction name="setOwner" access="public" returnType="void">
+	<cffunction name="setOwner" access="public" returnType="pageBean" hint="Sets the name of the page owner">
 		<cfargument name="data" type="string" required="true">
 		<cfif arguments.data eq "">
 			<cfthrow message="Page owner cannot be empty" type="homePortals.pageBean.ownerIsEmpty">
 		</cfif>
 		<cfset variables.instance.owner = trim(arguments.data)>
+		<cfreturn this>
 	</cffunction>
 		
 
 	<!---------------------------------------->
 	<!--- Access				           --->
 	<!---------------------------------------->		
-	<cffunction name="getAccess" access="public" returntype="string">
+	<cffunction name="getAccess" access="public" returntype="string" hint="Returns the access level for this page">
 		<cfreturn variables.instance.access>
 	</cffunction>
 	
-	<cffunction name="setAccess" access="public" returnType="void">
+	<cffunction name="setAccess" access="public" returnType="pageBean" hint="Sets the access level for this page">
 		<cfargument name="accessType" type="string" required="true">
 		<cfif not listFindNoCase(variables.ACCESS_TYPES, arguments.accessType)>
 			<cfthrow message="Invalid access type. Valid types are: #variables.ACCESS_TYPES#" type="homePortals.pageBean.invalidAccessType">
 		</cfif>
 		<cfset variables.instance.access = arguments.accessType>
+		<cfreturn this>
 	</cffunction>
 				
 		
@@ -393,11 +396,12 @@
 		<cfreturn duplicate(variables.instance.aStyles)>
 	</cffunction>
 
-	<cffunction name="addStylesheet" access="public" returnType="void" hint="adds a stylesheet to the page">
+	<cffunction name="addStylesheet" access="public" returnType="pageBean" hint="adds a stylesheet to the page">
 		<cfargument name="href" type="string" required="true">
 		<cfif not hasStylesheet(arguments.href)>
 			<cfset arrayAppend(variables.instance.aStyles, arguments.href)>
 		</cfif>
+		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="hasStylesheet" access="public" returnType="boolean" hint="checks if the page is already using a given stylesheet">
@@ -410,7 +414,7 @@
 		<cfreturn false>
 	</cffunction>	
 	
-	<cffunction name="removeStylesheet" access="public" returnType="void" hint="removes a stylesheet from the page">
+	<cffunction name="removeStylesheet" access="public" returnType="pageBean" hint="removes a stylesheet from the page">
 		<cfargument name="href" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aStyles)#" index="i">
 			<cfif variables.instance.aStyles[i] eq arguments.href>
@@ -418,25 +422,28 @@
 				<cfreturn>
 			</cfif>
 		</cfloop>
+		<cfreturn this>
 	</cffunction>	
 
-	<cffunction name="removeAllStylesheets" access="public" returnType="void" hint="removes all stylesheets on the page">
+	<cffunction name="removeAllStylesheets" access="public" returnType="pageBean" hint="removes all stylesheets on the page">
 		<cfset variables.instance.aStyles = ArrayNew(1)>
+		<cfreturn this>
 	</cffunction>
 	
 
 	<!---------------------------------------->
 	<!--- Scripts				           --->
 	<!---------------------------------------->	
-	<cffunction name="getScripts" access="public" returntype="array">
+	<cffunction name="getScripts" access="public" returntype="array" hint="returns an array with all script files referenced on the page">
 		<cfreturn duplicate(variables.instance.aScripts)>
 	</cffunction>
 
-	<cffunction name="addScript" access="public" returnType="void">
+	<cffunction name="addScript" access="public" returnType="pageBean" hint="adds a script reference to the page">
 		<cfargument name="src" type="string" required="true">
 		<cfif not hasScript(arguments.src)>
 			<cfset arrayAppend(variables.instance.aScripts, arguments.src)>
 		</cfif>
+		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="hasScript" access="public" returnType="boolean" hint="checks if the page is already using a given script">
@@ -449,7 +456,7 @@
 		<cfreturn false>
 	</cffunction>	
 	
-	<cffunction name="removeScript" access="public" returnType="void">
+	<cffunction name="removeScript" access="public" returnType="pageBean" hint="removes a script from the page">
 		<cfargument name="src" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aScripts)#" index="i">
 			<cfif variables.instance.aScripts[i] eq arguments.src>
@@ -457,21 +464,23 @@
 				<cfreturn>
 			</cfif>
 		</cfloop>
+		<cfreturn this>
 	</cffunction>	
 	
-	<cffunction name="removeAllScripts" access="public" returnType="void">
+	<cffunction name="removeAllScripts" access="public" returnType="pageBean" hint="removes all scripts from the page">
 		<cfset variables.instance.aScripts = ArrayNew(1)>
+		<cfreturn this>
 	</cffunction>
 
 
 	<!---------------------------------------->
 	<!--- Event Listeners		           --->
 	<!---------------------------------------->	
-	<cffunction name="getEventListeners" access="public" returntype="array">
+	<cffunction name="getEventListeners" access="public" returntype="array" hint="Returns an array with all event listeners on the page">
 		<cfreturn duplicate(variables.instance.aEventListeners)>
 	</cffunction>
 
-	<cffunction name="addEventListener" access="public" returnType="void">
+	<cffunction name="addEventListener" access="public" returnType="pageBean" hint="Adds an event listener to the page">
 		<cfargument name="objectName" type="string" required="true">
 		<cfargument name="eventName" type="string" required="true">
 		<cfargument name="eventHandler" type="string" required="true">
@@ -483,9 +492,10 @@
 		<cfset st.eventName = arguments.eventName>
 		<cfset st.eventHandler = arguments.eventHandler>
 		<cfset ArrayAppend(variables.instance.aEventListeners, st)>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeEventListener" access="public" returnType="void">
+	<cffunction name="removeEventListener" access="public" returnType="pageBean" hint="Removes the given event listener">
 		<cfargument name="objectName" type="string" required="true">
 		<cfargument name="eventName" type="string" required="true">
 		<cfargument name="eventHandler" type="string" required="true">
@@ -496,14 +506,15 @@
 			<cfset st = variables.instance.aEventListeners[i]>
 			<cfif st.objectName eq arguments.objectName and st.eventName eq arguments.eventName and st.eventHandler eq arguments.eventHandler>
 				<cfset arrayDeleteAt(variables.instance.aEventListeners, i)>
-				<cfreturn>
+				<cfreturn this>
 			</cfif>
 		</cfloop>
-		<Cfthrow message="event listener not found">
+		<cfreturn this>
 	</cffunction>	
 	
-	<cffunction name="removeAllEventListeners" access="public" returnType="void">
+	<cffunction name="removeAllEventListeners" access="public" returnType="pageBean" hint="removes all event listeners">
 		<cfset variables.instance.aEventListeners = arrayNew(1)>
+		<cfreturn this>
 	</cffunction>
 
 
@@ -511,11 +522,11 @@
 	<!---------------------------------------->
 	<!--- Layout Regions		           --->
 	<!---------------------------------------->	
-	<cffunction name="getLayoutRegions" access="public" returntype="array">
+	<cffunction name="getLayoutRegions" access="public" returntype="array" hint="returns an array with all layout regions">
 		<cfreturn duplicate(variables.instance.aLayouts)>
 	</cffunction>
 
-	<cffunction name="addLayoutRegion" access="public" returnType="void">
+	<cffunction name="addLayoutRegion" access="public" returnType="pageBean" hint="adds a layout region">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="class" type="string" required="false" default="">
@@ -540,6 +551,8 @@
 		<cfset st.id = arguments.id>
 		
 		<cfset ArrayAppend(variables.instance.aLayouts, st)>
+		
+		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="hasLayoutRegion" access="public" returnType="boolean" hint="checks if the page contains a given layout region">
@@ -552,18 +565,20 @@
 		<cfreturn false>
 	</cffunction>	
 
-	<cffunction name="removeLayoutRegion" access="public" returnType="void">
+	<cffunction name="removeLayoutRegion" access="public" returnType="pageBean" hint="removes a layout region">
 		<cfargument name="name" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aLayouts)#" index="i">
 			<cfif variables.instance.aLayouts[i].name eq arguments.name>
 				<cfset arrayDeleteAt(variables.instance.aLayouts, i)>
-				<cfreturn>
+				<cfreturn this>
 			</cfif>
 		</cfloop>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeAllLayoutRegions" access="public" returnType="void">
+	<cffunction name="removeAllLayoutRegions" access="public" returnType="pageBean" hint="removes all layout regions">
 		<cfset variables.instance.aLayouts = arrayNew(1)>
+		<cfreturn this>
 	</cffunction>
 
 
@@ -571,16 +586,16 @@
 	<!---------------------------------------->
 	<!--- Modules				           --->
 	<!---------------------------------------->	
-	<cffunction name="getModules" access="public" returntype="array">
+	<cffunction name="getModules" access="public" returntype="array" hint="returns an array with all content modules on the page">
 		<cfreturn duplicate(variables.instance.aModules)>
 	</cffunction>
 
-	<cffunction name="getModule" access="public" returntype="struct">
+	<cffunction name="getModule" access="public" returntype="struct" hint="returns a structure with information about the given module">
 		<cfargument name="moduleID" type="string" required="true">
 		<cfreturn duplicate(variables.instance.aModules[getModuleIndex(arguments.moduleID)])>
 	</cffunction>
 
-	<cffunction name="setModule" access="public" returntype="void">
+	<cffunction name="setModule" access="public" returntype="pageBean" hint="adds or updates a module to the page">
 		<cfargument name="moduleID" type="string" required="true">
 		<cfargument name="moduleAttributes" type="struct" required="false">
 		
@@ -601,42 +616,78 @@
 		</cfif>
 		
 		<cfset variables.instance.aModules[getModuleIndex(arguments.moduleID)] = arguments.moduleAttributes>
+		
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="addModule" access="public" returntype="void">
+	<cffunction name="addModule" access="public" returntype="pageBean" hint="adds a module to the page">
 		<cfargument name="moduleID" type="string" required="true">
-		<cfargument name="moduleAttributes" type="struct" required="false">
+		<cfargument name="location" type="string" required="false" default="">
+		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
+		
+		<cfset var stMod = duplicate(moduleAttributes)>
+		
 		<cfif structKeyExists(variables.instance.stModuleIndex, arguments.moduleID)>
 			<cfthrow message="Module ID already in use" type="homePortals.pageBean.duplicateModuleID">
 		</cfif>
 		<cfif arguments.moduleID eq "">
 			<cfthrow message="module ID cannot be empty" type="homePortals.pageBean.blankModuleID">
 		</cfif>
-		<cfif not structKeyExists(arguments.moduleAttributes,"id") or arguments.moduleAttributes.id eq "">
-			<cfthrow message="module ID cannot be empty" type="homePortals.pageBean.blankModuleID">
+		<cfif not structKeyExists(stMod,"id") or stMod.id eq "">
+			<cfset stMod.id = arguments.moduleID>
 		</cfif>
-		<cfif arguments.moduleID neq arguments.moduleAttributes.id>
+		<cfif arguments.moduleID neq stMod.id>
 			<cfthrow message="module ID attribute mismatch" type="homePortals.pageBean.mismatchModuleID">
 		</cfif>
-		<cfif not structKeyExists(arguments.moduleAttributes,"location") or arguments.moduleAttributes.location eq "">
+
+		<cfif not structKeyExists(stMod,"location") and arguments.location neq "">
+			<cfset stMod.location = arguments.location>
+		</cfif>
+		<cfif arguments.location eq "" and structKeyExists(stMod,"location") and stMod.location neq "">
+			<cfset arguments.location = stMod.location>
+		</cfif>
+		<cfif arguments.location eq "">
 			<cfthrow message="module location cannot be empty" type="homePortals.pageBean.blankModuleLocation">
 		</cfif>
-		<cfif not structKeyExists(arguments.moduleAttributes,"moduleType") or arguments.moduleAttributes.moduleType eq "">
-			<cfset arguments.moduleAttributes.moduleType = "module">
-		</cfif>
-		<cfset arrayAppend(variables.instance.aModules, arguments.moduleAttributes)>
-		<cfset indexModules()>
+
+		<cfscript>
+			if(not structKeyExists(stMod,"moduleType") or stMod.moduleType eq "")
+				stMod.moduleType = "module";
+
+			if(not structKeyExists(stMod,"container"))
+				stMod.container = true;
+
+			if(not structKeyExists(stMod,"style"))
+				stMod.style = "";
+
+			if(not structKeyExists(stMod,"output") or stMod.output eq "")
+				stMod.output = true;
+
+			if(not structKeyExists(stMod,"icon"))
+				stMod.icon = "";
+
+			if(not structKeyExists(stMod,"title"))
+				stMod.title = "";
+				
+			arrayAppend(variables.instance.aModules, stMod);
+			
+			indexModules();
+			
+			return this;
+		</cfscript>
 	</cffunction>
 
-	<cffunction name="removeModule" access="public" returntype="void">
+	<cffunction name="removeModule" access="public" returntype="pageBean" hint="removes a module from the page">
 		<cfargument name="moduleID" type="string" required="true">
 		<cfset arrayDeleteAt(variables.instance.aModules, getModuleIndex(arguments.moduleID))>
 		<cfset indexModules()>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeAllModules" access="public" returntype="void">
+	<cffunction name="removeAllModules" access="public" returntype="pageBean" hint="removes all modules">
 		<cfset variables.instance.aModules = arrayNew(1)>
 		<cfset variables.instance.stModuleIndex = structNew()>
+		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="getModuleIndex" access="private" returntype="numeric" hint="returns the index of a given module on the modules array">
@@ -659,11 +710,11 @@
 	<!---------------------------------------->
 	<!--- User-Defined Meta Tags           --->
 	<!---------------------------------------->	
-	<cffunction name="getMetaTags" access="public" returntype="array">
+	<cffunction name="getMetaTags" access="public" returntype="array" hint="returns an array with all user-defined meta tags">
 		<cfreturn duplicate(variables.instance.aMeta)>
 	</cffunction>
 
-	<cffunction name="addMetaTag" access="public" returnType="void">
+	<cffunction name="addMetaTag" access="public" returnType="pageBean" hint="adds a user-defined meta tag to the page">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="content" type="string" required="true">
 		<cfset var st = structNew()>
@@ -673,9 +724,10 @@
 		<cfset st.name = arguments.name>
 		<cfset st.content = arguments.content>
 		<cfset ArrayAppend(variables.instance.aMeta, st)>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeMetaTag" access="public" returnType="void">
+	<cffunction name="removeMetaTag" access="public" returnType="pageBean" hint="removes a user-defined meta tag">
 		<cfargument name="name" type="string" required="true">
 		<cfset var i = 0>
 		<cfset var st = structNew()>
@@ -683,27 +735,29 @@
 			<cfset st = variables.instance.aMeta[i]>
 			<cfif st.name eq arguments.name>
 				<cfset arrayDeleteAt(variables.instance.aMeta, i)>
-				<cfreturn>
+				<cfreturn this>
 			</cfif>
 		</cfloop>
-		<Cfthrow message="event listener not found">
+		<cfreturn this>
 	</cffunction>	
 	
-	<cffunction name="removeAllMetaTags" access="public" returnType="void">
+	<cffunction name="removeAllMetaTags" access="public" returnType="pageBean" hint="removes all user-defined meta tags">
 		<cfset variables.instance.aMeta = arrayNew(1)>
+		<cfreturn this>
 	</cffunction>
 
 
 	<!---------------------------------------->
 	<!--- SkinID				           --->
 	<!---------------------------------------->		
-	<cffunction name="getSkinID" access="public" returntype="string">
+	<cffunction name="getSkinID" access="public" returntype="string" hint="retrieves the ID of the skin used on this page">
 		<cfreturn variables.instance.skinID>
 	</cffunction>
 	
-	<cffunction name="setSkinID" access="public" returnType="void">
+	<cffunction name="setSkinID" access="public" returnType="pageBean" hint="sets the page skin">
 		<cfargument name="skinID" type="string" required="true">
 		<cfset variables.instance.skinID = arguments.skinID>
+		<cfreturn this>
 	</cffunction>
 
 
