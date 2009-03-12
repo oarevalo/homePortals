@@ -217,17 +217,13 @@
 		
 		<cfset var oDAO = getAccountsDAO()>
 		<cfset var qryAccount = oDAO.get(arguments.accountID)>
-		<cfset var accountsRoot = getConfig().getAccountsRoot()>
 		
 		<cfif qryAccount.recordCount gt 0>
 			<!--- delete record in table --->
 			<cfset oDAO.delete(arguments.accountID)>
 	
-			<!--- delete directory and files --->
-			<cfset tmpAccoutDir = ExpandPath("#accountsRoot#/#qryAccount.accountName#/")>
-			<cfif DirectoryExists(tmpAccoutDir)>
-				<cfdirectory action="delete" directory="#tmpAccoutDir#" recurse="true">
-			</cfif>
+			<!--- delete account site --->
+			<cfset getSite(qryAccount.accountName).delete()>
 		</cfif>
 		
 	</cffunction>

@@ -57,6 +57,35 @@
 	</cffunction>
 
 	<!---------------------------------------->
+	<!--- delete				           --->
+	<!---------------------------------------->	
+	<cffunction name="delete" access="public" returntype="void" hint="deletes the site structure for the account.">
+		<cfset var oPageProvider = getPageProvider()>
+		<cfset var oDAO = getSitesDAO()>
+		<cfset var qrySite = 0>
+		<cfset var qryAccountInfo = getAccountsService().getAccountByName( getOwner() )>
+	
+		<!--- delete directory for account (if exists) ---->
+		<cfif oPageProvider.folderExists( getSiteHREF() )>
+			<cfset oPageProvider.deleteFolder( getSiteHREF() )>
+		</cfif>
+		
+		<!--- check if there is a record for the site --->
+		<cfset qrySite = oDAO.search(accountID = qryAccountInfo.accountID)>
+		
+		<!--- if not found, then delete site record --->
+		<cfif qrySite.recordCount gt 0>
+			<cfset oDAO.delete(qrySite.siteID)>
+		</cfif>		
+		
+		<!--- clear instance --->
+		<cfset variables.instance.owner = "">
+		<cfset variables.instance.siteTitle = "">
+		<cfset variables.instance.aPages = arrayNew(1)>
+	</cffunction>
+
+
+	<!---------------------------------------->
 	<!--- renamePage			           --->
 	<!---------------------------------------->	
 	<cffunction name="renamePage" access="public" output="false" returntype="void" hint="Renames a page">
