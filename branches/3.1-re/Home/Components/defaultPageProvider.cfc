@@ -91,7 +91,7 @@
 		<cfloop query="qryDir">
 			<cfset queryAddRow(qryRet)>
 			<cfif qryDir.type eq "file">
-				<cfif findNoCase(".xml",qryDir.name) and not listFindNoCase(variables.EXCLUDED_FILE_NAMES,qryDir.name)>
+				<cfif right(qryDir.name,4) eq ".xml" and not listFindNoCase(variables.EXCLUDED_FILE_NAMES,qryDir.name)>
 					<cfset querySetCell(qryRet,"type","page")>
 					<cfset querySetCell(qryRet,"name",replaceNoCase(qryDir.name,".xml",""))>
 				</cfif>
