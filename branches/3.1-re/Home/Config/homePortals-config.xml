@@ -35,10 +35,10 @@
 	<contentCacheTTL>60</contentCacheTTL>
 
 	<!-- The maximum number of items to hold in the rss feeds cache -->
-	<contentCacheSize>50</contentCacheSize>
+	<rssCacheSize>50</rssCacheSize>
 
 	<!-- Default TTL in minutes for rss feeds on the rss cache.  -->
-	<contentCacheTTL>60</contentCacheTTL>
+	<rssCacheTTL>60</rssCacheTTL>
 
 	<!-- Path in dot notation for the class responsible for storing/retrieving HomePortals pages -->
 	<pageProviderClass>Home.Components.defaultPageProvider</pageProviderClass>
