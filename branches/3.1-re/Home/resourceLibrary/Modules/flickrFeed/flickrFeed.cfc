@@ -1,4 +1,4 @@
-<cfcomponent displayname="flickrFeed" extends="Home.Components.baseModule">
+<cfcomponent displayname="flickrFeed" extends="Home.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

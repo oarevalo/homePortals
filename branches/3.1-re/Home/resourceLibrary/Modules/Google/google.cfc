@@ -1,4 +1,4 @@
-<cfcomponent displayname="google" extends="Home.Components.baseModule">
+<cfcomponent displayname="google" extends="Home.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

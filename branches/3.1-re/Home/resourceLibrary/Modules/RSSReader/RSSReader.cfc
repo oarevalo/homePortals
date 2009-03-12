@@ -16,7 +16,7 @@ History:
 					- TODO: make cache directory and feed timout time a configrable setting.
 --->
 
-<cfcomponent displayname="RSSReader" extends="Home.Components.baseModule">
+<cfcomponent displayname="RSSReader" extends="Home.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>
@@ -102,7 +102,7 @@ History:
 			siteOwner = stUser.username;
 
 			// create the bean for the new resource
-			oResourceBean = createObject("component","Home.Components.resourceBean").init();	
+			oResourceBean = createObject("component","Home.components.resourceBean").init();	
 			oResourceBean.setID(createUUID());
 			oResourceBean.setName(arguments.feedName);
 			oResourceBean.setHREF(arguments.rssURL);
@@ -113,7 +113,7 @@ History:
 			oResourceBean.setType(resourceType); 
 			
 			/// add the new resource to the library
-			oResourceLibrary = createObject("component","Home.Components.resourceLibrary").init(resourceLibraryPath);
+			oResourceLibrary = createObject("component","Home.components.resourceLibrary").init(resourceLibraryPath);
 			oResourceLibrary.saveResource(oResourceBean, arguments.body);
 		
 			// update catalog
@@ -144,7 +144,7 @@ History:
 			siteOwner = stUser.username;
 
 			/// remove resource from the library
-			oResourceLibrary = createObject("component","Home.Components.resourceLibrary").init(resourceLibraryPath);
+			oResourceLibrary = createObject("component","Home.components.resourceLibrary").init(resourceLibraryPath);
 			oResourceLibrary.deleteResource(arguments.feedID, resourceType, siteOwner);
 
 			// remove from catalog

@@ -8,7 +8,7 @@ History:
 2/10/07 - oarevalo - created
 --->
 
-<cfcomponent displayname="WebViewer" extends="Home.Components.baseModule">
+<cfcomponent displayname="WebViewer" extends="Home.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

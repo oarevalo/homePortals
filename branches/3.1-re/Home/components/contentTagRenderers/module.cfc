@@ -1,8 +1,8 @@
-<cfcomponent extends="Home.Components.contentTagRenderer">
+<cfcomponent extends="Home.components.contentTagRenderer">
 
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
-		<cfargument name="headContentBuffer" type="Home.Components.singleContentBuffer" required="true">	
-		<cfargument name="bodyContentBuffer" type="Home.Components.singleContentBuffer" required="true">	
+		<cfargument name="headContentBuffer" type="Home.components.singleContentBuffer" required="true">	
+		<cfargument name="bodyContentBuffer" type="Home.components.singleContentBuffer" required="true">	
 		<cfscript>
 			var bIsFirstInClass = false;
 			var oModuleController = 0;
@@ -29,7 +29,7 @@
 				moduleNode["_page"].href =  getPageRenderer().getPageHREF();
 				
 				// instantiate module controller and call constructor
-				oModuleController = createObject("component","Home.Components.moduleController");
+				oModuleController = createObject("component","Home.components.moduleController");
 				oModuleController.init(getPageRenderer().getPageHREF(), 
 										moduleID, 
 										moduleName, 

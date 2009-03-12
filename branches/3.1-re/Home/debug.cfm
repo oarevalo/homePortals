@@ -19,4 +19,4 @@
 
 */ 
 ---->
-<cfinclude template="Common/Templates/debug.cfm">
+<cfinclude template="common/Templates/debug.cfm">

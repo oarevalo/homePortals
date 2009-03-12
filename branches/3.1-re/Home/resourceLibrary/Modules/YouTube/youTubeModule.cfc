@@ -1,4 +1,4 @@
-<cfcomponent displayname="youTubeModule" extends="Home.Components.baseModule">
+<cfcomponent displayname="youTubeModule" extends="Home.components.baseModule">
 
 	<cffunction name="getYouTubeService" access="private" returntype="youTubeService">
 		<cfscript>

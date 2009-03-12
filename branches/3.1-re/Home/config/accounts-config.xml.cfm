@@ -31,7 +31,7 @@
 	newAccountTemplate : used as the template for the initial page when creating a new account
 	newPageTemplate : used as the template when adding a new page to an account
 	-->
-	<newAccountTemplate>/Home/Common/AccountTemplates/default.xml</newAccountTemplate>
-	<newPageTemplate>/Home/Common/AccountTemplates/newPage.xml</newPageTemplate>
+	<newAccountTemplate>/Home/common/AccountTemplates/default.xml</newAccountTemplate>
+	<newPageTemplate>/Home/common/AccountTemplates/newPage.xml</newPageTemplate>
 	
 </homePortalsAccounts>

@@ -28,7 +28,7 @@
 		<cfset var oSystem =  createObject("java","java.lang.System")>
 		<cfset var pathSeparator = oSystem.getProperty("file.separator")>
 		<cfset var currentPath = getDirectoryFromPath(getCurrentTemplatePath())>
-		<cfset var configFile = currentPath & pathSeparator & "Config" & pathSeparator & "homePortals-config.xml">
+		<cfset var configFile = currentPath & pathSeparator & "config" & pathSeparator & "homePortals-config.xml">
 		
 		<cfif cgi.QUERY_STRING eq "version">
 			<b>HomePortals Application Platform</b><br>

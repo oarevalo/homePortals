@@ -14,7 +14,7 @@
 	<contentRoot>/Home/contentRoot/</contentRoot>
 
 	<!-- HomePortals page to load when no page has been provided -->
-	<defaultPage></defaultPage>
+	<defaultPage>default</defaultPage>
 
 	<!-- Event raised when a HomePortals page finishes loading -->
 	<initialEvent>Framework.onPageLoaded</initialEvent>

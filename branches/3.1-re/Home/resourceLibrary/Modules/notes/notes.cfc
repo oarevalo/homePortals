@@ -11,7 +11,7 @@
 							are many editboxes on the same page with staticContent set to true
 --->
 
-<cfcomponent displayname="notes" extends="Home.Components.baseModule">
+<cfcomponent displayname="notes" extends="Home.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

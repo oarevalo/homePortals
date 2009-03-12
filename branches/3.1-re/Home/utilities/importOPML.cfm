@@ -52,7 +52,7 @@
 				</cfif>
 			</cfif>
 		
-			<cfset oResourceLibrary = createObject("component","Home.Components.resourceLibrary").init(resourceLibraryRoot)>
+			<cfset oResourceLibrary = createObject("component","Home.components.resourceLibrary").init(resourceLibraryRoot)>
 			<cfset xmlDoc = xmlParse(opml)>
 			<cfset aNodes = xmlDoc.xmlRoot.body.xmlChildren>			
 			
@@ -65,7 +65,7 @@
 						id = createUUID();
 						
 						// create the bean for the new resource
-						oResourceBean = createObject("component","Home.Components.resourceBean").init();	
+						oResourceBean = createObject("component","Home.components.resourceBean").init();	
 						oResourceBean.setID(id);
 						oResourceBean.setName(aNodes[i].xmlAttributes.text);
 						oResourceBean.setHREF(aNodes[i].xmlAttributes.xmlURL);

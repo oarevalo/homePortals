@@ -226,7 +226,7 @@
 	<cffunction name="addPage" access="public" output="false" returntype="string" hint="This method creates a new page and adds it to the site. The new page can be completely new or can be an existing page">
 		<cfargument name="pageName" required="true" type="string" hint="the name of the new page.">
 		<cfargument name="pageHREF" required="false" default="" type="string" hint="Optional. The page to copy, if pageHREF is only the document name (without path), then assumes it is a local page on the current account">
-		<cfargument name="pageBean" required="false" type="Home.Components.pageBean" hint="Optional. The pageBean object to add to the site. Mutually exclusive with the pageHREF argument">
+		<cfargument name="pageBean" required="false" type="Home.components.pageBean" hint="Optional. The pageBean object to add to the site. Mutually exclusive with the pageHREF argument">
 		<cfscript>
 			var oPage = 0;
 			var xmlPage = 0;
@@ -301,7 +301,7 @@
 	<!---------------------------------------->
 	<!--- getPage			               --->
 	<!---------------------------------------->	
-	<cffunction name="getPage" access="public" returntype="Home.Components.pageBean" output="false" hint="Returns a pageBean object representing a site page">
+	<cffunction name="getPage" access="public" returntype="Home.components.pageBean" output="false" hint="Returns a pageBean object representing a site page">
 		<cfargument name="pageName" type="string" required="true" hint="The name of the page document">
 		<cfscript>
 			var href = getPageHREF(arguments.pageName);
@@ -315,7 +315,7 @@
 	<!---------------------------------------->	
 	<cffunction name="savePage" access="public" hint="Updates a site page" returntype="void">
 		<cfargument name="pageName" type="string" required="true" hint="The name of the page document">
-		<cfargument name="page" type="Home.Components.pageBean" required="true" hint="The page object">
+		<cfargument name="page" type="Home.components.pageBean" required="true" hint="The page object">
 		<!--- get page location --->
 		<cfset var href =  getPageHREF(arguments.pageName)>	
 		<!--- store page --->
@@ -397,7 +397,7 @@
 	<!--- P R I V A T E     M E T H O D S  --->
 	<!---------------------------------------->
 
-	<cffunction name="getPageProvider" access="private" returntype="Home.Components.pageProvider" hint="Retrieves an instance of the pageProvider object responsible for page persistance">
+	<cffunction name="getPageProvider" access="private" returntype="Home.components.pageProvider" hint="Retrieves an instance of the pageProvider object responsible for page persistance">
 		<cfreturn getAccountsService().getHomePortals().getPageProvider()>
 	</cffunction>
 	
@@ -489,7 +489,7 @@
 		</cfif>
 	</cffunction>
 
-	<cffunction name="getSitesDAO" access="private" returntype="Home.Components.lib.DAOFactory.DAO" hint="returns the sites DAO">
+	<cffunction name="getSitesDAO" access="private" returntype="Home.components.lib.DAOFactory.DAO" hint="returns the sites DAO">
 		<cfreturn getAccountsService().getDAO("sites")>
 	</cffunction>	
 	

@@ -1,1 +1,1 @@
-<cfinclude template="/Home/Common/Templates/gateway.cfm">
+<cfinclude template="/Home/common/Templates/gateway.cfm">

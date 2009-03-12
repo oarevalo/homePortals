@@ -13,8 +13,8 @@ This file is a gateway for calls to server-side components.
 
 
 <!--- references to homeportals resources --->
-<cfset moduleControllerRemotePath = HOMEPORTALS_MAPPING & ".Components.moduleControllerRemote">
-<cfset hpCommonTemplatesPath = "/" & HOMEPORTALS_MAPPING & "/Common/Templates">
+<cfset moduleControllerRemotePath = HOMEPORTALS_MAPPING & ".components.moduleControllerRemote">
+<cfset hpCommonTemplatesPath = "/" & HOMEPORTALS_MAPPING & "/common/Templates">
 
 <cfif isSimpleValue(HOMEPORTALS_INSTANCE) and HOMEPORTALS_INSTANCE eq "" and structKeyExists(application,"homePortals")>
 	<cfset HOMEPORTALS_INSTANCE = application.homePortals>

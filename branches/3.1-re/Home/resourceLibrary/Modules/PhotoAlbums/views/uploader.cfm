@@ -19,7 +19,7 @@
 			</style>
 		</head>
 		<body>
-			<form enctype="multipart/form-data" action="#application.homePortalsRoot#/Common/Templates/gateway.cfm" method="post">
+			<form enctype="multipart/form-data" action="#application.homePortalsRoot#/common/Templates/gateway.cfm" method="post">
 				<input type="hidden" name="moduleID" value="#moduleID#">
 				<input type="hidden" name="method" value="getView">
 				<input type="hidden" name="view" value="processUpload">

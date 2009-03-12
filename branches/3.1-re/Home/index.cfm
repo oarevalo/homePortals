@@ -19,4 +19,4 @@
 
 */ 
 ---->
-<cfinclude template="Common/Templates/accountPage.cfm">
+<cfinclude template="common/Templates/page.cfm">

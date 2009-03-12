@@ -1,4 +1,4 @@
-<cfcomponent displayname="photoAlbum" extends="Home.Components.baseModule">
+<cfcomponent displayname="photoAlbum" extends="Home.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

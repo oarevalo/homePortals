@@ -25,7 +25,7 @@
 		variables.hpEngineRoot = "/Home";		// root directory for the homeportals engine
 		variables.appRoot = "";					// Root directory of the application as a relative URL
 		variables.oHomePortalsConfigBean = 0;	// bean to store config settings
-		variables.configFilePath = "Config/homePortals-config.xml";  
+		variables.configFilePath = "config/homePortals-config.xml";  
 												// path of the config file relative to the root of the application
 		
 		variables.oAccountsService = 0;			// a handle to the accoutns service
@@ -76,7 +76,7 @@
 			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
 			
 			// initialize accounts service
-			variables.oAccountsService = CreateObject("Component","Home.Components.accounts.accounts").init(this);
+			variables.oAccountsService = CreateObject("Component","Home.components.accounts.accounts").init(this);
 
 			// initialize resource catalog
 			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
@@ -275,7 +275,7 @@
 	<!--------------------------------------->
 	<!----  getAccountsService			----->
 	<!--------------------------------------->
-	<cffunction name="getAccountsService" access="public" returntype="Home.Components.accounts.accounts" hint="Returns the accounts service">
+	<cffunction name="getAccountsService" access="public" returntype="Home.components.accounts.accounts" hint="Returns the accounts service">
 		<cfreturn variables.oAccountsService>
 	</cffunction>
 

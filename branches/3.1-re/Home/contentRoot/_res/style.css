@@ -32,7 +32,7 @@ a:hover {
 }
 
 #header {
-	background-image:url(/Home/Accounts/default/_res/images/top-header.gif);
+	background-image:url(/Home/contentRoot/_res/images/top-header.gif);
 	background-repeat:no-repeat;
 	height:75px;
 	padding-left:60px;
@@ -84,7 +84,7 @@ h1 {
 }
 
 #webviewer1 {
-	background-image:url(/Home/Accounts/default/_res/images/box_orange_bg.gif);
+	background-image:url(/Home/contentRoot/_res/images/box_orange_bg.gif);
 	background-repeat:no-repeat;
 	height:120px;
 	color:#fff;

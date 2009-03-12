@@ -2,7 +2,7 @@
 
 	<cfscript>
 		variables.configFileName = "module-properties.xml";
-		variables.configFilePath = "Config/" & variables.configFileName;  // path of the config file relative to the root of the application
+		variables.configFilePath = "config/" & variables.configFileName;  // path of the config file relative to the root of the application
 		variables.oConfigBean = 0;	// bean to store config settings
 	</cfscript>
 

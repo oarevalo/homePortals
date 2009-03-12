@@ -40,7 +40,7 @@
 	<cfscript>
 		// Initialize application if requested or needed
 		if((isBoolean(refreshApp) and refreshApp) or Not StructKeyExists(application, "homePortals")) {
-			application.homePortals = CreateObject("component","Home.Components.homePortals").init(request.appRoot);
+			application.homePortals = CreateObject("component","Home.components.homePortals").init(request.appRoot);
 		}
 
 		// load and parse page

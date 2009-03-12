@@ -35,7 +35,7 @@
 	<cffunction name="start" access="remote" returntype="boolean" hint="Initializes and loads into memory the HomPortals application">
 		<cfset var oHP = 0>
 		<cflock name="hpProxyAppControl" type="exclusive" timeout="30">
-			<cfset oHP = createObject("component","Home.Components.homePortals").init(variables.APP_ROOT)>
+			<cfset oHP = createObject("component","Home.components.homePortals").init(variables.APP_ROOT)>
 			<cfset setVariable(variables.HOMEPORTALS_INSTANCE_VAR, oHP)>
 		</cflock>
 		<cfreturn true>
@@ -49,7 +49,7 @@
 			<cfset setVariable(variables.HOMEPORTALS_INSTANCE_VAR, 0)>
 			
 			<!--- clear all cached information --->
-			<cfset oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init()>
+			<cfset oCacheRegistry = createObject("component","Home.components.cacheRegistry").init()>
 			<cfset oCacheRegistry.flush()>
 		</cflock>
 
@@ -59,21 +59,21 @@
 
 	<!--- Cache Monitoring --->
 	<cffunction name="getCacheNames" access="remote" returntype="Array" hint="Returns an array with the names of all registered caches">
-		<cfset var oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init()>
+		<cfset var oCacheRegistry = createObject("component","Home.components.cacheRegistry").init()>
 		<cfset var lstCaches = oCacheRegistry.getCacheNames()>
 		<cfreturn listToArray(lstCaches)>
 	</cffunction>
 
 	<cffunction name="getCacheInfo" access="remote" returntype="struct" hint="Returns a struct with status information about the requested cache">
 		<cfargument name="cacheName" type="string" required="true">
-		<cfset var oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init()>
+		<cfset var oCacheRegistry = createObject("component","Home.components.cacheRegistry").init()>
 		<cfset var oCache = oCacheRegistry.getCache(arguments.cacheName)>
 		<cfreturn oCache.getStats()>
 	</cffunction>
 
 	<cffunction name="clearCache" access="remote" returntype="boolean" hint="Removes the requested cache from memory">
 		<cfargument name="cacheName" type="string" required="true">
-		<cfset var oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init()>
+		<cfset var oCacheRegistry = createObject("component","Home.components.cacheRegistry").init()>
 		<cfset var oCache = oCacheRegistry.getCache(arguments.cacheName)>
 		<cfif left(arguments.cacheName,2) neq "hp">
 			<cfset oCache.flush(arguments.cache)>
@@ -85,7 +85,7 @@
 
 	<cffunction name="cleanupCache" access="remote" returntype="boolean" hint="Executes a reap on the requested cache to remove expired entries">
 		<cfargument name="cacheName" type="string" required="true">
-		<cfset var oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init()>
+		<cfset var oCacheRegistry = createObject("component","Home.components.cacheRegistry").init()>
 		<cfset var oCache = oCacheRegistry.getCache(arguments.cacheName)>
 		<cfset oCache.cleanup(arguments.cache)>
 		<cfreturn true>

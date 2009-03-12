@@ -24,7 +24,7 @@
 <cfscript>
 	// Initialize application if requested or needed
 	if((isBoolean(refreshApp) and refreshApp) or Not StructKeyExists(application, "homePortals")) {
-		application.homePortals = CreateObject("component","Home.Components.homePortals").init(request.appRoot);
+		application.homePortals = CreateObject("component","Home.components.homePortals").init(request.appRoot);
 		refreshApp = true;
 	}
 	hp = application.homePortals;
@@ -52,7 +52,7 @@
 		freeMemLabelColor = "red";
 		
 	// get reference to cache registry
-	oCacheRegistry = createObject("component","Home.Components.cacheRegistry").init();
+	oCacheRegistry = createObject("component","Home.components.cacheRegistry").init();
 	tmpMsg = "";
 </cfscript>
 </cfsilent>
