@@ -89,15 +89,16 @@
 		<cfdirectory action="list" directory="#resolvePath(arguments.path)#" name="qryDir">
 		
 		<cfloop query="qryDir">
-			<cfset queryAddRow(qryRet)>
 			<cfif qryDir.type eq "file">
 				<cfif right(qryDir.name,4) eq ".xml" and not listFindNoCase(variables.EXCLUDED_FILE_NAMES,qryDir.name)>
+					<cfset queryAddRow(qryRet)>
 					<cfset querySetCell(qryRet,"type","page")>
 					<cfset querySetCell(qryRet,"name",replaceNoCase(qryDir.name,".xml",""))>
 				</cfif>
 			</cfif>
 			<cfif qryDir.type eq "dir">
 				<cfif not listFindNoCase(variables.EXCLUDED_DIR_NAMES,qryDir.name)>
+					<cfset queryAddRow(qryRet)>
 					<cfset querySetCell(qryRet,"type","folder")>
 					<cfset querySetCell(qryRet,"name",qryDir.name)>
 				</cfif>
