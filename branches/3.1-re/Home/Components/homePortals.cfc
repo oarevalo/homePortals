@@ -141,7 +141,41 @@
 		</cfscript>
 	</cffunction>
 
-	
+
+
+	<!--------------------------------------->
+	<!----  load			 			----->
+	<!--------------------------------------->
+	<cffunction name="load" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page">
+		<cfargument name="path" type="string" required="false" default="" hint="Path in the content root for the page to load. This argument is mutually exclusive with all the rest">
+		<cfargument name="account" type="string" required="false" default="" hint="Account name, if empty will load the default account">
+		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
+		<cfargument name="pageObj" type="pageBean" required="false" hint="Instance of a pageBean object to load. This argument is mutually exclusive with all the rest">
+		<cfscript>
+			var pagePath = "";
+			
+			// no arguments, so get the overall default page
+			if(arguments.path eq "" and arguments.account eq "" and arguments.page eq "" and not structKeyExists(arguments,"pageObj"))
+				pagePath = getAppDefaultPage();
+			
+			// check mutually exclusive arguments
+			if(pagePath neq "") {
+				return loadPage(pagePath);			
+			
+			} else {
+				if(arguments.path neq "") {
+					return loadPage(arguments.path);
+					
+				} else if(arguments.account neq "") {
+					return loadAccountPage(arguments.account, arguments.page);
+				
+				} else if(structKeyExists(arguments,"pageObj"))
+					return loadPageBean(arguments.pageObj);
+			}
+			
+			throw("No page to load","homePortals.noDefaultPageFound");
+		</cfscript>
+	</cffunction>
 	
 	<!--------------------------------------->
 	<!----  loadAccountPage 			----->
@@ -204,17 +238,17 @@
 			var start = getTickCount();
 			
 			oPageRenderer = createObject("component","pageRenderer").init(pageUUID, arguments.page, this);
-			
-			variables.stTimers.loadPage = getTickCount()-start;
 
 			// clear persistent storage for module data
 			oConfigBeanStore = createObject("component","configBeanStore").init();
 			oConfigBeanStore.flushByPageHREF(pageUUID);
 
+			variables.stTimers.loadPage = getTickCount()-start;
 			return oPageRenderer;
 		</cfscript>
 	</cffunction>	
 	
+
 	
 	
 	<!--------------------------------------->
@@ -272,6 +306,28 @@
 	<cffunction name="getModuleProperties" access="public" returntype="moduleProperties">
 		<cfreturn variables.oModuleProperties>
 	</cffunction>
+
+	<!--------------------------------------->
+	<!----  getAppDefaultPage			----->
+	<!--------------------------------------->		
+	<cffunction name="getAppDefaultPage" access="public" returntype="string" hint="Returns the overall default page for the current application. The default page is given by checking first the defaultPage property in the main config, and then by checking the defaultAccount property on the accounts config.">
+		<cfscript>
+			var pageHREF = "";
+			
+			// first try the main config
+			pageHREF = getConfig().getDefaultPage();	
+			
+			// if nothing found there, then try the accounts config
+			if(pageHREF eq "") {
+				account = getAccountsService().getConfig().getDefaultAccount();		
+				if(account neq "")
+					pageHREF = getAccountsService().getAccountDefaultPage( account );
+			}
+		
+			return pageHREF;
+		</cfscript>
+	</cffunction>
+
 
 		
 	<!--------------------------------------->
