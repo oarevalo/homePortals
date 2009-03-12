@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page owner="default">
+	<title>HomePortals Framework</title>
+	<stylesheet href="/Home/contentRoot/_res/style.css" /> 
+	<layout>
+		<location class="header" name="header" type="header" />
+		<location class="maincolumn" name="middle" type="column" />
+		<location class="rightcolumn" name="right" type="column" />
+		<location class="footer" name="footer" type="footer" />
+	</layout>
+	<modules>
+		<content id="header" href="/Home/contentRoot/_res/content/header.html" container="false" location="header" />
+		<content id="welcome" href="/Home/contentRoot/_res/content/welcome.html" title="Welcome to HomePortals" location="middle"
+				container="false" style="padding-right:20px;" />
+		<module id="webviewer1" name="WebViewer/WebViewer" title="HomePortals Version" 
+				url="/Home/?version" location="right" container="false"
+				height="90" />
+		<content id="license" href="/Home/contentRoot/_res/content/license.html" container="false" location="right"
+				style="margin-top:30px;text-align:center;" />
+		<content id="footer" href="/Home/contentRoot/_res/content/footer.html" container="false" location="footer" />
+	</modules>
+</Page>
