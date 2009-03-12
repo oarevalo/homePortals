@@ -219,11 +219,11 @@
 		<cfset var qryAccount = oDAO.get(arguments.accountID)>
 		
 		<cfif qryAccount.recordCount gt 0>
-			<!--- delete record in table --->
-			<cfset oDAO.delete(arguments.accountID)>
-	
 			<!--- delete account site --->
 			<cfset getSite(qryAccount.accountName).delete()>
+
+			<!--- delete record in table --->
+			<cfset oDAO.delete(arguments.accountID)>
 		</cfif>
 		
 	</cffunction>

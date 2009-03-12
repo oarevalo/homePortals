@@ -34,20 +34,22 @@
 		<cfargument name="accounts" type="accounts" required="true" hint="This is a reference to the Accounts object">
 
 		<cfset var oPageProvider = 0>
+		<cfset var accRoot = "">
 		
 		<cfset setAccountsService( arguments.accounts )>
 		<cfset setOwner( arguments.owner )>
 
 		<cfset oPageProvider = getPageProvider()>
+		<cfset accRoot = getAccountsService().getConfig().getAccountsRoot()>
 
 		<!--- check that the accounts directory exists, if not lets create it --->
-		<cfif not oPageProvider.folderExists( getAccountsService().getAccountsRoot() )>
-			<cfset oPageProvider.createFolder( "", getAccountsService().getAccountsRoot() )>
+		<cfif not oPageProvider.folderExists( accRoot )>
+			<cfset oPageProvider.createFolder( "", accRoot )>
 		</cfif>
 
 		<!--- create directory for account (if doesnt exist already) ---->
-		<cfif Not oPageProvider.folderExists( getAccountsService().getAccountsRoot() & "/" & getOwner() )>
-			<cfset oPageProvider.createFolder( getAccountsService().getAccountsRoot(), getOwner() )>
+		<cfif Not oPageProvider.folderExists( accRoot & "/" & getOwner() )>
+			<cfset oPageProvider.createFolder( accRoot, getOwner() )>
 		</cfif>
 		
 		<!--- create site index --->
@@ -55,7 +57,7 @@
 		
 		<cfreturn this>
 	</cffunction>
-
+	
 	<!---------------------------------------->
 	<!--- delete				           --->
 	<!---------------------------------------->	
