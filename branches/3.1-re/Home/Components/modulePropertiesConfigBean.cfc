@@ -145,4 +145,11 @@
 		<cfreturn qry>
 	</cffunction>
 
+	<cffunction name="throw" access="private">
+		<cfargument name="message" type="string">
+		<cfargument name="detail" type="string" default=""> 
+		<cfargument name="type" type="string" default="custom"> 
+		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
+	</cffunction>
+	
 </cfcomponent>	
