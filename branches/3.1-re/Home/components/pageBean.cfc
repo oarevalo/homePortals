@@ -220,8 +220,8 @@
 			xmlDoc = xmlNew();
 			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "Page");
 
-			xmlDoc.xmlRoot.xmlAttributes["owner"] = xmlFormat(getOwner());
-			xmlDoc.xmlRoot.xmlAttributes["access"] = xmlFormat(getAccess());
+			if(getOwner() neq "") xmlDoc.xmlRoot.xmlAttributes["owner"] = xmlFormat(getOwner());
+			if(getAccess() neq "") xmlDoc.xmlRoot.xmlAttributes["access"] = xmlFormat(getAccess());
 			
 			// add title
 			xmlNode = xmlElemNew(xmlDoc,"title");
