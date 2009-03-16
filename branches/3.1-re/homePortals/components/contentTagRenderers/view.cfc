@@ -1,11 +1,11 @@
-<cfcomponent extends="Home.components.contentTagRenderer">
+<cfcomponent extends="homePortals.components.contentTagRenderer">
 
 	<!---------------------------------------->
 	<!--- renderContent	                   --->
 	<!---------------------------------------->		
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
-		<cfargument name="headContentBuffer" type="Home.components.singleContentBuffer" required="true">	
-		<cfargument name="bodyContentBuffer" type="Home.components.singleContentBuffer" required="true">
+		<cfargument name="headContentBuffer" type="homePortals.components.singleContentBuffer" required="true">	
+		<cfargument name="bodyContentBuffer" type="homePortals.components.singleContentBuffer" required="true">
 
 		<cfscript>
 			var moduleID = getContentTag().getAttribute("id");

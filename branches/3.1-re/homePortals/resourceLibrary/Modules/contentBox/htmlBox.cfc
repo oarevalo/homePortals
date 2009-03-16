@@ -1,4 +1,4 @@
-<cfcomponent displayname="htmlBox" extends="Home.components.baseModule">
+<cfcomponent displayname="htmlBox" extends="homePortals.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>
@@ -61,7 +61,7 @@
 					arguments.resourceID = createUUID();
 
 				// create the bean for the new resource
-				oResourceBean = createObject("component","Home.components.resourceBean").init();	
+				oResourceBean = createObject("component","homePortals.components.resourceBean").init();	
 				oResourceBean.setID(arguments.resourceID);
 				oResourceBean.setName(arguments.name);
 				oResourceBean.setOwner(siteOwner);
@@ -71,7 +71,7 @@
 				oResourceBean.setType(resourceType); 
 				
 				/// add the new resource to the library
-				oResourceLibrary = createObject("component","Home.components.resourceLibrary").init(resourceLibraryPath);
+				oResourceLibrary = createObject("component","homePortals.components.resourceLibrary").init(resourceLibraryPath);
 				oResourceLibrary.saveResource(oResourceBean, arguments.body);
 			
 				// update catalog
@@ -102,7 +102,7 @@
 			siteOwner = stUser.username;
 
 			/// remove resource from the library
-			oResourceLibrary = createObject("component","Home.components.resourceLibrary").init(resourceLibraryPath);
+			oResourceLibrary = createObject("component","homePortals.components.resourceLibrary").init(resourceLibraryPath);
 			oResourceLibrary.deleteResource(arguments.resourceID, resourceType, siteOwner);
 
 			// remove from catalog

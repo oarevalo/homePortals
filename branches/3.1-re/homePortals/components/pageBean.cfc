@@ -307,7 +307,7 @@
 								bWriteAttribute = (aTemp[i][attr] neq "");	// only write it if is not empty
 							break;
 						case "cache":
-							bWriteAttribute = (aTemp[i].moduleType eq "content") and (not aTemp[i][attr]);	// only write it if is false
+							bWriteAttribute = (aTemp[i].moduleType eq "content") and isBoolean(aTemp[i][attr]) and (not aTemp[i][attr]);	// only write it if is false
 							break;
 						case "resourceType":
 							if(aTemp[i].moduleType eq "content") 

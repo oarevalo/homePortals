@@ -14,7 +14,7 @@
 	- 3/9/06 - oarevalo - fixed owner intialization bug
 --->
 
-<cfcomponent displayname="bookmarks" extends="Home.components.baseModule">
+<cfcomponent displayname="bookmarks" extends="homePortals.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

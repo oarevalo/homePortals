@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Page>
-	<stylesheet href="/Home/resourceLibrary/Pagetemplates/layouts/layoutTemplates.css" />
+	<stylesheet href="/homePortals/resourceLibrary/Pagetemplates/layouts/layoutTemplates.css" />
 	
 	<layout>
 		<location class="column" name="left" type="column"/>

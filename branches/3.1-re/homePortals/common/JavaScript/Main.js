@@ -17,7 +17,7 @@ function h_setModuleContainerIcon(moduleID,imgURL) {
 }
 function h_setLoadingImg(secID) {
 	var d = document.getElementById("h_loading");
-	var url_loadingImage =  "/Home/common/Images/loading_text.gif";
+	var url_loadingImage =  "/homePortals/common/Images/loading_text.gif";
 
 	if(!d) {
 		var tmpHTML = "<div id='h_loading'><img src='" + url_loadingImage + "'></div>";

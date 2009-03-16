@@ -1,12 +1,12 @@
-<cfcomponent extends="Home.components.contentTagRenderer">
+<cfcomponent extends="homePortals.components.contentTagRenderer">
 	
 	<cfscript>
 		variables.HTTP_GET_TIMEOUT = 30;	// timeout for HTTP requests in content modules
 	</cfscript>
 
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
-		<cfargument name="headContentBuffer" type="Home.components.singleContentBuffer" required="true">	
-		<cfargument name="bodyContentBuffer" type="Home.components.singleContentBuffer" required="true">	
+		<cfargument name="headContentBuffer" type="homePortals.components.singleContentBuffer" required="true">	
+		<cfargument name="bodyContentBuffer" type="homePortals.components.singleContentBuffer" required="true">	
 		<cfscript>
 			var moduleID = getContentTag().getAttribute("id");
 			var tmpHTML = "";
@@ -60,7 +60,7 @@
 	<!--- getContentCache                  --->
 	<!---------------------------------------->		
 	<cffunction name="getContentCache" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
-		<cfset var oCacheRegistry = createObject("component","Home.components.cacheRegistry").init()>
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 		<cfset var cacheName = "contentCacheService">
 		<cfset var oCacheService = 0>
 		<cfset var cacheSize = getPageRenderer().getHomePortals().getConfig().getContentCacheSize()>

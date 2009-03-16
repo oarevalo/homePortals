@@ -1,4 +1,4 @@
-<cfcomponent displayname="button" extends="Home.components.baseModule">
+<cfcomponent displayname="button" extends="homePortals.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

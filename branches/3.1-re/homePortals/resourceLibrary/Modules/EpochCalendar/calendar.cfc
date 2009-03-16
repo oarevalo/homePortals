@@ -1,4 +1,4 @@
-<cfcomponent displayname="EpochCalendar" extends="Home.components.baseModule">
+<cfcomponent displayname="EpochCalendar" extends="homePortals.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

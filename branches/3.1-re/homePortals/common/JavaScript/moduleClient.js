@@ -95,7 +95,7 @@ function moduleClient() {
 
 			tmpHTML = "<a href='javascript:" + this.moduleID + ".closeWindow();'>" +
 							"<img id='h_moduleWindowClose' " +
-									"src='/Home/common/Images/cp_header_close.gif'"+ 
+									"src='/homePortals/common/Images/cp_header_close.gif'"+ 
 									"alt='Close' title='Close' border='0'></a>";
 			new Insertion.Top("h_moduleWindow",tmpHTML);
 

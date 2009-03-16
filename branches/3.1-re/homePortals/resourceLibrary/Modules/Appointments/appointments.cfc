@@ -1,4 +1,4 @@
-<cfcomponent displayname="appointments" extends="Home.components.baseModule">
+<cfcomponent displayname="appointments" extends="homePortals.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

@@ -3,7 +3,7 @@
 		variables.configFilePath = "config/accounts-config.xml.cfm";  // path of the config file relative to the root of the application
 		variables.oAccountsConfigBean = 0;	// bean to store config settings
 		variables.oHomePortals = 0;	// reference to the application instance
-		variables.clientDAOPath = "Home.components.accounts.db."; // here is where the DAO objects are located
+		variables.clientDAOPath = "homePortals.components.accounts.db."; // here is where the DAO objects are located
 		variables.oDataProvider = 0;	// provides access to account data storage
 	</cfscript>
 
@@ -11,7 +11,7 @@
 	<!----  init	 					----->
 	<!--------------------------------------->
 	<cffunction name="init" access="public" returntype="accounts" hint="Constructor">
-		<cfargument name="homePortals" type="Home.components.homePortals" required="true" hint="HomePortals application engine">
+		<cfargument name="homePortals" type="homePortals.components.homePortals" required="true" hint="HomePortals application engine">
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
@@ -72,7 +72,7 @@
 
 		<!--- register user information into the user registry --->
 		<!--- (this is to allow other components to access the current user information) --->
-		<cfset oUserRegistry = createObject("component","Home.components.userRegistry").init()>
+		<cfset oUserRegistry = createObject("component","homePortals.components.userRegistry").init()>
 		<cfset oUserRegistry.setUserInfo( qryAccount.accountID, qryAccount.accountName, qryAccount )>
 		
 		<cfreturn qryAccount>
@@ -85,7 +85,7 @@
 		<cfset var oUserRegistry = 0>
 
 		<!--- removes user information from the user registry --->
-		<cfset oUserRegistry = createObject("component","Home.components.userRegistry").init()>
+		<cfset oUserRegistry = createObject("component","homePortals.components.userRegistry").init()>
 		<cfset oUserRegistry.reinit()>
 	</cffunction>
 
@@ -172,11 +172,11 @@
 			
 			<cftry>
 				<!--- create directory structure --->
-				<cfset oSite = createObject("component","Home.components.accounts.site").create(Arguments.accountName, this)>
+				<cfset oSite = createObject("component","homePortals.components.accounts.site").create(Arguments.accountName, this)>
 				
 				<!--- create initial page --->
 				<cfset xmlDoc = processTemplate(arguments.accountName, newPageTemplate)>
-				<cfset oPage = createObject("component","Home.components.pageBean").init(xmlDoc)>
+				<cfset oPage = createObject("component","homePortals.components.pageBean").init(xmlDoc)>
 				<cfset oSite.addPage( pageName = GetFileFromPath(newPageTemplate),
 									  pageBean = oPage )>
 
@@ -265,7 +265,7 @@
 	<!----  validatePageAccess		    ----->
 	<!--------------------------------------->
 	<cffunction name="validatePageAccess" access="public" returntype="void" hint="Validates access to a page">
-		<cfargument name="page" type="Home.components.pageBean" required="true">
+		<cfargument name="page" type="homePortals.components.pageBean" required="true">
 
 		<cfscript>
 			var oUserRegistry = 0;
@@ -277,7 +277,7 @@
 			if(accessLevel eq "friend" or accessLevel eq "owner") {
 				// access to this page is restricted, so we must
 				// check who is the current user
-				oUserRegistry = createObject("component","Home.components.userRegistry").init();
+				oUserRegistry = createObject("component","homePortals.components.userRegistry").init();
 				stUserInfo = oUserRegistry.getUserInfo();
 				
 				// if not user logged in, then get out
@@ -353,7 +353,7 @@
 	<!--------------------------------------->
 	<!----  getNewPage		 			----->
 	<!--------------------------------------->
-	<cffunction name="getNewPage" access="public" hint="Returns a page object for a new page based on the newPage template" returntype="Home.components.pageBean">
+	<cffunction name="getNewPage" access="public" hint="Returns a page object for a new page based on the newPage template" returntype="homePortals.components.pageBean">
 		<cfargument name="AccountName" type="string" required="yes">
 		<cfscript>
 			var oConfig = getConfig();
@@ -367,11 +367,11 @@
 				xmlStr = processTemplate(arguments.accountName, oConfig.getNewPageTemplate());
 	
 				// convert into xml document
-				oPage = createObject("component","Home.components.pageBean").init(xmlStr);
+				oPage = createObject("component","homePortals.components.pageBean").init(xmlStr);
 			
 			} else {
 				// no template defined, so just get a blank page
-				oPage = createObject("component","Home.components.pageBean").init();
+				oPage = createObject("component","homePortals.components.pageBean").init();
 			}
 
 			return oPage;
@@ -390,21 +390,21 @@
 		<cfset variables.oAccountsConfigBean = arguments.data>
 	</cffunction>
 	
-	<cffunction name="getHomePortals" access="public" returntype="Home.components.homePortals">
+	<cffunction name="getHomePortals" access="public" returntype="homePortals.components.homePortals">
 		<cfreturn variables.oHomePortals>
 	</cffunction>
 
 	<cffunction name="setHomePortals" access="public" returntype="void">
-		<cfargument name="data" type="Home.components.homePortals" required="true">
+		<cfargument name="data" type="homePortals.components.homePortals" required="true">
 		<cfset variables.oHomePortals = arguments.data>
 	</cffunction>
 
-	<cffunction name="getDataProvider" access="public" returntype="Home.components.accounts.lib.DAOFactory.dataProvider">
+	<cffunction name="getDataProvider" access="public" returntype="homePortals.components.accounts.lib.DAOFactory.dataProvider">
 		<cfreturn variables.oDataProvider>
 	</cffunction>
 
 	<cffunction name="setDataProvider" access="public" returntype="void">
-		<cfargument name="data" type="Home.components.lib.DAOFactory.dataProvider" required="true">
+		<cfargument name="data" type="homePortals.components.lib.DAOFactory.dataProvider" required="true">
 		<cfset variables.oDataProvider = arguments.data>
 	</cffunction>
 
@@ -418,11 +418,11 @@
 	<cffunction name="loadDataProvider" access="private" returntype="void" hint="Loads and configures the instance of the dataprovider to be used">
 		<cfscript>
 			var storageType = oAccountsConfigBean.getStorageType();
-			var pkgPath = "Home.components.lib.DAOFactory.";
+			var pkgPath = "homePortals.components.lib.DAOFactory.";
 			var oConfigBean = 0;
 
 			// check that dataprovider exists
-			if(not fileExists(expandPath("/Home/components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc")))
+			if(not fileExists(expandPath("/homePortals/components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc")))
 				throw("Accounts storage type [#storageType#] is not supported","","homePortals.accounts.invalidStorageType");
 					
 			// create config		
@@ -450,7 +450,7 @@
 	<!--------------------------------------->
 	<!--- getDAO		 	        	  --->
 	<!--------------------------------------->
-	<cffunction name="getDAO" access="package" returntype="Home.components.lib.DAOFactory.DAO" hint="returns a properly configured instance of a DAO">
+	<cffunction name="getDAO" access="package" returntype="homePortals.components.lib.DAOFactory.DAO" hint="returns a properly configured instance of a DAO">
 		<cfargument name="entity" type="string" required="true">
 		<cfset var oDAO = createObject("component", variables.clientDAOPath & arguments.entity & "DAO")>
 		<cfset oDAO.init(variables.oDataProvider)>
@@ -483,7 +483,7 @@
 	<!--------------------------------------->
 	<!--- getAccountsDAO 	        	  --->
 	<!--------------------------------------->
-	<cffunction name="getAccountsDAO" access="private" returntype="Home.components.lib.DAOFactory.DAO" hint="returns the accounts DAO">
+	<cffunction name="getAccountsDAO" access="private" returntype="homePortals.components.lib.DAOFactory.DAO" hint="returns the accounts DAO">
 		<cfreturn getDAO("accounts")>
 	</cffunction>	
 	

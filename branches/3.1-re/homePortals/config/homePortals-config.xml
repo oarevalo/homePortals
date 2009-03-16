@@ -2,16 +2,16 @@
 <homePortals version="3.1.269">
 
 	<!-- base path for the HomePortals installation -->
-	<homePortalsPath>/Home/</homePortalsPath>
+	<homePortalsPath>/homePortals/</homePortalsPath>
 
 	<!-- Directory where HomePortals will look for resources  -->
-	<resourceLibraryPath>/Home/resourceLibrary/</resourceLibraryPath>
+	<resourceLibraryPath>/homePortals/resourceLibrary/</resourceLibraryPath>
 
 	<!-- base path for the current application -->
-	<appRoot>/Home/</appRoot>
+	<appRoot>/homePortals/</appRoot>
 
 	<!-- Directory where content pages will be stored -->
-	<contentRoot>/Home/contentRoot/</contentRoot>
+	<contentRoot>/homePortals/contentRoot/</contentRoot>
 
 	<!-- HomePortals page to load when no page has been provided -->
 	<defaultPage>default</defaultPage>
@@ -41,31 +41,31 @@
 	<rssCacheTTL>60</rssCacheTTL>
 
 	<!-- Path in dot notation for the class responsible for storing/retrieving HomePortals pages -->
-	<pageProviderClass>Home.components.defaultPageProvider</pageProviderClass>
+	<pageProviderClass>homePortals.components.defaultPageProvider</pageProviderClass>
 
 	<!-- List with allowed types of base resources -->
 	<baseResourceTypes>script,style,header,footer</baseResourceTypes>
 	
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>
-		<resource href="/Home/common/CSS/Main.css" type="style"/>
-		<resource href="/Home/common/JavaScript/prototype-1.4.0.js" type="script"/>
-		<resource href="/Home/common/JavaScript/Main.js" type="script"/>
-		<resource href="/Home/common/JavaScript/moduleClient.js" type="script"/>
+		<resource href="/homePortals/common/CSS/Main.css" type="style"/>
+		<resource href="/homePortals/common/JavaScript/prototype-1.4.0.js" type="script"/>
+		<resource href="/homePortals/common/JavaScript/Main.js" type="script"/>
+		<resource href="/homePortals/common/JavaScript/moduleClient.js" type="script"/>
 	</baseResources>
 
 	<!-- The following templates determine how homeportals will render the html content -->
 	<renderTemplates>
-		<renderTemplate type="module" href="/Home/common/Templates/Render/module.xml" />
-		<renderTemplate type="moduleNoContainer" href="/Home/common/Templates/Render/moduleNoContainer.xml" />
-		<renderTemplate type="page" href="/Home/common/Templates/Render/page.xml" />
+		<renderTemplate type="module" href="/homePortals/common/Templates/Render/module.xml" />
+		<renderTemplate type="moduleNoContainer" href="/homePortals/common/Templates/Render/moduleNoContainer.xml" />
+		<renderTemplate type="page" href="/homePortals/common/Templates/Render/page.xml" />
 	</renderTemplates>
 	
 	<!-- The following are the different types of modules or content renderers that will be supported on a page -->
 	<contentRenderers>
-		<contentRenderer moduleType="content" path="Home.components.contentTagRenderers.content" />
-		<contentRenderer moduleType="module" path="Home.components.contentTagRenderers.module" />
-		<contentRenderer moduleType="view" path="Home.components.contentTagRenderers.view" />
+		<contentRenderer moduleType="content" path="homePortals.components.contentTagRenderers.content" />
+		<contentRenderer moduleType="module" path="homePortals.components.contentTagRenderers.module" />
+		<contentRenderer moduleType="view" path="homePortals.components.contentTagRenderers.view" />
 	</contentRenderers>
 	
 </homePortals>

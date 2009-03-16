@@ -10,7 +10,7 @@
 <cfparam name="cacheName" default="">
 
 <!--- get reference to cache registry --->
-<cfset oCacheRegistry = createObject("component","Home.components.cacheRegistry").init()>
+<cfset oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 <cfset tmpMsg = "">
 
 <!--- Process Actions --->

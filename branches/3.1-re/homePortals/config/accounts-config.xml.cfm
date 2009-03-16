@@ -17,7 +17,7 @@
 	<!-- File-based storage info 
 	** only applicable when storageType is xml
 	-->
-	<dataRoot>/Home/contentRoot</dataRoot>
+	<dataRoot>/homePortals/contentRoot</dataRoot>
 	
 	<!-- Database connection info 
 	** only applicable when storageType is db
@@ -31,7 +31,7 @@
 	newAccountTemplate : used as the template for the initial page when creating a new account
 	newPageTemplate : used as the template when adding a new page to an account
 	-->
-	<newAccountTemplate>/Home/common/AccountTemplates/default.xml</newAccountTemplate>
-	<newPageTemplate>/Home/common/AccountTemplates/newPage.xml</newPageTemplate>
+	<newAccountTemplate>/homePortals/common/AccountTemplates/default.xml</newAccountTemplate>
+	<newPageTemplate>/homePortals/common/AccountTemplates/newPage.xml</newPageTemplate>
 	
 </homePortalsAccounts>

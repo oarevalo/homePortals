@@ -12,7 +12,7 @@
 	<modules>
 		<module followLink="false" 
 			id="bookmarks22" location="left" name="Bookmarks/bookmarks" title="News Feeds" 
-			url="/Home/resourceLibrary/Pages/News Reader/NewsFeeds.xml"/>
+			url="/homePortals/resourceLibrary/Pages/News Reader/NewsFeeds.xml"/>
 		<module followLink="false" 
 			id="bookmarks21" location="left" name="Bookmarks/bookmarks" title="My News Feeds" 
 			url="NewsReaderFeeds"/>

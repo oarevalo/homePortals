@@ -169,7 +169,7 @@
 	<!---------------------------------------->	
 	<cffunction name="applyPageTemplate" access="public" returntype="void" output="False" hint="Applies a page template resource bean. Page templates determine layout, styles, but preserve existing modules.">
 		<cfargument name="pageTemplateResourceBean" type="resourceBean" required="true">			
-		<cfargument name="resourceRoot" default="/Home/resourceLibrary/" type="string">			
+		<cfargument name="resourceRoot" default="/homePortals/resourceLibrary/" type="string">			
 
  		<cfscript>
 			var oPageTemplateBean = 0;
