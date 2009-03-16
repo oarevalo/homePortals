@@ -8,9 +8,6 @@
 <cfparam name="cacheName" default="">
 <cfparam name="refreshApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
 
-<cfparam name="account" default=""> 			<!--- HomePortals account --->
-<cfparam name="page" default=""> 				<!--- page to load within account --->
-
 <cfparam name="pageHREF" default="">			<!--- Path to a homeportals account --->
 <!----------------------------------->
 
@@ -30,10 +27,7 @@
 	hp = application.homePortals;
 
 	// load and parse page
-	if(pageHREF neq "")	
-		request.oPageRenderer = hp.loadPage(pageHREF);
-	else
-		request.oPageRenderer = hp.loadAccountPage(account, page);
+	request.oPageRenderer = hp.loadPage(pageHREF);
 
 	// render page html
 	html = request.oPageRenderer.renderPage();
@@ -130,10 +124,6 @@
 				<tr>
 					<td width="130"><b>App Root:</b></td>
 					<td>#request.appRoot#</td>
-				</tr>
-				<tr>
-					<td width="130"><b>Acounts Root:</b></td>
-					<td>#hp.getAccountsService().getConfig().getAccountsRoot()#</td>
 				</tr>
 				<tr>
 					<td width="130"><b>Resources Root:</b></td>
