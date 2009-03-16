@@ -28,7 +28,6 @@
 		variables.configFilePath = "config/homePortals-config.xml";  
 												// path of the config file relative to the root of the application
 		
-		variables.oAccountsService = 0;			// a handle to the accoutns service
 		variables.oCatalog = 0;					// a handle to the resources catalog 
 		variables.oPageProvider = 0;			// a handle to the provider of pages
 		variables.oModuleProperties = 0;		// a handle to the an object that provides properties for modules
@@ -75,9 +74,6 @@
 			// and only pass the appRoot on the constructor
 			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
 			
-			// initialize accounts service
-			variables.oAccountsService = CreateObject("Component","homePortals.components.accounts.accounts").init(this);
-
 			// initialize resource catalog
 			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
 
@@ -126,7 +122,6 @@
 		<cfscript>
 			// clear up instance variables
 			variables.oHomePortalsConfigBean = 0;
-			variables.oAccountsService = 0;	
 			variables.oCatalog = 0;	
 			variables.stTimers = structNew();
 			
@@ -148,15 +143,13 @@
 	<!--------------------------------------->
 	<cffunction name="load" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page">
 		<cfargument name="path" type="string" required="false" default="" hint="Path in the content root for the page to load. This argument is mutually exclusive with all the rest">
-		<cfargument name="account" type="string" required="false" default="" hint="Account name, if empty will load the default account">
-		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
 		<cfargument name="pageObj" type="pageBean" required="false" hint="Instance of a pageBean object to load. This argument is mutually exclusive with all the rest">
 		<cfscript>
 			var pagePath = "";
 			
 			// no arguments, so get the overall default page
-			if(arguments.path eq "" and arguments.account eq "" and arguments.page eq "" and not structKeyExists(arguments,"pageObj"))
-				pagePath = getAppDefaultPage();
+			if(arguments.path eq "" and not structKeyExists(arguments,"pageObj"))
+				pagePath = getConfig().getDefaultPage();
 			
 			// check mutually exclusive arguments
 			if(pagePath neq "") {
@@ -165,10 +158,7 @@
 			} else {
 				if(arguments.path neq "") {
 					return loadPage(arguments.path);
-					
-				} else if(arguments.account neq "") {
-					return loadAccountPage(arguments.account, arguments.page);
-				
+									
 				} else if(structKeyExists(arguments,"pageObj"))
 					return loadPageBean(arguments.pageObj);
 			}
@@ -176,34 +166,7 @@
 			throw("No page to load","homePortals.noDefaultPageFound");
 		</cfscript>
 	</cffunction>
-	
-	<!--------------------------------------->
-	<!----  loadAccountPage 			----->
-	<!--------------------------------------->
-	<cffunction name="loadAccountPage" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page belonging to an account">
-		<cfargument name="account" type="string" required="false" default="" hint="Account name, if empty will load the default account">
-		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
-		<cfscript>
-			var oPageRenderer = 0;
-			var oPageLoader = 0;
-			var pageHREF = "";
-			var start = getTickCount();
-					
-			// get location of page
-			pageHREF = getAccountsService().getAccountPageHREF(arguments.account, arguments.page);		
 			
-			// load page 
-			oPageLoader = createObject("component","pageLoader").init(this);
-			oPageRenderer = oPageLoader.load(pageHREF);	
-
-			// validate access to page
-			getAccountsService().validatePageAccess( oPageRenderer.getPage() );
-
-			variables.stTimers.loadPage = getTickCount()-start;
-			return oPageRenderer;
-		</cfscript>
-	</cffunction>
-		
 	<!--------------------------------------->
 	<!----  loadPage 					----->
 	<!--------------------------------------->
@@ -273,13 +236,6 @@
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  getAccountsService			----->
-	<!--------------------------------------->
-	<cffunction name="getAccountsService" access="public" returntype="homePortals.components.accounts.accounts" hint="Returns the accounts service">
-		<cfreturn variables.oAccountsService>
-	</cffunction>
-
-	<!--------------------------------------->
 	<!----  getCatalog					----->
 	<!--------------------------------------->
 	<cffunction name="getCatalog" access="public" returntype="catalog" hint="Returns the resources catalog">
@@ -306,28 +262,6 @@
 	<cffunction name="getModuleProperties" access="public" returntype="moduleProperties">
 		<cfreturn variables.oModuleProperties>
 	</cffunction>
-
-	<!--------------------------------------->
-	<!----  getAppDefaultPage			----->
-	<!--------------------------------------->		
-	<cffunction name="getAppDefaultPage" access="public" returntype="string" hint="Returns the overall default page for the current application. The default page is given by checking first the defaultPage property in the main config, and then by checking the defaultAccount property on the accounts config.">
-		<cfscript>
-			var pageHREF = "";
-			
-			// first try the main config
-			pageHREF = getConfig().getDefaultPage();	
-			
-			// if nothing found there, then try the accounts config
-			if(pageHREF eq "") {
-				account = getAccountsService().getConfig().getDefaultAccount();		
-				if(account neq "")
-					pageHREF = getAccountsService().getAccountDefaultPage( account );
-			}
-		
-			return pageHREF;
-		</cfscript>
-	</cffunction>
-
 
 		
 	<!--------------------------------------->
