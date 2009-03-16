@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page owner="default">
+	<title>HomePortalsAccounts Framework Extension</title>
+	<layout>
+		<location class="header" name="header" type="header" />
+		<location class="maincolumn" name="middle" type="column" />
+		<location class="rightcolumn" name="right" type="column" />
+		<location class="footer" name="footer" type="footer" />
+	</layout>
+	<modules>
+		<content id="welcome" href="/homePortalsAccounts/contentRoot/_res/welcome.html" title="Welcome to HomePortals" location="middle"
+				container="false" style="padding-right:20px;" />
+	</modules>
+</Page>
