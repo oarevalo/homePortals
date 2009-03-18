@@ -7,7 +7,7 @@
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="moduleProperties" hint="Constructor. Loads module settings from config files. Properties defined on config directory in current application overwrite those defined on the central config directory">
-		<cfargument name="configBean" type="homePortalsConfigBean" required="true" hint="HomePortals application settings">
+		<cfargument name="configBean" type="homePortals.components.homePortalsConfigBean" required="true" hint="HomePortals application settings">
 
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");

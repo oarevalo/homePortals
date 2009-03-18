@@ -36,8 +36,8 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="onAfterPageLoad" access="public" returntype="pageRenderer" hint="this method is executed right before the call to loadPage() returns.">
-		<cfargument name="eventArg" type="pageRenderer" required="true" hint="a pageRenderer object intialized for the requested page">	
+	<cffunction name="onAfterPageLoad" access="public" returntype="homePortals.components.pageRenderer" hint="this method is executed right before the call to loadPage() returns.">
+		<cfargument name="eventArg" type="homePortals.components.pageRenderer" required="true" hint="a pageRenderer object intialized for the requested page">	
 		<cfscript>
 			var pageHREF = arguments.eventArg.getPageHREF();
 			var oConfigBeanStore = 0;

@@ -27,7 +27,7 @@
 		<cfargument name="modulePageSettings" required="false" default="0">
 		<cfargument name="isFirstInClass" required="false" type="boolean" default="false">
 		<cfargument name="execMode" required="false" type="string" default="local" hint="Could be 'local' or 'remote', depending on under which context is being executed.">
-		<cfargument name="homePortals" type="homePortals" required="true" hint="reference to homeportals environment">
+		<cfargument name="homePortals" type="homePortals.components.homePortals" required="true" hint="reference to homeportals environment">
 	
 		<cfscript>
 			var contentStoreID = "";

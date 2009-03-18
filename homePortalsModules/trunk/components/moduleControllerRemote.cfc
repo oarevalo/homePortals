@@ -9,7 +9,7 @@
 	<cffunction name="init" access="public" hint="constructor" returntype="moduleControllerRemote">
 		<cfargument name="pageHREF" type="any" required="true">
 		<cfargument name="moduleID" type="any" required="true">
-		<cfargument name="homePortals" type="homePortals" required="true" hint="homeportals application instance">
+		<cfargument name="homePortals" type="homePortals.components.homePortals" required="true" hint="homeportals application instance">
 		
 		<cfscript>
 			var myConfigBeanStore = createObject("component", "configBeanStore").init();
