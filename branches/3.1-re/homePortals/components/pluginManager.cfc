@@ -41,9 +41,9 @@
 	<cffunction name="getPlugin" access="public" returntype="plugin" hint="return an instance of a registered plugin object">
 		<cfargument name="pluginName" type="string" required="true">
 		<cfif not structKeyExists(variables.pluginsMap, arguments.pluginName)>
-			<cfthrow message="The requested plugin has not been registed" type="homePortals.pluginManager.invalidPluginName">
+			<cfthrow message="The requested plugin has not been registered" type="homePortals.pluginManager.invalidPluginName">
 		</cfif>
-		<cfreturn variables.pluginsMap[key]>	
+		<cfreturn variables.pluginsMap[arguments.pluginName]>	
 	</cffunction>
 
 	<cffunction name="getPlugins" access="public" returntype="array" hint="returns an array with names of the registered plugins">

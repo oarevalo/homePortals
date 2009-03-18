@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Page owner="default">
+<Page>
 	<title>HomePortals Framework</title>
 	<stylesheet href="/homePortals/contentRoot/_res/style.css" /> 
 	<layout>
@@ -12,9 +12,8 @@
 		<content id="header" href="/homePortals/contentRoot/_res/content/header.html" container="false" location="header" />
 		<content id="welcome" href="/homePortals/contentRoot/_res/content/welcome.html" title="Welcome to HomePortals" location="middle"
 				container="false" style="padding-right:20px;" />
-		<module id="webviewer1" name="WebViewer/WebViewer" title="HomePortals Version" 
-				url="/homePortals/?version" location="right" container="false"
-				height="90" />
+		<content id="version" href="/homePortals/contentRoot/_res/content/version.html" title="HomePortals Version" location="right"
+				container="false"  />
 		<content id="license" href="/homePortals/contentRoot/_res/content/license.html" container="false" location="right"
 				style="margin-top:30px;text-align:center;" />
 		<content id="footer" href="/homePortals/contentRoot/_res/content/footer.html" container="false" location="footer" />

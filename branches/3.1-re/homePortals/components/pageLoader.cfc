@@ -18,7 +18,7 @@
 			var oCacheRegistry = createObject("component","cacheRegistry").init();			
 			var oCache = oCacheRegistry.getCache("hpPageCache");
 			var oPageProvider = getHomePortals().getPageProvider();
-			var oConfigBeanStore = 0;
+			var stInfo = structNew();
 
 			// get information about the page
 			stInfo = oPageProvider.query(arguments.href);
@@ -37,11 +37,6 @@
 			
 				// store page in cache
 				oCache.store(pageCacheKey, oPageRenderer);
-				
-				// clear persistent storage for module data
-				oConfigBeanStore = createObject("component","configBeanStore").init();
-				oConfigBeanStore.flushByPageHREF(arguments.href);
-				
 			}
 			
 			return oPageRenderer;

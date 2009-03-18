@@ -22,7 +22,7 @@
 ---->
 	
 	<cfscript>
-		variables.hpEngineRoot = "/Home";		// root directory for the homeportals engine
+		variables.hpEngineRoot = "/homePortals/";		// root directory for the homeportals engine
 		variables.appRoot = "";					// Root directory of the application as a relative URL
 		variables.oHomePortalsConfigBean = 0;	// bean to store config settings
 		variables.configFilePath = "config/homePortals-config.xml";  
@@ -30,7 +30,6 @@
 		
 		variables.oCatalog = 0;					// a handle to the resources catalog 
 		variables.oPageProvider = 0;			// a handle to the provider of pages
-		variables.oModuleProperties = 0;		// a handle to the an object that provides properties for modules
 		variables.oPluginManager = 0;			// a handle to the object responsible for managing extension plugins
 		
 		variables.stTimers = structNew();
@@ -45,14 +44,12 @@
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
-			var oModuleProperties = 0;
 			var start = getTickCount();
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
 			var oRSSService = 0;
 			var ppClass = "";
-			var oConfigBeanStore = 0;
-			
+
 			variables.appRoot = arguments.appRoot;
 
 			// create object to store configuration settings
@@ -63,7 +60,7 @@
 			variables.oHomePortalsConfigBean.load(defaultConfigFilePath);
 
 			// load configuration settings for the application (overrides specific settings)
-			if(arguments.appRoot neq "") {
+			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
 				if(fileExists(expandPath(variables.appRoot & "/" & variables.configFilePath))) {
 					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & "/" & variables.configFilePath));
 				}
@@ -80,10 +77,7 @@
 
 			// initialize page provider
 			variables.oPageProvider = createObject("component", variables.oHomePortalsConfigBean.getPageProviderClass() ).init(variables.oHomePortalsConfigBean);
-
-			// load module properties
-			variables.oModuleProperties = createObject("component","moduleProperties").init(variables.oHomePortalsConfigBean);
-			
+		
 			// initialize cache registry
 			oCacheRegistry = createObject("component","cacheRegistry").init();
 			oCacheRegistry.flush();		// clear registry
@@ -94,29 +88,18 @@
 			oCacheRegistry.register("hpPageCache", oCacheService);
 
 
-			// create and register content store cache
-			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
-																			variables.oHomePortalsConfigBean.getPageCacheTTL());
-			oCacheRegistry.register("hpContentStoreCache", oCacheService);
-
-
 			// initialize cache for RSSService
 			// (there is no need to register the service with the registry since it registers itself)
 			oRSSService = createObject("component","RSSService").init(variables.oHomePortalsConfigBean.getRSSCacheSize(), 
 																		variables.oHomePortalsConfigBean.getRSSCacheTTL());
-			
-			
+						
 			// register and initialize plugins
 			variables.oPluginManager = createObject("component","pluginManager").init(this);
 			
 			// ask plugins to perform their own initialization tasks
 			getPluginManager().notifyPlugins("appInit");
 			
-			
-			// clear all stored pages/module contexts (configbeans)
-			oConfigBeanStore = createObject("component","configBeanStore").init();
-			oConfigBeanStore.flushAll();
-			
+						
 			variables.stTimers.init = getTickCount()-start;
 			return this;
 		</cfscript>
@@ -210,7 +193,6 @@
 		<cfargument name="page" type="pageBean" required="true" hint="the page to load">
 		<cfscript>
 			var oPageRenderer = 0;
-			var oConfigBeanStore = 0;
 			var pageUUID = createUUID();
 			var start = getTickCount();
 
@@ -221,10 +203,6 @@
 
 			// notify plugins
 			oPageRenderer = getPluginManager().notifyPlugins("afterPageLoad", oPageRenderer);
-
-			// clear persistent storage for module data
-			oConfigBeanStore = createObject("component","configBeanStore").init();
-			oConfigBeanStore.flushByPageHREF(pageUUID);
 
 			variables.stTimers.loadPage = getTickCount()-start;
 			return oPageRenderer;
@@ -277,13 +255,6 @@
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  getModuleProperties			----->
-	<!--------------------------------------->		
-	<cffunction name="getModuleProperties" access="public" returntype="moduleProperties">
-		<cfreturn variables.oModuleProperties>
-	</cffunction>
-
-	<!--------------------------------------->
 	<!----  getPluginManager			----->
 	<!--------------------------------------->		
 	<cffunction name="getPluginManager" access="public" returntype="pluginManager">
@@ -294,7 +265,7 @@
 	<!--------------------------------------->
 	<!----  Private Methods  			----->
 	<!--------------------------------------->
-	<cffunction name="dump" access="private">
+	<cffunction name="dump" access="public">
 		<cfargument name="var" type="any">
 		<cfargument name="console" type="boolean" required="false" default="false">
 		<!--- dump to console is disabled because of compatibility with Railo, uncomment for debugging in CF8 
@@ -306,7 +277,7 @@
 		<cfdump var="#arguments.var#">
 	</cffunction>
 
-	<cffunction name="abort" access="private">
+	<cffunction name="abort" access="public">
 		<cfabort>
 	</cffunction>
 		

@@ -49,9 +49,6 @@
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>
 		<resource href="/homePortals/common/CSS/Main.css" type="style"/>
-		<resource href="/homePortals/common/JavaScript/prototype-1.4.0.js" type="script"/>
-		<resource href="/homePortals/common/JavaScript/Main.js" type="script"/>
-		<resource href="/homePortals/common/JavaScript/moduleClient.js" type="script"/>
 	</baseResources>
 
 	<!-- The following templates determine how homeportals will render the html content -->
@@ -64,7 +61,6 @@
 	<!-- The following are the different types of modules or content renderers that will be supported on a page -->
 	<contentRenderers>
 		<contentRenderer moduleType="content" path="homePortals.components.contentTagRenderers.content" />
-		<contentRenderer moduleType="module" path="homePortals.components.contentTagRenderers.module" />
 		<contentRenderer moduleType="view" path="homePortals.components.contentTagRenderers.view" />
 	</contentRenderers>
 	
