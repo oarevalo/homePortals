@@ -106,8 +106,9 @@
 						}
 						break;	
 									
-					// modules
+					// modules/body
 					case "modules":
+					case "body":
 						if(structKeyExists(xmlNode.xmlAttributes, "basePath"))
 							variables.stPage.page.basePath = xmlNode.xmlAttributes.basePath;
 				
@@ -281,7 +282,7 @@
 			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 
 			// add modules
-			xmlNode = xmlElemNew(xmlDoc,"modules");
+			xmlNode = xmlElemNew(xmlDoc,"body");
 			aTemp = getModules();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
 				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i].moduleType);
