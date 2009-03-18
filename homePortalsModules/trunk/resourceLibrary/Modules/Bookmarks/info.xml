@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog package="Tools">
+
+<modules>
+
+	
+	<!-- ********   Bookmarks  ************ -->
+	<module access="general" id="bookmarks" name="Bookmarks/bookmarks">
+		<description>
+			Displays a list of items and/or links. You can add/edit/delete items. Whenever an
+			option is selected the event bookmakrs.onClick is raised. Additionally you can 
+			indicate an external OPML file to display. When using external files, items cannot
+			be modified.
+		</description>
+		<attributes>
+			<attribute description="[Optional] Source of the bookmarks entries. For local storage you may only use a simple name, or it can also be a full URL for external opml files. Leave empty to use default storage." name="url" required="true"/>
+			<attribute description="Must be either Yes or No. Indicates whether to go to the URL address in the bookmark when clicking on it" name="followLink" required="true" type="list" values="Yes,No" />
+		</attributes>
+		<api>
+			<methods>
+				<method name="addItem" description="Adds an item" /> 
+			</methods>
+			<events>
+				<event name="onClick" description="This event is raised when someone clicks on a bookmark" />
+				<event name="onSave" description="This event is raised when a bookmark is saved" />
+				<event name="onDelete" description="This event is raised when a bookmark is deleted" />
+			</events>
+		</api>
+		<moduleInfo>
+			<authorName>Oscar Arevalo</authorName>
+			<authorEmail>oarevalo@gmail.com</authorEmail>
+			<authorURL>http://www.homeportals.com</authorURL>
+			<screenshot/>
+		</moduleInfo>
+	</module>
+	
+</modules>
+</catalog>

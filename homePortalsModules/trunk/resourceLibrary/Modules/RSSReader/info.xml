@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog package="Content">
+	<modules>
+		<!-- ********   RSS Reader  ************ -->
+		<module access="general" id="rssReader" name="RSSReader/RSSReader">
+			<description>
+				Displays content from RSS and Atom feeds. You may select to display the feed contents in the same module
+				or send them to another module such as a Panel module.
+			</description>
+			<attributes>
+				<attribute description="RSS URL" name="rss" required="true" type="resource" resourceType="feed" resourceField="Href" />
+				<attribute description="Number of Items to Display" name="maxItems" required="true"/>
+				<attribute description="Use 'short' for displaying only headlines, or 'long' for displaying headlines and content" label="Display Mode" name="displayMode" required="true" default="short" type="list" values="short,long" />
+			</attributes>
+			<moduleInfo>
+				<authorName>Oscar Arevalo</authorName>
+				<authorEmail>oarevalo@gmail.com</authorEmail>
+				<authorURL>http://www.homeportals.com</authorURL>
+				<screenshot/>
+			</moduleInfo>
+			<api>
+				<methods>
+					<method name="getFeed" description="Retrieves and displays the given feed." /> 
+				</methods>
+				<events />
+			</api>
+		</module>	
+
+	</modules>
+</catalog>

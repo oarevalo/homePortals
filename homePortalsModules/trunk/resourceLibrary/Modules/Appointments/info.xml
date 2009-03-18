@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog package="Tools">
+<modules>
+	<module access="general" id="Appointments" name="Appointments/appointments">
+		<description>
+			Maintains a list of appointments organized by date and time. Appointments can be displayed
+			daily, weekly, monthly or for the next 45 days.
+		</description>
+		<resources/>
+		<attributes>
+			<attribute description="[Optional] Indicates the name of a document where to store your appointments. Leave empty to use default storage." name="calendarURL" required="true"/>
+		</attributes>
+		<eventListeners/>
+		<moduleInfo>
+			<authorName>Oscar Arevalo</authorName>
+			<authorEmail>oarevalo@gmail.com</authorEmail>
+			<authorURL>http://www.homeportals.com</authorURL>
+			<screenshot/>
+		</moduleInfo>
+		<api>
+			<methods>
+				<method description="Retrieves appointments for the selected date." name="getAppointmentsByDate"/> 
+			</methods>
+			<events/>
+		</api>
+	</module>	
+</modules>
+</catalog>
