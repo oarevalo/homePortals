@@ -27,12 +27,12 @@
 		<cfset variables.memCacheTTL = arguments.memCacheTTL>
 		
 		<!--- check cacheRegistry for the rss cache --->
-		<cfset oCacheRegistry = createObject("component","cacheRegistry").init()>
+		<cfset oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 
 		<cflock type="exclusive" name="#variables.lockName#" timeout="30">
 			<cfif not oCacheRegistry.isRegistered(variables.cacheName) or arguments.reloadCache>
 				<!--- crate cache instance --->
-				<cfset oCacheService = createObject("component","cacheService").init(variables.memCacheSize, variables.memCacheTTL)>
+				<cfset oCacheService = createObject("component","homePortals.components.cacheService").init(variables.memCacheSize, variables.memCacheTTL)>
 
 				<!--- add cache to registry --->
 				<cfset oCacheRegistry.register(variables.cacheName, oCacheService)>
@@ -45,8 +45,8 @@
 	<!-------------------------------------->
 	<!--- getCacheService                --->
 	<!-------------------------------------->	
-	<cffunction name="getCacheService" access="public" returnType="cacheService">
-		<cfset var oCacheRegistry = createObject("component","cacheRegistry").init()>
+	<cffunction name="getCacheService" access="public" returnType="homePortals.components.cacheService">
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 		<cfreturn oCacheRegistry.getCache(variables.cacheName)>
 	</cffunction>
 	
