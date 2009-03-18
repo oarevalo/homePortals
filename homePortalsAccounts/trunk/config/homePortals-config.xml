@@ -3,5 +3,9 @@
 
 	<contentRoot>/homePortalsAccounts/contentRoot/</contentRoot>
 	<defaultPage></defaultPage>
-	
+
+	<plugins>
+		<plugin name="accounts" path="homePortalsAccounts.components.accountsPlugin" />
+	</plugins>
+		
 </homePortals>

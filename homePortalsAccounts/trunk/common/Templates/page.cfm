@@ -42,17 +42,13 @@
 		// Initialize application if requested or needed
 		if((isBoolean(refreshApp) and refreshApp) or Not StructKeyExists(application, "homePortals")) {
 			application.homePortals = CreateObject("component","homePortals.components.homePortals").init(request.appRoot);
-			application.homePortalsAccounts = CreateObject("component","homePortalsAccounts.components.accounts").init( application.homePortals );
 		}
 
 		// get location of page
-		pageHREF = application.homePortalsAccounts.getAccountPageHREF(account, page);		
+		pageHREF = account & "::" & page;		
 			
 		// load and parse page
 		request.oPageRenderer = application.homePortals.loadPage(pageHREF);
-
-		// validate access to page
-		application.homePortalsAccounts.validatePageAccess( request.oPageRenderer.getPage() );
 
 		// render page html
 		html = request.oPageRenderer.renderPage();
