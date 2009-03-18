@@ -30,6 +30,7 @@
 			variables.stConfig.renderTemplates = structNew();
 			variables.stConfig.resources = structNew();
 			variables.stConfig.contentRenderers = structNew();
+			variables.stConfig.plugins = structNew();
 			
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -88,6 +89,12 @@
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						variables.stConfig.contentRenderers[ xmlNode.xmlChildren[j].xmlAttributes.moduleType ] = xmlNode.xmlChildren[j].xmlAttributes.path;
+					}
+
+				} else if(xmlNode.xmlName eq "plugins") {
+		
+					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+						variables.stConfig.plugins[ xmlNode.xmlChildren[j].xmlAttributes.name ] = xmlNode.xmlChildren[j].xmlAttributes.path;
 					}
 							
 				} else
@@ -170,6 +177,17 @@
 				tmpXmlNode.xmlAttributes["path"] = variables.stConfig.contentRenderers[thisKey];
 				ArrayAppend(xmlConfigDoc.xmlRoot.contentRenderers.xmlChildren, tmpXmlNode );
 			}
+
+			// ****** [plugins] *****
+			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"plugins") );
+			
+			for(thisKey in variables.stConfig.plugins) {
+				tmpXmlNode = xmlElemNew(xmlConfigDoc,"plugin");
+				tmpXmlNode.xmlAttributes["name"] = thisKey;
+				tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[thisKey];
+				ArrayAppend(xmlConfigDoc.xmlRoot.plugins.xmlChildren, tmpXmlNode );
+			}
+
 
 			// return document
 			return xmlConfigDoc;
@@ -286,7 +304,20 @@
 		</cfif>
 	</cffunction>
 	
+	<cffunction name="getPlugin" access="public" returntype="string" hint="returns the path to the given extension plugin cfc">
+		<cfargument name="name" type="string" required="true">
+		<cfif structKeyExists( variables.stConfig.plugins, arguments.name )>
+			<cfreturn variables.stConfig.plugins[arguments.name]>
+		<cfelse>
+			<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
+		</cfif>
+	</cffunction>	
 
+	<cffunction name="getPlugins" access="public" returntype="struct" hint="returns a key-value map with all declared plugins and their paths">
+		<cfreturn duplicate(variables.stConfig.plugins)>
+	</cffunction>	
+	
+	
 	<!--- Setters --->
 	<cffunction name="setVersion" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
@@ -413,6 +444,16 @@
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="path" type="string" required="true">
 		<cfset variables.stConfig.contentRenderers[arguments.name] = arguments.path>
+	</cffunction>
+
+	<cffunction name="setPlugin" access="public" returntype="void">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="path" type="string" required="true">
+		<cfif arguments.path neq "">
+			<cfset variables.stConfig.plugins[arguments.name] = arguments.path>
+		<cfelseif structKeyExists(variables.stConfig.plugins, arguments.name)>
+			<cfset structDelete(variables.stConfig.plugins, arguments.name)>
+		</cfif>
 	</cffunction>
 
 	<cffunction name="throw" access="private">

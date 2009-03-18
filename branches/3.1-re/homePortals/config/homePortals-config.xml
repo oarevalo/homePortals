@@ -68,4 +68,9 @@
 		<contentRenderer moduleType="view" path="homePortals.components.contentTagRenderers.view" />
 	</contentRenderers>
 	
+	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
+	<plugins>
+		<!--<plugin name="sample" path="homePortals.components.plugin" />-->
+	</plugins>		
+	
 </homePortals>

@@ -31,6 +31,7 @@
 		variables.oCatalog = 0;					// a handle to the resources catalog 
 		variables.oPageProvider = 0;			// a handle to the provider of pages
 		variables.oModuleProperties = 0;		// a handle to the an object that provides properties for modules
+		variables.oPluginManager = 0;			// a handle to the object responsible for managing extension plugins
 		
 		variables.stTimers = structNew();
 	</cfscript>
@@ -105,6 +106,13 @@
 																		variables.oHomePortalsConfigBean.getRSSCacheTTL());
 			
 			
+			// register and initialize plugins
+			variables.oPluginManager = createObject("component","pluginManager").init(this);
+			
+			// ask plugins to perform their own initialization tasks
+			getPluginManager().notifyPlugins("appInit");
+			
+			
 			// clear all stored pages/module contexts (configbeans)
 			oConfigBeanStore = createObject("component","configBeanStore").init();
 			oConfigBeanStore.flushAll();
@@ -177,12 +185,18 @@
 			var oPageLoader = 0;
 			var start = getTickCount();
 			
+			// notify plugins
+			arguments.pageHREF = getPluginManager().notifyPlugins("beforePageLoad", arguments.pageHREF);
+			
 			// if no page is given, then load default page
 			if(arguments.pageHREF eq "") arguments.pageHREF = getConfig().getDefaultPage();			
 						
 			// load page 
 			oPageLoader = createObject("component","pageLoader").init(this);
 			oPageRenderer = oPageLoader.load(arguments.pageHREF);	
+
+			// notify plugins
+			oPageRenderer = getPluginManager().notifyPlugins("afterPageLoad", oPageRenderer);
 
 			variables.stTimers.loadPage = getTickCount()-start;
 			return oPageRenderer;
@@ -199,8 +213,14 @@
 			var oConfigBeanStore = 0;
 			var pageUUID = createUUID();
 			var start = getTickCount();
+
+			// notify plugins
+			arguments.pageHREF = getPluginManager().notifyPlugins("beforePageLoad", pageUUID);
 			
 			oPageRenderer = createObject("component","pageRenderer").init(pageUUID, arguments.page, this);
+
+			// notify plugins
+			oPageRenderer = getPluginManager().notifyPlugins("afterPageLoad", oPageRenderer);
 
 			// clear persistent storage for module data
 			oConfigBeanStore = createObject("component","configBeanStore").init();
@@ -261,6 +281,13 @@
 	<!--------------------------------------->		
 	<cffunction name="getModuleProperties" access="public" returntype="moduleProperties">
 		<cfreturn variables.oModuleProperties>
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  getPluginManager			----->
+	<!--------------------------------------->		
+	<cffunction name="getPluginManager" access="public" returntype="pluginManager">
+		<cfreturn variables.oPluginManager>
 	</cffunction>
 
 		
