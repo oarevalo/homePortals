@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalog>
-	<pages>
-		<page access="general"
-			href="pages/News Reader/News Reader.xml"
-			id="News Reader" name="News Reader" owner=""></page>
-	</pages>
-</catalog>
