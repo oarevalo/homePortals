@@ -11,7 +11,7 @@
 	<cfset variables.HOMEPORTALS_INSTANCE_VAR = "application.homePortals">
 	
 	<!--- This variable points to the target application root --->
-	<cfset variables.APP_ROOT = "/Home">
+	<cfset variables.APP_ROOT = "/homePortals">
 
 	
 	<cffunction name="init" access="public" returntype="homePortalsProxy" hint="constructor">
@@ -94,8 +94,7 @@
 	
 	<!--- Page Processing --->
 	<cffunction name="renderPage" access="remote" returntype="string" hint="Returns the output generated from rendering the requested page">
-		<cfargument name="account" type="string" required="true">
-		<cfargument name="page" type="string" required="true">
+		<cfargument name="pageHREF" type="string" required="true">
 		
 		<cfset var oHP = 0>
 		<cfset var oPageRenderer = 0>
@@ -108,7 +107,7 @@
 		
 		<!--- load page --->
 		<cfset oHP = evaluate(variables.HOMEPORTALS_INSTANCE_VAR)>
-		<cfset request.oPageRenderer = oHP.loadPage(arguments.account, arguments.page)>
+		<cfset request.oPageRenderer = oHP.loadPage(arguments.pageHREF)>
 		
 		<!--- render page output --->	
 		<cfset html = request.oPageRenderer.renderPage()>
