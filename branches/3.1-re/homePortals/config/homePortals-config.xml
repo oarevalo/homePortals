@@ -68,5 +68,14 @@
 	<plugins>
 		<!--<plugin name="sample" path="homePortals.components.plugin" />-->
 	</plugins>		
-	
+
+	<!-- This section declares the available resource types -->
+	<resourceTypes>
+		<resourceType name="skin" extension="css" />
+		<resourceType name="pagetemplate" extension="xml" />
+		<resourceType name="page" extension="xml" />
+		<resourceType name="content" extension="html" />
+		<resourceType name="feed" extension="rss" />
+		<resourceType name="html" extension="html" />
+	</resourceTypes>
 </homePortals>

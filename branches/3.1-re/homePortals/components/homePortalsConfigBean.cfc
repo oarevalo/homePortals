@@ -31,6 +31,7 @@
 			variables.stConfig.resources = structNew();
 			variables.stConfig.contentRenderers = structNew();
 			variables.stConfig.plugins = structNew();
+			variables.stConfig.resourceTypes = structNew();
 			
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -95,6 +96,12 @@
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						variables.stConfig.plugins[ xmlNode.xmlChildren[j].xmlAttributes.name ] = xmlNode.xmlChildren[j].xmlAttributes.path;
+					}
+
+				} else if(xmlNode.xmlName eq "resourceTypes") {
+		
+					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+						variables.stConfig.resourceTypes[ xmlNode.xmlChildren[j].xmlAttributes.name ] = xmlNode.xmlChildren[j].xmlAttributes.extension;
 					}
 							
 				} else
@@ -188,6 +195,15 @@
 				ArrayAppend(xmlConfigDoc.xmlRoot.plugins.xmlChildren, tmpXmlNode );
 			}
 
+			// ****** [resourceTypes] *****
+			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceTypes") );
+			
+			for(thisKey in variables.stConfig.resourceTypes) {
+				tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceType");
+				tmpXmlNode.xmlAttributes["name"] = thisKey;
+				tmpXmlNode.xmlAttributes["extension"] = variables.stConfig.resourceTypes[thisKey];
+				ArrayAppend(xmlConfigDoc.xmlRoot.resourceTypes.xmlChildren, tmpXmlNode );
+			}
 
 			// return document
 			return xmlConfigDoc;
@@ -316,6 +332,10 @@
 	<cffunction name="getPlugins" access="public" returntype="struct" hint="returns a key-value map with all declared plugins and their paths">
 		<cfreturn duplicate(variables.stConfig.plugins)>
 	</cffunction>	
+	
+	<cffunction name="getResourceTypes" access="public" returntype="struct" hint="returns a key-value map with all declared resource types and their associated extensions">
+		<cfreturn duplicate(variables.stConfig.resourceTypes)>
+	</cffunction>		
 	
 	
 	<!--- Setters --->
@@ -456,6 +476,12 @@
 		</cfif>
 	</cffunction>
 
+	<cffunction name="setResourceType" access="public" returntype="void">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="extension" type="string" required="true">
+		<cfset variables.stConfig.resourceTypes[arguments.name] = arguments.extension>
+	</cffunction>
+	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 

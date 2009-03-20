@@ -31,6 +31,7 @@
 		variables.oCatalog = 0;					// a handle to the resources catalog 
 		variables.oPageProvider = 0;			// a handle to the provider of pages
 		variables.oPluginManager = 0;			// a handle to the object responsible for managing extension plugins
+		variables.oResourceLibrary = 0;			// a handle to the resource library
 		
 		variables.stTimers = structNew();
 	</cfscript>
@@ -49,6 +50,9 @@
 			var oCacheService = 0;
 			var oRSSService = 0;
 			var ppClass = "";
+
+			// check that appRoot has the right format
+			if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";
 
 			variables.appRoot = arguments.appRoot;
 
@@ -71,9 +75,12 @@
 			// set the appRoot to the given parameter, this way, we can get away without having a local config 
 			// and only pass the appRoot on the constructor
 			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
+
+			// initialize resource library
+			variables.oResourceLibrary = CreateObject("Component","resourceLibrary").init(variables.oHomePortalsConfigBean);
 			
 			// initialize resource catalog
-			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean.getResourceLibraryPath());
+			variables.oCatalog = CreateObject("Component","catalog").init(variables.oResourceLibrary);
 
 			// initialize page provider
 			variables.oPageProvider = createObject("component", variables.oHomePortalsConfigBean.getPageProviderClass() ).init(variables.oHomePortalsConfigBean);
@@ -261,6 +268,14 @@
 		<cfreturn variables.oPluginManager>
 	</cffunction>
 
+	<!--------------------------------------->
+	<!----  getResourceLibrary			----->
+	<!--------------------------------------->		
+	<cffunction name="getResourceLibrary" access="public" returntype="resourceLibrary">
+		<cfreturn variables.oResourceLibrary>
+	</cffunction>
+		
+		
 		
 	<!--------------------------------------->
 	<!----  Private Methods  			----->

@@ -1,28 +1,50 @@
 <cfcomponent>
 
 	<cfscript>
-		variables.lstResourceTypes = "module,skin,pagetemplate,page,content,feed,html";
-		variables.lstResourceTypesExtensions = "cfc,css,xml,xml,html,rss,html";
 		variables.lstAccessTypes = "general,owner,friend";	
 		variables.resourceDescriptorFile = "info.xml";
 		variables.resourcesRoot = "";
 		variables.stTimers = structNew();
+		variables.stResourceTypes = structNew();
 	</cfscript>
 
 	<!------------------------------------------------->
 	<!--- init				                	   ---->
 	<!------------------------------------------------->
 	<cffunction name="init" returntype="resourceLibrary" access="public" hint="This is the constructor">
-		<cfargument name="resourceLibraryPath" type="string" required="true">
-		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
+		<cfargument name="config" type="homePortalsConfigBean" required="true">
+		<cfset var stResTypes = arguments.config.getResourceTypes()>
+		<cfset variables.resourcesRoot = arguments.config.getResourceLibraryPath()>
+		
+		<cfloop collection="#stResTypes#" item="res">
+			<cfset registerResourceType(res, stResTypes[res])>
+		</cfloop>
+		
 		<cfreturn this>
+	</cffunction>
+
+	<!------------------------------------------------->
+	<!--- registerResourceType                	   ---->
+	<!------------------------------------------------->
+	<cffunction name="registerResourceType" access="public" returntype="void">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfargument name="resourceExtension" type="string" required="true">
+		<cfset variables.stResourceTypes[arguments.resourceType] = arguments.resourceExtension>
 	</cffunction>
 
 	<!------------------------------------------------->
 	<!--- getResourceTypes	                	   ---->
 	<!------------------------------------------------->
 	<cffunction name="getResourceTypes" access="public" returntype="array" hint="returns an array with the allowed resource types">
-		<cfreturn listToArray(variables.lstResourceTypes)>
+		<cfreturn listToArray(structKeyList(variables.stResourceTypes))>
+	</cffunction>
+
+	<!------------------------------------------------->
+	<!--- hasResourceType	                	   ---->
+	<!------------------------------------------------->
+	<cffunction name="hasResourceType" access="public" returntype="boolean" hint="checks whether a given resource types is supported">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfreturn structKeyExists(variables.stResourceTypes,arguments.resourceType)>
 	</cffunction>
 
 	<!------------------------------------------------->
@@ -117,7 +139,7 @@
 			// validate bean			
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(rb.getPackage() eq "") throw("No package has been specified for the resource","homePortals.resourceLibrary.validation");
-			if(not listFindNoCase(variables.lstResourceTypes, resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
+			if(not hasResourceType(resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
 			if(not listFindNoCase(variables.lstAccessTypes, rb.getAccessType())) throw("The access type is invalid","homePortals.resourceLibrary.invalidAccessType");
 
 			// setup base directory
@@ -211,7 +233,7 @@
 			if(arguments.id eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(arguments.package eq "") throw("No folder has been specified","homePortals.resourceLibrary.validation");
 			if(arguments.resourceType eq "module") throw("Module resources must be deleted manually","homePortals.resourceLibrary.invalidResourceType");
-			if(not listFindNoCase(variables.lstResourceTypes, arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
+			if(not hasResourceType(arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
 			
 			resTypeDir = getResourceTypeDirName(arguments.resourceType);
 
@@ -269,7 +291,7 @@
 			if(arguments.resourceType neq "")
 				aResTypes[1] = arguments.resourceType;
 			else
-				aResTypes = listToArray(variables.lstResourceTypes);
+				aResTypes = getResourceTypes();
 			
 			for(i=1;i lte arrayLen(aResTypes);i=i+1) {
 				res = aResTypes[i];
@@ -301,16 +323,9 @@
 	<!---------------------------------------->
 	<cffunction name="getResourceTypeExtension" access="public" output="false" returntype="string" hint="Returns the file extension associated with the given resource type">
 		<cfargument name="resourceType" type="string" required="true">
-		<cfset var res = "">
-		<cfset var index = 1>
-		
-		<cfloop list="#variables.lstResourceTypes#" index="res">
-			<cfif res eq arguments.resourceType>
-				<cfreturn listGetAt(variables.lstResourceTypesExtensions, index)>
-			</cfif>
-			<cfset index = index + 1>
-		</cfloop>
-		
+		<cfif hasResourceType(arguments.resourceType)>
+			<cfreturn variables.stResourceTypes[arguments.resourceType]>
+		</cfif>
 		<cfthrow message="Invalid resource type" type="homeportals.resourceLibrary.invalidResourceType">
 	</cffunction>
 
@@ -473,7 +488,7 @@
 	<cffunction name="getResourceTypeDirName" access="public" output="false" returntype="string" hint="Returns the name of the directory on the resource library for the given resource type">
 		<cfargument name="resourceType" type="string" required="true">
 		
-		<cfif listFindNoCase(variables.lstResourceTypes, arguments.resourceType)>
+		<cfif hasResourceType(arguments.resourceType)>
 			<cfreturn ucase(left(arguments.resourceType,1)) & lcase(mid(arguments.resourceType,2,len(arguments.resourceType)-1)) & "s">
 		</cfif>
 		

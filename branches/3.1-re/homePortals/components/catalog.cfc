@@ -1,7 +1,7 @@
 <cfcomponent hint="This component implements a catalog to access the resource library using lazy loading of resources">
 
 	<cfscript>
-		variables.resourcesRoot = "";
+		variables.oResourceLibrary = 0;
 		variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
 		variables.mapResources = structNew();
 	</cfscript>
@@ -10,14 +10,34 @@
 	<!--- init					           --->
 	<!---------------------------------------->	
 	<cffunction name="init" access="public" returntype="catalog" hint="This is the constructor">
-		<cfargument name="resourceLibraryPath" type="string" required="true" hint="The path to the root of the resource library">
+		<cfargument name="resourceLibrary" type="resourceLibrary" required="true" hint="The resource library provider">
 		<cfargument name="indexLibrary" type="boolean" required="false" default="false" hint="Flag to indicate whether or not to perform a full index of the entire resource library. Depending on the amount of resources on the library this operation may take some time to complete. The default is False">
-		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
+
+		<cfset setResourceLibrary(arguments.resourceLibrary)>
+
 		<cfif arguments.indexLibrary>
 			<cfset index()>
 		</cfif>
+		
 		<cfreturn this>
 	</cffunction>
+
+	<!---------------------------------------->
+	<!--- getResourceLibrary			   --->
+	<!---------------------------------------->	
+	<cffunction name="getResourceLibrary" access="public" returntype="resourceLibrary">
+		<cfreturn variables.oResourceLibrary>
+	</cffunction> 
+
+	<!---------------------------------------->
+	<!--- setResourceLibrary			   --->
+	<!---------------------------------------->	
+	<cffunction name="setResourceLibrary" access="public" returntype="void">
+		<cfargument name="resourceLibrary" type="resourceLibrary" required="true" hint="The resource library provider">
+		<cfset variables.oResourceLibrary = arguments.resourceLibrary>
+	</cffunction> 
+
+
 
 	<!---------------------------------------->
 	<!--- getResourcesByType         --->
@@ -73,7 +93,6 @@
 		
 		<cfscript>
 			var stResourceInfo = structNew();
-			var oResourceLibrary = 0;
 			
 			// Make sure the resourceID does not have any XML escaped characters
 			arguments.resourceID = XMLUnformat(arguments.resourceID);
@@ -93,13 +112,9 @@
 				// reload package from file system
 				throw("Resource [#arguments.resourceID#] of type [#arguments.resourceType#] does not exist", "homePortals.catalog.resourceNotFound");
 			}
-
-			// create an instance of the resourceLibrary object
-			oResourceLibrary = createObject("component","resourceLibrary");
-			oResourceLibrary.init(variables.resourcesRoot);
 			
-			// find the requested resource
-			return oResourceLibrary.getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID, stResourceInfo.infoHREF);
+			// find the requested resource on the resource library
+			return getResourceLibrary().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID, stResourceInfo.infoHREF);
 		</cfscript>
 	</cffunction>	
 
@@ -134,8 +149,7 @@
 			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
 
 			// create an instance of the resourceLibrary object
-			oResourceLibrary = createObject("component","resourceLibrary");
-			oResourceLibrary.init(variables.resourcesRoot);
+			oResourceLibrary = getResourceLibrary();
 			
 			// get list of resource packages
 			qry = oResourceLibrary.getResourcePackagesList();
@@ -210,8 +224,7 @@
 			var st = structNew();
 
 			// create an instance of the resourceLibrary object
-			oResourceLibrary = createObject("component","resourceLibrary");
-			oResourceLibrary.init(variables.resourcesRoot);
+			oResourceLibrary = getResourceLibrary();
 
 			// get all resources on the current package
 			aResources = oResourceLibrary.getResourcesInPackage(arguments.resourceType, arguments.packageName);
@@ -303,8 +316,7 @@
 			var st = structNew();
 			
 			// create an instance of the resourceLibrary object
-			oResourceLibrary = createObject("component","resourceLibrary");
-			oResourceLibrary.init(variables.resourcesRoot);
+			oResourceLibrary = getResourceLibrary();
 
 			// clear existing map for this resource type
 			variables.mapResources[arguments.resourceType] = structNew();
