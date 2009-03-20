@@ -18,6 +18,7 @@
 	<cfproperty name="Resources" type="array" hint="For module resources, this represents a list of required script or style resources that should be added to the page" />
 	<cfproperty name="EventListeners" type="array" hint="For module resources, this represent a list of event listeners that will need to be added to the page" />
 	<cfproperty name="infoHREF" type="string" hint="the location of the package descriptor file that describes this resource" />
+	<cfproperty name="resLibPath" type="string" hint="the location of the resource library where this resource is located" />
 
 	<cffunction name="Init" access="public" output="true" returntype="Any">
 		<cfargument name="resourceNode" type="XML" hint="XML node from a descriptor document that represents the resource" required="false" />
@@ -305,4 +306,14 @@
 		<cfset variables.instance.infoHREF = arguments.infoHREF />
 		<cfreturn />
 	</cffunction>
+	
+	<cffunction name="getResLibPath" access="public" output="false" returntype="string">
+		<cfreturn variables.instance.resLibPath />
+	</cffunction>
+
+	<cffunction name="setResLibPath" access="public" output="false" returntype="void">
+		<cfargument name="resLibPath" type="string" required="true" />
+		<cfset variables.instance.resLibPath = arguments.resLibPath />
+		<cfreturn />
+	</cffunction>	
 </cfcomponent>

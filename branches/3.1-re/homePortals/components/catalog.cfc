@@ -1,19 +1,19 @@
 <cfcomponent hint="This component implements a catalog to access the resource library using lazy loading of resources">
 
 	<cfscript>
-		variables.oResourceLibrary = 0;
-		variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
+		variables.qryResources = QueryNew("libpath,type,id,access,name,href,package,owner,description,infoHREF");
 		variables.mapResources = structNew();
+		variables.oResourceLibraryManager = 0;
 	</cfscript>
 	
 	<!---------------------------------------->
 	<!--- init					           --->
 	<!---------------------------------------->	
 	<cffunction name="init" access="public" returntype="catalog" hint="This is the constructor">
-		<cfargument name="resourceLibrary" type="resourceLibrary" required="true" hint="The resource library provider">
+		<cfargument name="resourceLibraryManager" type="resourceLibraryManager" required="true" hint="An instance of the resource library manager">
 		<cfargument name="indexLibrary" type="boolean" required="false" default="false" hint="Flag to indicate whether or not to perform a full index of the entire resource library. Depending on the amount of resources on the library this operation may take some time to complete. The default is False">
 
-		<cfset setResourceLibrary(arguments.resourceLibrary)>
+		<cfset variables.oResourceLibraryManager = arguments.resourceLibraryManager>
 
 		<cfif arguments.indexLibrary>
 			<cfset index()>
@@ -23,19 +23,12 @@
 	</cffunction>
 
 	<!---------------------------------------->
-	<!--- getResourceLibrary			   --->
+	<!--- getResourceLibraryManager		   --->
 	<!---------------------------------------->	
-	<cffunction name="getResourceLibrary" access="public" returntype="resourceLibrary">
-		<cfreturn variables.oResourceLibrary>
+	<cffunction name="getResourceLibraryManager" access="public" returntype="resourceLibraryManager">
+		<cfreturn variables.oResourceLibraryManager>
 	</cffunction> 
 
-	<!---------------------------------------->
-	<!--- setResourceLibrary			   --->
-	<!---------------------------------------->	
-	<cffunction name="setResourceLibrary" access="public" returntype="void">
-		<cfargument name="resourceLibrary" type="resourceLibrary" required="true" hint="The resource library provider">
-		<cfset variables.oResourceLibrary = arguments.resourceLibrary>
-	</cffunction> 
 
 
 
@@ -114,7 +107,7 @@
 			}
 			
 			// find the requested resource on the resource library
-			return getResourceLibrary().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID, stResourceInfo.infoHREF);
+			return getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID, stResourceInfo.infoHREF);
 		</cfscript>
 	</cffunction>	
 
@@ -149,7 +142,7 @@
 			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
 
 			// create an instance of the resourceLibrary object
-			oResourceLibrary = getResourceLibrary();
+			oResourceLibrary = getResourceLibraryManager();
 			
 			// get list of resource packages
 			qry = oResourceLibrary.getResourcePackagesList();
@@ -224,7 +217,7 @@
 			var st = structNew();
 
 			// create an instance of the resourceLibrary object
-			oResourceLibrary = getResourceLibrary();
+			oResourceLibrary = getResourceLibraryManager();
 
 			// get all resources on the current package
 			aResources = oResourceLibrary.getResourcesInPackage(arguments.resourceType, arguments.packageName);
@@ -316,7 +309,7 @@
 			var st = structNew();
 			
 			// create an instance of the resourceLibrary object
-			oResourceLibrary = getResourceLibrary();
+			oResourceLibrary = getResourceLibraryManager();
 
 			// clear existing map for this resource type
 			variables.mapResources[arguments.resourceType] = structNew();
@@ -373,9 +366,10 @@
 		</cfscript>
 	</cffunction>
 
-	<!---------------------------------------->
-	<!--- debugging methods				   --->
-	<!---------------------------------------->	
+
+
+	<!--- * * * *     U T I L I T Y     M E T H O D S   * * * * 	   --->	
+	
 	<cffunction name="throw" access="private" returntype="void" hint="facade for cfthrow">
 		<cfargument name="message" type="string" required="false" default="">
 		<cfargument name="type" type="string" required="false" default="">

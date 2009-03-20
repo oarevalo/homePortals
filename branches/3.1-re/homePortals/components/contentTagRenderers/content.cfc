@@ -95,7 +95,7 @@
 			// define source of content (resource or external)
 			if(arguments.moduleNode.resourceID neq "") {
 				oResourceBean = oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
-				contentSrc = oHPConfig.getResourceLibraryPath() & "/" & oResourceBean.getHref();
+				contentSrc = oResourceBean.getResLibPath() & "/" & oResourceBean.getHref();
 			
 			} else if(arguments.moduleNode.href neq "") {
 				contentSrc = arguments.moduleNode.href;

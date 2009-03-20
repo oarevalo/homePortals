@@ -12,14 +12,13 @@
 	<!--- init				                	   ---->
 	<!------------------------------------------------->
 	<cffunction name="init" returntype="resourceLibrary" access="public" hint="This is the constructor">
-		<cfargument name="config" type="homePortalsConfigBean" required="true">
-		<cfset var stResTypes = arguments.config.getResourceTypes()>
-		<cfset variables.resourcesRoot = arguments.config.getResourceLibraryPath()>
-		
-		<cfloop collection="#stResTypes#" item="res">
-			<cfset registerResourceType(res, stResTypes[res])>
+		<cfargument name="resourceLibraryPath" type="string" required="true">
+		<cfargument name="resourceTypesStruct" type="struct" required="false" default="#structNew()#">
+		<cfset var res = "">
+		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
+		<cfloop collection="#arguments.resourceTypesStruct#" item="res">
+			<cfset registerResourceType(res, arguments.resourceTypesStruct[res])>
 		</cfloop>
-		
 		<cfreturn this>
 	</cffunction>
 
@@ -53,6 +52,13 @@
 	<cffunction name="getAccessTypes" access="public" returntype="array" hint="returns an array with the allowed access types">
 		<cfreturn listToArray(variables.lstAccessTypes)>
 	</cffunction>
+
+	<!------------------------------------------------->
+	<!--- getPath			                	   ---->
+	<!------------------------------------------------->
+	<cffunction name="getPath" access="public" returntype="string" hint="returns the root directory for this library">
+		<cfreturn variables.resourcesRoot>
+	</cffunction>
 	
 	<!------------------------------------------------->
 	<!--- getResource		                	   ---->
@@ -78,12 +84,15 @@
 			if(fileExists(expandPath(arguments.infoHREF))) {
 				// resource descriptor exists, so read the resource from the descriptor
 				aResources = getResourcesInDescriptorFile(arguments.infoHREF, arguments.packageName, arguments.resourceID);
-				oResourceBean = aResources[1];
+				if(arrayLen(aResources) gt 0)
+					oResourceBean = aResources[1];
 			} else {
 				// no resource descriptor, so create resource based on package name
 				o = getDefaultResourceInPackage(arguments.resourceType, arguments.packageName);
 				if(not isSimpleValue(o)) oResourceBean = o;
 			}
+			
+			if( isSimpleValue(oResourceBean) ) throw("The requested resource [#arguments.packageName#.#arguments.resourceID#] was not found","homePortals.resourceLibrary.resourceNotFound");
 
 			variables.stTimers.getResource = getTickCount()-start;
 			return oResourceBean;
@@ -389,6 +398,7 @@
 						if(stResourceBean.AccessType eq "")	oResourceBean.setAccessType(access);
 	
 						oResourceBean.setInfoHREF(arguments.href);
+						oResourceBean.setResLibPath( variables.resourcesRoot );
 	
 						// add resource bean to returning array
 						arrayAppend(aResBeans, oResourceBean);
@@ -432,6 +442,7 @@
 				oResourceBean.setType( arguments.resourceType );
 				oResourceBean.setPackage( arguments.packageName );
 				oResourceBean.setAccessType("general");
+				oResourceBean.setResLibPath( variables.resourcesRoot );
 			}
 			
 			return oResourceBean;

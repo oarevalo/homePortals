@@ -31,7 +31,7 @@
 		variables.oCatalog = 0;					// a handle to the resources catalog 
 		variables.oPageProvider = 0;			// a handle to the provider of pages
 		variables.oPluginManager = 0;			// a handle to the object responsible for managing extension plugins
-		variables.oResourceLibrary = 0;			// a handle to the resource library
+		variables.oResourceLibraryManager = 0;	// a handle to the resource library manager
 		
 		variables.stTimers = structNew();
 	</cfscript>
@@ -76,11 +76,11 @@
 			// and only pass the appRoot on the constructor
 			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
 
-			// initialize resource library
-			variables.oResourceLibrary = CreateObject("Component","resourceLibrary").init(variables.oHomePortalsConfigBean);
+			// initialize resource library manager
+			variables.oResourceLibraryManager = CreateObject("Component","resourceLibraryManager").init(variables.oHomePortalsConfigBean);
 			
 			// initialize resource catalog
-			variables.oCatalog = CreateObject("Component","catalog").init(variables.oResourceLibrary);
+			variables.oCatalog = CreateObject("Component","catalog").init(variables.oResourceLibraryManager);
 
 			// initialize page provider
 			variables.oPageProvider = createObject("component", variables.oHomePortalsConfigBean.getPageProviderClass() ).init(variables.oHomePortalsConfigBean);
@@ -269,10 +269,10 @@
 	</cffunction>
 
 	<!--------------------------------------->
-	<!----  getResourceLibrary			----->
+	<!----  getResourceLibraryManager	----->
 	<!--------------------------------------->		
-	<cffunction name="getResourceLibrary" access="public" returntype="resourceLibrary">
-		<cfreturn variables.oResourceLibrary>
+	<cffunction name="getResourceLibraryManager" access="public" returntype="resourceLibraryManager">
+		<cfreturn variables.oResourceLibraryManager>
 	</cffunction>
 		
 		

@@ -183,7 +183,6 @@
 		<cfset var tmpHTML = "">
 		<cfset var tmpHTML2 = "">
 		<cfset var appRoot = getHomePortals().getConfig().getAppRoot()>
-		<cfset var resRoot = getHomePortals().getConfig().getResourceLibraryPath()>
 		
 		<!--- Add user-defined meta tags --->
 		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
@@ -197,7 +196,7 @@
 		
 		<!--- Add page skin --->
 		<cfif variables.stPage.page.skinHREF neq "">
-			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#resRoot#/#variables.stPage.page.skinHREF#""/>">
+			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#variables.stPage.page.skinHREF#""/>">
 		</cfif>
 		
 		<!--- Include required and user-defined Javascript files --->
@@ -353,7 +352,7 @@
 			// skin
 			if(getPage().getSkinID() neq "") {
 				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", getPage().getSkinID());
-				variables.stPage.page.skinHREF = oResourceBean.getHref();
+				variables.stPage.page.skinHREF = oResourceBean.getResLibPath() & "/" & oResourceBean.getHref();
 			}
 
 			

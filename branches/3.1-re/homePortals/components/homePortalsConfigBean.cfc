@@ -14,7 +14,7 @@
 			variables.stConfig.layoutSections = "";
 			variables.stConfig.bodyOnLoad = "";
 			variables.stConfig.homePortalsPath = "";
-			variables.stConfig.resourceLibraryPath = "";
+			variables.stConfig.resourceLibraryPaths = arrayNew(1);
 			variables.stConfig.defaultPage = "";
 			variables.stConfig.appRoot = "";
 			variables.stConfig.contentRoot = "";
@@ -102,6 +102,16 @@
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						variables.stConfig.resourceTypes[ xmlNode.xmlChildren[j].xmlAttributes.name ] = xmlNode.xmlChildren[j].xmlAttributes.extension;
+					}
+
+				} else if(xmlNode.xmlName eq "resourceLibraryPath") {
+
+					arrayAppend( variables.stConfig.resourceLibraryPaths, xmlNode.xmlText ); 
+
+				} else if(xmlNode.xmlName eq "resourceLibraryPaths") {
+		
+					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+						arrayAppend( variables.stConfig.resourceLibraryPaths , xmlNode.xmlChildren[j].xmlText );
 					}
 							
 				} else
@@ -231,10 +241,6 @@
 		<cfreturn variables.stConfig.homePortalsPath>
 	</cffunction>
 
-	<cffunction name="getResourceLibraryPath" access="public" returntype="string" hint="The path to the root where all resources are stored">
-		<cfreturn variables.stConfig.resourceLibraryPath>
-	</cffunction>
-
 	<cffunction name="getDefaultPage" access="public" returntype="string" hint="The name of the page to load when page has been specified">
 		<cfreturn variables.stConfig.defaultPage>
 	</cffunction>
@@ -337,6 +343,19 @@
 		<cfreturn duplicate(variables.stConfig.resourceTypes)>
 	</cffunction>		
 	
+	<cffunction name="getResourceLibraryPath" access="public" returntype="string" hint="The path to the root where all resources are stored">
+		<cfset var rtn = "">
+		<cfif arrayLen(variables.stConfig.resourceLibraryPaths) gt 0>
+			<cfreturn variables.stConfig.resourceLibraryPaths[1]>
+		</cfif>
+		<cfreturn rtn>
+	</cffunction>
+
+	<cffunction name="getResourceLibraryPaths" access="public" returntype="array" hint="Array with all registered resource paths">
+		<cfreturn variables.stConfig.resourceLibraryPaths>
+	</cffunction>
+	
+	
 	
 	<!--- Setters --->
 	<cffunction name="setVersion" access="public" returntype="void">
@@ -361,7 +380,7 @@
 
 	<cffunction name="setResourceLibraryPath" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.resourceLibraryPath = arguments.data>
+		<cfset variables.stConfig.resourceLibraryPaths[1] = arguments.data>
 	</cffunction>
 
 	<cffunction name="setDefaultPage" access="public" returntype="void">
@@ -481,6 +500,11 @@
 		<cfargument name="extension" type="string" required="true">
 		<cfset variables.stConfig.resourceTypes[arguments.name] = arguments.extension>
 	</cffunction>
+	
+	<cffunction name="addResourceLibraryPath" access="public" returntype="void">
+		<cfargument name="path" type="string" required="true">
+		<cfset arrayAppend(variables.stConfig.resourceLibraryPaths, arguments.path)>
+	</cffunction>	
 	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">

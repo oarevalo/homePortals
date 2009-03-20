@@ -4,9 +4,6 @@
 	<!-- base path for the HomePortals installation -->
 	<homePortalsPath>/homePortals/</homePortalsPath>
 
-	<!-- Directory where HomePortals will look for resources  -->
-	<resourceLibraryPath>/homePortals/resourceLibrary/</resourceLibraryPath>
-
 	<!-- base path for the current application -->
 	<appRoot>/homePortals/</appRoot>
 
@@ -78,4 +75,10 @@
 		<resourceType name="feed" extension="rss" />
 		<resourceType name="html" extension="html" />
 	</resourceTypes>
+	
+	<!-- Directories where HomePortals will look for resources  -->
+	<resourceLibraryPaths>
+		<resourceLibraryPath>/homePortals/resourceLibrary/</resourceLibraryPath>
+	</resourceLibraryPaths>
+	
 </homePortals>

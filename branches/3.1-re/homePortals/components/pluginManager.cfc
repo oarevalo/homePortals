@@ -13,7 +13,7 @@
 			variables.homePortals = arguments.homePortals;
 			
 			for(key in stPlugins) {
-				registerPlugin(arguments.homePortals, key, stPlugins[key]);
+				registerPlugin(key, stPlugins[key]);
 			}
 			
 			return this;
