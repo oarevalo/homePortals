@@ -9,6 +9,10 @@
 			var oConfigBeanStore = 0;
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
+
+			// register the contentTagRenderer
+			oConfig.setContentRenderer("module","homePortalsModules.components.contentTagRenderers.module");
+
 			
 			// load module properties
 			variables.oModuleProperties = createObject("component","moduleProperties").init(oConfig);
