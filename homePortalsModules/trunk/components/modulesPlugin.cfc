@@ -9,11 +9,8 @@
 			var oConfigBeanStore = 0;
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
+			var oResourceLibrary = 0;
 
-			// register the contentTagRenderer
-			oConfig.setContentRenderer("module","homePortalsModules.components.contentTagRenderers.module");
-
-			
 			// load module properties
 			variables.oModuleProperties = createObject("component","moduleProperties").init(oConfig);
 
@@ -31,11 +28,19 @@
 			oConfigBeanStore.flushAll();
 			
 			
+			// add resource type to library
+			oResourceLibrary = getHomePortals().getResourceLibrary();
+			oResourceLibrary.registerResourceType("module","cfc");
+
+			
 			// update main config bean
 			oConfig.addBaseResource("style","/homePortalsModules/common/CSS/modules.css");
 			oConfig.addBaseResource("script","/homePortalsModules/common/JavaScript/prototype-1.4.0.js");
 			oConfig.addBaseResource("script","/homePortalsModules/common/JavaScript/Main.js");
 			oConfig.addBaseResource("script","/homePortalsModules/common/JavaScript/moduleClient.js");
+
+
+			// register the contentTagRenderer
 			oConfig.setContentRenderer("module","homePortalsModules.components.contentTagRenderers.module");
 		</cfscript>
 	</cffunction>
