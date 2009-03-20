@@ -10,9 +10,12 @@
 			var moduleName = getContentTag().getAttribute("name");
 			var tmpMsg = "";
 			var moduleNode = structNew();
+			var oHP = getPageRenderer().getHomePortals();
+			var modResBean = 0;
 
 			try {
-				moduleName = getPageRenderer().getHomePortals().getConfig().getResourceLibraryPath() & "/Modules/" & moduleName;
+				modResBean = oHP.getResourceLibraryManager().getResource("module",listFirst(moduleName,"/"),listLast(moduleName,"/"));
+				moduleName = modResBean.getResLibPath() & "/Modules/" & modResBean.getName();
 
 				// convert the moduleName into a dot notation path
 				moduleName = replace(moduleName,"/",".","ALL");

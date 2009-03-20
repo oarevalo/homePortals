@@ -11,8 +11,6 @@
 <cfset pm.notifyPlugin("accounts","appInit")>
 <cfset pm.notifyPlugin("modules","appInit")>
 
-<cfset application.homePortals.getConfig().setResourceLibraryPath("/homePortalsModules/resourceLibrary")>
-
 
 <!------------------------------>
 <!--- Assemble Page			 --->
@@ -33,7 +31,7 @@
 
 <cfset oPage = createObject("component","homePortals.components.pageBean")
 				.init()
-				.addStylesheet("/homePortals/resourceLibrary/Skins/silver/silver.css")
+				.setSkinID("rounded")
 				.setTitle("HomePortals Modules Framework")
 				.addLayoutRegion("col1","column")
 				.addLayoutRegion("col2","column")

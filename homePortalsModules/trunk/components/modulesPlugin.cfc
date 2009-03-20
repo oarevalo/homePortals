@@ -9,7 +9,7 @@
 			var oConfigBeanStore = 0;
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
-			var oResourceLibrary = 0;
+			var oResourceLibraryManager = 0;
 
 			// load module properties
 			variables.oModuleProperties = createObject("component","moduleProperties").init(oConfig);
@@ -27,10 +27,11 @@
 			oConfigBeanStore = createObject("component","configBeanStore").init();
 			oConfigBeanStore.flushAll();
 			
-			
+
 			// add resource type to library
-			oResourceLibrary = getHomePortals().getResourceLibrary();
-			oResourceLibrary.registerResourceType("module","cfc");
+			oResourceLibraryManager = getHomePortals().getResourceLibraryManager();
+			oResourceLibraryManager.registerResourceLibraryPath("/homePortalsModules/resourceLibrary");
+			oResourceLibraryManager.registerResourceType("module","cfc");
 
 			
 			// update main config bean
