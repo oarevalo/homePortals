@@ -1,11 +1,23 @@
 <cfcomponent>
 
 	<cfscript>
+		variables.ACCESS_TYPES = "general,owner,friend";
+		variables.DEFAULT_PAGE_TITLE = "";
+		variables.DEFAULT_PAGE_OWNER = "";
+		variables.DEFAULT_PAGE_ACCESS = "general";
+		variables.DEFAULT_PAGE_SKINID = "";
+		variables.DEFAULT_MODULE_TITLE = "";
+		variables.DEFAULT_MODULE_ICON = "";
+		variables.DEFAULT_MODULE_STYLE = "";
+		variables.DEFAULT_MODULE_CLASS = "";
+		variables.DEFAULT_MODULE_CONTAINER = true;
+		variables.DEFAULT_MODULE_OUTPUT = true;
+
 		variables.instance = structNew();
-		variables.instance.title = "";
-		variables.instance.owner = "";
-		variables.instance.skinID = "";
-		variables.instance.access = "general";
+		variables.instance.title = variables.DEFAULT_PAGE_TITLE;
+		variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
+		variables.instance.owner = variables.DEFAULT_PAGE_OWNER;
+		variables.instance.access = variables.DEFAULT_PAGE_ACCESS;
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
 		variables.instance.aEventListeners = ArrayNew(1);
@@ -13,11 +25,6 @@
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
-		
-		variables.ACCESS_TYPES = "general,owner,friend";
-		variables.DEFAULT_CONTENT_CACHE_TTL = 60;
-		variables.DEFAULT_CONTENT_RESOURCE_TYPE = "content";
-		variables.DEFAULT_CONTENT_CACHE = true;
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
@@ -125,38 +132,18 @@
 								args[item] = xmlThisNode.xmlAttributes[item];
 							}
 	
-	
 							// define common attributes for module tags
 							if(Not structKeyExists(args, "id")) args["id"] = ""; 
 							if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
-							if(Not structKeyExists(args, "container")) args["container"] = true; 
-							if(Not structKeyExists(args, "title")) args["title"] = ""; 
-							if(Not structKeyExists(args, "icon")) args["icon"] = ""; 
-							if(Not structKeyExists(args, "style")) args["style"] = ""; 
-							if(Not structKeyExists(args, "output")) args["output"] = true; 
+							if(Not structKeyExists(args, "container")) args["container"] = variables.DEFAULT_MODULE_CONTAINER; 
+							if(Not structKeyExists(args, "title")) args["title"] = variables.DEFAULT_MODULE_TITLE; 
+							if(Not structKeyExists(args, "icon")) args["icon"] = variables.DEFAULT_MODULE_ICON; 
+							if(Not structKeyExists(args, "style")) args["style"] = variables.DEFAULT_MODULE_STYLE; 
+							if(Not structKeyExists(args, "output")) args["output"] = variables.DEFAULT_MODULE_OUTPUT; 
+							if(Not structKeyExists(args, "class")) args["class"] = variables.DEFAULT_MODULE_CLASS; 
 	
 							// Provide a unique ID for each module 
 							if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
-	
-	
-							// handle child tags
-							switch(xmlThisNode.xmlName) {
-							
-								case "module":		// handle <module> tag
-	
-									if(Not structKeyExists(args, "name")) args["name"] = "";
-									if(args.title eq "") args.title = args.name; 
-									break;
-							
-								case "content":		// handle <content> tag
-								
-									if(Not structKeyExists(args, "resourceID")) args["resourceID"] = ""; 
-									if(Not structKeyExists(args, "resourceType")) args["resourceType"] = variables.DEFAULT_CONTENT_RESOURCE_TYPE; 
-									if(Not structKeyExists(args, "href")) args["href"] = ""; 
-									if(Not structKeyExists(args, "cache")) args["cache"] = ""; 
-									if(Not structKeyExists(args, "cacheTTL")) args["cacheTTL"] = ""; 
-									break;
-							}
 	
 							// add module to instance
 							addModule(args.id, args.location, args);
@@ -221,8 +208,8 @@
 			xmlDoc = xmlNew();
 			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "Page");
 
-			if(getOwner() neq "") xmlDoc.xmlRoot.xmlAttributes["owner"] = xmlFormat(getOwner());
-			if(getAccess() neq "") xmlDoc.xmlRoot.xmlAttributes["access"] = xmlFormat(getAccess());
+			if(getOwner() neq variables.DEFAULT_PAGE_OWNER) xmlDoc.xmlRoot.xmlAttributes["owner"] = xmlFormat(getOwner());
+			if(getAccess() neq variables.DEFAULT_PAGE_ACCESS) xmlDoc.xmlRoot.xmlAttributes["access"] = xmlFormat(getAccess());
 			
 			// add title
 			xmlNode = xmlElemNew(xmlDoc,"title");
@@ -294,31 +281,22 @@
 							bWriteAttribute = false; 	// this attribute is ignored
 							break;
 						case "container":
+							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_CONTAINER);	
+							break;
 						case "output":
-							bWriteAttribute = (not aTemp[i][attr]);	// only write it if is false
+							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_OUTPUT);
 							break;
 						case "icon":
+							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_ICON);
+							break;
 						case "title":
+							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_TITLE);
+							break;
 						case "style":
-							bWriteAttribute = (aTemp[i][attr] neq "");	// only write it if is not empty
+							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_STYLE);
 							break;
-						case "href":
-						case "resourceID":
-							if(aTemp[i].moduleType eq "content") 
-								bWriteAttribute = (aTemp[i][attr] neq "");	// only write it if is not empty
-							break;
-						case "cache":
-							bWriteAttribute = (aTemp[i].moduleType eq "content") and isBoolean(aTemp[i][attr]) and (not aTemp[i][attr]);	// only write it if is false
-							break;
-						case "resourceType":
-							if(aTemp[i].moduleType eq "content") 
-								bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_CONTENT_RESOURCE_TYPE and aTemp[i][attr] neq "");
-							break;
-						case "cacheTTL":
-							bWriteAttribute = (aTemp[i].moduleType eq "content" and aTemp[i][attr] neq "");
-							break;
-						case "name":
-							bWriteAttribute = (aTemp[i].moduleType eq "module");	// this attribute is only needed for type "module"
+						case "class":
+							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_CLASS);
 							break;
 						default:
 							bWriteAttribute = true;		// write down all other attributes
@@ -331,7 +309,7 @@
 			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			
 			// add skin
-			if(variables.instance.skinID neq "") {
+			if(variables.instance.skinID neq variables.DEFAULT_PAGE_SKINID) {
 				xmlNode = xmlElemNew(xmlDoc,"skin");
 				xmlNode.xmlAttributes["id"] = variables.instance.skinID;
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
@@ -598,82 +576,27 @@
 
 	<cffunction name="setModule" access="public" returntype="pageBean" hint="adds or updates a module to the page">
 		<cfargument name="moduleID" type="string" required="true">
-		<cfargument name="moduleAttributes" type="struct" required="false">
-		
-		<cfif arguments.moduleID eq "">
-			<cfthrow message="module ID cannot be empty" type="homePortals.pageBean.blankModuleID">
-		</cfif>
-		<cfif not structKeyExists(arguments.moduleAttributes,"id") or arguments.moduleAttributes.id eq "">
-			<cfthrow message="module ID cannot be empty" type="homePortals.pageBean.blankModuleID">
-		</cfif>
-		<cfif arguments.moduleID neq arguments.moduleAttributes.id>
-			<cfthrow message="module ID attribute mismatch" type="homePortals.pageBean.mismatchModuleID">
-		</cfif>
-		<cfif not structKeyExists(arguments.moduleAttributes,"location") or arguments.moduleAttributes.location eq "">
-			<cfthrow message="module location cannot be empty" type="homePortals.pageBean.blankModuleLocation">
-		</cfif>
-		<cfif not structKeyExists(arguments.moduleAttributes,"moduleType") or arguments.moduleAttributes.moduleType eq "">
-			<cfset arguments.moduleAttributes.moduleType = "module">
-		</cfif>
-		
-		<cfset variables.instance.aModules[getModuleIndex(arguments.moduleID)] = arguments.moduleAttributes>
-		
-		<cfreturn this>
+		<cfargument name="location" type="string" required="false" default="">
+		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
+		<cfscript>
+			var stMod = normalizeModule(arguments.moduleID, 
+										arguments.location,
+										arguments.moduleAttributes);
+			variables.instance.aModules[getModuleIndex(arguments.moduleID)] = arguments.moduleAttributes;
+			return this;
+		</cfscript>
 	</cffunction>
 
 	<cffunction name="addModule" access="public" returntype="pageBean" hint="adds a module to the page">
 		<cfargument name="moduleID" type="string" required="true">
 		<cfargument name="location" type="string" required="false" default="">
 		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
-		
-		<cfset var stMod = duplicate(moduleAttributes)>
-		
-		<cfif structKeyExists(variables.instance.stModuleIndex, arguments.moduleID)>
-			<cfthrow message="Module ID already in use" type="homePortals.pageBean.duplicateModuleID">
-		</cfif>
-		<cfif arguments.moduleID eq "">
-			<cfthrow message="module ID cannot be empty" type="homePortals.pageBean.blankModuleID">
-		</cfif>
-		<cfif not structKeyExists(stMod,"id") or stMod.id eq "">
-			<cfset stMod.id = arguments.moduleID>
-		</cfif>
-		<cfif arguments.moduleID neq stMod.id>
-			<cfthrow message="module ID attribute mismatch" type="homePortals.pageBean.mismatchModuleID">
-		</cfif>
-
-		<cfif not structKeyExists(stMod,"location") and arguments.location neq "">
-			<cfset stMod.location = arguments.location>
-		</cfif>
-		<cfif arguments.location eq "" and structKeyExists(stMod,"location") and stMod.location neq "">
-			<cfset arguments.location = stMod.location>
-		</cfif>
-		<cfif arguments.location eq "">
-			<cfthrow message="module location cannot be empty" type="homePortals.pageBean.blankModuleLocation">
-		</cfif>
-
 		<cfscript>
-			if(not structKeyExists(stMod,"moduleType") or stMod.moduleType eq "")
-				stMod.moduleType = "module";
-
-			if(not structKeyExists(stMod,"container"))
-				stMod.container = true;
-
-			if(not structKeyExists(stMod,"style"))
-				stMod.style = "";
-
-			if(not structKeyExists(stMod,"output") or stMod.output eq "")
-				stMod.output = true;
-
-			if(not structKeyExists(stMod,"icon"))
-				stMod.icon = "";
-
-			if(not structKeyExists(stMod,"title"))
-				stMod.title = "";
-				
+			var stMod = normalizeModule(arguments.moduleID, 
+										arguments.location,
+										arguments.moduleAttributes);
 			arrayAppend(variables.instance.aModules, stMod);
-			
 			indexModules();
-			
 			return this;
 		</cfscript>
 	</cffunction>
@@ -706,6 +629,49 @@
 		</cfloop>
 	</cffunction>
 
+	<cffunction name="normalizeModule" access="private" returntype="struct" hint="checks module properties and assign correct default values when needed">
+		<cfargument name="moduleID" type="string" required="true">
+		<cfargument name="location" type="string" required="false" default="">
+		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
+		<cfscript>
+			var stMod = duplicate(moduleAttributes);
+			
+			if(structKeyExists(variables.instance.stModuleIndex, arguments.moduleID))
+				throw("Module ID already in use","homePortals.pageBean.duplicateModuleID");
+			
+			if(arguments.moduleID eq "")
+				throw("Module ID cannot be empty","homePortals.pageBean.blankModuleID");
+			
+			if(not structKeyExists(stMod,"id") or stMod.id eq "")
+				stMod.id = arguments.moduleID;
+			
+			if(arguments.moduleID neq stMod.id)
+				throw("Module ID attribute mismatch", "homePortals.pageBean.mismatchModuleID");
+			
+			if(not structKeyExists(stMod,"location") and arguments.location neq "")
+				stMod.location = arguments.location;
+				
+			if(arguments.location eq "" and structKeyExists(stMod,"location") and stMod.location neq "")
+				arguments.location = stMod.location;
+			
+			// check required params
+			if(arguments.location eq "")
+				throw("Module location cannot be empty","homePortals.pageBean.blankModuleLocation");
+				
+			if(not structKeyExists(stMod,"moduleType") or stMod.moduleType eq "")
+				throw("Module type cannot be empty","homePortals.pageBean.missingModuleType");
+
+			// set defaults
+			if(not structKeyExists(stMod,"style")) 		stMod.style = variables.DEFAULT_MODULE_STYLE;
+			if(not structKeyExists(stMod,"icon"))		stMod.icon = variables.DEFAULT_MODULE_ICON;
+			if(not structKeyExists(stMod,"title"))		stMod.title = variables.DEFAULT_MODULE_TITLE;
+			if(not structKeyExists(stMod,"class"))		stMod.title = variables.DEFAULT_MODULE_CLASS;
+			if(not structKeyExists(stMod,"container") or not isBoolean(stMod.container)) 	stMod.container = variables.DEFAULT_MODULE_CONTAINER;
+			if(not structKeyExists(stMod,"output") or not isBoolean(stMod.output)) 			stMod.output = variables.DEFAULT_MODULE_OUTPUT;
+			
+			return stMod;
+		</cfscript>
+	</cffunction>
 
 
 	<!---------------------------------------->
@@ -783,16 +749,18 @@
 	<!---------------------------------------->	
 	<cffunction name="initPageProperties" access="private" returntype="void" hint="sets initial value for page properties">
 		<cfscript>
-			variables.instance.title = "";
-			variables.instance.owner = "";
-			variables.instance.access = "general";
-			variables.instance.aStyles = arrayNew(1);
-			variables.instance.aScripts = arrayNew(1);
+			variables.instance = structNew();
+			variables.instance.title = variables.DEFAULT_PAGE_TITLE;
+			variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
+			variables.instance.owner = variables.DEFAULT_PAGE_OWNER;
+			variables.instance.access = variables.DEFAULT_PAGE_ACCESS;
+			variables.instance.aStyles = ArrayNew(1);
+			variables.instance.aScripts = ArrayNew(1);
 			variables.instance.aEventListeners = ArrayNew(1);
-			variables.instance.aLayouts = ArrayNew(1);			
-			variables.instance.aModules = ArrayNew(1);				
-			variables.instance.stModuleIndex = structNew();
-			variables.instance.aMeta = ArrayNew(1);	
+			variables.instance.aLayouts = StructNew();			// holds properties for layout sections
+			variables.instance.aModules = ArrayNew(1);		// holds modules		
+			variables.instance.stModuleIndex = structNew();	// an index of modules	
+			variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
 		</cfscript>	
 	</cffunction>
 

@@ -22,7 +22,6 @@
 
 					// generate a key for the cache entry
 					cacheKey = getContentTag().getAttribute("resourceID") & "/" 
-								& getContentTag().getAttribute("resourceType") & "/" 
 								& getContentTag().getAttribute("href");
 					
 					try {

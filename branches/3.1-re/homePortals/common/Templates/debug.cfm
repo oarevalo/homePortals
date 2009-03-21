@@ -115,23 +115,46 @@
 				<tr>
 					<th colspan="2">
 						<div style="float:right;">
-							<a href="#cgi.SCRIPT_NAME#?refreshapp=1&account=#account#&page=#page#">Reset App</a> |
-							<a href="#cgi.SCRIPT_NAME#?account=#account#&page=#page#">Reload Page</a>
+							<a href="#cgi.SCRIPT_NAME#?refreshapp=1&pageHREF=#pageHREF#">Reset App</a> |
+							<a href="#cgi.SCRIPT_NAME#?pageHREF=#pageHREF#">Reload Page</a>
 						</div>
 						Application:
 					</th>
+				</tr>
+				<tr>
+					<td width="130"><b>HP Engine Version:</b></td>
+					<td>#hp.getVersion()#</td>
 				</tr>
 				<tr>
 					<td width="130"><b>App Root:</b></td>
 					<td>#request.appRoot#</td>
 				</tr>
 				<tr>
-					<td width="130"><b>Resources Root:</b></td>
-					<td>#hp.getConfig().getResourceLibraryPath()#</td>
+					<td width="130"><b>Content Root:</b></td>
+					<td>#hp.getConfig().getContentRoot()#</td>
 				</tr>
 				<tr>
-					<td width="130"><b>HP Engine Version:</b></td>
-					<td>#hp.getVersion()#</td>
+					<td width="130"><b>Resource Libraries:</b></td>
+					<td>
+						<cfset rm = hp.getResourceLibraryManager()>
+						<cfset aResLibs = rm.getResourceLibraries()>
+						<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
+							#aResLibs[i].getPath()#<br />
+						</cfloop>
+					</td>
+				</tr>
+				<tr>
+					<td width="130"><b>Plugins Installed:</b></td>
+					<td>
+						<cfset pm = hp.getPluginManager()>
+						<cfset aPlugins = pm.getPlugins()>
+						<cfloop from="1" to="#arrayLen(aPlugins)#" index="i">
+							#aPlugins[i]#<br />
+						</cfloop>
+						<cfif arrayLen(aPlugins) eq 0>
+							<em>None</em>
+						</cfif>
+					</td>
 				</tr>
 				<tr>
 					<td width="130"><b>Free JVM Memory:</b></td>
