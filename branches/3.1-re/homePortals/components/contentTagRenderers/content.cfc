@@ -30,7 +30,7 @@
 					
 					} catch(homePortals.cacheService.itemNotFound e) {
 						// read from source
-						tmpHTML = retrieveContent( getContentTag().getNode() );
+						tmpHTML = retrieveContent();
 						
 						// update cache
 						if(cacheTTL neq "" and val(cacheTTL) gte 0)
@@ -41,7 +41,7 @@
 					
 				} else {
 					// retrieve from source
-					tmpHTML = retrieveContent( getContentTag().getNode() );
+					tmpHTML = retrieveContent();
 				}
 
 				// add rendered content to buffer
@@ -82,7 +82,6 @@
 	<!--- retrieveContent                  --->
 	<!---------------------------------------->		
 	<cffunction name="retrieveContent" access="private" returntype="string" hint="retrieves content from source for a content module">
-		<cfargument name="moduleNode" type="any" required="true">
 		<cfscript>
 			var oResourceBean = 0;
 			var contentSrc = "";
@@ -91,13 +90,17 @@
 			var oCatalog = getPageRenderer().getHomePortals().getCatalog();
 			var oHPConfig = getPageRenderer().getHomePortals().getConfig();
 			
+			var resourceID = getContentTag().getAttribute("resourceID");
+			var resourceType = getContentTag().getAttribute("resourceType","content");
+			var href = getContentTag().getAttribute("href");
+			
 			// define source of content (resource or external)
-			if(arguments.moduleNode.resourceID neq "") {
-				oResourceBean = oCatalog.getResourceNode(arguments.moduleNode.resourceType, arguments.moduleNode.resourceID);
+			if(resourceID neq "") {
+				oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
 				contentSrc = oResourceBean.getResLibPath() & "/" & oResourceBean.getHref();
 			
-			} else if(arguments.moduleNode.href neq "") {
-				contentSrc = arguments.moduleNode.href;
+			} else if(href neq "") {
+				contentSrc = href;
 			}
 
 			// retrieve content
