@@ -21,7 +21,7 @@
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
 		variables.instance.aEventListeners = ArrayNew(1);
-		variables.instance.aLayouts = StructNew();			// holds properties for layout sections
+		variables.instance.aLayouts = ArrayNew(1);			// holds properties for layout sections
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
@@ -757,7 +757,7 @@
 			variables.instance.aStyles = ArrayNew(1);
 			variables.instance.aScripts = ArrayNew(1);
 			variables.instance.aEventListeners = ArrayNew(1);
-			variables.instance.aLayouts = StructNew();			// holds properties for layout sections
+			variables.instance.aLayouts = ArrayNew(1);			// holds properties for layout sections
 			variables.instance.aModules = ArrayNew(1);		// holds modules		
 			variables.instance.stModuleIndex = structNew();	// an index of modules	
 			variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
