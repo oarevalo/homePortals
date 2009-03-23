@@ -5,6 +5,7 @@
 		<cfset setPrimaryKey("linkedPageID","cf_sql_varchar")>
 		
 		<cfset addColumn("siteID", "cf_sql_varchar")>
+		<cfset addColumn("name", "cf_sql_varchar")>
 		<cfset addColumn("linkPath", "cf_sql_varchar")>
 	</cffunction>
 

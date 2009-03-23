@@ -6,6 +6,7 @@
 		variables.instance.owner = "";
 		variables.instance.siteTitle = "";
 		variables.instance.aPages = arrayNew(1);
+		variables.instance.siteID = "";
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -63,11 +64,9 @@
 	<!---------------------------------------->	
 	<cffunction name="delete" access="public" returntype="void" hint="deletes the site structure for the account.">
 		<cfset var oPageProvider = getPageProvider()>
-		<cfset var oDAO = getSitesDAO()>
 		<cfset var oLinkedPagesDAO = getLinkedPagesDAO()>
 		<cfset var qrySite = 0>
 		<cfset var qryPages = 0>
-		<cfset var qryAccountInfo = getAccountsService().getAccountByName( getOwner() )>
 	
 		<!--- delete directory for account (if exists) ---->
 		<cfif oPageProvider.folderExists( getSiteHREF() )>
@@ -75,23 +74,24 @@
 		</cfif>
 		
 		<!--- check if there is a record for the site --->
-		<cfset qrySite = oDAO.search(accountID = qryAccountInfo.accountID)>
+		<cfset qrySite = getSitesDAO().get(variables.instance.siteID)>
 		
 		<!--- if not found, then delete site record --->
 		<cfif qrySite.recordCount gt 0>
-			<cfset qryPages = oLinkedPages.search(siteID = qrySite.siteID)>
+			<cfset qryPages = oLinkedPagesDAO.search(siteID = qrySite.siteID)>
 			<cfif qryPages.recordCount gt 0>
 				<cfloop query="qryPages">
-					<cfset oLinkedPages.delete(qryPages.linkedPageID)>
+					<cfset oLinkedPagesDAO.delete(qryPages.linkedPageID)>
 				</cfloop>
 			</cfif>
 			
-			<cfset oDAO.delete(qrySite.siteID)>
+			<cfset getSitesDAO().delete(qrySite.siteID)>
 		</cfif>		
 		
 		<!--- clear instance --->
 		<cfset variables.instance.owner = "">
 		<cfset variables.instance.siteTitle = "">
+		<cfset variables.instance.siteID = "">
 		<cfset variables.instance.aPages = arrayNew(1)>
 	</cffunction>
 
@@ -110,7 +110,7 @@
 			var href =  "";
 			var pageIndex = 0;
 			
-			if(isLinkedPage(arguments.pageName)) {
+			if(isLinkedPage(arguments.pageName)) 
 				throw("A linked page cannot be modified from within a site", "homePortals.site.notAllowed");
 				
 			// get the location of the page (this will also check for existence)
@@ -230,8 +230,7 @@
 				if(not isLinkedPage(arguments.pageName)) {
 					getPageProvider().delete(tmpPageHREF);		
 				} else {
-					oDAO = getSitesDAO();
-					qrySite = oDAO.search(accountID = qryAccountInfo.accountID)
+					qrySite = getSitesDAO().get(variables.instance.siteID);
 					if(qrySite.recordCount gt 0) {
 						oDAO = getLinkedPagesDAO();
 						qry = oDAO.search(siteID = qrySite.siteID,
@@ -295,7 +294,7 @@
 				for(i=1;i lte arrayLen(aPages);i=i+1) {
 					if(replaceNoCase(aPages[i].href,".xml","","ALL") eq pName) {
 						currIndex = currIndex + 1;
-						pName = originalName & currIndex;
+						pName = arguments.pageName & currIndex;
 						bFound = true;
 					}
 				}
@@ -319,6 +318,7 @@
 			newNode.title = oPage.getTitle();
 			newNode.href = getFileFromPath(newPageHREF);
 			newNode.default = false;
+			newNode.linkPath = "";
 			ArrayAppend(variables.instance.aPages, newNode);
 			
 			return newPageHREF;
@@ -345,6 +345,7 @@
 		<cfargument name="page" type="homePortals.components.pageBean" required="true" hint="The page object">
 		<!--- get page location --->
 		<cfset var href =  getPageHREF(arguments.pageName)>	
+		<!--- check that this is not a linked page --->
 		<cfif isLinkedPage(arguments.pageName)>
 			<cfthrow message="A linked page cannot be modified from within a site" type="homePortals.site.notAllowed">
 		</cfif>
@@ -359,10 +360,65 @@
 	<!---------------------------------------->	
 	<cffunction name="isLinkedPage" access="public" returntype="boolean" hint="Checks whether the given page is a linked (external) page">
 		<cfargument name="pageName" type="string" required="true" hint="The name of the page">
-		<cfreturn ( getPageIndex(arguments.pageName) gt 0 
-					and variables.instance.aPages[i].linkPath neq "" )>
+		<cfset var index = getPageIndex(arguments.pageName)>
+		<cfreturn ( index gt 0 and variables.instance.aPages[index].linkPath neq "" )>
 	</cffunction>
 
+	<!---------------------------------------->
+	<!--- linkPage			               --->
+	<!---------------------------------------->	
+	<cffunction name="linkPage" access="public" output="false" returntype="string" hint="This method links an existing page to a site. The added page remains external to the site.">
+		<cfargument name="pageName" required="true" type="string" hint="The name of the new page.">
+		<cfargument name="pageHREF" required="true" type="string" hint="The path to the page to link to the site">
+		<cfscript>
+			var oPage = 0;
+			var xmlPage = 0;
+			var pname = "";
+			var currIndex = 0;
+			var	bFound = true;
+			var i = 1;
+			var newNode = structNew();
+			var aPages = getPages();
+			
+			// check that pagename is not empty 
+			if(arguments.pageName eq "") throw("Please enter a name for the new page","homePortals.site.pageNameMissing");
+			if(arguments.pageHREF eq "") throw("Please the path of the page to link","homePortals.site.pagePathMissing");
+
+			// check if the page is already linked to this site
+			getLinkedPagesDAO().search();
+
+			// load page
+			oPage = getPageProvider().load( arguments.pageHREF );
+
+			// make sure the page has a unique name within the account
+			pName = arguments.pageName;
+			while(bFound) {
+				bFound = false;
+				for(i=1;i lte arrayLen(aPages);i=i+1) {
+					if(replaceNoCase(aPages[i].href,".xml","","ALL") eq pName) {
+						currIndex = currIndex + 1;
+						pName = arguments.pageName & currIndex;
+						bFound = true;
+					}
+				}
+			}		
+			
+			// save linked page
+			getLinkedPagesDAO().save(siteID = variables.instance.siteID,
+									 name = pName,
+									 linkPath = arguments.pageHREF);
+			
+			// append new page name to site definition
+			newNode = structNew();
+			newNode.title = oPage.getTitle();
+			newNode.href = pName;
+			newNode.default = false;
+			newNode.linkPath = arguments.pageHREF;
+			ArrayAppend(variables.instance.aPages, newNode);
+			
+			return arguments.pageHREF;
+		</cfscript>
+	</cffunction>
 
 	
 	<!---------------------------------------->
@@ -415,7 +471,8 @@
 			
 			// build file location
 			if(isLinkedPage(arguments.pageName)) {
-				href = variables.instance.aPages[i].linkPath;
+				pageIndex = getPageIndex(arguments.pageName);
+				href = variables.instance.aPages[ pageIndex ].linkPath;
 			} else 
 				href = getSiteHREF() & "/" & arguments.pageName;
 	
@@ -487,13 +544,14 @@
 				<cfset defaultPage = qryPages.name[1]>
 			</cfif>
 
-			<cfset oDAO.save(accountID = qryAccountInfo.accountID,
-							 title = getOwner(),
-							 defaultPage = defaultPage,
-							 createdOn = now())>
+			<cfset variables.instance.siteID = oDAO.save(accountID = qryAccountInfo.accountID,
+														 title = getOwner(),
+														 defaultPage = defaultPage,
+														 createdOn = now())>
 		<cfelse>
-			<!--- set site title --->
+			<!--- set site info --->
 			<cfset setSiteTitle( qrySite.title )>
+			<cfset variables.instance.siteID = qrySite.siteID>
 		</cfif>
 		
 		<!--- add local pages --->
@@ -520,7 +578,7 @@
 	
 				<cfset st = structNew()>
 				<cfset st.default = (qrySite.defaultPage eq listLast(qryPages.linkPath,"/") )>
-				<cfset st.href = listLast(qryPages.linkPath,"/")>	
+				<cfset st.href = qryPages.name>	
 				<cfset st.title = oPage.getTitle()>
 				<cfset st.linkPath = qryPages.linkPath>
 	

@@ -11,15 +11,17 @@
 		<cfargument name="eventArg" type="string" required="true" hint="the page to load">	
 		<cfset var account = "">
 		<cfset var page = "">
-		
+	
 		<!--- if there is no default page, then check if the pagehref has the format for an account page 
 			or if there is a default account page --->
 		<cfif arguments.eventArg eq "" or findNoCase("::",arguments.eventArg)>
-			<cfset arguments.eventArg = replace(arguments.eventArg,"::",",")>
-			<cfset account = listFirst(arguments.eventArg)>
-			<cfif listLen(arguments.eventArg gt 1)>
-				<cfset page = listLast(arguments.eventArg)>
+			<cfset account = listFirst(arguments.eventArg,"::")>
+			<cfif listLen(arguments.eventArg,"::") gt 1>
+				<cfset page = listLast(arguments.eventArg,"::")>
 			</cfif>
+			<cfdump var="account: [#account#]">
+			<cfdump var="page: [#page#]">
+		
 			<cfset arguments.eventArg = getAccountsService().getAccountPageHREF(account,page)>
 		</cfif>
 		

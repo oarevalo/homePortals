@@ -106,9 +106,17 @@
 		<cfargument name="lastname" type="string" required="no" default="">
 		<cfargument name="email" type="string" required="no" default="">
 		<cfset var oDAO = getAccountsDAO()>
-		<cfreturn oDAO.search(accountName = arguments.accountname, 
-								lastName = arguments.lastName, 
-								email = arguments.email)>
+		<cfset var args = structNew()>
+		<cfif accountName neq "">
+			<cfset args.accountName = arguments.accountName>
+		</cfif>
+		<cfif lastname neq "">
+			<cfset args.lastname = arguments.lastname>
+		</cfif>
+		<cfif email neq "">
+			<cfset args.email = arguments.email>
+		</cfif>
+		<cfreturn oDAO.search(argumentCollection = args)>
 	</cffunction>
 
 	<!--------------------------------------->
@@ -172,7 +180,7 @@
 			
 			<cftry>
 				<!--- create directory structure --->
-				<cfset oSite = createObject("component","homePortals.components.accounts.site").create(Arguments.accountName, this)>
+				<cfset oSite = createObject("component","homePortalsAccounts.components.site").create(Arguments.accountName, this)>
 				
 				<!--- create initial page --->
 				<cfset xmlDoc = processTemplate(arguments.accountName, newPageTemplate)>
@@ -340,10 +348,8 @@
 			if(arguments.page eq "") 
 				pageHREF = getAccountDefaultPage(arguments.account);
 			else {
-				oSite = createObject("component","site");	// dont call init to avoid loading/reading the site- we dont need that right now
-				oSite.setAccountsService(this);
-				oSite.setOwner(arguments.account);
-				pageHREF = oSite.getPageHREF(arguments.page, false);	// turn off page checking because since we didnt read the site, there is no index
+				oSite = getSite(arguments.account);				
+				pageHREF = oSite.getPageHREF(arguments.page);	// turn off page checking because since we didnt read the site, there is no index
 			}
 
 			return pageHREF;
@@ -399,12 +405,12 @@
 		<cfset variables.oHomePortals = arguments.data>
 	</cffunction>
 
-	<cffunction name="getDataProvider" access="public" returntype="homePortals.components.accounts.lib.DAOFactory.dataProvider">
+	<cffunction name="getDataProvider" access="public" returntype="homePortalsAccounts.components.lib.DAOFactory.dataProvider">
 		<cfreturn variables.oDataProvider>
 	</cffunction>
 
 	<cffunction name="setDataProvider" access="public" returntype="void">
-		<cfargument name="data" type="homePortals.components.lib.DAOFactory.dataProvider" required="true">
+		<cfargument name="data" type="homePortalsAccounts.components.lib.DAOFactory.dataProvider" required="true">
 		<cfset variables.oDataProvider = arguments.data>
 	</cffunction>
 
