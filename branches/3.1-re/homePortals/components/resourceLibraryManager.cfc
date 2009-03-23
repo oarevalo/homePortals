@@ -137,7 +137,6 @@
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="packageName" type="string" required="true">
 		<cfargument name="resourceID" type="string" required="true">
-		<cfargument name="infoHREF" type="string" required="false" default="" hint="the location of the resource descriptor file, if exists">
 		<cfset var aResLibs = getResourceLibraries()>
 		<cfset var resBean = 0>
 		<cfset var i = 0>
@@ -145,7 +144,9 @@
 		<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
 			<cfif aResLibs[i].hasResourceType(arguments.resourceType)>
 				<cftry>
-					<cfset resBean = aResLibs[i].getResource(argumentCollection = arguments)>
+					<cfset resBean = aResLibs[i].getResource(resourceType = arguments.resourceType,
+															packageName = arguments.packageName,
+															resourceID = arguments.resourceID)>
 					
 					<!--- if we didnt get an error, then it means that the resource was found,
 						so lets return that one --->

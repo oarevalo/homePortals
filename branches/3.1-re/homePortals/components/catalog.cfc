@@ -107,7 +107,7 @@
 			}
 			
 			// find the requested resource on the resource library
-			return getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID, stResourceInfo.infoHREF);
+			return getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID);
 		</cfscript>
 	</cffunction>	
 
