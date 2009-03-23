@@ -665,7 +665,7 @@
 			if(not structKeyExists(stMod,"style")) 		stMod.style = variables.DEFAULT_MODULE_STYLE;
 			if(not structKeyExists(stMod,"icon"))		stMod.icon = variables.DEFAULT_MODULE_ICON;
 			if(not structKeyExists(stMod,"title"))		stMod.title = variables.DEFAULT_MODULE_TITLE;
-			if(not structKeyExists(stMod,"class"))		stMod.title = variables.DEFAULT_MODULE_CLASS;
+			if(not structKeyExists(stMod,"class"))		stMod.class = variables.DEFAULT_MODULE_CLASS;
 			if(not structKeyExists(stMod,"container") or not isBoolean(stMod.container)) 	stMod.container = variables.DEFAULT_MODULE_CONTAINER;
 			if(not structKeyExists(stMod,"output") or not isBoolean(stMod.output)) 			stMod.output = variables.DEFAULT_MODULE_OUTPUT;
 			
