@@ -215,8 +215,8 @@
 					xmlNode2 = xmlElemNew(xmlDoc, "property");
 					xmlNode2.xmlAttributes["name"] = key;
 					xmlNode2.xmlText = stProps[key];
+					arrayAppend(xmlNode.xmlChildren, xmlNode2);
 				}
-				arrayAppend(xmlNode.xmlChildren, xmlNode2);
 			}
 
 			if(Not bFound) {
