@@ -183,10 +183,12 @@
 				<cfset oSite = createObject("component","homePortalsAccounts.components.site").create(Arguments.accountName, this)>
 				
 				<!--- create initial page --->
-				<cfset xmlDoc = processTemplate(arguments.accountName, newPageTemplate)>
-				<cfset oPage = createObject("component","homePortals.components.pageBean").init(xmlDoc)>
-				<cfset oSite.addPage( pageName = GetFileFromPath(newPageTemplate),
-									  pageBean = oPage )>
+				<cfif newPageTemplate neq "">
+					<cfset xmlDoc = processTemplate(arguments.accountName, newPageTemplate)>
+					<cfset oPage = createObject("component","homePortals.components.pageBean").init(xmlDoc)>
+					<cfset oSite.addPage( pageName = GetFileFromPath(newPageTemplate),
+										  pageBean = oPage )>
+				</cfif>
 
 				<cfcatch type="any">
 					<cfthrow message="Could not create directory structure for new account. Account was not created. #cfcatch.message#" type="homePortals.accounts.directoryCreationException">			
