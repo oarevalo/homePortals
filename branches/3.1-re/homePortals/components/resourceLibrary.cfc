@@ -144,6 +144,9 @@
 			var resType = rb.getType();
 			var filePath = "";
 			var resTypeDir = getResourceTypeDirName(resType);
+			var xmlNode = 0; xmlNode2 = 0;
+			var stProps = structNew();
+			var key = "";
 		
 			// validate bean			
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
@@ -204,6 +207,16 @@
 			xmlNode.xmlAttributes["owner"] = rb.getOwner();
 			xmlNode.xmlAttributes["access"] = rb.getAccessType();
 			xmlNode.xmlText = rb.getDescription();
+
+			// set custom properties (if any)
+			stProps = rb.getProperties();
+			if(not structIsEmpty(stProps)) {
+				for(key in stProps) {
+					xmlNode2 = xmlElemNew(xmlDoc, "property");
+					xmlNode2.xmlAttributes["name"] = key;
+					xmlNode2.xmlText = stProps[key];
+				}
+			}
 
 			if(Not bFound) {
 				arrayAppend(xmlDoc.xmlRoot[resTypeDir].xmlChildren, xmlNode);

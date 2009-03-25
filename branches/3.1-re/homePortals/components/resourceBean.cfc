@@ -19,6 +19,7 @@
 	<cfproperty name="EventListeners" type="array" hint="For module resources, this represent a list of event listeners that will need to be added to the page" />
 	<cfproperty name="infoHREF" type="string" hint="the location of the package descriptor file that describes this resource" />
 	<cfproperty name="resLibPath" type="string" hint="the location of the resource library where this resource is located" />
+	<cfproperty name="customProperties" type="struct" hint="holds custom properties for the resource">
 
 	<cffunction name="Init" access="public" output="true" returntype="Any">
 		<cfargument name="resourceNode" type="XML" hint="XML node from a descriptor document that represents the resource" required="false" />
@@ -47,6 +48,7 @@
 			variables.instance.Resources = arrayNew(1);
 			variables.instance.EventListeners = arrayNew(1);
 			variables.instance.infoHREF = "";
+			variables.instance.customProperties = structNew();
 			
 			if(structKeyExists(arguments,"resourceNode") and isXmlNode(arguments.resourceNode)) {
 				xmlNode = arguments.resourceNode;
@@ -54,15 +56,17 @@
 				// populate bean
 				variables.instance.type = xmlNode.xmlName;
 				variables.instance.id = xmlNode.xmlAttributes.id;
+				variables.instance.description = xmlNode.xmlText;
+
 				if(structKeyExists(xmlNode.xmlAttributes,"name")) variables.instance.name = xmlNode.xmlAttributes.name;
 				if(structKeyExists(xmlNode.xmlAttributes,"package")) variables.instance.package = xmlNode.xmlAttributes.package;
 				if(structKeyExists(xmlNode.xmlAttributes,"owner")) variables.instance.owner = xmlNode.xmlAttributes.owner;
 				if(structKeyExists(xmlNode.xmlAttributes,"access")) variables.instance.accessType = xmlNode.xmlAttributes.access;
 				if(structKeyExists(xmlNode.xmlAttributes,"href")) variables.instance.href = xmlNode.xmlAttributes.href;
-				if(structKeyExists(xmlNode,"description")) 
+								
+				if(structKeyExists(xmlNode,"description")) {
 					variables.instance.description = xmlNode.description.xmlText;
-				else
-					variables.instance.description = xmlNode.xmlText;
+				}
 					
 				if(structKeyExists(xmlNode,"attributes")) {
 					for(i=1;i lte arrayLen(xmlNode.attributes.xmlChildren);i=i+1) {
@@ -148,6 +152,16 @@
 					if(structKeyExists(xmlNode.moduleInfo,"AuthorURL")) variables.instance.AuthorURL = xmlNode.moduleInfo.AuthorURL.xmlText;
 					if(structKeyExists(xmlNode.moduleInfo,"Screenshot")) variables.instance.Screenshot = xmlNode.moduleInfo.Screenshot.xmlText;
 				}				
+
+				if(structKeyExists(xmlNode,"property")) {
+					for(i=1;i lte arrayLen(xmlNode.xmlChildren);i=i+1) {
+						stSrc = xmlNode.xmlChildren[i];
+						if(stSrc.xmlName eq "property" and structKeyExists(stSrc.xmlAttributes,"name")) {
+							variables.instance.customProperties[stSrc.xmlAttributes.name] = stSrc.xmlText;
+						}
+					}
+				}
+
 			}
 		</cfscript>
 		<cfreturn this />
@@ -316,4 +330,31 @@
 		<cfset variables.instance.resLibPath = arguments.resLibPath />
 		<cfreturn />
 	</cffunction>	
+	
+	<cffunction name="getProperties" access="public" output="false" returntype="struct">
+		<cfreturn duplicate(variables.instance.customProperties) />
+	</cffunction>
+
+	<cffunction name="getProperty" access="public" output="false" returntype="string">
+		<cfargument name="name" type="string" required="true" />
+		<cfif not structKeyExists(variables.instance.customProperties, arguments.name)>
+			<cfthrow message="Invalid property name" type="homePortals.resourceBean.invalidProperty">
+		</cfif>
+		<cfreturn variables.instance.customProperties[arguments.name] />
+	</cffunction>
+	
+	<cffunction name="setProperty" access="public" output="false" returntype="void">
+		<cfargument name="name" type="string" required="true" />
+		<cfargument name="value" type="string" required="true" />
+		<cfset variables.instance.customProperties[arguments.name] = arguments.value />
+	</cffunction>	
+
+	<cffunction name="deleteProperty" access="public" output="false" returntype="void">
+		<cfargument name="name" type="string" required="true" />
+		<cfif not structKeyExists(variables.instance.customProperties, arguments.name)>
+			<cfthrow message="Invalid property name" type="homePortals.resourceBean.invalidProperty">
+		</cfif>
+		<cfset structDelete(variables.instance.customProperties, arguments.name) />
+	</cffunction>
+
 </cfcomponent>
