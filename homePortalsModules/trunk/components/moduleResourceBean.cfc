@@ -12,7 +12,7 @@
 	<cfproperty name="Resources" type="array" hint="For module resources, this represents a list of required script or style resources that should be added to the page" />
 	<cfproperty name="EventListeners" type="array" hint="For module resources, this represent a list of event listeners that will need to be added to the page" />
 
-	<cffunction name="init" access="public" output="false" returntype="resourceBean" hint="constructor">
+	<cffunction name="init" access="public" output="false" returntype="moduleResourceBean" hint="constructor">
 		<cfscript>
 			super.init();
 
@@ -31,7 +31,7 @@
 		<cfreturn this />
 	</cffunction>
 
-	<cffunction name="loadFromXMLNode" access="public" output="false" returntype="resourceBean" hint="populates the current instance from an xml node from a resource descriptor file">
+	<cffunction name="loadFromXMLNode" access="public" output="false" returntype="moduleResourceBean" hint="populates the current instance from an xml node from a resource descriptor file">
 		<cfargument name="resourceNode" type="XML" hint="XML node from a descriptor document that represents the resource" required="true" />
 		<cfscript>
 			var xmlNode = arguments.resourceNode;
