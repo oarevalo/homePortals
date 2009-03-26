@@ -6,6 +6,8 @@
 		variables.resourcesRoot = "";
 		variables.stTimers = structNew();
 		variables.stResourceTypes = structNew();
+		
+		variables.DEFAULT_RES_BEAN_PATH = "homePortals.components.defaultResourceBean";
 	</cfscript>
 
 	<!------------------------------------------------->
@@ -15,9 +17,12 @@
 		<cfargument name="resourceLibraryPath" type="string" required="true">
 		<cfargument name="resourceTypesStruct" type="struct" required="false" default="#structNew()#">
 		<cfset var res = "">
+		<cfset var args = structNew()>
 		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
 		<cfloop collection="#arguments.resourceTypesStruct#" item="res">
-			<cfset registerResourceType(res, arguments.resourceTypesStruct[res])>
+			<cfset args = arguments.resourceTypesStruct[res]>
+			<cfset args.resourceType = res>
+			<cfset registerResourceType(argumentCollection = args)>
 		</cfloop>
 		<cfreturn this>
 	</cffunction>
@@ -27,8 +32,28 @@
 	<!------------------------------------------------->
 	<cffunction name="registerResourceType" access="public" returntype="void">
 		<cfargument name="resourceType" type="string" required="true">
-		<cfargument name="resourceExtension" type="string" required="true">
-		<cfset variables.stResourceTypes[arguments.resourceType] = arguments.resourceExtension>
+		<cfargument name="folderName" type="string" required="false" default="">
+		<cfargument name="defaultExtension" type="string" required="false" default="">
+		<cfargument name="autoIndexExtensions" type="string" required="false" default="">
+		<cfargument name="customProperties" type="string" required="false" default="">
+		<cfargument name="resBeanPath" type="string" required="false" default="">
+		
+		<cfif arguments.resourceType eq "">
+			<cfthrow message="Resource type name cannot be empty" type="homePortals.resourceLibrary.invalidResourceType">
+		</cfif>
+		<cfif arguments.folderName eq "">
+			<cfset arguments.folderName = arguments.resourceType>
+		</cfif>
+		<cfif arguments.resBeanPath eq "">
+			<cfset arguments.resBeanPath = variables.DEFAULT_RES_BEAN_PATH>
+		</cfif>
+		
+		<cfset variables.stResourceTypes[arguments.resourceType] = structNew()>
+		<cfset variables.stResourceTypes[arguments.resourceType].folderName = arguments.folderName>
+		<cfset variables.stResourceTypes[arguments.resourceType].defaultExtension = arguments.defaultExtension>
+		<cfset variables.stResourceTypes[arguments.resourceType].autoIndexExtensions = arguments.autoIndexExtensions>
+		<cfset variables.stResourceTypes[arguments.resourceType].customProperties = arguments.customProperties>
+		<cfset variables.stResourceTypes[arguments.resourceType].resBeanPath = arguments.resBeanPath>
 	</cffunction>
 
 	<!------------------------------------------------->
@@ -353,6 +378,20 @@
 	</cffunction>
 
 	<!---------------------------------------->
+	<!--- getResourceTypeDirName		   --->
+	<!---------------------------------------->
+	<cffunction name="getResourceTypeDirName" access="public" output="false" returntype="string" hint="Returns the name of the directory on the resource library for the given resource type">
+		<cfargument name="resourceType" type="string" required="true">
+		
+		<cfif hasResourceType(arguments.resourceType)>
+			<cfreturn ucase(left(arguments.resourceType,1)) & lcase(mid(arguments.resourceType,2,len(arguments.resourceType)-1)) & "s">
+		</cfif>
+		
+		<cfthrow message="Invalid resource type. [#resourceType#]" type="homeportals.resourceLibrary.invalidResourceType">
+	</cffunction>
+					
+					
+	<!---------------------------------------->
 	<!--- getTimers						   --->
 	<!---------------------------------------->	
 	<cffunction name="getTimers" access="public" returntype="any" hint="Returns the timers for this object">
@@ -463,23 +502,20 @@
 		</cfscript>
 	</cffunction>
 
+
+
+
 	<!---------------------------------------->
-	<!--- saveFile                         --->
+	<!--- Utility Methods                  --->
 	<!---------------------------------------->
 	<cffunction name="saveFile" access="private" hint="saves a file">
 		<cfargument name="path" type="string" hint="Path to the file">
 		<cfargument name="content" type="string" hint="file content">
-
-		<!--- store page --->
 		<cffile action="write" file="#arguments.path#" output="#arguments.content#">
 	</cffunction>
 	
-	<!---------------------------------------->
-	<!--- removeFile                       --->
-	<!---------------------------------------->
 	<cffunction name="removeFile" access="private" hint="deletes a file">
 		<cfargument name="path" type="string" hint="full path to file">
-
 		<cffile action="delete" file="#arguments.path#">
 	</cffunction>	
 
@@ -506,21 +542,7 @@
 		<cfargument name="path" type="string" required="true">
 		<cfdirectory action="delete" directory="#ExpandPath(arguments.path)#" recurse="true">
 	</cffunction>
-				
-	<!---------------------------------------->
-	<!--- getResourceTypeDirName		   --->
-	<!---------------------------------------->
-	<cffunction name="getResourceTypeDirName" access="public" output="false" returntype="string" hint="Returns the name of the directory on the resource library for the given resource type">
-		<cfargument name="resourceType" type="string" required="true">
-		
-		<cfif hasResourceType(arguments.resourceType)>
-			<cfreturn ucase(left(arguments.resourceType,1)) & lcase(mid(arguments.resourceType,2,len(arguments.resourceType)-1)) & "s">
-		</cfif>
-		
-		<cfthrow message="Invalid resource type. [#resourceType#]" type="homeportals.resourceLibrary.invalidResourceType">
-	</cffunction>
-					
-				
+							
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 
@@ -530,6 +552,7 @@
 	<cffunction name="abort" access="private" returntype="void">
 		<cfabort>
 	</cffunction>
+	
 	<cffunction name="dump" access="private" returntype="void">
 		<cfargument name="data" type="any">
 		<cfdump var="#arguments.data#">

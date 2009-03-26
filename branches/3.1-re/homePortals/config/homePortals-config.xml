@@ -68,9 +68,20 @@
 
 	<!-- This section declares the available resource types -->
 	<resourceTypes>
-		<resourceType name="content" extension="html" />
-		<resourceType name="feed" extension="rss" />
-		<resourceType name="skin" extension="css" />
+		<resourceType name="content"
+						folderName="Contents"
+						autoIndexExtensions="html,htm,cfm,txt"
+						customProperties="author,owner,accessType"
+						resBeanPath="homePortals.components.resBeans.defaultResourceBean" />
+		<resourceType name="feed"
+						folderName="Feeds"
+						autoIndexExtensions="html,htm,cfm,txt"
+						customProperties="sourceURL,pubDate,format,tags"
+						resBeanPath="homePortals.components.resBeans.defaultResourceBean" />
+		<resourceType name="skin" extension="css"
+						folderName="Skins"
+						autoIndexExtensions="css"
+						resBeanPath="homePortals.components.resBeans.defaultResourceBean" />
 	</resourceTypes>
 	
 	<!-- Directories where HomePortals will look for resources  -->

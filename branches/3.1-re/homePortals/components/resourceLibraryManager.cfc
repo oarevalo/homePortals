@@ -53,7 +53,11 @@
 	<!------------------------------------------------->
 	<cffunction name="registerResourceType" access="public" returntype="void">
 		<cfargument name="resourceType" type="string" required="true">
-		<cfargument name="resourceExtension" type="string" required="true">
+		<cfargument name="folderName" type="string" required="true">
+		<cfargument name="defaultExtension" type="string" required="true">
+		<cfargument name="autoIndexExtensions" type="string" required="true">
+		<cfargument name="customProperties" type="string" required="true">
+		<cfargument name="resBeanPath" type="string" required="true">
 		<cfset variables.stResourceTypes[arguments.resourceType] = arguments.resourceExtension>
 		<cfloop from="1" to="#arrayLen(variables.aResourceLibs)#" index="i">
 			<cfset variables.aResourceLibs[i].registerResourceType(arguments.resourceType, arguments.resourceExtension)>
