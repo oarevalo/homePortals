@@ -3,7 +3,7 @@
 	<cfset variables.stConfig = StructNew()>
 	<cfset variables.hpEngineBaseVersion = "3.1.x">
 	<cfset variables.stRenderTemplatesCache = structNew()>
-	<cfset variables.RESOURCE_TYPE_ATTRIBUTES = "name,folderName,defaultExtension,autoIndexExtensions,customProperties,resBeanPath">
+	<cfset variables.RESOURCE_TYPE_ATTRIBUTES = "name,folderName,defaultExtension,customProperties,resBeanPath">
 
 	<cffunction name="init" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -52,7 +52,7 @@
 			var xmlNode = 0;
 			var j = 0; k = 0;
 			var xmlThisNode = 0;
-			var key = ""
+			var key = "";
 			
 			// read configuration file
 			if(Not fileExists(arguments.configFilePath))
@@ -514,13 +514,11 @@
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="folderName" type="string" required="false" default="">
 		<cfargument name="defaultExtension" type="string" required="false" default="">
-		<cfargument name="autoIndexExtensions" type="string" required="false" default="">
 		<cfargument name="customProperties" type="string" required="false" default="">
 		<cfargument name="resBeanPath" type="string" required="false" default="">
 		<cfset variables.stConfig.resourceTypes[arguments.name] = structNew()>
 		<cfset variables.stConfig.resourceTypes[arguments.name].folderName = arguments.folderName>
 		<cfset variables.stConfig.resourceTypes[arguments.name].defaultExtension = arguments.defaultExtension>
-		<cfset variables.stConfig.resourceTypes[arguments.name].autoIndexExtensions = arguments.autoIndexExtensions>
 		<cfset variables.stConfig.resourceTypes[arguments.name].customProperties = arguments.customProperties>
 		<cfset variables.stConfig.resourceTypes[arguments.name].resBeanPath = arguments.resBeanPath>
 	</cffunction>

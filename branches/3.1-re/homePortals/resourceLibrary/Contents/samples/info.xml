@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog>
-	<contents>
-		<content access="general" href="Contents/samples/Collaboration.html" id="Collaboration" name="" owner="default"/>
-	</contents>
-</catalog>
+<resLib type="content">
+	<resource href="Contents/samples/Collaboration.html" id="Collaboration" />
+</resLib>

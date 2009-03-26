@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog><feeds><feed href="http://digg.com/rss/index.xml" id="Digg">Front stories from Digg.com</feed><feed href="http://reddit.com/.rss" id="Reddit">Latest stories on Reddit.com</feed><feed href="http://del.icio.us/rss/" id="Del.icio.us">Top bookmarks from del.icio.us</feed></feeds></catalog>
+<resLib type="feed">
+	<resource href="http://digg.com/rss/index.xml" id="Digg"><description>Front stories from Digg.com</description></resource>
+	<resource href="http://reddit.com/.rss" id="Reddit"><description>Latest stories on Reddit.com</description></resource>
+	<resource href="http://del.icio.us/rss/" id="Del.icio.us"><description>Top bookmarks from del.icio.us</description></resource>
+</resLib>

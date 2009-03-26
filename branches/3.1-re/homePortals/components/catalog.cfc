@@ -1,7 +1,7 @@
 <cfcomponent hint="This component implements a catalog to access the resource library using lazy loading of resources">
 
 	<cfscript>
-		variables.qryResources = QueryNew("libpath,type,id,access,name,href,package,owner,description,infoHREF");
+		variables.qryResources = QueryNew("libpath,type,id,href,package,description,infoHREF");
 		variables.mapResources = structNew();
 		variables.oResourceLibraryManager = 0;
 	</cfscript>
@@ -52,30 +52,6 @@
 		
 		<cfreturn qry>
 	</cffunction>
-	
-	<!---------------------------------------->
-	<!--- getModuleByName				   --->
-	<!---------------------------------------->	
-	<cffunction name="getModuleByName" access="public" returntype="any" hint="Returns the tree node for a given resource on this catalog">
-		<cfargument name="moduleName" type="string" required="true" hint="Name of the module">
-		<cfscript>
-			var qry = 0;
-			var item = "";
-			var stResourceInfo = structNew();
-
-			if(not StructKeyExists(variables.mapResources, "module")) {
-				loadResourcesByType("module");
-			}
-						
-			for(item in variables.mapResources.module) {
-				stResourceInfo = variables.mapResources.module[item];
-				if(stResourceInfo.name eq arguments.moduleName) {
-					return getResourceNode("module", stResourceInfo.id);
-				}
-			}
-		</cfscript>
-		<cfthrow message="Resource [#arguments.moduleName#] not found" type="homePortals.catalog.resourceNotFound">
-	</cffunction>	
 		
 	<!---------------------------------------->
 	<!--- getResourceNode				   --->
@@ -139,7 +115,7 @@
 
 			// clear the catalog
 			variables.mapResources = structNew();
-			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
+			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF");
 
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
@@ -161,11 +137,8 @@
 					queryAddRow(variables.qryResources);
 					querySetCell(variables.qryResources, "type", stResourceBean.type);
 					querySetCell(variables.qryResources, "id", stResourceBean.id);
-					querySetCell(variables.qryResources, "access", stResourceBean.AccessType);
-					querySetCell(variables.qryResources, "name", stResourceBean.Name);
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
-					querySetCell(variables.qryResources, "owner", stResourceBean.Owner);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
 					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);					
 					
@@ -173,11 +146,8 @@
 					st = structNew();
 					st.type = stResourceBean.type;
 					st.id = stResourceBean.id;
-					st.access = stResourceBean.AccessType;
-					st.name = stResourceBean.name;
 					st.HREF = stResourceBean.HREF;
 					st.Package = stResourceBean.Package;
-					st.Owner = stResourceBean.Owner;
 					st.Description = stResourceBean.Description;
 					st.infoHREF = stResourceBean.infoHREF;
 
@@ -236,11 +206,8 @@
 				st = structNew();
 				st.type = stResourceBean.type;
 				st.id = stResourceBean.id;
-				st.access = stResourceBean.accessType;
-				st.name = stResourceBean.name;
 				st.HREF = stResourceBean.HREF;
 				st.Package = stResourceBean.Package;
-				st.Owner = stResourceBean.Owner;
 				st.Description = stResourceBean.Description;
 				st.infoHREF = stResourceBean.infoHREF;
 
@@ -269,7 +236,7 @@
 			var resType = "";
 			var resID = "";
 			
-			variables.qryResources = QueryNew("type,id,access,name,href,package,owner,description,infoHREF");
+			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF");
 			
 			for(resType in variables.mapResources) {
 			
@@ -280,11 +247,8 @@
 					queryAddRow(variables.qryResources);
 					querySetCell(variables.qryResources, "type", resType);
 					querySetCell(variables.qryResources, "id", resID);
-					querySetCell(variables.qryResources, "access", stResourceBean.access);
-					querySetCell(variables.qryResources, "name", stResourceBean.Name);
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
-					querySetCell(variables.qryResources, "owner", stResourceBean.Owner);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);
 					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);
 				
@@ -307,7 +271,7 @@
 			var aResources = arrayNew(1);
 			var stResourceBean = structNew();
 			var st = structNew();
-			
+
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
 
@@ -331,11 +295,8 @@
 					queryAddRow(variables.qryResources);
 					querySetCell(variables.qryResources, "type", stResourceBean.type);
 					querySetCell(variables.qryResources, "id", stResourceBean.id);
-					querySetCell(variables.qryResources, "access", stResourceBean.AccessType);
-					querySetCell(variables.qryResources, "name", stResourceBean.Name);
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
-					querySetCell(variables.qryResources, "owner", stResourceBean.Owner);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
 					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);					
 					
@@ -343,11 +304,8 @@
 					st = structNew();
 					st.type = stResourceBean.type;
 					st.id = stResourceBean.id;
-					st.access = stResourceBean.AccessType;
-					st.name = stResourceBean.name;
 					st.HREF = stResourceBean.HREF;
 					st.Package = stResourceBean.Package;
-					st.Owner = stResourceBean.Owner;
 					st.Description = stResourceBean.Description;
 					st.infoHREF = stResourceBean.infoHREF;
 
@@ -359,8 +317,8 @@
 					// add resource to map
 					variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
 				}
-			}		
-			
+			}
+
 			// recreate query of resources
 			populateResourcesQuery();		
 		</cfscript>

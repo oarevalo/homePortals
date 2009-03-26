@@ -19,13 +19,16 @@
 		<cfset var stResTypes = arguments.config.getResourceTypes()>
 		<cfset var aResLibs = arguments.config.getResourceLibraryPaths()>
 
+		<!--- create and register the resource library instances --->
 		<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
 			<cfset oResLib = createObject("component","resourceLibrary").init( aResLibs[i] )>
 			<cfset addResourceLibrary( oResLib )>
 		</cfloop>
 		
+		<!--- register the resource types into all libraries --->
 		<cfloop collection="#stResTypes#" item="i">
-			<cfset registerResourceType(i, stResTypes[i])>
+			<cfset stResTypes[i].resourceType = i>
+			<cfset registerResourceType(argumentCollection = stResTypes[i])>
 		</cfloop>
 		
 		<cfreturn this>
@@ -53,14 +56,13 @@
 	<!------------------------------------------------->
 	<cffunction name="registerResourceType" access="public" returntype="void">
 		<cfargument name="resourceType" type="string" required="true">
-		<cfargument name="folderName" type="string" required="true">
-		<cfargument name="defaultExtension" type="string" required="true">
-		<cfargument name="autoIndexExtensions" type="string" required="true">
-		<cfargument name="customProperties" type="string" required="true">
-		<cfargument name="resBeanPath" type="string" required="true">
-		<cfset variables.stResourceTypes[arguments.resourceType] = arguments.resourceExtension>
+		<cfargument name="folderName" type="string" required="false" default="">
+		<cfargument name="defaultExtension" type="string" required="false" default="">
+		<cfargument name="customProperties" type="string" required="false" default="">
+		<cfargument name="resBeanPath" type="string" required="false" default="">
+		<cfset variables.stResourceTypes[arguments.resourceType] = arguments>
 		<cfloop from="1" to="#arrayLen(variables.aResourceLibs)#" index="i">
-			<cfset variables.aResourceLibs[i].registerResourceType(arguments.resourceType, arguments.resourceExtension)>
+			<cfset variables.aResourceLibs[i].registerResourceType(argumentCollection = arguments)>
 		</cfloop>
 	</cffunction>
 

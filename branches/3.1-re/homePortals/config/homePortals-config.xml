@@ -70,18 +70,13 @@
 	<resourceTypes>
 		<resourceType name="content"
 						folderName="Contents"
-						autoIndexExtensions="html,htm,cfm,txt"
-						customProperties="author,owner,accessType"
-						resBeanPath="homePortals.components.resBeans.defaultResourceBean" />
+						customProperties="author,owner,accessType" />
 		<resourceType name="feed"
 						folderName="Feeds"
-						autoIndexExtensions="html,htm,cfm,txt"
-						customProperties="sourceURL,pubDate,format,tags"
-						resBeanPath="homePortals.components.resBeans.defaultResourceBean" />
+						customProperties="sourceURL,pubDate,format,tags" />
 		<resourceType name="skin" extension="css"
 						folderName="Skins"
-						autoIndexExtensions="css"
-						resBeanPath="homePortals.components.resBeans.defaultResourceBean" />
+						defaultExtension="css" />
 	</resourceTypes>
 	
 	<!-- Directories where HomePortals will look for resources  -->
