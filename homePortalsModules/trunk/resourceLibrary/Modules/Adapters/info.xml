@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="User Interface">
-    <modules>
+<resLib type="module">
+
         <!-- ********   simpleAdapter  ************ -->
-        <module access="general" id="simpleAdapter" name="Adapters/simpleAdapter">
+        <resource access="general" id="simpleAdapter" name="Adapters/simpleAdapter">
             <description>
                 Provides a simple adapter to transform the output of a module's event into the input of another module's method
             </description>
@@ -23,7 +23,7 @@
 					<event name="onOutputFired" description="Raised when the adapter's output has been fired" />
 				</events>
 			</api>
-        </module>	
+        </resource>	
 
-      </modules>
-</catalog>
+</resLib>
+

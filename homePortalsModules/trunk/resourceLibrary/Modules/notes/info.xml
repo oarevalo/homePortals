@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Content">
+<resLib type="module">
 
-<modules>
+
 
 	
 	<!-- ********   Notes  ************ -->
-	<module access="general" id="Notes" name="notes/notes">
+	<resource access="general" id="Notes" name="notes/notes">
 		<attributes>
 			<attribute description="The ID of the content entry to display by default. If empty, displays an index of all entries." name="contentID" required="true"/>
 		</attributes>		
@@ -18,7 +18,7 @@
 			<authorURL>http://www.homeportals.com</authorURL>
 			<screenshot/>
 		</moduleInfo>
-	</module>		
+	</resource>		
 	
-</modules>
-</catalog>
+
+</resLib>

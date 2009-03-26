@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Content">
-	<modules>
+<resLib type="module">
+
 		
 		<!-- ********   blog  ************ -->
-		<module access="general" id="blog" name="Blog/blog">
+		<resource access="general" id="blog" name="Blog/blog">
 			<description>
 				This module generates a basic blog where the author can post articles
 				organized by dates. Visitors to a page with a blog module are free to 
@@ -29,7 +29,7 @@
 					<event name="onBlogInfoChanged" description="Raised when blog information has been changed" />
 				</events>
 			</api>
-		</module>	
+		</resource>	
 		
-	</modules>
-</catalog>
+
+</resLib>

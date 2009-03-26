@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Tools">
+<resLib type="module">
 
-<modules>
 
 	
 	<!-- ********   Epoch Calendar  ************ -->
-	<module access="general" id="EpochCalendar" name="EpochCalendar/calendar">
+	<resource access="general" id="EpochCalendar" name="EpochCalendar/calendar">
 		<description>
 			Displays a calendar
 		</description>
@@ -26,7 +25,7 @@
 				<event description="This event is raised when someone clicks on a date. The argument passed is the selected date." name="onSelectDate"/>
 			</events>
 		</api>
-	</module>
+	</resource>
 	
-</modules>
-</catalog>
+
+</resLib>

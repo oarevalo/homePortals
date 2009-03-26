@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Content">
-    <modules>
+<resLib type="module">
+
         <!-- ********   contentBox  ************ -->
-        <module access="general" id="contentBox" name="contentBox/contentBox">
+        <resource access="general" id="contentBox" name="contentBox/contentBox">
             <description>
                 Displays a content entry from the content library
             </description>
@@ -21,10 +21,10 @@
                 <screenshot/>
             </moduleInfo>
 			<api />
-        </module>	
+        </resource>	
 
         <!-- ********   htmlBox  ************ -->
-        <module access="general" id="htmlBox" name="contentBox/htmlBox">
+        <resource access="general" id="htmlBox" name="contentBox/htmlBox">
             <description>
                 Displays an HTML snippet from the resource library
             </description>
@@ -43,7 +43,7 @@
                 <screenshot/>
             </moduleInfo>
 			<api />
-        </module>	
+        </resource>	
 
-      </modules>
-</catalog>
+ 
+</resLib>

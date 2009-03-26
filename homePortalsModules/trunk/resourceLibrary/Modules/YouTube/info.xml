@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Internet">
-    <modules>
+<resLib type="module">
+   
         <!-- ********   youTubeVideo  ************ -->
-        <module access="general" id="youTubeVideo" name="YouTube/youTubeVideo">
+        <resource access="general" id="youTubeVideo" name="YouTube/youTubeVideo">
             <description>
                 Displays a video from YouTube.com
             </description>
@@ -24,10 +24,10 @@
 				</methods>
 				<events />
 			</api>
-        </module>	
+        </resource>	
 
        <!-- ********   youTubeSearch  ************ -->
-        <module access="general" id="youTubeSearch" name="YouTube/youTubeSearch">
+        <resource access="general" id="youTubeSearch" name="YouTube/youTubeSearch">
             <description>
                 Search videos by tag
             </description>
@@ -50,8 +50,8 @@
 					<event name="onSelectVideo" description="Raised whenever a video is selected from the search results" />
 				</events>
 			</api>
-        </module>	
+        </resource>	
 
 
-    </modules>
-</catalog>
+   
+</resLib>

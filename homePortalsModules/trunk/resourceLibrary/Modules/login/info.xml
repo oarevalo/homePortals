@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="User Interface">
-	<modules>
-		<module access="general" id="login" name="login/login">
+<resLib type="module">
+	
+		<resource access="general" id="login" name="login/login">
 			<description>
 				Provides a login form to signing in to an account
 			</description>
@@ -11,6 +11,6 @@
 				<authorURL>http://www.homeportals.com</authorURL>
 				<screenshot/>
 			</moduleInfo>
-		</module>
-	</modules>
-</catalog>
+		</resource>
+	
+</resLib>

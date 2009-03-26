@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="User Interface">
-    <modules>
+<resLib type="module">
+    
         <!-- ********   button  ************ -->
-        <module access="general" id="button" name="ui/button">
+        <resource access="general" id="button" name="ui/button">
             <description>
                 Displays a button
             </description>
@@ -22,10 +22,10 @@
 					<event name="onClick" description="Raised whenever the button is clicked" />
 				</events>
 			</api>
-        </module>	
+        </resource>	
 
        <!-- ********   image  ************ -->
-        <module access="general" id="image" name="ui/image">
+        <resource access="general" id="image" name="ui/image">
             <description>
                 Displays an image
             </description>
@@ -46,10 +46,10 @@
 					<event name="onClick" description="Raised whenever the image is clicked" />
 				</events>
 			</api>
-        </module>	
+        </resource>	
         
  		<!-- ********   Panel  ************ -->
-		<module access="general" id="panel" name="">
+		<resource access="general" id="panel" name="">
 			<description>
 				Displays an empty panel.
 			</description>
@@ -59,7 +59,7 @@
 				<authorURL>http://www.homeportals.com</authorURL>
 				<screenshot/>
 			</moduleInfo>
-		</module>       
+		</resource>       
 
-    </modules>
-</catalog>
+    
+</resLib>

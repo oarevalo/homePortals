@@ -15,7 +15,7 @@
 
 			try {
 				modResBean = oHP.getResourceLibraryManager().getResource("module",listFirst(moduleName,"/"),listLast(moduleName,"/"));
-				moduleName = modResBean.getResLibPath() & "/Modules/" & modResBean.getName();
+				moduleName = modResBean.getResLibPath() & "/Modules/" & moduleName;
 
 				// convert the moduleName into a dot notation path
 				moduleName = replace(moduleName,"/",".","ALL");
@@ -47,7 +47,7 @@
 				arguments.bodyContentBuffer.set(  class = moduleName, 
 												content = oModuleController.renderView() );
 								
-			} catch(any e) {
+			} catch(lock e) {
 				tmpMsg = "<b>An unexpected error ocurred while initializing module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
 				arguments.bodyContentBuffer.set(  class = moduleName, 
 												content = tmpMsg );

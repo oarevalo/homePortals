@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Tools">
-<modules>
-	<module access="general" id="Appointments" name="Appointments/appointments">
+<resLib type="module">
+
+	<resource access="general" id="Appointments" name="Appointments/appointments">
 		<description>
 			Maintains a list of appointments organized by date and time. Appointments can be displayed
 			daily, weekly, monthly or for the next 45 days.
@@ -23,6 +23,6 @@
 			</methods>
 			<events/>
 		</api>
-	</module>	
-</modules>
-</catalog>
+	</resource>	
+
+</resLib>

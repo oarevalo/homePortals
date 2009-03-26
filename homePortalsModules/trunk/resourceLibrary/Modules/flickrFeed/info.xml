@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Internet">
+<resLib type="module">
 
-<modules>
-	
+
 	<!-- ********  Flickr Feed  ************ -->
-	<module access="general" id="FlickrFeed" name="flickrFeed/flickrFeed">
+	<resource access="general" id="FlickrFeed" name="flickrFeed/flickrFeed">
 		<description>
 			Displays pictures from flickr. Pictures can be displayed by user or by tags.
 		</description>
@@ -22,7 +21,7 @@
 			<authorURL>http://www.homeportals.com</authorURL>
 			<screenshot/>
 		</moduleInfo>
-	</module>
+	</resource>
 	
-</modules>
-</catalog>
+
+</resLib>

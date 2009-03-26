@@ -31,7 +31,9 @@
 			// add resource type to library
 			oResourceLibraryManager = getHomePortals().getResourceLibraryManager();
 			oResourceLibraryManager.registerResourceLibraryPath("/homePortalsModules/resourceLibrary");
-			oResourceLibraryManager.registerResourceType("module","cfc");
+			oResourceLibraryManager.registerResourceType(resourceType = "module",
+															folderName = "Modules",
+															resBeanPath = "homePortalsModules.components.moduleResourceBean");
 
 			
 			// update main config bean

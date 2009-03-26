@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Tools">
+<resLib type="module">
 
-<modules>
+
 
 	
 	<!-- ********   Bookmarks  ************ -->
-	<module access="general" id="bookmarks" name="Bookmarks/bookmarks">
+	<resource access="general" id="bookmarks" name="Bookmarks/bookmarks">
 		<description>
 			Displays a list of items and/or links. You can add/edit/delete items. Whenever an
 			option is selected the event bookmakrs.onClick is raised. Additionally you can 
@@ -32,7 +32,7 @@
 			<authorURL>http://www.homeportals.com</authorURL>
 			<screenshot/>
 		</moduleInfo>
-	</module>
+	</resource>
 	
-</modules>
-</catalog>
+
+</resLib>

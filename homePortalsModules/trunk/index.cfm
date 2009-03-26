@@ -17,14 +17,14 @@
 <!------------------------------>
 <cfset feed1 = {
 				moduleType = "module",
-				name="RSSReader/RSSReader",
+				name="RSSReader/rssReader",
 				title="HomePortals News",
 				rss="http://www.homeportals.net/blog/rss.cfm"
 			}>
 
 <cfset feed2 = {
 				moduleType = "module",
-				name="RSSReader/RSSReader",
+				name="RSSReader/rssReader",
 				title="OscarArevalo.com",
 				rss="http://www.oscararevalo.com/rss.cfm"
 			}>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Internet">
-    <modules>
+<resLib type="module">
+    
         <!-- ********   WebViewer  ************ -->
-        <module access="general" id="WebViewer" name="WebViewer/WebViewer">
+        <resource access="general" id="WebViewer" name="WebViewer/WebViewer">
             <description>
                 Use this module to load and display a URL within a HomePortals page.
             </description>
@@ -27,6 +27,6 @@
                 </methods>
                 <events />
             </api>
-        </module>	
-    </modules>
-</catalog>
+        </resource>	
+    
+</resLib>

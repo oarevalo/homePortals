@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalog package="Content">
+<resLib type="module">
 
-<modules>
+
 
 	<!-- ********  Photo Album  ************ -->
-	<module access="general" id="photoAlbum" name="PhotoAlbums/photoAlbum">
+	<resource access="general" id="photoAlbum" name="PhotoAlbums/photoAlbum">
 		<description>
 			Displays a photo album.
 		</description>
@@ -14,6 +14,6 @@
 			<authorURL>http://www.homeportals.com</authorURL>
 			<screenshot/>
 		</moduleInfo>
-	</module>		
-</modules>
-</catalog>
+	</resource>		
+
+</resLib>
