@@ -19,9 +19,6 @@
 			<cfif listLen(arguments.eventArg,"::") gt 1>
 				<cfset page = listLast(arguments.eventArg,"::")>
 			</cfif>
-			<cfdump var="account: [#account#]">
-			<cfdump var="page: [#page#]">
-		
 			<cfset arguments.eventArg = getAccountsService().getAccountPageHREF(account,page)>
 		</cfif>
 		
