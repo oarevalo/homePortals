@@ -26,7 +26,7 @@
 		<cfset var retVal = arguments.eventArg>		
 		
 		<cfloop collection="#variables.pluginsMap#" item="key">
-			<cfset retVal = notifyPlugin(key, arguments.eventType, arguments.eventArg)>
+			<cfset retVal = notifyPlugin(key, arguments.eventType, retVal)>
 		</cfloop>	
 
 		<cfreturn retVal>
