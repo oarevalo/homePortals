@@ -50,7 +50,7 @@
 		<cfscript>
 			var i = 0;
 			var xmlNode = 0;
-			var j = 0; k = 0;
+			var j = 0; var k = 0;
 			var xmlThisNode = 0;
 			var key = "";
 			
