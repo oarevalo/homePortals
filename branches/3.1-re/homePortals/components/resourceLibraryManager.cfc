@@ -74,6 +74,13 @@
 	</cffunction>
 
 	<!------------------------------------------------->
+	<!--- getResourceTypesInfo                	   ---->
+	<!------------------------------------------------->
+	<cffunction name="getResourceTypesInfo" access="public" returntype="struct" hint="returns an array of structures with details on the registered resource types">
+		<cfreturn duplicate(variables.stResourceTypes)>
+	</cffunction>
+	
+	<!------------------------------------------------->
 	<!--- hasResourceType	                	   ---->
 	<!------------------------------------------------->
 	<cffunction name="hasResourceType" access="public" returntype="boolean" hint="checks whether a given resource types is supported">
@@ -99,7 +106,7 @@
 		<cfset var qry = 0>
 		
 		<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
-			<cfif aResLibs[i].hasResourceType(arguments.resourceType)>
+			<cfif arguments.resourceType eq "" or aResLibs[i].hasResourceType(arguments.resourceType)>
 				<cfset qry = aResLibs[i].getResourcePackagesList(arguments.resourceType)>
 				<cfloop query="qry">
 					<cfset queryAddRow(qryFull)>
