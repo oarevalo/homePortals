@@ -66,7 +66,7 @@
 		<cfset qryAccount = getAccountByName(arguments.username)>
 
 		<!--- validate the password --->
-		<cfif (qryAccount.recordCount eq 0) or (qryAccount.password[1] neq pwdHSH)>
+		<cfif (qryAccount.recordCount eq 0) or (qryAccount.password[1] neq Arguments.password)>
 			<cfthrow message="Invalid account name or password" type="homePortals.accounts.invalidLogin">
 		</cfif>			
 
