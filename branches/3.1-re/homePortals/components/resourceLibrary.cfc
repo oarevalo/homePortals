@@ -231,11 +231,11 @@
 			}
 			
 			// check if we need to update the file descriptor
-			for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resTypeDir].xmlChildren);i=i+1) {
-				xmlNode = xmlDoc.xmlRoot[resTypeDir].xmlChildren[i];
+			for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
+				xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
 				if(xmlNode.xmlAttributes.id eq rb.getID()) {
 					// node found so we will delete it to add it again
-					arrayDeleteAt(xmlDoc.xmlRoot[resTypeDir].xmlChildren, i);
+					arrayDeleteAt(xmlDoc.xmlRoot.xmlChildren, i);
 					break;
 				}
 			}
