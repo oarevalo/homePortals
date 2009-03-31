@@ -340,6 +340,10 @@
 			<cfthrow message="Unknown content renderer" type="homePortals.config.invalidContentRendererName">
 		</cfif>
 	</cffunction>
+
+	<cffunction name="getContentRenderers" access="public" returntype="struct" hint="returns a key-value map with all declared content renderers and their paths">
+		<cfreturn duplicate(variables.stConfig.contentRenderers)>
+	</cffunction>	
 	
 	<cffunction name="getPlugin" access="public" returntype="string" hint="returns the path to the given extension plugin cfc">
 		<cfargument name="name" type="string" required="true">
