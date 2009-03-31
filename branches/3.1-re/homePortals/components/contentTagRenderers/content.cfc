@@ -1,4 +1,11 @@
-<cfcomponent extends="homePortals.components.contentTagRenderer">
+<cfcomponent extends="homePortals.components.contentTagRenderer"
+			 hint="Inserts a block of HTML-formatted content into the page. Content can be located on the same server or retrieved from an external URL. Content can also be obtained from the resource library.">
+
+	<cfproperty name="resourceID" type="resource:content" required="false" />
+	<cfproperty name="href" type="string" required="false" />
+	<cfproperty name="cache" default="false" type="boolean" required="false" />
+	<cfproperty name="cacheTTL" type="numeric" required="false" />
+
 	
 	<cfscript>
 		variables.HTTP_GET_TIMEOUT = 30;	// timeout for HTTP requests in content modules

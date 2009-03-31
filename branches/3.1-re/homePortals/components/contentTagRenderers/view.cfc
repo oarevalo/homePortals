@@ -1,4 +1,7 @@
-<cfcomponent extends="homePortals.components.contentTagRenderer">
+<cfcomponent extends="homePortals.components.contentTagRenderer"
+			 hint="Use this content renderer to include an existing CFML view or template on a page.">
+	<cfproperty name="href" default="" type="string" required="true" hint="The location of the template to include. You can use a relative address starting from the webroot or use an available mapping.">
+
 
 	<!---------------------------------------->
 	<!--- renderContent	                   --->
