@@ -112,6 +112,69 @@
 		</cfscript>
 	</cffunction>
 
+
+	<!---------------------------------------->
+	<!--- addContentTag			           --->
+	<!---------------------------------------->	
+	<cffunction name="addContentTag" access="public" returntype="string" output="False" hint="Adds a content tag to the page">
+		<cfargument name="tag" type="string" required="true">
+		<cfargument name="locationID" type="string" required="yes">
+		<cfargument name="customAttributes" type="struct" required="no" default="#structNew()#">
+
+		<cfscript>
+			var stModule = structNew();
+			var moduleID = "";
+			var keepLooping = true;
+			var moduleIndex = 1;
+			var st = structNew();
+			var aTemp = arrayNew(1);
+			var i = 0;
+			var thisAttr = "";
+			var def = "";
+			var oPage = getPage();
+			
+			// define a unique id for the new module based on the tag name
+			while(keepLooping) {
+				try {
+					moduleID = tag & moduleIndex;
+					st = oPage.getModule(moduleID);
+					moduleIndex = moduleIndex + 1;
+					keepLooping = true;
+				
+				} catch(homePortals.pageBean.moduleNotFound e) {
+					keepLooping = false;
+				}
+			}
+
+
+			// if no location is given, then add the module to the first location
+			if(arguments.locationID eq "") {
+				aTemp = oPage.getLayoutRegions();
+				if(arrayLen(aTemp) gt 0) {
+					arguments.locationID = aTemp[1].name;
+				}
+			}
+
+
+			// add basic properties to module
+			stModule["id"] = moduleID;
+			stModule["moduleType"] = tag;
+			stModule["location"] = arguments.locationID;
+			stModule["title"] = moduleID;
+						
+			// add custom properties 
+			for(attr in arguments.customAttributes) {
+				stModule[attr] = arguments.customAttributes[attr];
+			}
+
+			// add module to page
+			oPage.addModule(moduleID, arguments.locationID, stModule);
+
+			return moduleID;		
+		</cfscript>
+	</cffunction>
+
+
 	<!---------------------------------------->
 	<!--- setModuleOrder		           --->
 	<!---------------------------------------->	
