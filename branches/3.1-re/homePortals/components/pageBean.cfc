@@ -595,6 +595,8 @@
 			var stMod = normalizeModule(arguments.moduleID, 
 										arguments.location,
 										arguments.moduleAttributes);
+			if(structKeyExists(variables.instance.stModuleIndex, arguments.moduleID))
+				throw("Module ID already in use","homePortals.pageBean.duplicateModuleID");
 			arrayAppend(variables.instance.aModules, stMod);
 			indexModules();
 			return this;
@@ -635,9 +637,6 @@
 		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
 		<cfscript>
 			var stMod = duplicate(moduleAttributes);
-			
-			if(structKeyExists(variables.instance.stModuleIndex, arguments.moduleID))
-				throw("Module ID already in use","homePortals.pageBean.duplicateModuleID");
 			
 			if(arguments.moduleID eq "")
 				throw("Module ID cannot be empty","homePortals.pageBean.blankModuleID");
