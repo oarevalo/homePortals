@@ -1,10 +1,10 @@
 <cfcomponent extends="homePortals.components.contentTagRenderer"
 			 hint="Inserts a block of HTML-formatted content into the page. Content can be located on the same server or retrieved from an external URL. Content can also be obtained from the resource library.">
 
-	<cfproperty name="resourceID" type="resource:content" required="false" />
-	<cfproperty name="href" type="string" required="false" />
-	<cfproperty name="cache" default="false" type="boolean" required="false" />
-	<cfproperty name="cacheTTL" type="numeric" required="false" />
+	<cfproperty name="resourceID" type="resource:content" required="false"  displayname="Resource ID" />
+	<cfproperty name="href" type="string" required="false" displayname="HREF" />
+	<cfproperty name="cache" default="false" type="boolean" required="false" displayname="Cache Content?" />
+	<cfproperty name="cacheTTL" type="numeric" required="false" displayname="Cache TTL" />
 
 	
 	<cfscript>

@@ -37,6 +37,7 @@
 	<!---------------------------------------->	
 	<cffunction name="getResourcesByType" access="public" returntype="query" output="False" hint="Returns all resources of a given type">
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
+		<cfargument name="resLibPath" type="string" required="false" default="" hint="Restricts the resources to a single resource library">
 
 		<cfset var qry = queryNew("")>
 		
@@ -48,6 +49,9 @@
 			SELECT *
 				FROM variables.qryResources
 				WHERE type = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resourceType#">
+					<cfif resLibPath neq "">
+						AND libpath = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resLibPath#"> 
+					</cfif>
 		</cfquery>
 		
 		<cfreturn qry>
@@ -115,7 +119,7 @@
 
 			// clear the catalog
 			variables.mapResources = structNew();
-			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF");
+			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF,libPath");
 
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
@@ -141,6 +145,7 @@
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
 					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);					
+					querySetCell(variables.qryResources, "libPath", stResourceBean.resLibPath);					
 					
 					// create resource map entry
 					st = structNew();
@@ -150,6 +155,7 @@
 					st.Package = stResourceBean.Package;
 					st.Description = stResourceBean.Description;
 					st.infoHREF = stResourceBean.infoHREF;
+					st.libPath = stResourceBean.resLibPath;
 
 					// create node for resource type group if doesnt exist
 					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
@@ -210,6 +216,7 @@
 				st.Package = stResourceBean.Package;
 				st.Description = stResourceBean.Description;
 				st.infoHREF = stResourceBean.infoHREF;
+				st.libpath = stResourceBean.resLibPath;
 
 				// add resource to map
 				variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
@@ -236,7 +243,7 @@
 			var resType = "";
 			var resID = "";
 			
-			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF");
+			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF,libpath");
 			
 			for(resType in variables.mapResources) {
 			
@@ -251,7 +258,7 @@
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);
 					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);
-				
+					querySetCell(variables.qryResources, "libpath", stResourceBean.libpath);			
 				}
 	
 			}
@@ -299,6 +306,7 @@
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
 					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);					
+					querySetCell(variables.qryResources, "libpath", stResourceBean.resLibPath);					
 					
 					// create resource map entry
 					st = structNew();
@@ -308,6 +316,7 @@
 					st.Package = stResourceBean.Package;
 					st.Description = stResourceBean.Description;
 					st.infoHREF = stResourceBean.infoHREF;
+					st.libpath = stResourceBean.resLibPath;
 
 					// create node for resource type group if doesnt exist
 					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
