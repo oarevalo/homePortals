@@ -79,7 +79,7 @@
 
 			if(getDescription() neq "") {
 				xmlNode2 = xmlElemNew(arguments.xmlDoc, "description");
-				xmlNode2.xmlText = rb.getDescription();
+				xmlNode2.xmlText = getDescription();
 				arrayAppend(xmlNode.xmlChildren, xmlNode2);
 			}
 

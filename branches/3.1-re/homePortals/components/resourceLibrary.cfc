@@ -310,7 +310,7 @@
 			if(not hasResourceType(arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
 
 			// get location of descriptor file
-			infoHREF = getResourceDescriptorFilePath( rb.getType(), rb.getPackage() );
+			infoHREF = getResourceDescriptorFilePath( arguments.resourceType, arguments.package  );
 			
 			resTypeDir = getResourceTypeProperty(arguments.resourceType, "folderName");
 
@@ -319,14 +319,14 @@
 			if(fileExists(expandPath(infoHREF))) {
 				xmlDoc = xmlParse(expandPath(infoHREF));
 
-				for(i=1;i lte arrayLen(xmlDoc.xmlRoot[resTypeDir].xmlChildren);i=i+1) {
-					xmlNode = xmlDoc.xmlRoot[resTypeDir].xmlChildren[i];
+				for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
+					xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
 					if(xmlNode.xmlAttributes.id eq id) {
 						if(structKeyExists(xmlNode.xmlAttributes, "href"))
 							resHref = xmlNode.xmlAttributes.href;
 					
 						// remove node from document
-						arrayDeleteAt(xmlDoc.xmlRoot[resTypeDir].xmlChildren, i);
+						arrayDeleteAt(xmlDoc.xmlRoot.xmlChildren, i);
 						
 						// save modified resource descriptor file
 						saveFile(expandPath(infoHREF), toString(xmlDoc));						
@@ -342,9 +342,9 @@
 			}				
 			
 			// remove resource file
-			if(resHref neq "" and left(resHref,4) neq "http" and fileExists(expandPath(variables.resourcesRoot & "/" & resHref))) {
-				removeFile(expandPath(variables.resourcesRoot & "/" & resHref));			
-			}
+//			if(resHref neq "" and left(resHref,4) neq "http" and fileExists(expandPath(variables.resourcesRoot & "/" & resHref))) {
+//				removeFile(expandPath(variables.resourcesRoot & "/" & resHref));			
+//			}
 			
 		</cfscript>	
 	</cffunction>	
