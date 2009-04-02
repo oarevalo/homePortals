@@ -40,6 +40,7 @@
 	<cffunction name="addResourceLibrary" access="public" returntype="void">
 		<cfargument name="resLib" type="resourceLibrary" required="true">
 		<cfset arrayAppend(variables.aResourceLibs, arguments.resLib)>
+		<cfset reRegisterResourceTypes()>
 	</cffunction>
 
 	<!------------------------------------------------->
@@ -65,6 +66,20 @@
 			<cfset variables.aResourceLibs[i].registerResourceType(argumentCollection = arguments)>
 		</cfloop>
 	</cffunction>
+
+	<!------------------------------------------------->
+	<!--- reRegisterResourceTypes                  ---->
+	<!------------------------------------------------->
+	<cffunction name="reRegisterResourceTypes" access="public" returntype="void" hint="registers again all defined resource types with all libraries.">
+		<cfset var res = "">
+
+		<cfloop from="1" to="#arrayLen(variables.aResourceLibs)#" index="i">
+			<cfloop collection="#variables.stResourceTypes#" item="res">
+				<cfset variables.aResourceLibs[i].registerResourceType(argumentCollection = variables.stResourceTypes[res])>
+			</cfloop>
+		</cfloop>
+	</cffunction>
+
 
 	<!------------------------------------------------->
 	<!--- getResourceTypes	                	   ---->
