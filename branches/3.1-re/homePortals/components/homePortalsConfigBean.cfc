@@ -149,7 +149,7 @@
 			var key = "";
 			var thisResourceType = "";
 			var tmpXmlNode = 0;
-			var lstKeysIgnore = "version,renderTemplates,resources";
+			var lstKeysIgnore = "version,renderTemplates,resources,contentRenderers,plugins,resourceTypes,resourceLibraryPaths";
 
 			// create a blank xml document and add the root node
 			xmlConfigDoc = xmlNew();
@@ -530,6 +530,17 @@
 	<cffunction name="addResourceLibraryPath" access="public" returntype="void">
 		<cfargument name="path" type="string" required="true">
 		<cfset arrayAppend(variables.stConfig.resourceLibraryPaths, arguments.path)>
+	</cffunction>	
+
+	<cffunction name="removeResourceLibraryPath" access="public" returntype="void">
+		<cfargument name="path" type="string" required="true">
+		<cfset var i = 0>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.resourceLibraryPaths)#" index="i">
+			<cfif variables.stConfig.resourceLibraryPaths[i] eq arguments.path>
+				<cfset arrayDeleteAt(variables.stConfig.resourceLibraryPaths, i)>
+				<cfreturn>
+			</cfif>
+		</cfloop>
 	</cffunction>	
 	
 	<cffunction name="throw" access="private">
