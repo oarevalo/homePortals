@@ -15,7 +15,6 @@
 			variables.stConfig.layoutSections = "";
 			variables.stConfig.bodyOnLoad = "";
 			variables.stConfig.homePortalsPath = "";
-			variables.stConfig.resourceLibraryPaths = arrayNew(1);
 			variables.stConfig.defaultPage = "";
 			variables.stConfig.appRoot = "";
 			variables.stConfig.contentRoot = "";
@@ -28,6 +27,7 @@
 			variables.stConfig.baseResourceTypes = "";
 			variables.stConfig.pageProviderClass = "";
 
+			variables.stConfig.resourceLibraryPaths = arrayNew(1);
 			variables.stConfig.renderTemplates = structNew();
 			variables.stConfig.resources = structNew();
 			variables.stConfig.contentRenderers = structNew();
@@ -161,8 +161,25 @@
 
 			for(i=1;i lte ListLen(lstKeys);i=i+1) {
 				thisKey = ListGetAt(lstKeys,i);
-				if(not listFindNoCase(lstKeysIgnore, thisKey)) {
-					tmpXmlNode = xmlElemNew(xmlConfigDoc,thisKey);
+				tmpXmlNode = 0;
+				switch(thisKey) {
+					case "initialEvent": tmpXmlNode = xmlElemNew(xmlConfigDoc,"initialEvent"); break;
+					case "layoutSections": tmpXmlNode = xmlElemNew(xmlConfigDoc,"layoutSections"); break;
+					case "bodyOnLoad": tmpXmlNode = xmlElemNew(xmlConfigDoc,"bodyOnLoad"); break;
+					case "homePortalsPath": tmpXmlNode = xmlElemNew(xmlConfigDoc,"homePortalsPath"); break;
+					case "defaultPage": tmpXmlNode = xmlElemNew(xmlConfigDoc,"defaultPage"); break;
+					case "appRoot": tmpXmlNode = xmlElemNew(xmlConfigDoc,"appRoot"); break;
+					case "contentRoot": tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentRoot"); break;
+					case "pageCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageCacheSize"); break;
+					case "pageCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageCacheTTL"); break;
+					case "contentCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentCacheSize"); break;
+					case "contentCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentCacheTTL"); break;
+					case "rssCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"rssCacheSize"); break;
+					case "rssCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"rssCacheTTL"); break;
+					case "baseResourceTypes": tmpXmlNode = xmlElemNew(xmlConfigDoc,"baseResourceTypes"); break;
+					case "pageProviderClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageProviderClass"); break;
+				}
+				if(isXMLNode(tmpXmlNode)) {
 					tmpXmlNode.xmlText = variables.stConfig[thisKey];
 					arrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, tmpXmlNode);
 				}	
@@ -228,6 +245,14 @@
 					}
 				}
 				ArrayAppend(xmlConfigDoc.xmlRoot.resourceTypes.xmlChildren, tmpXmlNode );
+			}
+
+			// ****** [resourceLibrary] *****	
+			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceLibraryPaths") );
+			for(i=1;i lte arrayLen(variables.stConfig.resourceLibraryPaths);i=i+1) {
+				tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceLibraryPath");
+				tmpXmlNode.xmlText = variables.stConfig.resourceLibraryPaths[i];
+				ArrayAppend(xmlConfigDoc.xmlRoot.resourceLibraryPaths.xmlChildren, tmpXmlNode );
 			}
 
 			// return document
@@ -504,6 +529,11 @@
 		<cfset variables.stConfig.contentRenderers[arguments.name] = arguments.path>
 	</cffunction>
 
+	<cffunction name="removeContentRenderer" access="public" returntype="void">
+		<cfargument name="name" type="string" required="true">
+		<cfset structDelete(variables.stConfig.contentRenderers, arguments.name, false)>
+	</cffunction>
+
 	<cffunction name="setPlugin" access="public" returntype="void">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="path" type="string" required="true">
@@ -512,6 +542,11 @@
 		<cfelseif structKeyExists(variables.stConfig.plugins, arguments.name)>
 			<cfset structDelete(variables.stConfig.plugins, arguments.name)>
 		</cfif>
+	</cffunction>
+
+	<cffunction name="removePlugin" access="public" returntype="void">
+		<cfargument name="name" type="string" required="true">
+		<cfset structDelete(variables.stConfig.plugins, arguments.name, false)>
 	</cffunction>
 
 	<cffunction name="setResourceType" access="public" returntype="void">
