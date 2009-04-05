@@ -3,7 +3,6 @@
 	<cfset variables.stConfig = StructNew()>
 	<cfset variables.hpEngineBaseVersion = "3.1.x">
 	<cfset variables.stRenderTemplatesCache = structNew()>
-	<cfset variables.RESOURCE_TYPE_ATTRIBUTES = "name,folderName,defaultExtension,customProperties,resBeanPath">
 
 	<cffunction name="init" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -104,11 +103,19 @@
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						xmlThisNode = xmlNode.xmlChildren[j];
-						variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ] = structNew();
-						for(k=1;k lte listLen(variables.RESOURCE_TYPE_ATTRIBUTES);k=k+1) {
-							key = listGetAt(variables.RESOURCE_TYPE_ATTRIBUTES,k);
-							if( structKeyExists(xmlThisNode.xmlAttributes,key) ) {
-								variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ][ key ] = xmlThisNode.xmlAttributes[key];
+						
+						if(xmlThisNode.xmlName eq "resourceType") {
+							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ] = structNew();
+							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ].name = xmlThisNode.xmlAttributes.name;
+							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ].properties = arrayNew(1);
+					
+							for(k=1;k lte arrayLen(xmlThisNode.xmlChildren);k=k+1) {
+								if(xmlThisNode.xmlChildren[k].xmlName eq "property") {
+									arrayAppend(variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ].properties,
+												xmlThisNode.xmlChildren[k].xmlAttributes);								
+								} else {
+									variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ][ xmlThisNode.xmlChildren[k].xmlName ] = xmlThisNode.xmlChildren[k].xmlText;
+								}
 							}
 						}
 					}
@@ -140,15 +147,13 @@
 		<cfscript>
 			var xmlConfigDoc = "";
 			var xmlOriginalConfigDoc = "";
-			var backupFileName = "";
 			var lstResourceTypes = getBaseResourceTypes();
 			var lstKeys = "";
-			var i = 1;
-			var j = 1;
+			var i = 1; var j = 1; var k = 1;
 			var thisKey = "";
-			var key = "";
+			var key = ""; var st = structNew();
 			var thisResourceType = "";
-			var tmpXmlNode = 0;
+			var tmpXmlNode = 0; var tmpXmlNode2 = 0;
 			var lstKeysIgnore = "version,renderTemplates,resources,contentRenderers,plugins,resourceTypes,resourceLibraryPaths";
 
 			// create a blank xml document and add the root node
@@ -236,13 +241,32 @@
 			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceTypes") );
 			
 			for(thisKey in variables.stConfig.resourceTypes) {
+				st = variables.stConfig.resourceTypes[thisKey];
+				
 				tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceType");
-				for(j=1;j lte listLen(variables.RESOURCE_TYPE_ATTRIBUTES);j=j+1) {
-					key = listGetAt(variables.RESOURCE_TYPE_ATTRIBUTES,j);
-					if( structKeyExists(variables.stConfig.resourceTypes[thisKey],key) and
-							variables.stConfig.resourceTypes[thisKey][key] neq "" ) {
-						tmpXmlNode.xmlAttributes[key] = variables.stConfig.resourceTypes[thisKey][key];
+				tmpXmlNode.xmlAttributes["name"] = st.name;
+				
+				for(key in st) {
+					tmpXmlNode2 = xmlElemNew(xmlConfigDoc,key);
+					switch(key) {
+						case "description": if(st[key] neq "") tmpXmlNode2.xmlAttributes["description"] = st[key]; break;
+						case "folderName": if(st[key] neq "") tmpXmlNode2.xmlAttributes["folderName"] = st[key]; break;
+						case "resBeanPath": if(st[key] neq "") tmpXmlNode2.xmlAttributes["resBeanPath"] = st[key]; break;
+						case "fileTypes": if(st[key] neq "") tmpXmlNode2.xmlAttributes["fileTypes"] = st[key]; break;
+						case "properties":
+							aProperties = st.properties;
+							for(k=1;k lte arrayLen(aProperties);k=k+1) {
+								if(structKeyExist(aProperties[k],"name") and aProperties[k].name neq "") tmpXmlNode2.xmlAttributes["name"] = aProperties[k].name;
+								if(structKeyExist(aProperties[k],"description") and aProperties[k].description neq "") tmpXmlNode2.xmlAttributes["description"] = aProperties[k].description;
+								if(structKeyExist(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
+								if(structKeyExist(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
+								if(structKeyExist(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
+								if(structKeyExist(aProperties[k],"default") and aProperties[k].default neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k].default;
+								if(structKeyExist(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
+							}
+							break;	
 					}
+					ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
 				}
 				ArrayAppend(xmlConfigDoc.xmlRoot.resourceTypes.xmlChildren, tmpXmlNode );
 			}
@@ -385,6 +409,11 @@
 	
 	<cffunction name="getResourceTypes" access="public" returntype="struct" hint="returns a key-value map with all declared resource types and their associated extensions">
 		<cfreturn duplicate(variables.stConfig.resourceTypes)>
+	</cffunction>		
+
+	<cffunction name="getResourceType" access="public" returntype="struct" hint="returns a key-value map with the requested resource type and its associated extensions">
+		<cfargument name="name" type="string" required="true">
+		<cfreturn duplicate(variables.stConfig.resourceTypes[arguments.name])>
 	</cffunction>		
 	
 	<cffunction name="getResourceLibraryPath" access="public" returntype="string" hint="The path to the root where all resources are stored">
@@ -552,14 +581,43 @@
 	<cffunction name="setResourceType" access="public" returntype="void">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="folderName" type="string" required="false" default="">
-		<cfargument name="defaultExtension" type="string" required="false" default="">
-		<cfargument name="customProperties" type="string" required="false" default="">
+		<cfargument name="description" type="string" required="false" default="">
 		<cfargument name="resBeanPath" type="string" required="false" default="">
-		<cfset variables.stConfig.resourceTypes[arguments.name] = structNew()>
+		<cfargument name="fileTypes" type="string" required="false" default="">
+		<cfif not structKeyExists(variables.stConfig.resourceTypes, arguments.name)>
+			<cfset variables.stConfig.resourceTypes[arguments.name] = structNew()>
+			<cfset variables.stConfig.resourceTypes[arguments.name].properties = arrayNew(1)>
+		</cfif>
+		<cfset variables.stConfig.resourceTypes[arguments.name].name = arguments.name>
 		<cfset variables.stConfig.resourceTypes[arguments.name].folderName = arguments.folderName>
-		<cfset variables.stConfig.resourceTypes[arguments.name].defaultExtension = arguments.defaultExtension>
-		<cfset variables.stConfig.resourceTypes[arguments.name].customProperties = arguments.customProperties>
+		<cfset variables.stConfig.resourceTypes[arguments.name].description = arguments.description>
 		<cfset variables.stConfig.resourceTypes[arguments.name].resBeanPath = arguments.resBeanPath>
+		<cfset variables.stConfig.resourceTypes[arguments.name].fileTypes = arguments.fileTypes>
+	</cffunction>
+
+	<cffunction name="setResourceTypeProperty" access="public" returntype="void">
+		<cfargument name="resType" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="description" type="string" required="false" default="">
+		<cfargument name="type" type="string" required="false" default="">
+		<cfargument name="values" type="string" required="false" default="">
+		<cfargument name="required" type="string" required="false" default="">
+		<cfargument name="default" type="string" required="false" default="">
+		<cfargument name="label" type="string" required="false" default="">
+		<cfset var st = structNew()>
+		<cfset st.name = arguments.name>
+		<cfset st.description = arguments.description>
+		<cfset st.type = arguments.type>
+		<cfset st.values = arguments.values>
+		<cfset st.required = arguments.required>
+		<cfset st.default = arguments.default>
+		<cfset st.label = arguments.label>
+		<cfset arrayAppend(variables.stConfig.resourceTypes[arguments.resType], duplicate(st))>
+	</cffunction>
+
+	<cffunction name="removeResourceType" access="public" returntype="void">
+		<cfargument name="name" type="string" required="true">
+		<cfset structDelete(variables.stConfig.resourceTypes, arguments.name, false)>
 	</cffunction>
 	
 	<cffunction name="addResourceLibraryPath" access="public" returntype="void">

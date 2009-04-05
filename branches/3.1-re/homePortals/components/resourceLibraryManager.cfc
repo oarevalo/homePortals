@@ -13,25 +13,38 @@
 	<!------------------------------------------------->
 	<cffunction name="init" returntype="resourceLibraryManager" access="public" hint="This is the constructor">
 		<cfargument name="config" type="homePortalsConfigBean" required="true">
+		<cfscript>
+			var i = 0;
+			var oResLib = 0;
+			var oResType = 0;
+			var stResTypes = arguments.config.getResourceTypes();
+			var aResLibs = arguments.config.getResourceLibraryPaths();
 
-		<cfset var i = 0>
-		<cfset var oResLib = 0>
-		<cfset var stResTypes = arguments.config.getResourceTypes()>
-		<cfset var aResLibs = arguments.config.getResourceLibraryPaths()>
+			// create and register the resource library instances
+			for(i=1;i lte arrayLen(aResLibs);i=i+1) {
+				oResLib = createObject("component","resourceLibrary").init( aResLibs[i] );
+				addResourceLibrary( oResLib );
+			}
 
-		<!--- create and register the resource library instances --->
-		<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
-			<cfset oResLib = createObject("component","resourceLibrary").init( aResLibs[i] )>
-			<cfset addResourceLibrary( oResLib )>
-		</cfloop>
-		
-		<!--- register the resource types into all libraries --->
-		<cfloop collection="#stResTypes#" item="i">
-			<cfset stResTypes[i].resourceType = i>
-			<cfset registerResourceType(argumentCollection = stResTypes[i])>
-		</cfloop>
-		
-		<cfreturn this>
+			// register the resource types into all libraries
+			for(i in stResTypes) {
+				oResType = createObject("component","resourceType").init();
+				
+				if(structKeyExists(stResTypes[i],"name")) oResType.setName( stResTypes[i].name );
+				if(structKeyExists(stResTypes[i],"description")) oResType.setDescription( stResTypes[i].description );
+				if(structKeyExists(stResTypes[i],"folderName")) oResType.setFolderName( stResTypes[i].folderName );
+				if(structKeyExists(stResTypes[i],"resBeanPath")) oResType.setResBeanPath( stResTypes[i].resBeanPath );
+				if(structKeyExists(stResTypes[i],"fileTypes")) oResType.setFileTypes( stResTypes[i].fileTypes );
+				
+				for(j=1;j lte arrayLen(stResTypes[i].properties);j=j+1) {
+					oResType.setProperty(argumentCollection = stResTypes[i].properties[j]);
+				}
+
+				registerResourceType(oResType);
+			}			
+			
+			return this;
+		</cfscript>
 	</cffunction>
 
 	<!------------------------------------------------->
@@ -56,14 +69,10 @@
 	<!--- registerResourceType                	   ---->
 	<!------------------------------------------------->
 	<cffunction name="registerResourceType" access="public" returntype="void">
-		<cfargument name="resourceType" type="string" required="true">
-		<cfargument name="folderName" type="string" required="false" default="">
-		<cfargument name="defaultExtension" type="string" required="false" default="">
-		<cfargument name="customProperties" type="string" required="false" default="">
-		<cfargument name="resBeanPath" type="string" required="false" default="">
-		<cfset variables.stResourceTypes[arguments.resourceType] = arguments>
+		<cfargument name="resType" type="resourceType" required="true">
+		<cfset variables.stResourceTypes[arguments.resType.getName()] = resType>
 		<cfloop from="1" to="#arrayLen(variables.aResourceLibs)#" index="i">
-			<cfset variables.aResourceLibs[i].registerResourceType(argumentCollection = arguments)>
+			<cfset variables.aResourceLibs[i].registerResourceType(arguments.resType)>
 		</cfloop>
 	</cffunction>
 
@@ -75,7 +84,7 @@
 
 		<cfloop from="1" to="#arrayLen(variables.aResourceLibs)#" index="i">
 			<cfloop collection="#variables.stResourceTypes#" item="res">
-				<cfset variables.aResourceLibs[i].registerResourceType(argumentCollection = variables.stResourceTypes[res])>
+				<cfset variables.aResourceLibs[i].registerResourceType(variables.stResourceTypes[res])>
 			</cfloop>
 		</cfloop>
 	</cffunction>
@@ -91,10 +100,18 @@
 	<!------------------------------------------------->
 	<!--- getResourceTypesInfo                	   ---->
 	<!------------------------------------------------->
-	<cffunction name="getResourceTypesInfo" access="public" returntype="struct" hint="returns an array of structures with details on the registered resource types">
-		<cfreturn duplicate(variables.stResourceTypes)>
+	<cffunction name="getResourceTypesInfo" access="public" returntype="struct" hint="returns an array of resourceType objects with details on the registered resource types">
+		<cfreturn variables.stResourceTypes>
 	</cffunction>
 	
+	<!------------------------------------------------->
+	<!--- getResourceTypeInfo                	   ---->
+	<!------------------------------------------------->
+	<cffunction name="getResourceTypeInfo" access="public" returntype="resourceType" hint="returns a resourceType object with details on the requested resource type">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfreturn variables.stResourceTypes[arguments.resourceType]>
+	</cffunction>
+		
 	<!------------------------------------------------->
 	<!--- hasResourceType	                	   ---->
 	<!------------------------------------------------->

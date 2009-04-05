@@ -1,7 +1,7 @@
 <cfcomponent hint="This component implements a catalog to access the resource library using lazy loading of resources">
 
 	<cfscript>
-		variables.qryResources = QueryNew("libpath,type,id,href,package,description,infoHREF");
+		variables.qryResources = QueryNew("libpath,type,id,href,package,description");
 		variables.mapResources = structNew();
 		variables.oResourceLibraryManager = 0;
 	</cfscript>
@@ -119,7 +119,7 @@
 
 			// clear the catalog
 			variables.mapResources = structNew();
-			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF,libPath");
+			variables.qryResources = QueryNew("type,id,href,package,description,libPath");
 
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
@@ -144,7 +144,6 @@
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
-					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);					
 					querySetCell(variables.qryResources, "libPath", stResourceBean.resLibPath);					
 					
 					// create resource map entry
@@ -154,7 +153,6 @@
 					st.HREF = stResourceBean.HREF;
 					st.Package = stResourceBean.Package;
 					st.Description = stResourceBean.Description;
-					st.infoHREF = stResourceBean.infoHREF;
 					st.libPath = stResourceBean.resLibPath;
 
 					// create node for resource type group if doesnt exist
@@ -215,7 +213,6 @@
 				st.HREF = stResourceBean.HREF;
 				st.Package = stResourceBean.Package;
 				st.Description = stResourceBean.Description;
-				st.infoHREF = stResourceBean.infoHREF;
 				st.libpath = stResourceBean.resLibPath;
 
 				// add resource to map
@@ -243,7 +240,7 @@
 			var resType = "";
 			var resID = "";
 			
-			variables.qryResources = QueryNew("type,id,href,package,description,infoHREF,libpath");
+			variables.qryResources = QueryNew("type,id,href,package,description,libpath");
 			
 			for(resType in variables.mapResources) {
 			
@@ -257,7 +254,6 @@
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);
-					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);
 					querySetCell(variables.qryResources, "libpath", stResourceBean.libpath);			
 				}
 	
@@ -305,7 +301,6 @@
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
-					querySetCell(variables.qryResources, "infoHREF", stResourceBean.infoHREF);					
 					querySetCell(variables.qryResources, "libpath", stResourceBean.resLibPath);					
 					
 					// create resource map entry
@@ -315,7 +310,6 @@
 					st.HREF = stResourceBean.HREF;
 					st.Package = stResourceBean.Package;
 					st.Description = stResourceBean.Description;
-					st.infoHREF = stResourceBean.infoHREF;
 					st.libpath = stResourceBean.resLibPath;
 
 					// create node for resource type group if doesnt exist

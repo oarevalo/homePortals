@@ -5,7 +5,6 @@
 	<cfproperty name="Package" type="string" hint="The package to which this resource belongs to" />
 	<cfproperty name="HREF" type="string" />
 	<cfproperty name="Description" type="string" />
-	<cfproperty name="infoHREF" type="string" hint="the location of the package descriptor file that describes this resource" />
 	<cfproperty name="resLibPath" type="string" hint="the location of the resource library where this resource is located" />
 	<cfproperty name="customProperties" type="struct" hint="holds custom properties for the resource">
 
@@ -17,7 +16,6 @@
 		variables.instance.Package = "";
 		variables.instance.HREF = "";
 		variables.instance.Description = "";
-		variables.instance.infoHREF = "";
 		variables.instance.resLibPath = "";
 		variables.instance.customProperties = structNew();
 	</cfscript>
@@ -29,7 +27,6 @@
 			variables.instance.Package = "";
 			variables.instance.HREF = "";
 			variables.instance.Description = "";
-			variables.instance.infoHREF = "";
 			variables.instance.resLibPath = "";
 			variables.instance.customProperties = structNew();
 		</cfscript>
@@ -106,6 +103,14 @@
 		<cfreturn variables.instance.Href />
 	</cffunction>
 
+	<cffunction name="getFullHref" access="public" output="false" returntype="string">
+		<cfif right(variables.instance.resLibPath,1) neq "/">
+			<cfreturn variables.instance.resLibPath & "/" & variables.instance.Href />
+		<cfelse>
+			<cfreturn variables.instance.resLibPath & variables.instance.Href />
+		</cfif>
+	</cffunction>
+	
 	<cffunction name="setHref" access="public" output="false" returntype="void">
 		<cfargument name="Href" type="string" required="true" />
 		<cfset variables.instance.Href = arguments.Href />
@@ -152,16 +157,6 @@
 		<cfreturn />
 	</cffunction>
 
-	<cffunction name="getInfoHREF" access="public" output="false" returntype="string">
-		<cfreturn variables.instance.infoHREF />
-	</cffunction>
-
-	<cffunction name="setInfoHREF" access="public" output="false" returntype="void">
-		<cfargument name="infoHREF" type="string" required="true" />
-		<cfset variables.instance.infoHREF = arguments.infoHREF />
-		<cfreturn />
-	</cffunction>
-	
 	<cffunction name="getResLibPath" access="public" output="false" returntype="string">
 		<cfreturn variables.instance.resLibPath />
 	</cffunction>
