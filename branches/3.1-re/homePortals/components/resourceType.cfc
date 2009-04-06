@@ -23,7 +23,7 @@
 			oResBean.setType ( variables.instance.name );
 			
 			for(p in stProps) {
-				oResBean.setProperty( p, stProps[p].default );
+				oResBean.setProperty( p, stProps[p]["default"] );
 			}
 		
 			return oResBean;

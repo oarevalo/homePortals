@@ -261,7 +261,7 @@
 								if(structKeyExist(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
 								if(structKeyExist(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
 								if(structKeyExist(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
-								if(structKeyExist(aProperties[k],"default") and aProperties[k].default neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k].default;
+								if(structKeyExist(aProperties[k],"default") and aProperties[k]["default"] neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k]["default"];
 								if(structKeyExist(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
 							}
 							break;	
