@@ -73,17 +73,14 @@
 			<property name="author" type="string" />
 			<property name="owner" type="string" />
 			<property name="accessType" type="list" values="public,private" />
+			<fileTypes>htm</fileTypes>
 		</resourceType>
 						
 		<resourceType name="feed">
 			<folderName>Feeds</folderName>
 			<description>This represents an rss or atom feed</description>
-			<property name="sourceURL" type="string" hint="location of the source of the feed" label="URL" />
-			<property name="pubDate" type="date" label="Publication Date" />
-			<property name="format" type="list" values="rss,atom" default="rss" label="Format" />
-			<property name="about" type="resource:content" label="About this Feed" />
-			<resBeanPath>homePortals.components.resourceBean</resBeanPath>
-			<fileTypes>xml,url,rss</fileTypes>
+			<property name="rssurl" type="string" hint="Location of the source of the feed" label="Feed URL" />
+			<property name="htmlurl" type="string" hint="Location of the website associated with this feed" label="Website URL" />
 		</resourceType>
 		
 		<resourceType name="skin">
