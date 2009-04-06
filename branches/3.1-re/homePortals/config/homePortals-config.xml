@@ -59,6 +59,7 @@
 	<contentRenderers>
 		<contentRenderer moduleType="content" path="homePortals.components.contentTagRenderers.content" />
 		<contentRenderer moduleType="view" path="homePortals.components.contentTagRenderers.view" />
+		<contentRenderer moduleType="image" path="homePortals.components.contentTagRenderers.image" />
 	</contentRenderers>
 	
 	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
@@ -87,6 +88,13 @@
 			<folderName>Skins</folderName>
 			<fileTypes>css</fileTypes>
 		</resourceType>
+
+		<resourceType name="image">
+			<folderName>Images</folderName>
+			<description>This represents an an image</description>
+			<property name="label" type="string"  />
+		</resourceType>
+		
 	</resourceTypes>
 	
 	<!-- Directories where HomePortals will look for resources  -->
