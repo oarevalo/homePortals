@@ -317,27 +317,27 @@
 		<cfreturn variables.stConfig.contentRoot>
 	</cffunction>
 
-	<cffunction name="getPageCacheSize" access="public" returntype="numeric" hint="The maximum number of homeportals pages to cache at any given time">
+	<cffunction name="getPageCacheSize" access="public" returntype="any" hint="The maximum number of homeportals pages to cache at any given time">
 		<cfreturn val(variables.stConfig.pageCacheSize)>	
 	</cffunction>
 
-	<cffunction name="getPageCacheTTL" access="public" returntype="numeric" hint="The maximum amount in minutes before an unchanged page is expelled from the cache.">
+	<cffunction name="getPageCacheTTL" access="public" returntype="any" hint="The maximum amount in minutes before an unchanged page is expelled from the cache.">
 		<cfreturn val(variables.stConfig.pageCacheTTL)>
 	</cffunction>
 
-	<cffunction name="getContentCacheSize" access="public" returntype="numeric" hint="The maximum number of items to hold in the content cache">
+	<cffunction name="getContentCacheSize" access="public" returntype="any" hint="The maximum number of items to hold in the content cache">
 		<cfreturn val(variables.stConfig.contentCacheSize)>	
 	</cffunction>
 
-	<cffunction name="getContentCacheTTL" access="public" returntype="numeric" hint="Default TTL in minutes for content items on the content cache. This can be overriden for individual entries">
+	<cffunction name="getContentCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the content cache. This can be overriden for individual entries">
 		<cfreturn val(variables.stConfig.contentCacheTTL)>
 	</cffunction>
 
-	<cffunction name="getRSSCacheSize" access="public" returntype="numeric" hint="The maximum number of items to hold in the RSS cache">
+	<cffunction name="getRSSCacheSize" access="public" returntype="any" hint="The maximum number of items to hold in the RSS cache">
 		<cfreturn val(variables.stConfig.rssCacheSize)>	
 	</cffunction>
 
-	<cffunction name="getRSSCacheTTL" access="public" returntype="numeric" hint="Default TTL in minutes for content items on the RSS cache. This can be overriden for individual entries">
+	<cffunction name="getRSSCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the RSS cache. This can be overriden for individual entries">
 		<cfreturn val(variables.stConfig.rssCacheTTL)>
 	</cffunction>
 
@@ -428,6 +428,9 @@
 		<cfreturn variables.stConfig.resourceLibraryPaths>
 	</cffunction>
 	
+	<cffunction name="getMemento" access="public" returntype="struct" hint="returns a struct with a copy of all settings">
+		<cfreturn duplicate(variables.stConfig)>
+	</cffunction>
 	
 	
 	<!--- Setters --->
