@@ -272,13 +272,13 @@
 						case "properties":
 							aProperties = st.properties;
 							for(k=1;k lte arrayLen(aProperties);k=k+1) {
-								if(structKeyExist(aProperties[k],"name") and aProperties[k].name neq "") tmpXmlNode2.xmlAttributes["name"] = aProperties[k].name;
-								if(structKeyExist(aProperties[k],"description") and aProperties[k].description neq "") tmpXmlNode2.xmlAttributes["description"] = aProperties[k].description;
-								if(structKeyExist(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
-								if(structKeyExist(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
-								if(structKeyExist(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
-								if(structKeyExist(aProperties[k],"default") and aProperties[k]["default"] neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k]["default"];
-								if(structKeyExist(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
+								if(structKeyExists(aProperties[k],"name") and aProperties[k].name neq "") tmpXmlNode2.xmlAttributes["name"] = aProperties[k].name;
+								if(structKeyExists(aProperties[k],"description") and aProperties[k].description neq "") tmpXmlNode2.xmlAttributes["description"] = aProperties[k].description;
+								if(structKeyExists(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
+								if(structKeyExists(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
+								if(structKeyExists(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
+								if(structKeyExists(aProperties[k],"default") and aProperties[k]["default"] neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k]["default"];
+								if(structKeyExists(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
 							}
 							break;	
 					}
