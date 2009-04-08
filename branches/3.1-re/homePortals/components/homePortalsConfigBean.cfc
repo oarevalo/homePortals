@@ -25,6 +25,7 @@
 			variables.stConfig.rssCacheTTL = "";
 			variables.stConfig.baseResourceTypes = "";
 			variables.stConfig.pageProviderClass = "";
+			variables.stConfig.lstResourceTypes = "";
 
 			variables.stConfig.resourceLibraryPaths = arrayNew(1);
 			variables.stConfig.renderTemplates = structNew();
@@ -73,11 +74,20 @@
 				
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						xmlThisNode = xmlNode.xmlChildren[j];
-						if(Not structKeyExists(xmlThisNode.xmlAttributes,"type"))
-							throw("HomePortals config file is malformed. Missing TYPE attribute for baseResource","","homePortals.config.configFileNotValid");
-						if(Not structKeyExists(variables.stConfig.resources, xmlThisNode.xmlAttributes.type)) 
-							variables.stConfig.resources[xmlThisNode.xmlAttributes.type] = ArrayNew(1);
-						ArrayAppend(variables.stConfig.resources[xmlThisNode.xmlAttributes.type], xmlThisNode.xmlAttributes.href);
+						if(xmlThisNode.xmlName eq "resource") {
+							// make sure we have a type attribute
+							if(Not structKeyExists(xmlThisNode.xmlAttributes,"type"))
+								throw("HomePortals config file is malformed. Missing TYPE attribute for baseResource","","homePortals.config.configFileNotValid");
+
+							// store baseresources indexed by type
+							if(Not structKeyExists(variables.stConfig.resources, xmlThisNode.xmlAttributes.type)) {
+								variables.stConfig.resources[xmlThisNode.xmlAttributes.type] = ArrayNew(1);
+							
+								// keep track of list of existing types (this is used in case there is no baseResourceTypes entry)
+								variables.stConfig.lstResourceTypes = listAppend(variables.stConfig.lstResourceTypes, xmlThisNode.xmlAttributes.type);
+							}
+							ArrayAppend(variables.stConfig.resources[xmlThisNode.xmlAttributes.type], xmlThisNode.xmlAttributes.href);
+						}
 						
 					}
 
@@ -147,7 +157,7 @@
 		<cfscript>
 			var xmlConfigDoc = "";
 			var xmlOriginalConfigDoc = "";
-			var lstResourceTypes = getBaseResourceTypes();
+			var lstResourceTypes = "";
 			var lstKeys = "";
 			var i = 1; var j = 1; var k = 1;
 			var thisKey = "";
@@ -193,6 +203,12 @@
 			
 			// ****** [baseResources] *****
 			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"baseResources") );
+			
+			if(getBaseResourceTypes() neq "") {
+				lstResourceTypes = getBaseResourceTypes();
+			} else {
+				lstResourceTypes = variables.stConfig.lstResourceTypes;
+			}
 			
 			for(i=1;i lte ListLen(lstResourceTypes);i=i+1) {
 				thisResourceType = ListGetAt(lstResourceTypes, i);
@@ -348,7 +364,7 @@
 	<cffunction name="getBaseResourcesByType" access="public" returntype="array" hint="Returns all base resources of the given type">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfset var aResources = arrayNew(1)>
-		<cfif listFindNoCase(variables.stConfig.baseResourceTypes, arguments.resourceType) and structKeyExists( variables.stConfig.resources, arguments.resourceType )>
+		<cfif structKeyExists( variables.stConfig.resources, arguments.resourceType )>
 			<cfset aResources = variables.stConfig.resources[arguments.resourceType]>
 		</cfif>
 		<cfreturn aResources>
@@ -513,14 +529,16 @@
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="href" type="string" required="true">
 		
-		<cfif listFindNoCase(variables.stConfig.baseResourceTypes, arguments.type)>
-			<cfif not structKeyExists(variables.stConfig.resources, arguments.type)>
-				<cfset variables.stConfig.resources[arguments.type] = arrayNew(1)>
-			</cfif>
-			<cfset arrayAppend(variables.stConfig.resources[arguments.type], arguments.href)>
-		<cfelse>
-			<cfthrow message="Resource type not allowed" type="homePortals.config.invalidBaseResourceType">		
+		<cfif not listFindNoCase(variables.stConfig.baseResourceTypes, arguments.type)
+				and not listFindNoCase(variables.stConfig.lstResourceTypes, arguments.type)>
+			<cfset variables.stConfig.lstResourceTypes = listAppend(variables.stConfig.lstResourceTypes, arguments.type)>
 		</cfif>
+		
+		<cfif not structKeyExists(variables.stConfig.resources, arguments.type)>
+			<cfset variables.stConfig.resources[arguments.type] = arrayNew(1)>
+		</cfif>
+
+		<cfset arrayAppend(variables.stConfig.resources[arguments.type], arguments.href)>
 	</cffunction>
 
 	<cffunction name="removeBaseResource" access="public" returntype="void">
