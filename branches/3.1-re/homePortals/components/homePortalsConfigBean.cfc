@@ -263,27 +263,34 @@
 				tmpXmlNode.xmlAttributes["name"] = st.name;
 				
 				for(key in st) {
-					tmpXmlNode2 = xmlElemNew(xmlConfigDoc,key);
+					tmpXmlNode2 = 0;
 					switch(key) {
-						case "description": if(st[key] neq "") tmpXmlNode2.xmlAttributes["description"] = st[key]; break;
-						case "folderName": if(st[key] neq "") tmpXmlNode2.xmlAttributes["folderName"] = st[key]; break;
-						case "resBeanPath": if(st[key] neq "") tmpXmlNode2.xmlAttributes["resBeanPath"] = st[key]; break;
-						case "fileTypes": if(st[key] neq "") tmpXmlNode2.xmlAttributes["fileTypes"] = st[key]; break;
-						case "properties":
-							aProperties = st.properties;
-							for(k=1;k lte arrayLen(aProperties);k=k+1) {
-								if(structKeyExists(aProperties[k],"name") and aProperties[k].name neq "") tmpXmlNode2.xmlAttributes["name"] = aProperties[k].name;
-								if(structKeyExists(aProperties[k],"description") and aProperties[k].description neq "") tmpXmlNode2.xmlAttributes["description"] = aProperties[k].description;
-								if(structKeyExists(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
-								if(structKeyExists(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
-								if(structKeyExists(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
-								if(structKeyExists(aProperties[k],"default") and aProperties[k]["default"] neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k]["default"];
-								if(structKeyExists(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
-							}
-							break;	
+						case "description":  tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"description"); break;
+						case "folderName": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"folderName"); break;
+						case "resBeanPath": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"resBeanPath"); break;
+						case "fileTypes": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"fileTypes"); break;
 					}
-					ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+					if(isXmlNode(tmpXmlNode2) and st[key] neq "") {
+						tmpXmlNode2.xmlText = xmlFormat(st[key]);
+						ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+					}
 				}
+				
+				if(structKeyExists(st,"properties")) {
+					aProperties = st.properties;
+					for(k=1;k lte arrayLen(aProperties);k=k+1) {
+						tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"property");
+						if(structKeyExists(aProperties[k],"name") and aProperties[k].name neq "") tmpXmlNode2.xmlAttributes["name"] = aProperties[k].name;
+						if(structKeyExists(aProperties[k],"description") and aProperties[k].description neq "") tmpXmlNode2.xmlAttributes["description"] = aProperties[k].description;
+						if(structKeyExists(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
+						if(structKeyExists(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
+						if(structKeyExists(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
+						if(structKeyExists(aProperties[k],"default") and aProperties[k]["default"] neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k]["default"];
+						if(structKeyExists(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
+						ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+					}
+				}
+				
 				ArrayAppend(xmlConfigDoc.xmlRoot.resourceTypes.xmlChildren, tmpXmlNode );
 			}
 
@@ -626,6 +633,17 @@
 		<cfargument name="default" type="string" required="false" default="">
 		<cfargument name="label" type="string" required="false" default="">
 		<cfset var st = structNew()>
+		<cfset var aProps = variables.stConfig.resourceTypes[arguments.resType].properties>
+		<cfset var index = 0>
+		<cfset var i = 0>
+
+		<cfloop from="1" to="#arrayLen(aProps)#" index="i">
+			<cfif aProps[i].name eq arguments.name>
+				<cfset index = i>
+				<cfbreak>
+			</cfif>
+		</cfloop>
+
 		<cfset st.name = arguments.name>
 		<cfset st.description = arguments.description>
 		<cfset st.type = arguments.type>
@@ -633,14 +651,31 @@
 		<cfset st.required = arguments.required>
 		<cfset st.default = arguments.default>
 		<cfset st.label = arguments.label>
-		<cfset arrayAppend(variables.stConfig.resourceTypes[arguments.resType], duplicate(st))>
+		
+		<cfif index eq 0>
+			<cfset arrayAppend(variables.stConfig.resourceTypes[arguments.resType].properties, duplicate(st))>
+		<cfelse>
+			<cfset variables.stConfig.resourceTypes[arguments.resType].properties[index] = duplicate(st)>
+		</cfif>
 	</cffunction>
 
 	<cffunction name="removeResourceType" access="public" returntype="void">
 		<cfargument name="name" type="string" required="true">
 		<cfset structDelete(variables.stConfig.resourceTypes, arguments.name, false)>
 	</cffunction>
-	
+
+	<cffunction name="removeResourceTypeProperty" access="public" returntype="void">
+		<cfargument name="resType" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfset var aProps = variables.stConfig.resourceTypes[arguments.resType].properties>
+		<cfloop from="1" to="#arrayLen(aProps)#" index="i">
+			<cfif aProps[i].name eq arguments.name>
+				<cfset arrayDeleteAt(variables.stConfig.resourceTypes[arguments.resType].properties, i)>
+				<cfreturn>
+			</cfif>
+		</cfloop>
+	</cffunction>
+		
 	<cffunction name="addResourceLibraryPath" access="public" returntype="void">
 		<cfargument name="path" type="string" required="true">
 		<cfset arrayAppend(variables.stConfig.resourceLibraryPaths, arguments.path)>
