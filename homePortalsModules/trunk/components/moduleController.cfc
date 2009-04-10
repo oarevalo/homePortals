@@ -35,6 +35,7 @@
 			var myConfigBeanStore = createObject("component", "configBeanStore").init();
 			var tmpModuleRoot = "";
 			var oModuleProperties = 0;
+			var csStorePath = "";
 		
 			// validate the module info
 			if(arguments.pageHREF eq "") throw("Page HREF cannot be blank","homePortals.moduleController.missingPageHREF");
@@ -72,9 +73,14 @@
 				myConfigBeanStore.save(variables.pageHREF, variables.moduleID, variables.oModuleConfigBean);
 			}
 
-
+			// build the path where the modules will store their data 
+			csStorePath = getHomePortalsConfigBean().getAppRoot() & "/accountsData";
+			if(not directoryExists(expandPath(csStorePath))) {
+				createDir(expandPath(csStorePath));
+			}
+			
 			// set the accounts root and the page owner on the content store
-			variables.oContentStoreConfigBean.setAccountsRoot( getHomePortals().getPluginManager().getPlugin("accounts").getAccountsService().getConfig().getAccountsRoot() );
+			variables.oContentStoreConfigBean.setAccountsRoot( csStorePath );
 			variables.oContentStoreConfigBean.setOwner( variables.oModuleConfigBean.getPageSetting("_page").owner );
 
 		
@@ -143,7 +149,7 @@
 	<!---------------------------------------->
 	<!--- getHomePortalsConfigBean         --->
 	<!---------------------------------------->		
-	<cffunction name="getHomePortalsConfigBean" returntype="homePortalsConfigBean" access="public"
+	<cffunction name="getHomePortalsConfigBean" returntype="homePortals.components.homePortalsConfigBean" access="public"
 				hint="Returns a bean with configuration settings for the HomePortals application">
 		<cfreturn variables.oHomePortals.getConfig()>
 	</cffunction>
@@ -345,7 +351,7 @@
 				if(isSimpleValue(stSettings[tmpField])) 
 					stModule[tmpField] = stSettings[tmpField]; 	
 			}			
-			oPage.setModule(id, stModule);
+			oPage.setModule(id, stModule.location, stModule);
 
 			// save changes in configBean store
 			oConfigBeanStore = createObject("component", "configBeanStore").init();
@@ -588,6 +594,11 @@
 		<cfabort>
 	</cffunction>	
 
+	<cffunction name="createDir" access="private" returntype="void">
+		<cfargument name="path" type="string" required="true">
+		<cfdirectory action="create" directory="#arguments.path#">
+	</cffunction>
+	
 </cfcomponent>
 			 
 			 

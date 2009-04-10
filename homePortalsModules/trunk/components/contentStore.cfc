@@ -43,6 +43,10 @@
 								& "/" & variables.owner
 								& "/" & variables.oContentStoreConfigBean.getDefaultName()
 								& "." & ext;
+				
+				if(not directoryExists(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.owner)))				
+					createDir(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.owner));
+								
 				variables.oContentStoreConfigBean.setURL(tmpURL);
 			}
 			
@@ -52,6 +56,9 @@
 				tmpURL = variables.oContentStoreConfigBean.getAccountsRoot() 
 								& "/" & variables.oContentStoreConfigBean.getOwner()
 								& "/" & tmpURL;
+
+				if(not directoryExists(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.oContentStoreConfigBean.getOwner())))				
+					createDir(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.oContentStoreConfigBean.getOwner()));
 				
 				// append .xml if necessary
 				if(listLast(tmpURL,".") neq ext)
@@ -220,4 +227,8 @@
 		<cfthrow message="#arguments.message#">
 	</cffunction>
 
+	<cffunction name="createDir" access="private" returntype="void">
+		<cfargument name="path" type="string" required="true">
+		<cfdirectory action="create" directory="#arguments.path#">
+	</cffunction>
 </cfcomponent>

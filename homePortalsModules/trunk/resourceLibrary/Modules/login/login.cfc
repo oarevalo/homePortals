@@ -23,7 +23,8 @@ Also processes cookie logins.
 
 		<cfset var qryUser = QueryNew("")>
 		<cfset var oHP = this.controller.getHomePortals()>
-		<cfset var oAccountsService = oHP.getAccountsService()>
+		<cfset var oAccountsPlugin = oHP.getPluginManager().getPlugin("accounts")>
+		<cfset var oAccountsService = oAccountsPlugin.getAccountsService()>
 		<cfset var appRoot = oHP.getConfig().getAppRoot()>	
 		
 		<cftry>
@@ -31,13 +32,13 @@ Also processes cookie logins.
 			<cfset qryUser = oAccountsService.loginUser(arguments.username, Arguments.password)>
 
 			<cfif rememberMe eq 1>
-				<cfset userKey = encrypt(qryUser.userID, getLocalSecret())>
-				<cfcookie name="homeportals_username" value="#qryUser.username#" expires="never">			
+				<cfset userKey = encrypt(qryUser.accountID, getLocalSecret())>
+				<cfcookie name="homeportals_username" value="#qryUser.accountname#" expires="never">			
 				<cfcookie name="homeportals_userKey" value="#userKey#" expires="never">			
 			</cfif>
 
 			<cfset this.controller.setMessage("Welcome Back!")>
-			<cfset this.controller.setScript("document.location='#appRoot#/?account=#qryUser.username#'")>
+			<cfset this.controller.setScript("document.location='#appRoot#/?account=#qryUser.accountname#'")>
 					
 			<cfcatch type="any">
 				<cfset this.controller.setMessage(jsstringformat(cfcatch.Message))>
@@ -53,15 +54,17 @@ Also processes cookie logins.
 		<cfargument name="username" type="string" required="yes">
 		<cfargument name="userkey" type="string" required="yes">
 
-		<cfset var oAccountsService = this.controller.getHomePortals().getAccountsService()>
+		<cfset var oHP = this.controller.getHomePortals()>
+		<cfset var oAccountsPlugin = oHP.getPluginManager().getPlugin("accounts")>
+		<cfset var oAccountsService = oAccountsPlugin.getAccountsService()>
 		<cfset var decKey = "">
 		<cfset var qry = 0>
 		
 		<cftry>
 			<cfset decKey = decrypt(arguments.userKey, getLocalSecret())>
-			<cfset qry = oAccountsService.getAccountByUsername(arguments.username)>
+			<cfset qry = oAccountsService.getAccountByName(arguments.username)>
 	
-			<cfif decKey eq qry.userID>
+			<cfif decKey eq qry.accountID>
 				<cfset qryUser = oAccountsService.loginUser(arguments.username, "", qry.password)>
 			</cfif>
 
@@ -79,10 +82,11 @@ Also processes cookie logins.
 	<!---------------------------------------->	
 	<cffunction name="doLogoff" access="public" output="true">
 		<cfset var oHP = this.controller.getHomePortals()>
-		<cfset var oAccounts = oHP.getAccountsService()>
+		<cfset var oAccountsPlugin = oHP.getPluginManager().getPlugin("accounts")>
+		<cfset var oAccountsService = oAccountsPlugin.getAccountsService()>
 		<cfset var appRoot = oHP.getConfig().getAppRoot()>	
 
-		<cfset oAccounts.logoutUser()>
+		<cfset oAccountsService.logoutUser()>
 
 		<cfcookie name="homeportals_username" value="" expires="now">			
 		<cfcookie name="homeportals_userKey" value="" expires="now">

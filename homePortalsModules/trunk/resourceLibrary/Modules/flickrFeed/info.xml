@@ -3,7 +3,7 @@
 
 
 	<!-- ********  Flickr Feed  ************ -->
-	<resource access="general" id="FlickrFeed" name="flickrFeed/flickrFeed">
+	<resource access="general" id="FlickrFeed" name="flickrFeed/FlickrFeed">
 		<description>
 			Displays pictures from flickr. Pictures can be displayed by user or by tags.
 		</description>
