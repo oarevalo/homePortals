@@ -110,7 +110,7 @@
 			var href =  "";
 			var pageIndex = 0;
 			
-			if(isLinkedPage(arguments.pageName)) 
+			if(isLinkedPage(arguments.oldPageName)) 
 				throw("A linked page cannot be modified from within a site", "homePortals.site.notAllowed");
 				
 			// get the location of the page (this will also check for existence)
