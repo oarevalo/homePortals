@@ -41,7 +41,7 @@
 			var oPage = getPage();
 			
 			// define a unique id for the new module based on the module name
-			moduleName =  oResourceBean.getName();
+			moduleName =  oResourceBean.getPackage() & "/" & oResourceBean.getID();
 			aModules = oPage.getModules();
 			
 			while(keepLooping) {
@@ -69,8 +69,9 @@
 			// add basic properties to module
 			stModule["id"] = moduleID;
 			stModule["location"] = arguments.locationID;
-			stModule["name"] = oResourceBean.getName();
+			stModule["name"] = moduleName;
 			stModule["title"] = moduleID;
+			stModule["moduleType"] = "module";
 			
 			// add default properties from resourceBean
 			aTemp = oResourceBean.getAttributes();
