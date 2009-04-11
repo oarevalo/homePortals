@@ -167,8 +167,9 @@ History:
 			var aAccess = arrayNew(1);
 			var j = 1;
 			var oHP = this.controller.getHomePortals();
+			var oAccountsService = oHP.getPluginManager().getPlugin("accounts").getAccountsService();
 		
-			var oFriendsService = oHP.getAccountsService().getFriendsService();
+			var oFriendsService = oAccountsService.getFriendsService();
 			var qryFriends = oFriendsService.getFriends(arguments.owner);
 			
 			var qryResources = oHP.getCatalog().getResourcesByType(arguments.resourceType);
