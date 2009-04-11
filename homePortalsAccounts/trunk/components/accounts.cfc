@@ -367,13 +367,13 @@
 			var oConfig = getConfig();
 			var oPage = 0;
 			var xmlStr = "";
-			
+
 			// if a template for new pages has been defined then use that for the new page
-			if(oConfig.getNewPageTemplate() eq "") {
+			if(oConfig.getNewPageTemplate() neq "") {
 
 				// get new page and process tokens
 				xmlStr = processTemplate(arguments.accountName, oConfig.getNewPageTemplate());
-	
+
 				// convert into xml document
 				oPage = createObject("component","homePortals.components.pageBean").init(xmlStr);
 			
