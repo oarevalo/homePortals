@@ -34,7 +34,8 @@
 							.init()
 							.setName("module")
 							.setFolderName("Modules")
-							.setResBeanPath("homePortalsModules.components.moduleResourceBean");
+							.setResBeanPath("homePortalsModules.components.moduleResourceBean")
+							.setDescription("Modules are reusable components that allow you page to perform particular tasks. Modules act as mini applications that can do things like displaying calendars, blogs, rss feed contents, etc.");
 			
 			oResourceLibraryManager = getHomePortals().getResourceLibraryManager();
 			oResourceLibraryManager.registerResourceLibraryPath("/homePortalsModules/resourceLibrary");
