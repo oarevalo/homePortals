@@ -11,6 +11,7 @@
 	
 	bFailed = false;
 	errorMessage = "";
+	startDate = now();
 	
 	try {	
 		// get content store

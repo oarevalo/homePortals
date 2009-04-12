@@ -4,7 +4,7 @@
 
 	
 	<!-- ********   Epoch Calendar  ************ -->
-	<resource access="general" id="EpochCalendar" name="EpochCalendar/calendar">
+	<resource access="general" id="calendar" name="EpochCalendar/calendar">
 		<description>
 			Displays a calendar
 		</description>

@@ -82,7 +82,6 @@ History:
 	<cffunction name="saveFeed" access="public" returntype="void">
 		<cfargument name="rssURL" type="string" required="true" hint="The URL of the feed">
 		<cfargument name="feedName" type="string" required="true" hint="resource name">
-		<cfargument name="access" type="string" required="true" hint="access type for resource">
 		<cfargument name="description" type="string" required="true" hint="resource description">
 				
         <cfset var oResourceBean = 0>
@@ -106,8 +105,6 @@ History:
 			oResourceBean.setID(createUUID());
 			oResourceBean.setName(arguments.feedName);
 			oResourceBean.setHREF(arguments.rssURL);
-			oResourceBean.setOwner(siteOwner);
-			oResourceBean.setAccessType(arguments.access); 
 			oResourceBean.setDescription(arguments.description); 
 			oResourceBean.setPackage(siteOwner); 
 			oResourceBean.setType(resourceType); 
@@ -173,21 +170,11 @@ History:
 			var qryFriends = oFriendsService.getFriends(arguments.owner);
 			
 			var qryResources = oHP.getCatalog().getResourcesByType(arguments.resourceType);
-			
-			for(j=1;j lte qryResources.recordCount;j=j+1) {
-				aAccess[j] = qryResources.access[j] eq "general"
-							or qryResources.access[j] eq ""
-							or (qryResources.access[j] eq "owner" and qryResources.owner[j] eq arguments.owner)
-							or (qryResources.access[j] eq "friend" and qryResources.owner[j] eq arguments.owner)
-							or (qryResources.access[j] eq "friend" and listFindNoCase(valueList(qryFriends.userName), qryResources.owner[j]));
-			}
-			queryAddColumn(qryResources, "hasAccess", aAccess);
 		</cfscript>
 		
 		<cfquery name="qryResources" dbtype="query">
 			SELECT *
 				FROM qryResources
-				WHERE hasAccess = 1
 				ORDER BY package, id
 		</cfquery>
 

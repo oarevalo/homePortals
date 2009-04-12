@@ -737,7 +737,7 @@ CalCell.prototype.onclick = function ()
 		// *** ADDED 9/29/06 - Oscar arevalo ****
 		// This was added for HomePortals integration
 		// this raises a HomePortals event notifying that a date has been selected
-		h_raiseEvent(owner.name,"onSelectDate",cell.date); 
+		h_raiseEvent(owner.name,"onSelectDate",cell.date.dateFormat()); 
 	}
 };
 //-----------------------------------------------------------------------------

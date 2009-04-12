@@ -22,28 +22,5 @@
             </moduleInfo>
 			<api />
         </resource>	
-
-        <!-- ********   htmlBox  ************ -->
-        <resource access="general" id="htmlBox" name="contentBox/htmlBox">
-            <description>
-                Displays an HTML snippet from the resource library
-            </description>
-			<attributes>
-				<attribute name="resourceID" 
-							required="true"
-							description="The resource ID of the html snippet to add to the page."
-							type="resourceOnly"
-							resourceType="html"
-							resourceField="ID" />
-			</attributes>
-            <moduleInfo>
-                <authorName>Oscar Arevalo</authorName>
-                <authorEmail>oarevalo@gmail.com</authorEmail>
-                <authorURL>http://www.homeportals.com</authorURL>
-                <screenshot/>
-            </moduleInfo>
-			<api />
-        </resource>	
-
  
 </resLib>

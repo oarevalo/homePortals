@@ -22,6 +22,25 @@
 		text-align:left;
 		border-bottom:1px solid silver;
 	}
+	#frmEditAppointment {
+		padding:0px;
+		margin:0px;
+	}
+	#frmEditAppointment input {
+		font-family:Arial, Helvetica, sans-serif;
+		font-size:11px;
+		border:1px solid black;
+		padding:2px;
+	}
+	#frmEditAppointment textarea  {
+		font-family:Arial, Helvetica, sans-serif;
+		font-size:11px;
+		width:475px;
+		border:1px solid silver;
+		padding:2px;
+		height:320px;
+		margin:5px;
+	}		
 </style>
 
 <cfoutput>

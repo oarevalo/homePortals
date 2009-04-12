@@ -3,7 +3,7 @@
 	// get module path
 	cfg = this.controller.getModuleConfigBean();
 	tmpModulePath = cfg.getModuleRoot();	
-	imgRoot = tmpModulePath & "/Images";
+	imgRoot = tmpModulePath & "/images";
 	
 	resourceID = arguments.resourceID;	
 	
@@ -12,16 +12,12 @@
 	
 	if(resourceID neq "") {
 		oResourceBean = this.controller.getHomePortals().getCatalog().getResourceNode(getResourceType(),resourceID);
-		access = oResourceBean.getAccessType();
-		name = oResourceBean.getName();
 		description = oResourceBean.getDescription();
 		content = "";
-		contentLocation = oResourceBean.getHref();
+		contentLocation = oResourceBean.getFullHref();
 		tmpTitle = "Edit Content";
 	} else {
-		access = "owner";
 		description = "";
-		name = "";
 		content = "";
 		contentLocation = "";
 		tmpTitle = "Create Content";
@@ -37,7 +33,6 @@
 </cfscript>
 
 <cfif contentLocation neq "">
-	<cfset contentLocation = resourcesRoot & "/" & contentLocation>
 	<cfif fileExists(expandPath(contentLocation))>
 		<cffile action="read" file="#expandPath(contentLocation)#" variable="content">
 	<cfelse>
@@ -56,21 +51,11 @@
 			</div>
 	
 			<form name="frmEditContent" action="##" method="post" style="margin:0px;padding:0px;">
-				<input type="hidden" name="resourceID" value="#resourceID#">
 				<div style="border:1px solid silver;background-color:##fff;margin:5px;">
 					<table>
 						<tr>
 							<td width="100"><b>Name:</b></td>
-							<td><input type="text" name="name" value="#name#" style="width:300px;"></td>
-						</tr>
-						<tr>
-							<td><strong>Share with:</strong></td>
-							<td>
-								<input type="radio" name="access_chk" value="general" <cfif access eq "general">checked</cfif> onclick="if(this.checked) this.form.access.value=this.value;"> Everyone &nbsp;&nbsp;&nbsp;
-								<input type="radio" name="access_chk" value="friend" <cfif access eq "friend">checked</cfif> onclick="if(this.checked) this.form.access.value=this.value;"> My Friends &nbsp;&nbsp;&nbsp;
-								<input type="radio" name="access_chk" value="owner" <cfif access eq "owner">checked</cfif> onclick="if(this.checked) this.form.access.value=this.value;"> Only Me
-								<input type="hidden" name="access" value="#access#">
-							</td>
+							<td><input type="text" name="resourceID" value="#resourceID#" style="width:300px;"></td>
 						</tr>
 						<tr valign="top">
 							<td><strong>Description:</strong></td>
@@ -82,7 +67,7 @@
 				<textarea name="body" 
 							wrap="off" 
 							id="#moduleID#_edit" 
-							style="width:475px;border:1px solid silver;padding:2px;height:285px;margin:5px;">#HTMLEditFormat(content)#</textarea>
+							style="width:475px;border:1px solid silver;padding:2px;height:300px;margin:5px;">#HTMLEditFormat(content)#</textarea>
 				
 				<div style="margin-top:10px;padding-bottom:10px;text-align:center;">
 					<input type="button" name="btnSave" value="Save" onclick="#moduleID#.doFormAction('saveResource',this.form);#moduleID#.closeWindow();">&nbsp;&nbsp;&nbsp;

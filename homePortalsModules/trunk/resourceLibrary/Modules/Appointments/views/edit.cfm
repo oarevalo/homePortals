@@ -52,28 +52,6 @@
 	}
 </cfscript>
 
-<style type="text/css">
-	#frmEditAppointment {
-		padding:0px;
-		margin:0px;
-	}
-	#frmEditAppointment input {
-		font-family:Arial, Helvetica, sans-serif;
-		font-size:11px;
-		border:1px solid black;
-		padding:2px;
-	}
-	#frmEditAppointment textarea  {
-		font-family:Arial, Helvetica, sans-serif;
-		font-size:11px;
-		width:475px;
-		border:1px solid silver;
-		padding:2px;
-		height:320px;
-		margin:5px;
-	}	
-</style>
-
 <cfoutput>
 	<div style="background-color:##f5f5f5;">
 		<div style="padding:0px;width:490px;">

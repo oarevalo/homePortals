@@ -39,7 +39,6 @@
 	<cffunction name="saveResource" access="public" returntype="void">
 		<cfargument name="resourceID" type="string" required="true" hint="resource id">
 		<cfargument name="name" type="string" required="true" hint="Content resource name">
-		<cfargument name="access" type="string" required="true" hint="access type for resource">
 		<cfargument name="description" type="string" required="true" hint="resource description">
 		<cfargument name="body" type="string" required="true" hint="resource body">
 		
@@ -64,8 +63,6 @@
 				oResourceBean = createObject("component","homePortals.components.resourceBean").init();	
 				oResourceBean.setID(arguments.resourceID);
 				oResourceBean.setName(arguments.name);
-				oResourceBean.setOwner(siteOwner);
-				oResourceBean.setAccessType(arguments.access); 
 				oResourceBean.setDescription(arguments.description); 
 				oResourceBean.setPackage(siteOwner); 
 				oResourceBean.setType(resourceType); 
@@ -124,27 +121,13 @@
 			var aAccess = arrayNew(1);
 			var j = 1;
 			var oHP = this.controller.getHomePortals();
-			var resourceType = getResourceType();
-		
-			var oFriendsService = oHP.getAccountsService().getFriendsService();
-			var qryFriends = oFriendsService.getFriends(arguments.owner);
-			
+			var resourceType = getResourceType();			
 			var qryResources = oHP.getCatalog().getResourcesByType(resourceType);
-			
-			for(j=1;j lte qryResources.recordCount;j=j+1) {
-				aAccess[j] = qryResources.access[j] eq "general"
-							or qryResources.access[j] eq ""
-							or (qryResources.access[j] eq "owner" and qryResources.owner[j] eq arguments.owner)
-							or (qryResources.access[j] eq "friend" and qryResources.owner[j] eq arguments.owner)
-							or (qryResources.access[j] eq "friend" and listFindNoCase(valueList(qryFriends.userName), qryResources.owner[j]));
-			}
-			queryAddColumn(qryResources, "hasAccess", aAccess);
 		</cfscript>
 		
 		<cfquery name="qryResources" dbtype="query">
 			SELECT *
 				FROM qryResources
-				WHERE hasAccess = 1
 				ORDER BY package, id
 		</cfquery>
 

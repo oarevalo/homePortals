@@ -10,7 +10,7 @@
 	// get module path
 	cfg = this.controller.getModuleConfigBean();
 	tmpModulePath = cfg.getModuleRoot();	
-	imgRoot = tmpModulePath & "/Images";
+	imgRoot = tmpModulePath & "/images";
 	allowExternalContent = true;
 	
 	// get current user info
@@ -35,7 +35,7 @@
 	// check if current user is owner
 	bIsContentOwner = (stUser.isOwner and not bContentFound)
 						or
-					 	(bContentFound and stUser.isOwner and (stUser.username eq oResourceBean.getOwner()));
+					 	(bContentFound and stUser.isOwner);
 	
 	// get resource library root
 	hpConfigBean = this.controller.getHomePortalsConfigBean();
@@ -62,11 +62,7 @@
 	<cfset contentLocation = oResourceBean.getHref()>
 
 	<!--- Check if there is a title for this entry --->
-	<cfif oResourceBean.getName() neq "">
-		<cfset contentTitle = oResourceBean.getName()>
-	<cfelse>
-		<cfset contentTitle = resourceID>
-	</cfif>
+	<cfset contentTitle = resourceID>
 
 	<!--- Check if this is an external content or local content --->
 	<cfif left(contentLocation, 4) eq "http">
@@ -77,7 +73,7 @@
 			<b>External content is not allowed!</b>
 		</cfif>
 	<cfelse>
-		<cfset contentLocation = resourcesRoot & "/" & contentLocation>
+		<cfset contentLocation = oResourceBean.getFullHref()>
 		<cfif fileExists(expandPath(contentLocation))>
 			<cffile action="read" file="#expandPath(contentLocation)#" variable="txtDoc">
 		<cfelse>

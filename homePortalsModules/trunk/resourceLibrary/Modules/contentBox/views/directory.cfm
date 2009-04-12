@@ -17,31 +17,16 @@
 	moduleID = this.controller.getModuleID();	
 </cfscript>
 
-<cfquery name="qryMyResources" dbtype="query">
-	SELECT *
-		FROM qryResources
-		WHERE owner = <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
-		<cfif searchTerm neq "">
-			 AND (upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
-				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
-				)
-		</cfif>
-		ORDER BY package, name, id
-</cfquery>
-
-<cfquery name="qryResources" dbtype="query">
-	SELECT *
-		FROM qryResources
-		WHERE owner <> <cfqueryparam cfsqltype="cf_sql_varchar" value="#siteOwner#">
-		<cfif searchTerm neq "">
-			 AND ( upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
-				OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
-				OR upper(name) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%"> 
-				)
-		</cfif>
-		ORDER BY package, name, id
-</cfquery>
+<cfif searchTerm neq "">
+	<cfquery name="qryResources" dbtype="query">
+		SELECT *
+			FROM qryResources
+			WHERE ( upper(id) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">
+					OR upper(package) LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="%#ucase(searchTerm)#%">  
+					)
+			ORDER BY package, id
+	</cfquery>
+</cfif>
 
 
 <div style="background-color:#f5f5f5;">
@@ -67,33 +52,13 @@
 	<div style="width:150px;height:400px;border:1px solid silver;float:left;margin-left:5px;background-color:#fff;">
 
 		<div style="margin:3px;line-height:16px;font-size:11px;">
-			<div class="rd_packageTitle" style="color:#990000;">
-				<cfoutput><a href="##" onclick="Element.toggle('cp_feedGroup0');return false;" style="color:##990000;font-weight:bold;">&raquo; My Content (#qryMyResources.recordCount#)</a></cfoutput>
-			</div>
-			<div id="cp_feedGroup0" style="display:none;margin-left:10px;margin-bottom:8px;">
-				<cfoutput query="qryMyResources">
-					<cfif qryMyresources.name eq "">
-						<cfset tmpName = qryMyResources.id>
-					<cfelse>
-						<cfset tmpName = qryMyResources.name>
-					</cfif>
-					<a href="##" 
-						onclick="#moduleID#.getView('contentInfo','cb_moduleInfo',{resourceID:'#jsstringFormat(qryMyResources.id)#'})" 
-						style="color:##333;">#tmpName#</a><br>
-				</cfoutput>
-			</div>
-		
 			<cfoutput query="qryResources" group="package">
 				<div class="rd_packageTitle">
 					<a href="##" onclick="Element.toggle('cp_feedGroup#qryResources.currentRow#');return false;" style="color:##333;font-weight:bold;">&raquo; #qryResources.package#</a>
 				</div>
 				<div style="display:none;margin-left:10px;margin-bottom:8px;" id="cp_feedGroup#qryResources.currentRow#"> 
 					<cfoutput>
-						<cfif qryResources.name eq "">
-							<cfset tmpName = qryResources.id>
-						<cfelse>
-							<cfset tmpName = qryResources.name>
-						</cfif>
+						<cfset tmpName = qryResources.id>
 						<a href="##" 
 							onclick="#moduleID#.getView('contentInfo','cb_moduleInfo',{resourceID:'#jsstringFormat(qryResources.id)#'})" 
 							style="color:##333;">#tmpName#</a><br>

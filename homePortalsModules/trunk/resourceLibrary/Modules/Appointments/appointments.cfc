@@ -227,14 +227,16 @@
 		<cfargument name="type" type="string" required="false" default="day" hint="day|week|month|agenda">
 	
 		<cfset var qryData = getAppointmentsData()>
+		<cfset var tmpDateStr = dateFormat(arguments.date,"mm/dd/yyyy")>
 		<cfset var tmpEndDate = "">
 		
 		<cfswitch expression="#arguments.type#">
 			<cfcase value="day">
+				<cfset tmpDate = createODBCDate(arguments.date)>
 				<cfquery name="qryData" dbtype="query">
 					SELECT *
 						FROM qryData
-						WHERE eventDate = <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.date#">
+						WHERE eventDate = <cfqueryparam cfsqltype="cf_sql_varchar" value="#tmpDateStr#">
 						ORDER BY eventDate, eventTime
 				</cfquery>
 			</cfcase>
@@ -260,12 +262,12 @@
 			</cfcase>
 
 			<cfcase value="agenda">
-				<cfset tmpEndDate = dateAdd("d",45,arguments.date)>
+				<cfset tmpEndDate = dateFormat(dateAdd("d",45,arguments.date),"mm/dd/yyyy")>
 				<cfquery name="qryData" dbtype="query">
 					SELECT *
 						FROM qryData
-						WHERE eventDate >= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.date#">
-							AND eventDate <= <cfqueryparam cfsqltype="cf_sql_timestamp" value="#tmpEndDate#"> 
+						WHERE eventDate >= <cfqueryparam cfsqltype="cf_sql_varchar" value="#tmpDateStr#">
+							AND eventDate <= <cfqueryparam cfsqltype="cf_sql_varchar" value="#tmpEndDate#"> 
 						ORDER BY eventDate, eventTime
 				</cfquery>
 			</cfcase>
