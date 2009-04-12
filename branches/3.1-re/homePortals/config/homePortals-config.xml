@@ -71,6 +71,7 @@
 	<resourceTypes>
 		<resourceType name="content">
 			<folderName>Contents</folderName>
+			<description>Content resources are blocks of formatted text that can be reused across a site</description>
 			<property name="author" type="string" />
 			<property name="owner" type="string" />
 			<property name="accessType" type="list" values="public,private" />
@@ -79,20 +80,22 @@
 						
 		<resourceType name="feed">
 			<folderName>Feeds</folderName>
-			<description>This represents an rss or atom feed</description>
+			<description>Feeds are either RSS or Atom feeds from external sources that you can use with feed-enabled modules to display their contents on your site</description>
 			<property name="rssurl" type="string" hint="Location of the source of the feed" label="Feed URL" />
 			<property name="htmlurl" type="string" hint="Location of the website associated with this feed" label="Website URL" />
 		</resourceType>
 		
 		<resourceType name="skin">
 			<folderName>Skins</folderName>
+			<description>Skins are a way to customize the look and feel of a page. Skins dictate things like colors, fonts, margins and other visual attributes of the page</description>
 			<fileTypes>css</fileTypes>
 		</resourceType>
 
 		<resourceType name="image">
 			<folderName>Images</folderName>
-			<description>This represents an an image</description>
-			<property name="label" type="string"  />
+			<description>This resource type is used to represent an image document</description>
+			<property name="label" type="string" hint="Image title" />
+			<property name="url" type="string" hint="An URL address associated to this image" />
 		</resourceType>
 		
 	</resourceTypes>
