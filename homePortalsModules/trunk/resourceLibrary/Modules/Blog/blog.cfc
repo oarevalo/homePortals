@@ -57,6 +57,8 @@
 			// check if we find the entry the caller say we are updating
 			aUpdateNode = xmlSearch(xmlDoc, "//entry[created='#arguments.created#']");
 
+			if(content eq "") throw("Entry content cannot be empty");
+
 			if(arguments.created eq "" or arrayLen(aUpdateNode) eq 0) {
 				// create new node
 				xmlNode = xmlElemNew(xmlDoc,"entry");
@@ -117,8 +119,9 @@
 		
 			tmpNode = xmlDoc.blog;
 			for(i=1;i lte ArrayLen(tmpNode.xmlChildren);i=i+1) {
-				if(StructKeyExists(tmpNode.xmlChildren[i],"created") and tmpNode.xmlChildren[i].created.xmlText eq arguments.timestamp)
-					ArrayClear(tmpNode.xmlChildren[i]);
+				if(StructKeyExists(tmpNode.xmlChildren[i],"created") and tmpNode.xmlChildren[i].created.xmlText eq arguments.timestamp) {
+					ArrayDeleteAt(tmpNode.xmlChildren,i);
+				}
 			}	
 			
 			myContentStore.save(xmlDoc);

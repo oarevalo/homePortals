@@ -23,7 +23,7 @@
 	if(arrayLen(aEntries) gt maxEntries) endIndex = arrayLen(aEntries) - maxEntries;
 	
 	// url to rss feed
-	rssURL = "http://" & cgi.SERVER_NAME & getDirectoryFromPath(tmpModulePath) & "rss";
+	rssURL = "http://" & cgi.SERVER_NAME & ":" & cgi.SERVER_PORT & getDirectoryFromPath(tmpModulePath) & "rss";
 	
 	// get the moduleID
 	moduleID = this.controller.getModuleID();
@@ -108,9 +108,9 @@
 	<cfif bIsBlogOwner>
 		<!--- only show links to add post to blog owner --->
 		<a href="javascript:#moduleID#.getPopupView('editPost');"><img src="#imgRoot#/add-page-orange.gif" border="0" align="absmiddle" alt="Add New Entry"></a>
-		<a href="javascript:#moduleID#.getPopupView('editPost')">Add New Entry</a>&nbsp;
+		<a href="javascript:#moduleID#.getPopupView('editPost')">Add New Entry</a>&nbsp;|&nbsp;
 	</cfif>					
-	|&nbsp;
+	
 	<a href="javascript:#moduleID#.getPopupView('blogInfo');"><img src="#imgRoot#/web-page-orange.gif" border="0" align="absmiddle" alt="About This Blog"></a>
 	<a href="javascript:#moduleID#.getPopupView('blogInfo')">About This Blog</a>
 

@@ -77,7 +77,8 @@
 						deleteFile(expandPath(dirPhotoAlbums & "/" & tmpNode.xmlChildren[j].xmlAttributes.src));
 						deleteFile(expandPath(dirPhotoAlbums & "/" & tmpNode.xmlChildren[j].xmlAttributes.thumbnailSrc));
 					}
-					ArrayClear(tmpNode);
+					arrayDeleteAt(xmlDoc.xmlRoot.xmlChildren,i);
+					break;
 				}
 			}	
 			myContentStore.save(xmlDoc);
@@ -122,7 +123,8 @@
 						if(tmpNode.xmlChildren[j].xmlAttributes.src eq arguments.src) {
 							deleteFile(expandPath(dirPhotoAlbums & "/" & tmpNode.xmlChildren[j].xmlAttributes.src));
 							deleteFile(expandPath(dirPhotoAlbums & "/" & tmpNode.xmlChildren[j].xmlAttributes.thumbnailSrc));
-							ArrayClear(tmpNode.xmlChildren[j]);
+							arrayDeleteAt(tmpNode.xmlChildren,j);
+							break;
 						}
 					}
 				}

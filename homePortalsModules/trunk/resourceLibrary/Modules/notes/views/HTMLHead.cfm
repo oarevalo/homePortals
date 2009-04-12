@@ -43,11 +43,11 @@
 				
 				clearInterval(#moduleID#_saveTimer);
 				
-				// save one last time
+				/* save one last time  */
 				this.doFormAction('save',$(modID + '_frm'));
 				
-				// refresh view
-				this.getView();
+				/* refresh view */
+				this.getView();						
 			};
 			
 			#moduleID#.newNote = function() {
@@ -58,12 +58,12 @@
 				
 				if(nName=='' || nName==null || nName==undefined) {
 					return;
-				}
+				};
 				frm.noteID.value = nName;
 				eEditor.value = "Type some notes here...";
 				this.doFormAction('save',$(modID + '_frm'));
 				this.enableEditMode();
-			}	
+			};	
 	
 			#moduleID#.deleteNote = function() {
 				var modID = "#moduleID#";
@@ -71,9 +71,9 @@
 				var eEditor = $(modID + "_editor");
 	
 				if(confirm("Delete note?")) {
-					this.doFormAction('delete',$(modID + '_frm'));
-				}
-			}			
+					this.doFormAction('delete',$(modID + '_frm'))
+				};
+			};	
 		</script>
 	</cfif>
 </cfoutput>

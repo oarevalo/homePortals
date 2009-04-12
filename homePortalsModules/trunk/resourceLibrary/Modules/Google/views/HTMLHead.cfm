@@ -6,6 +6,7 @@
 
 	searchers = cfg.getPageSetting("searchers","Web");
 	localSearchCenterPoint = cfg.getPageSetting("localSearchCenterPoint","");
+	if(searchers eq "") searchers = "Web";
 </cfscript>	
 	
 <cfoutput>
@@ -18,28 +19,28 @@
 
     <script language="Javascript" type="text/javascript">
 
-		// create function for setup google search widget	
+		/* create function for setup google search widget	*/
 		#moduleID#.setupGoogleSearch = function() {
 
-	      // Create a search control
+	      /* Create a search control */
 	      var searchControl = new google.search.SearchControl();
 	
-	      // Add searchers
+	      /* Add searchers */
 	      <cfloop list="#searchers#" index="item">
 	      	<cfif item eq "local">
 		    	var localSearch = new google.search.LocalSearch();
 		    	searchControl.addSearcher(localSearch);
 
-				// Set the Local Search center point
+				/* Set the Local Search center point */
 				localSearch.setCenterPoint("#jsstringFormat(localSearchCenterPoint)#");
 	      	<cfelse>
 				searchControl.addSearcher(new google.search.#item#Search());
 	      	</cfif>
 	      </cfloop>
 	
-	      // Tell the searcher to draw itself and tell it where to attach
+	      /* Tell the searcher to draw itself and tell it where to attach */
 	      searchControl.draw(document.getElementById("#moduleID#_searchcontrol"));
-	    }
+	    };
 	    google.setOnLoadCallback(#moduleID#.setupGoogleSearch);
 
 

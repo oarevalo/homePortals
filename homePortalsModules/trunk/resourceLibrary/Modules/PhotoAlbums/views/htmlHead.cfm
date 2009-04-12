@@ -8,3 +8,4 @@
 		border-bottom:1px solid black;
 	}
 </style>
+<link rel="stylesheet" type="text/css" href="/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/lighterbox2.css" /> 

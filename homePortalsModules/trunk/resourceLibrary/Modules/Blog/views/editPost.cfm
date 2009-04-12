@@ -42,49 +42,80 @@
 
 <!--- Display blog entry (edit mode) --->
 <cfoutput>
-	<form action="##" name="frmBlogPost" method="post" class="blogPostForm" style="margin:0px;padding:0px;">
-		<input type="hidden" name="created" value="#arguments.timestamp#">
+
+<div style="background-color:##f5f5f5;">
+	<div style="padding:0px;width:490px;">
+	
+		<div style="margin:5px;background-color:##333;border:1px solid silver;color:##fff;">
+			<div style="margin:5px;">
+				<cfoutput><strong>Blog:</strong> Add/Edit Entry </cfoutput>
+			</div>
+		</div>
+	
+		<form action="##" name="frmBlogPost" method="post" class="blogPostForm" style="margin:0px;padding:0px;">
+			<input type="hidden" name="created" value="#arguments.timestamp#">
+	
+			<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
+				<div style="margin:5px;"> 
+					<table width="100%" cellpadding="0" cellspacing="1" border="0">
+						<tr valign="middle">
+							<tr>
+								<td width="90">&nbsp;Title:</td>
+								<td><input type="text" name="title" value="#stEntry.title#" style="width:330px;"></td>
+							</tr>
+							<tr>
+								<td>&nbsp;Post By:</td>
+								<td><input type="text" name="author" value="#stEntry.author#" style="width:330px;"></td>
+							</tr>
+						</tr>
+					</table>	
+				</div>
+			</div>	
+			
+			<div >
+				<textarea name="content" 
+						  style="width:470px;height:330px;border:1px solid silver;margin:5px;background-color:##fff;padding:3px;"	
+						  rows="20" 
+						  onkeypress="BlogCheckTab(event)" 
+						  onkeydown="BlogCheckTabIE()"
+						  class="BlogPostContent">#htmlEditFormat(stEntry.content)#</textarea>
+	
+			</div>
+			
+		</form>	
+	
+		<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
+			<div style="margin:5px;"> 
+				<table width="100%" cellspacing="1" border="0">
+					<tr valign="middle">
+						<td>
+							<a href="##" onclick="#moduleID#.doFormAction('savePost',document.frmBlogPost);#moduleID#.closeWindow();"><img src="#imgRoot#/disk.png" border="0" align="absmiddle" style="margin-right:2px;"></a>
+							<a href="##" onclick="#moduleID#.doFormAction('savePost',document.frmBlogPost);#moduleID#.closeWindow();"><strong>Save Changes</strong></a>
+							&nbsp;&nbsp;|&nbsp;&nbsp;
+							<cfif arguments.timestamp neq "">
+								<a href="##" onclick="if(confirm('Delete post?')) {#moduleID#.doAction('deletePost',{timestamp:'#arguments.timestamp#'});#moduleID#.closeWindow();}"><img src="#imgRoot#/cross.png" border="0" align="absmiddle" style="margin-right:2px;"></a>
+								<a href="##" onclick="if(confirm('Delete post?')) {#moduleID#.doAction('deletePost',{timestamp:'#arguments.timestamp#'});#moduleID#.closeWindow();}"><strong>Delete</strong></a>
+								&nbsp;&nbsp;|&nbsp;&nbsp;
+							</cfif>
+							<a href="##" onclick="#moduleID#.closeWindow();"><strong>Close</strong></a>
+						</td>
+						<td align="right" style="font-size:9px;color:##333;font-weight:bold;">
+							<cfif arguments.timestamp neq "">
+								Posted on 
+								#LSDateFormat(ListFirst(arguments.timestamp,"T"))# 
+								#LSTimeFormat(ListLast(arguments.timestamp,"T"))#
+								&nbsp;&nbsp;&nbsp;
+							</cfif>
+						</td>
+					</tr>
+				</table>			
+			</div>
+		</div>	
+	
 
 		<!--- Post header --->
-		<table width="100%" class="BlogPostBar" cellpadding="0" cellspacing="1" border="0">
-			<tr valign="middle">
-				<tr>
-					<td width="90">&nbsp;Title:</td>
-					<td><input type="text" name="title" value="#stEntry.title#" style="width:330px;"></td>
-					<td width="30" rowspan="3">&nbsp;</td>
-				</tr>
-				<tr>
-					<td>&nbsp;Post By:</td>
-					<td><input type="text" name="author" value="#stEntry.author#" style="width:330px;"></td>
-				</tr>
-			</tr>
-		</table>	
 			
-		<textarea name="content" 
-				  rows="22"
-				  onkeypress="BlogCheckTab(event)" 
-				  onkeydown="BlogCheckTabIE()"
-				  class="BlogPostContent">#htmlEditFormat(stEntry.content)#</textarea>
 
-		<table width="100%" class="BlogPostBar" cellpadding="3" cellspacing="1" border="0">
-			<tr valign="middle">
-				<td>
-					<a href="##" onclick="#moduleID#.doFormAction('savePost',document.frmBlogPost);#moduleID#.closeWindow();"><img src="#imgRoot#/disk.png" border="0" align="absmiddle" style="margin-right:2px;">Save Changes</a>
-					<cfif arguments.timestamp neq "">
-						&nbsp;&nbsp;&nbsp;
-						<a href="##" onclick="if(confirm('Delete post?')) {#moduleID#.doAction('deletePost',{timestamp:'#arguments.timestamp#'});#moduleID#.closeWindow();}"><img src="#imgRoot#/cross.png" border="0" align="absmiddle" style="margin-right:2px;">Delete</a>
-					</cfif>
-				</td>
-				<td align="right" style="font-size:9px;color:##333;font-weight:bold;">
-					<cfif arguments.timestamp neq "">
-						Posted on 
-						#LSDateFormat(ListFirst(arguments.timestamp,"T"))# 
-						#LSTimeFormat(ListLast(arguments.timestamp,"T"))#
-						&nbsp;&nbsp;&nbsp;
-					</cfif>
-				</td>
-			</tr>
-		</table>			
-	</form>
+
 </cfoutput>
 		

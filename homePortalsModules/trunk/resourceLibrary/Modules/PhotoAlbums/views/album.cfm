@@ -52,11 +52,15 @@
 		<div style="text-align:center;">
 			<cfloop from="1" to="#arrayLen(myAlbum.xmlChildren)#" index="i">
 				<cfset tmpNode = myAlbum.xmlChildren[i]>
-				<a href="#dirPhotoAlbums#/#tmpNode.xmlAttributes.src#" target="_blank">
+				<a href="#dirPhotoAlbums#/#tmpNode.xmlAttributes.src#" title="#getFileFromPath(tmpNode.xmlAttributes.src)#" rel="lighterbox">
 					<img src="#dirPhotoAlbums#/#tmpNode.xmlAttributes.thumbnailSrc#"
 						  style="border:1px solid black;margin:2px;"></a>
+				
 			</cfloop>
 		</div>
+		<script>
+			#moduleID#.setTitle("#jsstringformat(myalbum.xmlAttributes.name)#");
+		</script>
 	<cfelse>
 		<em>There are no pictures on this album</em>	
 	</cfif>
@@ -71,5 +75,7 @@
 			<a href="javascript:#moduleID#.getView()"><strong>Refresh Album</strong></a>
 		</div>
 	</cfif>
+	
+	<script type="text/javascript" src="/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/lighterbox2.js" ></script>
 </cfoutput>
 	

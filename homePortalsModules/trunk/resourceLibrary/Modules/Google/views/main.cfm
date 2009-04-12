@@ -32,10 +32,10 @@
 
 	<cfif this.controller.getExecMode() eq "remote">
 		<script>
-			// Create a search control
+			/* Create a search control */
 			var searchControl = new google.search.SearchControl();
 			
-			// Add searchers
+			/* Add searchers */
 			<cfloop list="#searchers#" index="item">
 				<cfif item eq "local">
 				  	var localSearch = new google.search.LocalSearch();
@@ -46,7 +46,7 @@
 			   	</cfif>
 			</cfloop>
 			
-			// Tell the searcher to draw itself and tell it where to attach
+			/* Tell the searcher to draw itself and tell it where to attach */
 			searchControl.draw(document.getElementById("#moduleID#_searchcontrol"));
 		</script>
 	</cfif>

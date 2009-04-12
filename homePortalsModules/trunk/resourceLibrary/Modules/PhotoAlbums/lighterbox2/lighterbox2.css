@@ -1,0 +1,14 @@
+@charset "UTF-8";
+/*lighter box*/
+#lighterbox2 {display:none;position:absolute;margin:auto;left:0px;top:0px;width:100%;height:100%;background-image:url(overlay.png);padding-top:20px;z-index:100;}
+#lighterbox2 img {position:relative;z-index:100;}
+#lighterboxholder2,#portimage,#lightercloseimage {z-index:100;}
+#lighterboxwrapper2,#lighterboxcontent2 {background-color:#fff;float:left;z-index:100;}
+#closebutton2 {position:relative;z-index:150;float:left;width:100%;background-color:#fff;line-height:26px;color:#333;font-family:sans-serif;overflow:hidden;top:-7px;margin-bottom:20px;}
+#description2{font-size:13px;position:relative;top:-5px;margin-left:10px;margin-right:15px;line-height:20px;}
+#portimage2{border:solid #fff 10px;}
+#lighterboxwrapper2{position:absolute;}
+#lighterboxcontent2{background-image:url(load.gif);background-position:50% 40%;background-repeat:no-repeat;}
+.hide{display:none;}
+.show{display:block;}
+

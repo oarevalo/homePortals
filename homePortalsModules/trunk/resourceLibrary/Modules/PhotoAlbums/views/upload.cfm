@@ -4,7 +4,7 @@
 	// get the moduleID
 	moduleID = this.controller.getModuleID();
 
-	uploaderPath =  "/homePortals/ResourceLibrary/Modules/PhotoAlbums/views/uploader.cfm";
+	uploaderPath =  "/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/views/uploader.cfm";
 	
 	// get content store
 	myContentStore = this.controller.getContentStore();
@@ -19,16 +19,18 @@
 
 	// get all photo albums
 	aAlbums = xmlSearch(xmlDoc,"//photoAlbum");
+	
+	pageHREF = this.controller.getModuleConfigBean().getPageHREF();
+	appRoot = this.controller.getHomePortalsConfigBean().getAppRoot();
 </cfscript>
 
 <cfoutput>
-	<form action="##" method="post" name="frmPhotoAlbum" style="margin:0px;padding:0px;">
-		<table width="100%" style="border:1px solid silver;background-color:##fefcd8;">
-			<tr>
-				<td nowrap>
-					<b>Photo Album Manager</b>
-				</td>
-				<td align="right">
+<div style="background-color:##f5f5f5;">
+	<div style="padding:0px;width:490px;">
+	
+		<div style="margin:5px;background-color:##333;border:1px solid silver;color:##fff;height:35px;">
+			<div style="margin:5px;">
+				<div style="float:right;">
 					<select name="EntryID" onchange="#moduleID#.getPopupView('manager',{albumName:this.value})" style="width:180px;">
 						<cfloop from="1" to="#ArrayLen(aAlbums)#" index="i">
 							<cfset tmpAlbumName= aAlbums[i].xmlAttributes.name>
@@ -42,18 +44,22 @@
 						</cfloop>
 						<option value="NEW">--- Create New Album ---</option>
 					</select> 
-				</td>
-				<td width="30">&nbsp;</td>
-			</tr>
-		</table>
-			
-		<iframe name="frmUpload" 
-				style="width:100%;border:1px solid black;padding:2px;height:410px;overflow:auto;background-color:##fff;"
-				frameborder="false" 
-				src="#uploaderPath#?moduleID=#moduleID#&albumName=#arguments.albumName#"></iframe>
-
-		<div width="100%" style="border:1px solid silver;background-color:##fefcd8;padding:5px;">
-			<input type="button" name="btn1" onclick="#moduleID#.getPopupView('manager',{albumName:'#jsStringFormat(arguments.albumName)#'});" value="Return" style="font-size:11px;">
+				</div>
+				<strong>Photo Album:</strong> Upload Photos
+			</div>
+			<div style="clear:both;"></div>
 		</div>
-	</form>
+
+		<iframe name="frmUpload" 
+				style="width:490px;height:400px;border:1px solid silver;margin:5px;background-color:##fff;overflow:auto;"
+				frameborder="false" 
+				src="#uploaderPath#?moduleID=#moduleID#&albumName=#arguments.albumName#&pageHREF=#pageHREF#&appRoot=#appRoot#"></iframe>
+
+		<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
+			<div style="margin:5px;"> 
+				<input type="button" name="btn1" onclick="#moduleID#.getPopupView('manager',{albumName:'#jsStringFormat(arguments.albumName)#'});" value="Return" style="font-size:11px;">
+			</div>
+		</div>	
+	</div>
+</div>		
 </cfoutput>	

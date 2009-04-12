@@ -17,7 +17,7 @@
 <cfset rootURL = "">
 <cfset cat = "">
 <cfset endIndex = 1>
-<cfset blogURL = "http://" & cgi.SERVER_NAME & cgi.SCRIPT_NAME>
+<cfset blogURL = "http://" & cgi.SERVER_NAME & cgi.SCRIPT_NAME & ":" & cgi.SERVER_PORT>
 <cfset stBlog = structNew()>
 
 <cftry>
@@ -179,7 +179,7 @@
 	<cfargument name="entryid" type="any" required="true">
 
 	<cfset var retVar = "">
-	<cfset var blogURL = "http://" & cgi.SERVER_NAME & getDirectoryFromPath(cgi.SCRIPT_NAME)>
+	<cfset var blogURL = "http://" & cgi.SERVER_NAME & ":" & cgi.SERVER_PORT & getDirectoryFromPath(cgi.SCRIPT_NAME)>
 	
 	<cfset retVar = blogURL & "../?blog=" & blog & "&timestamp=" & arguments.entryID>
 	

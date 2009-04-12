@@ -60,77 +60,81 @@
 
 
 <cfoutput>
-	
-	<form action="##" name="frmBlogPost" method="post" class="blogPostForm" style="width:100%;margin:0px;padding:0px;">
 
-		<table width="100%" class="BlogPostBar" cellpadding="0" cellspacing="1" border="0">
-			<tr valign="middle">
-				<tr>
-					<td>
-						<h2>#stBlog.title#</h2>
-						<cfif stBlog.owner neq "">
-							<div style="font-size:10px;">
-								Created by 
-								<a href="#tmpOwnerHome#"><b>#stBlog.owner#</b></a>
-								<cfif stBlog.createdOn neq "">
-									on #stBlog.createdOn#
-								</cfif>
-							</div>
-						</cfif>
-					</td>
-					<td width="30">&nbsp;</td>
-				</tr>
-			</tr>
-		</table>	
-		
-		<div class="BlogPostContent" style="padding:0px;">
-		<table style="font-size:11px;margin-top:10px;">
-			<cfif bIsBlogOwner>
-				<tr>
-					<td width="100">&nbsp;<strong>Blog Title:</strong></td>
-					<td><input type="text" name="title" value="#stBlog.title#" style="width:320px;" #tmpDisabled#></td>
-				</tr>
-				<tr>
-					<td>&nbsp;<strong>Owner Email:</strong></td>
-					<td><input type="text" name="ownerEmail" value="#stBlog.ownerEmail#" style="width:320px;" #tmpDisabled#></td>
-				</tr>
-				<tr>
-					<td>&nbsp;<strong>Blog URL:</strong></td>
-					<td><input type="text" name="blogURL" value="#stBlog.url#" style="width:320px;" #tmpDisabled#></td>
-				</tr>
-				<tr valign="top">
-					<td>&nbsp;<strong>Description:</strong></td>
-					<td><textarea name="description"  rows="17" style="width:320px;" #tmpDisabled#>#stBlog.description#</textarea></td>
-				</tr>
-			<cfelse>
-				<tr>
-					<td width="100">&nbsp;<strong>Blog Title:</strong></td>
-					<td>#stBlog.title#</td>
-				</tr>
-				<tr>
-					<td>&nbsp;<strong>Owner Email:</strong></td>
-					<td><a href="mailto:#stBlog.ownerEmail#">#stBlog.ownerEmail#</a></td>
-				</tr>
-				<tr>
-					<td>&nbsp;<strong>Blog URL:</strong></td>
-					<td><a href="#stBlog.url#" target="_blank">#stBlog.url#</a></td>
-				</tr>
-				<tr>
-					<td>&nbsp;<strong>Description:</strong></td>
-					<td><pre style="font-family:Arial, Helvetica, sans-serif;">#stBlog.description#</pre></td>
-				</tr>
-			</cfif>
-		</table>
+<div style="background-color:##f5f5f5;">
+	<div style="padding:0px;width:490px;">
+	
+		<div style="margin:5px;background-color:##333;border:1px solid silver;color:##fff;">
+			<div style="margin:5px;">
+				<cfoutput><strong>Blog:</strong> About This Blog </cfoutput>
+			</div>
 		</div>
-		
-		<table width="100%" class="BlogPostBar" cellpadding="3" cellspacing="1" border="0">
-			<tr>
-				<td>
+	
+		<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
+			<div style="margin:5px;"> 
+				<h2><cfif stBlog.title neq "">#stBlog.title#<cfelse><em>No Title</em></cfif></h2>
+				<cfif stBlog.owner neq "">
+					<div style="font-size:10px;">
+						Created by 
+						<a href="#tmpOwnerHome#"><b>#stBlog.owner#</b></a>
+						<cfif stBlog.createdOn neq "">
+							on #stBlog.createdOn#
+						</cfif>
+					</div>
+				</cfif>
+			</div>
+		</div>	
+	
+		<div style="width:490px;height:370px;border:1px solid silver;margin:5px;background-color:##fff;">
+			
+			<br />
+			<form action="##" name="frmBlogPost" method="post" class="blogPostForm" style="width:480px;margin:0px;padding:0px;">
+				<table style="font-size:11px;">
 					<cfif bIsBlogOwner>
-						<a href="##" onclick="#moduleID#.doFormAction('saveBlog',document.frmBlogPost);#moduleID#.closeWindow();"><img src="#imgRoot#/disk.png" border="0" align="absmiddle" style="margin-right:2px;">Save Changes</a>
+						<tr>
+							<td width="100">&nbsp;<strong>Blog Title:</strong></td>
+							<td><input type="text" name="title" value="#stBlog.title#" style="width:320px;" #tmpDisabled#></td>
+						</tr>
+						<tr>
+							<td>&nbsp;<strong>Owner Email:</strong></td>
+							<td><input type="text" name="ownerEmail" value="#stBlog.ownerEmail#" style="width:320px;" #tmpDisabled#></td>
+						</tr>
+						<tr>
+							<td>&nbsp;<strong>Blog URL:</strong></td>
+							<td><input type="text" name="blogURL" value="#stBlog.url#" style="width:320px;" #tmpDisabled#></td>
+						</tr>
+						<tr valign="top">
+							<td>&nbsp;<strong>Description:</strong></td>
+							<td><textarea name="description"  rows="14" style="width:320px;" #tmpDisabled#>#stBlog.description#</textarea></td>
+						</tr>
+					<cfelse>
+						<tr>
+							<td colspan="2">
+								<pre style="font-family:Arial, Helvetica, sans-serif;margin:10px;">#stBlog.description#</pre>
+							</td>
+						</tr>
+						<cfif stBlog.url neq "">
+							<tr>
+								<td colspan="2"><div style="margin:10px;"><a href="#stBlog.url#" target="_blank" style="font-size:10px;"><u>#stBlog.url#</u></a></div></td>
+							</tr>
+						</cfif>
 					</cfif>
-				</td>
-			</tr>
-		</table>
-	</form>
+				</table>
+			</form>
+	
+		</div>
+
+		<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
+			<div style="margin:5px;"> 
+				<cfif bIsBlogOwner>
+					<a href="##" onclick="#moduleID#.doFormAction('saveBlog',document.frmBlogPost);#moduleID#.closeWindow();"><img src="#imgRoot#/disk.png" border="0" align="absmiddle" style="margin-right:2px;"></a>
+					<a href="##" onclick="#moduleID#.doFormAction('saveBlog',document.frmBlogPost);#moduleID#.closeWindow();"><strong>Save Changes</strong></a>
+					&nbsp;&nbsp;|&nbsp;&nbsp;
+				</cfif>
+				<a href="##" onclick="#moduleID#.closeWindow();"><strong>Close</strong></a>
+			</div>
+		</div>	
+	</div>
+</div>
+		
 </cfoutput>
