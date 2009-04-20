@@ -133,7 +133,7 @@
 	<cffunction name="getResourceLibrary" access="public" returntype="resourceLibrary" hint="returns the resource library object for the given path">
 		<cfargument name="resLibPath" type="string" required="true">
 		
-		<cfif right(arguments.resLibPath neq "/")>
+		<cfif right(arguments.resLibPath,1) neq "/">
 			<cfset arguments.resLibPath = arguments.resLibPath & "/">
 		</cfif>
 		
