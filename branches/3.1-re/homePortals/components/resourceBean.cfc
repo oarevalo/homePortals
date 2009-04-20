@@ -217,7 +217,7 @@
 		<cfelse>
 			<cfthrow message="Resource has no associated file or file does not exists" type="homePortals.resourceBean.missingTargetFile">
 		</cfif>
-		<cfreturn txtDoc>
+		<cfreturn doc>
 	</cffunction>
 
 	<cffunction name="saveFile" access="public" output="false" returntype="void" hint="Saves a file associated to this resource">
