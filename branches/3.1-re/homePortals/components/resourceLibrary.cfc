@@ -113,6 +113,7 @@
 			var tmpHREF = "";
 			var aResources = arrayNew(1);
 			var start = getTickCount();
+			var oResourceBean = 0;
 			
 			// check if there is a resource descriptor for the package
 			tmpHREF = getResourceDescriptorFilePath(arguments.resourceType, arguments.packageName);
