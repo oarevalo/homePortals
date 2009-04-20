@@ -124,47 +124,13 @@
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
 			
-			// get list of resource packages
-			qry = oResourceLibrary.getResourcePackagesList();
-
-			// add resources to the catalog
-			for(i=1;i lte qry.recordCount;i=i+1) {
-				// get all resources on the current package
-				aResources = oResourceLibrary.getResourcesInPackage(qry.resType[i], qry.name[i]);
-
-				// store the resources in a map
-				for(j=1;j lte arrayLen(aResources);j=j+1) {
-					stResourceBean = aResources[j].getMemento();
-					resTypeGroup = stResourceBean.type;
-
-					// add resource to resources query
-					queryAddRow(variables.qryResources);
-					querySetCell(variables.qryResources, "type", stResourceBean.type);
-					querySetCell(variables.qryResources, "id", stResourceBean.id);
-					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
-					querySetCell(variables.qryResources, "package", stResourceBean.Package);
-					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
-					querySetCell(variables.qryResources, "libPath", stResourceBean.resourceLibrary.getPath());					
-					
-					// create resource map entry
-					st = structNew();
-					st.type = stResourceBean.type;
-					st.id = stResourceBean.id;
-					st.HREF = stResourceBean.HREF;
-					st.Package = stResourceBean.Package;
-					st.Description = stResourceBean.Description;
-					st.libPath = stResourceBean.resourceLibrary.getPath();
-
-					// create node for resource type group if doesnt exist
-					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
-						variables.mapResources[resTypeGroup] = structNew();
-					}
-
-					// add resource to map
-					variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
-						
-				}
-			}		
+			aTypes = oResourceLibrary.getResourceTypes();
+			
+			for(i=1;i lte arrayLen(aTypes);i=i+1) {
+				dumpConsole("CALLING load of resource type [#i#][#aTypes[i]#]");
+				loadResourcesByType(aTypes[i]);
+			}	
+			
 		</cfscript>
 	</cffunction>
 
@@ -274,7 +240,7 @@
 			var aResources = arrayNew(1);
 			var stResourceBean = structNew();
 			var st = structNew();
-
+dumpConsole("loading resource type [#resourceType#]");
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
 
@@ -344,6 +310,11 @@
 	<cffunction name="dump" access="private" returntype="void" hint="facade for cfdump">
 		<cfargument name="data" type="any">
 		<cfdump var="#arguments.data#">
+	</cffunction>
+
+	<cffunction name="dumpConsole" access="private" returntype="void" hint="facade for cfdump">
+		<cfargument name="data" type="any">
+		<cfdump var="#arguments.data#" output="console">
 	</cffunction>
 
 	<cffunction name="XMLUnformat" access="private" returntype="string">
