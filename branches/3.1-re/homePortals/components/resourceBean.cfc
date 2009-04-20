@@ -200,7 +200,7 @@
 	
 	<!--- Target File Methods --->
 
-	<cffunction name="targetFileExists" access="public" output="false" returntype="void" hint="Returns whether the file associated with this resources exists on the local file system or not. This only works for target files within the resource library">
+	<cffunction name="targetFileExists" access="public" output="false" returntype="boolean" hint="Returns whether the file associated with this resources exists on the local file system or not. This only works for target files within the resource library">
 		<cfreturn getHref() neq "" and fileExists(expandPath(getFullHref()))>
 	</cffunction>
 	
