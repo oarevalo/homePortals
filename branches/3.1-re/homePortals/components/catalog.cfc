@@ -144,7 +144,7 @@
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
-					querySetCell(variables.qryResources, "libPath", stResourceBean.resLibPath);					
+					querySetCell(variables.qryResources, "libPath", stResourceBean.resourceLibrary.getPath());					
 					
 					// create resource map entry
 					st = structNew();
@@ -153,7 +153,7 @@
 					st.HREF = stResourceBean.HREF;
 					st.Package = stResourceBean.Package;
 					st.Description = stResourceBean.Description;
-					st.libPath = stResourceBean.resLibPath;
+					st.libPath = stResourceBean.resourceLibrary.getPath();
 
 					// create node for resource type group if doesnt exist
 					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
@@ -213,7 +213,7 @@
 				st.HREF = stResourceBean.HREF;
 				st.Package = stResourceBean.Package;
 				st.Description = stResourceBean.Description;
-				st.libpath = stResourceBean.resLibPath;
+				st.libpath = stResourceBean.resourceLibrary.getPath();
 
 				// add resource to map
 				variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
@@ -301,7 +301,7 @@
 					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
-					querySetCell(variables.qryResources, "libpath", stResourceBean.resLibPath);					
+					querySetCell(variables.qryResources, "libpath", stResourceBean.resourceLibrary.getPath());					
 					
 					// create resource map entry
 					st = structNew();
@@ -310,7 +310,7 @@
 					st.HREF = stResourceBean.HREF;
 					st.Package = stResourceBean.Package;
 					st.Description = stResourceBean.Description;
-					st.libpath = stResourceBean.resLibPath;
+					st.libpath = stResourceBean.resourceLibrary.getPath();
 
 					// create node for resource type group if doesnt exist
 					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
