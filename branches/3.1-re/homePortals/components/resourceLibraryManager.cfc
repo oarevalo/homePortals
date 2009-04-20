@@ -124,7 +124,26 @@
 	<!--- getResourceLibraries               	   ---->
 	<!------------------------------------------------->
 	<cffunction name="getResourceLibraries" access="public" returntype="array" hint="returns an array with the registered resource libraries">
-		<cfreturn aResourceLibs>
+		<cfreturn variables.aResourceLibs>
+	</cffunction>	
+
+	<!------------------------------------------------->
+	<!--- getResourceLibrary	               	   ---->
+	<!------------------------------------------------->
+	<cffunction name="getResourceLibrary" access="public" returntype="resourceLibrary" hint="returns the resource library object for the given path">
+		<cfargument name="resLibPath" type="string" required="true">
+		
+		<cfif right(arguments.resLibPath neq "/")>
+			<cfset arguments.resLibPath = arguments.resLibPath & "/">
+		</cfif>
+		
+		<cfloop from="1" to="#arrayLen(variables.aResourceLibs)#" index="i">
+			<cfif variables.aResourceLibs[i].getPath() eq arguments.resLibPath or
+					variables.aResourceLibs[i].getPath() & "/" eq arguments.resLibPath>
+				<cfreturn variables.aResourceLibs[i]>	
+			</cfif>
+		</cfloop>
+		<cfthrow message="Resource library not found" type="homePortals.resourceLibraryManager.resourceLibraryNotFound">
 	</cffunction>	
 	
 

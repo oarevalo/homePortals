@@ -5,8 +5,8 @@
 	<cfproperty name="Package" type="string" hint="The package to which this resource belongs to" />
 	<cfproperty name="HREF" type="string" />
 	<cfproperty name="Description" type="string" />
-	<cfproperty name="resLibPath" type="string" hint="the location of the resource library where this resource is located" />
 	<cfproperty name="customProperties" type="struct" hint="holds custom properties for the resource">
+	<cfproperty name="resourceLibrary" type="resourceLibrary" hint="the resource library to which this resource belongs">
 
 	<cfscript>
 		// initialize here in case someone extends this and forget to call super.init() on their own init()
@@ -16,19 +16,20 @@
 		variables.instance.Package = "";
 		variables.instance.HREF = "";
 		variables.instance.Description = "";
-		variables.instance.resLibPath = "";
 		variables.instance.customProperties = structNew();
+		variables.instance.resourceLibrary = 0;
 	</cfscript>
 
 	<cffunction name="init" access="public" output="false" returntype="resourceBean" hint="constructor">
+		<cfargument name="resourceLibrary" type="homePortals.components.resourceLibrary" required="true">
 		<cfscript>
 			variables.instance.ID = "";
 			variables.instance.Type = "";
 			variables.instance.Package = "";
 			variables.instance.HREF = "";
 			variables.instance.Description = "";
-			variables.instance.resLibPath = "";
 			variables.instance.customProperties = structNew();
+			variables.instance.resourceLibrary = arguments.resourceLibrary;
 		</cfscript>
 		<cfreturn this />
 	</cffunction>
@@ -104,10 +105,13 @@
 	</cffunction>
 
 	<cffunction name="getFullHref" access="public" output="false" returntype="string">
-		<cfif right(variables.instance.resLibPath,1) neq "/">
-			<cfreturn variables.instance.resLibPath & "/" & variables.instance.Href />
+		<cfset var resLibPath = getResourceLibrary().getPath()>
+		<cfset var href = getHref()>
+		
+		<cfif right(resLibPath,1) neq "/">
+			<cfreturn resLibPath & "/" & href />
 		<cfelse>
-			<cfreturn variables.instance.resLibPath & variables.instance.Href />
+			<cfreturn resLibPath & href />
 		</cfif>
 	</cffunction>
 	
@@ -157,15 +161,15 @@
 		<cfreturn />
 	</cffunction>
 
-	<cffunction name="getResLibPath" access="public" output="false" returntype="string">
-		<cfreturn variables.instance.resLibPath />
+	<cffunction name="getResourceLibrary" access="public" returntype="homePortals.components.resourceLibrary">
+		<cfreturn variables.instance.ResourceLibrary>
 	</cffunction>
 
-	<cffunction name="setResLibPath" access="public" output="false" returntype="void">
-		<cfargument name="resLibPath" type="string" required="true" />
-		<cfset variables.instance.resLibPath = arguments.resLibPath />
-		<cfreturn />
-	</cffunction>	
+	<cffunction name="setResourceLibrary" access="public" returntype="void">
+		<cfargument name="data" type="homePortals.components.resourceLibrary" required="true">
+		<cfset variables.instance.ResourceLibrary = arguments.data>
+	</cffunction>
+	
 	
 	<cffunction name="getProperties" access="public" output="false" returntype="struct">
 		<cfreturn duplicate(variables.instance.customProperties) />
@@ -193,4 +197,57 @@
 		<cfset structDelete(variables.instance.customProperties, arguments.name) />
 	</cffunction>
 
+	
+	<!--- Target File Methods --->
+
+	<cffunction name="fileExists" access="public" output="false" returntype="void" hint="Returns whether the file associated with this resources exists on the local file system or not. This only works for target files within the resource library">
+		<cfreturn getHref() neq "" and fileExists(expandPath(getFullHref()))>
+	</cffunction>
+	
+	<cffunction name="readFile" access="public" output="false" returntype="any" hint="Reads the file associated with this resource. If there is no associated file then returns a missingTargetFile error. This only works for target files stored within the resource library">
+		<cfargument name="readAsBinary" type="boolean" required="false" hint="Reads the file as a binary document">
+		<cfset var doc = "">
+		<cfset var href = getFullHref()>
+		<cfif fileExists()>
+			<cfif arguments.readAsBinary>
+				<cffile action="readbinary" file="#expandPath(href)#" variable="doc">
+			<cfelse>
+				<cffile action="read" file="#expandPath(href)#" variable="doc">
+			</cfif>
+		<cfelse>
+			<cfthrow message="Resource has no associated file or file does not exists" type="homePortals.resourceBean.missingTargetFile">
+		</cfif>
+		<cfreturn txtDoc>
+	</cffunction>
+
+	<cffunction name="saveFile" access="public" output="false" returntype="void" hint="Saves a file associated to this resource">
+		<cfargument name="fileName" type="string" required="true" hint="filename to use">
+		<cfargument name="fileContent" type="any" required="true" hint="File contents">
+		
+		<cfset var rt = getResourceLibrary().getResourceType( getType() )>
+		<cfset var defaultExtension = listFirst(rt.getFileTypes())>
+		<cfset var href = "">
+		
+		<cfif arguments.fileName eq "">
+			<cfthrow message="resource file name cannot be empty" type="homePortals.resourceBean.blankFileName">
+		</cfif>
+
+		<cfset href = rt.getFolderName() 
+					& "/" 
+					& getPackage() 
+					& "/" 
+					& arguments.fileName>
+		
+		<cfset setHREF(href)>
+		
+		<cffile action="write" file="#expandPath(getFullHREF())#" output="#arguments.fileContent#">
+	</cffunction>
+
+	<cffunction name="deleteFile" access="public" output="false" returntype="void" hint="Deletes the file associated with this resource">
+		<cfset var href = getFullHref()>
+		<cfif fileExists()>
+			<cffile action="delete" file="#expandPath(href)#">
+		</cfif>
+		<cfset setHREF("")>
+	</cffunction>
 </cfcomponent>

@@ -16,8 +16,9 @@
 	</cffunction>
 	
 	<cffunction name="createBean" access="public" returntype="resourceBean" hint="Factory method that creates an empty bean for this resource type">
+		<cfargument name="resLib" type="homePortals.components.resourceLibrary" required="true">
 		<cfscript>
-			var oResBean = createObject("component", getResBeanPath()).init();
+			var oResBean = createObject("component", getResBeanPath()).init( arguments.resLib );
 			var stProps = getProperties();
 			
 			oResBean.setType ( variables.instance.name );

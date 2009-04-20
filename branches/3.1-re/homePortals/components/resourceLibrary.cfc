@@ -258,20 +258,9 @@
 										& defaultExtension;
 			}
 			
-			// path is always relative to the res lib root
-			href = rt.getFolderName() 
-					& "/" 
-					& rb.getPackage() 
-					& "/" 
-					& arguments.fileName;
-			rb.setHREF(href); 
-		
-			// save file (or delete if empty)
-			filePath = expandPath(variables.resourcesRoot & "/" & href);
-			if(arguments.resourceBody neq "") {
-				saveFile(filePath, arguments.resourceBody);
-			}
-
+			// save file
+			rb.saveFile(arguments.fileName, arguments.resourceBody);
+			
 			// update resource bean
 			saveResource(rb);		
 		</cfscript>		
@@ -341,8 +330,7 @@
 	<cffunction name="getNewResource" access="public" returntype="resourceBean" hint="creates a new empty instance of a given resource type for this library">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfset var rt = getResourceType(arguments.resourceType)>
-		<cfset var oResBean = rt.createBean()>
-		<cfset oResBean.setResLibPath(variables.resourcesRoot)>
+		<cfset var oResBean = rt.createBean(this)>
 		<cfreturn oResBean>
 	</cffunction>
 
