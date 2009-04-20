@@ -104,7 +104,7 @@
 			// define source of content (resource or external)
 			if(resourceID neq "") {
 				oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
-				contentSrc = oResourceBean.getResLibPath() & "/" & oResourceBean.getHref();
+				contentSrc = oResourceBean.getFullHref();
 			
 			} else if(href neq "") {
 				contentSrc = href;
