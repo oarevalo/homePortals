@@ -200,7 +200,7 @@
 	
 	<!--- Target File Methods --->
 
-	<cffunction name="fileExists" access="public" output="false" returntype="void" hint="Returns whether the file associated with this resources exists on the local file system or not. This only works for target files within the resource library">
+	<cffunction name="targetFileExists" access="public" output="false" returntype="void" hint="Returns whether the file associated with this resources exists on the local file system or not. This only works for target files within the resource library">
 		<cfreturn getHref() neq "" and fileExists(expandPath(getFullHref()))>
 	</cffunction>
 	
@@ -208,7 +208,7 @@
 		<cfargument name="readAsBinary" type="boolean" required="false" hint="Reads the file as a binary document">
 		<cfset var doc = "">
 		<cfset var href = getFullHref()>
-		<cfif fileExists()>
+		<cfif targetFileExists()>
 			<cfif arguments.readAsBinary>
 				<cffile action="readbinary" file="#expandPath(href)#" variable="doc">
 			<cfelse>
@@ -245,7 +245,7 @@
 
 	<cffunction name="deleteFile" access="public" output="false" returntype="void" hint="Deletes the file associated with this resource">
 		<cfset var href = getFullHref()>
-		<cfif fileExists()>
+		<cfif targetFileExists()>
 			<cffile action="delete" file="#expandPath(href)#">
 		</cfif>
 		<cfset setHREF("")>
