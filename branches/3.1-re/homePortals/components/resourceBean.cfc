@@ -205,7 +205,7 @@
 	</cffunction>
 	
 	<cffunction name="readFile" access="public" output="false" returntype="any" hint="Reads the file associated with this resource. If there is no associated file then returns a missingTargetFile error. This only works for target files stored within the resource library">
-		<cfargument name="readAsBinary" type="boolean" required="false" hint="Reads the file as a binary document">
+		<cfargument name="readAsBinary" type="boolean" required="false" default="false" hint="Reads the file as a binary document">
 		<cfset var doc = "">
 		<cfset var href = getFullHref()>
 		<cfif targetFileExists()>
@@ -250,4 +250,5 @@
 		</cfif>
 		<cfset setHREF("")>
 	</cffunction>
+
 </cfcomponent>
