@@ -110,12 +110,9 @@
 	<!---------------------------------------->	
 	<cffunction name="index" access="public" returntype="void" hint="Crawls the resource library indexing all available resources. Depending on the amount of resources this operation may take some time to complete">
 		<cfscript>
-			var qry = QueryNew("");
-			var i = 1; var j = 0;
+			var i = 1;
 			var oResourceLibrary = 0;
 			var aResources = arrayNew(1);
-			var stResourceBean = structNew();
-			var st = structNew();
 
 			// clear the catalog
 			variables.mapResources = structNew();
@@ -127,7 +124,6 @@
 			aTypes = oResourceLibrary.getResourceTypes();
 			
 			for(i=1;i lte arrayLen(aTypes);i=i+1) {
-				dumpConsole("CALLING load of resource type [#i#][#aTypes[i]#]");
 				loadResourcesByType(aTypes[i]);
 			}	
 			
@@ -240,7 +236,7 @@
 			var aResources = arrayNew(1);
 			var stResourceBean = structNew();
 			var st = structNew();
-dumpConsole("loading resource type [#resourceType#]");
+
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
 
