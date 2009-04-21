@@ -97,14 +97,14 @@
 				
 				try {
 					// read from cache
-					oResBean = getContentCache().retrieve(cacheKey);
+					oResBean = getCacheService().retrieve(cacheKey);
 				
 				} catch(homePortals.cacheService.itemNotFound e) {
 					// read from source
 					oResBean = getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID);
 					
 					// update cache
-					oCache.store(cacheKey, oResBean);
+					getCacheService().store(cacheKey, oResBean);
 				}
 			
 			} else {
