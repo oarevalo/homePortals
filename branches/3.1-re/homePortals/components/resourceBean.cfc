@@ -9,6 +9,8 @@
 	<cfproperty name="resourceLibrary" type="resourceLibrary" hint="the resource library to which this resource belongs">
 
 	<cfscript>
+		variables.FILE_NOT_READ  = "___FILE_NOT_READ___";
+		
 		// initialize here in case someone extends this and forget to call super.init() on their own init()
 		variables.instance = structNew();
 		variables.instance.ID = "";
@@ -18,6 +20,7 @@
 		variables.instance.Description = "";
 		variables.instance.customProperties = structNew();
 		variables.instance.resourceLibrary = 0;
+		variables.instance.fileContents = variables.FILE_NOT_READ;
 	</cfscript>
 
 	<cffunction name="init" access="public" output="false" returntype="resourceBean" hint="constructor">
@@ -208,14 +211,19 @@
 		<cfargument name="readAsBinary" type="boolean" required="false" default="false" hint="Reads the file as a binary document">
 		<cfset var doc = "">
 		<cfset var href = getFullHref()>
-		<cfif targetFileExists()>
-			<cfif arguments.readAsBinary>
-				<cffile action="readbinary" file="#expandPath(href)#" variable="doc">
+		<cfif variables.instance.fileContents eq variables.FILE_NOT_READ>
+			<cfif targetFileExists()>
+				<cfif arguments.readAsBinary>
+					<cffile action="readbinary" file="#expandPath(href)#" variable="doc">
+				<cfelse>
+					<cffile action="read" file="#expandPath(href)#" variable="doc">
+				</cfif>
+				<cfset variables.instance.fileContents = doc>
 			<cfelse>
-				<cffile action="read" file="#expandPath(href)#" variable="doc">
+				<cfthrow message="Resource has no associated file or file does not exists" type="homePortals.resourceBean.missingTargetFile">
 			</cfif>
 		<cfelse>
-			<cfthrow message="Resource has no associated file or file does not exists" type="homePortals.resourceBean.missingTargetFile">
+			<cfset doc = variables.instance.fileContents>
 		</cfif>
 		<cfreturn doc>
 	</cffunction>
@@ -241,6 +249,8 @@
 		<cfset setHREF(href)>
 		
 		<cffile action="write" file="#expandPath(getFullHREF())#" output="#arguments.fileContent#">
+
+		<cfset variables.instance.fileContents = arguments.fileContent>
 	</cffunction>
 
 	<cffunction name="deleteFile" access="public" output="false" returntype="void" hint="Deletes the file associated with this resource">
@@ -249,6 +259,7 @@
 			<cffile action="delete" file="#expandPath(href)#">
 		</cfif>
 		<cfset setHREF("")>
+		<cfset variables.instance.fileContents = variables.FILE_NOT_READ>
 	</cffunction>
 
 </cfcomponent>
