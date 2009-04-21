@@ -4,6 +4,7 @@
 		variables.qryResources = QueryNew("libpath,type,id,href,package,description");
 		variables.mapResources = structNew();
 		variables.oResourceLibraryManager = 0;
+		variables.cacheServiceName = "catalogCacheService";
 	</cfscript>
 	
 	<!---------------------------------------->
@@ -66,6 +67,8 @@
 		
 		<cfscript>
 			var stResourceInfo = structNew();
+			var oResBean = 0;
+			var cacheKey = "";
 			
 			// Make sure the resourceID does not have any XML escaped characters
 			arguments.resourceID = XMLUnformat(arguments.resourceID);
@@ -86,8 +89,30 @@
 				throw("Resource [#arguments.resourceID#] of type [#arguments.resourceType#] does not exist", "homePortals.catalog.resourceNotFound");
 			}
 			
-			// find the requested resource on the resource library
-			return getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID);
+			// if the cache for the catalog has been enabled, then first check if the resource is already cached
+			if(hasCacheService()) {
+
+				// generate a key for the cache entry
+				cacheKey = "//" & arguments.resourceType & "/" & stResourceInfo.package & "/" & arguments.resourceID;
+				
+				try {
+					// read from cache
+					oResBean = getContentCache().retrieve(cacheKey);
+				
+				} catch(homePortals.cacheService.itemNotFound e) {
+					// read from source
+					oResBean = getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID);
+					
+					// update cache
+					oCache.store(cacheKey, oResBean);
+				}
+			
+			} else {
+				// not using catalog cache, so just read the resource from the library
+				oResBean = getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID);
+			}
+			
+			return oResBean;
 		</cfscript>
 	</cffunction>	
 
@@ -289,6 +314,21 @@
 		</cfscript>
 	</cffunction>
 
+	<!---------------------------------------->
+	<!--- hasCacheService				   --->
+	<!---------------------------------------->	
+	<cffunction name="hasCacheService" access="private" returntype="boolean" hint="Checks whether the cache for the catalog has been registered">
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
+		<cfreturn oCacheRegistry.isRegistered(variables.cacheServiceName)>
+	</cffunction>
+	
+	<!---------------------------------------->
+	<!--- getCacheService				   --->
+	<!---------------------------------------->	
+	<cffunction name="getCacheService" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching resources in the catalog">
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
+		<cfreturn oCacheRegistry.getCache(variables.cacheServiceName)>
+	</cffunction>
 
 
 	<!--- * * * *     U T I L I T Y     M E T H O D S   * * * * 	   --->	

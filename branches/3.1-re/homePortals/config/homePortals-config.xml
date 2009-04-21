@@ -37,6 +37,12 @@
 	<!-- Default TTL in minutes for rss feeds on the rss cache.  -->
 	<rssCacheTTL>60</rssCacheTTL>
 
+	<!-- The maximum number of items to hold in the catalog cache -->
+	<catalogCacheSize>50</catalogCacheSize>
+
+	<!-- Default TTL in minutes for content items on the catalog cache. -->
+	<catalogCacheTTL>60</catalogCacheTTL>
+
 	<!-- Path in dot notation for the class responsible for storing/retrieving HomePortals pages -->
 	<pageProviderClass>homePortals.components.defaultPageProvider</pageProviderClass>
 

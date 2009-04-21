@@ -21,6 +21,8 @@
 			variables.stConfig.pageCacheTTL = "";
 			variables.stConfig.contentCacheSize = "";
 			variables.stConfig.contentCacheTTL = "";
+			variables.stConfig.catalogCacheSize = "";
+			variables.stConfig.catalogCacheTTL = "";
 			variables.stConfig.rssCacheSize = "";
 			variables.stConfig.rssCacheTTL = "";
 			variables.stConfig.baseResourceTypes = "";
@@ -191,6 +193,8 @@
 					case "contentCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentCacheTTL"); break;
 					case "rssCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"rssCacheSize"); break;
 					case "rssCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"rssCacheTTL"); break;
+					case "catalogCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"catalogCacheSize"); break;
+					case "catalogCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"catalogCacheTTL"); break;
 					case "baseResourceTypes": tmpXmlNode = xmlElemNew(xmlConfigDoc,"baseResourceTypes"); break;
 					case "pageProviderClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageProviderClass"); break;
 				}
@@ -353,6 +357,14 @@
 	</cffunction>
 
 	<cffunction name="getContentCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the content cache. This can be overriden for individual entries">
+		<cfreturn val(variables.stConfig.contentCacheTTL)>
+	</cffunction>
+
+	<cffunction name="getCatalogCacheSize" access="public" returntype="any" hint="The maximum number of items to hold in the catalog cache">
+		<cfreturn val(variables.stConfig.contentCacheSize)>	
+	</cffunction>
+
+	<cffunction name="getCatalogCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the catalog cache">
 		<cfreturn val(variables.stConfig.contentCacheTTL)>
 	</cffunction>
 
@@ -525,6 +537,16 @@
 	<cffunction name="setRSSCacheTTL" access="public" returntype="void">
 		<cfargument name="data" type="numeric" required="true">
 		<cfset variables.stConfig.rssCacheTTL = arguments.data>
+	</cffunction>
+
+	<cffunction name="setCatalogCacheSize" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.CatalogCacheSize = arguments.data>	
+	</cffunction>
+
+	<cffunction name="setCatalogCacheTTL" access="public" returntype="void">
+		<cfargument name="data" type="numeric" required="true">
+		<cfset variables.stConfig.CatalogCacheTTL = arguments.data>
 	</cffunction>
 
 	<cffunction name="setBaseResourceTypes" access="public" returnType="void">

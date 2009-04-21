@@ -89,10 +89,16 @@
 			oCacheRegistry = createObject("component","cacheRegistry").init();
 			oCacheRegistry.flush();		// clear registry
 
-			// crate page cache instances
+			// crate page cache instance
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
 																			variables.oHomePortalsConfigBean.getPageCacheTTL());
 			oCacheRegistry.register("hpPageCache", oCacheService);
+
+
+			// crate catalog cache instance
+			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getCatalogCacheSize(), 
+																			variables.oHomePortalsConfigBean.getCatalogCacheTTL());
+			oCacheRegistry.register("catalogCacheService", oCacheService);
 
 
 			// initialize cache for RSSService
