@@ -13,8 +13,9 @@
 	<cfproperty name="EventListeners" type="array" hint="For module resources, this represent a list of event listeners that will need to be added to the page" />
 
 	<cffunction name="init" access="public" output="false" returntype="moduleResourceBean" hint="constructor">
+		<cfargument name="resourceLibrary" type="homePortals.components.resourceLibrary" required="true">
 		<cfscript>
-			super.init();
+			super.init(arguments.resourceLibrary);
 
 			variables.instance.Owner = "";
 			variables.instance.AccessType = "";

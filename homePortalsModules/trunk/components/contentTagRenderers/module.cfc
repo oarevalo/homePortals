@@ -24,10 +24,10 @@
 			try {
 				if(moduleName neq "") {
 					modResBean = oHP.getResourceLibraryManager().getResource("module",listFirst(moduleName,"/"),listLast(moduleName,"/"));
-					moduleName = modResBean.getResLibPath() & "/Modules/" & moduleName;
+					moduleName = modResBean.getResourceLibrary().getPath() & "/Modules/" & moduleName;
 				} else if(moduleResID neq "") {
 					modResBean = oHP.getCatalog().getResourceNode("module",moduleResID);
-					moduleName = modResBean.getResLibPath() & "/Modules/" & modResBean.getPackage() & "/" & modResBean.getID();
+					moduleName = modResBean.getResourceLibrary().getPath() & "/Modules/" & modResBean.getPackage() & "/" & modResBean.getID();
 				}
 
 				// convert the moduleName into a dot notation path
@@ -61,7 +61,7 @@
 				arguments.bodyContentBuffer.set(  class = moduleName, 
 												content = oModuleController.renderView() );
 								
-			} catch(lock e) {
+			} catch(any e) {
 				tmpMsg = "<b>An unexpected error ocurred while initializing module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
 				arguments.bodyContentBuffer.set(  class = moduleName, 
 												content = tmpMsg );
