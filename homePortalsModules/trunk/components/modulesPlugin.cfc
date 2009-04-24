@@ -11,6 +11,7 @@
 			var oCacheService = 0;
 			var oResourceLibraryManager = 0;
 			var oResourceType = 0;
+			var oRSSService = 0;
 
 			// load module properties
 			variables.oModuleProperties = createObject("component","moduleProperties").init(oConfig);
@@ -23,6 +24,10 @@
 			oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init();
 			oCacheRegistry.register("hpContentStoreCache", oCacheService);
 
+			// initialize cache for RSSService 
+			// (there is no need to register the service with the registry since it registers itself)
+			oRSSService = createObject("component","RSSService").init(oConfig.getCatalogCacheSize(), 
+																		oConfig.getCatalogCacheTTL());
 
 			// clear all stored pages/module contexts (configbeans)
 			oConfigBeanStore = createObject("component","configBeanStore").init();

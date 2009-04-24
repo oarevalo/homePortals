@@ -18,7 +18,7 @@
 	imgRoot = tmpModulePath & "/images";
 
 	// get reader service
-	oRSSReaderService = this.controller.getAPIObject("lib.RSSService").init();
+	oRSSReaderService = createObject("component","homePortalsModules.components.RSSService").init();
 
 	// get current rss/atom url
 	rssURL = cfg.getPageSetting("rss");
