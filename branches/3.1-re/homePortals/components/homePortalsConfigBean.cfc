@@ -352,28 +352,12 @@
 		<cfreturn val(variables.stConfig.pageCacheTTL)>
 	</cffunction>
 
-	<cffunction name="getContentCacheSize" access="public" returntype="any" hint="The maximum number of items to hold in the content cache">
-		<cfreturn val(variables.stConfig.contentCacheSize)>	
-	</cffunction>
-
-	<cffunction name="getContentCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the content cache. This can be overriden for individual entries">
-		<cfreturn val(variables.stConfig.contentCacheTTL)>
-	</cffunction>
-
 	<cffunction name="getCatalogCacheSize" access="public" returntype="any" hint="The maximum number of items to hold in the catalog cache">
 		<cfreturn val(variables.stConfig.contentCacheSize)>	
 	</cffunction>
 
 	<cffunction name="getCatalogCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the catalog cache">
 		<cfreturn val(variables.stConfig.contentCacheTTL)>
-	</cffunction>
-
-	<cffunction name="getRSSCacheSize" access="public" returntype="any" hint="The maximum number of items to hold in the RSS cache">
-		<cfreturn val(variables.stConfig.rssCacheSize)>	
-	</cffunction>
-
-	<cffunction name="getRSSCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the RSS cache. This can be overriden for individual entries">
-		<cfreturn val(variables.stConfig.rssCacheTTL)>
 	</cffunction>
 
 	<cffunction name="getBaseResourceTypes" access="public" returntype="string" hint="List with allowed types of base resources">
@@ -517,26 +501,6 @@
 	<cffunction name="setPageCacheTTL" access="public" returntype="void">
 		<cfargument name="data" type="numeric" required="true">
 		<cfset variables.stConfig.pageCacheTTL = arguments.data>
-	</cffunction>
-
-	<cffunction name="setContentCacheSize" access="public" returntype="void">
-		<cfargument name="data" type="numeric" required="true">
-		<cfset variables.stConfig.contentCacheSize = arguments.data>	
-	</cffunction>
-
-	<cffunction name="setContentCacheTTL" access="public" returntype="void">
-		<cfargument name="data" type="numeric" required="true">
-		<cfset variables.stConfig.contentCacheTTL = arguments.data>
-	</cffunction>
-
-	<cffunction name="setRSSCacheSize" access="public" returntype="void">
-		<cfargument name="data" type="numeric" required="true">
-		<cfset variables.stConfig.rssCacheSize = arguments.data>	
-	</cffunction>
-
-	<cffunction name="setRSSCacheTTL" access="public" returntype="void">
-		<cfargument name="data" type="numeric" required="true">
-		<cfset variables.stConfig.rssCacheTTL = arguments.data>
 	</cffunction>
 
 	<cffunction name="setCatalogCacheSize" access="public" returntype="void">

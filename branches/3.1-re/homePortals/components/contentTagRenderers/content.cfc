@@ -9,6 +9,8 @@
 	
 	<cfscript>
 		variables.HTTP_GET_TIMEOUT = 30;	// timeout for HTTP requests in content modules
+		variables.EXT_CONTENT_CACHE = "extContentCacheService";	// name of the cache instance to use for external content
+		variables.CONTENT_RES_TYPE = "content";	// name of resource type to use for content
 	</cfscript>
 
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
@@ -21,35 +23,57 @@
 			var oCache = 0;
 			var cache = getContentTag().getAttribute("cache",false);
 			var cacheTTL = getContentTag().getAttribute("cacheTTL");
+			var gotContent = false;
 			
 			try {
-				if(isBoolean(cache) and cache) {
-					// get the content cache (this will initialize it, if needed)
-					oCache = getContentCache();
-
-					// generate a key for the cache entry
-					cacheKey = getContentTag().getAttribute("resourceID") & "/" 
-								& getContentTag().getAttribute("href");
+				// for content resources, we try to get it first from the catalog
+				// there is no need for us to worry about caching here since the catalog
+				// itself caches local resources
+				if(getContentTag().getAttribute("resourceID") neq "") {
+					oResBean = getPageRenderer()
+									.getHomePortals()
+									.getCatalog()
+									.getResourceNode(variables.CONTENT_RES_TYPE, resourceID);
 					
-					try {
-						// read from cache
-						tmpHTML = oCache.retrieve(cacheKey);
-					
-					} catch(homePortals.cacheService.itemNotFound e) {
-						// read from source
-						tmpHTML = retrieveContent();
-						
-						// update cache
-						if(cacheTTL neq "" and val(cacheTTL) gte 0)
-							oCache.store(cacheKey, tmpHTML, val(cacheTTL));
-						else
-							oCache.store(cacheKey, tmpHTML);
+					if(oResBean.targetFileExists()) {
+						tmpHTML = oResBean.readFile();
+						gotContent = true;
 					}
-					
-				} else {
-					// retrieve from source
-					tmpHTML = retrieveContent();
 				}
+					
+				// at this point the requested content is not a resource, or may be a
+				// resource that is pointing to an external source	
+				if(not gotContent) {
+					if(isBoolean(cache) and cache) {
+						// get the content cache (this will initialize it, if needed)
+						oCache = getContentCache();
+	
+						// generate a key for the cache entry
+						cacheKey = getContentTag().getAttribute("resourceID") & "/" 
+									& getContentTag().getAttribute("href");
+						
+						try {
+							// read from cache
+							tmpHTML = oCache.retrieve(cacheKey);
+						
+						} catch(homePortals.cacheService.itemNotFound e) {
+							// read from source
+							tmpHTML = retrieveContent();
+							
+							// update cache
+							if(cacheTTL neq "" and val(cacheTTL) gte 0)
+								oCache.store(cacheKey, tmpHTML, val(cacheTTL));
+							else
+								oCache.store(cacheKey, tmpHTML);
+						}
+						
+					} else {
+						// retrieve from source
+						tmpHTML = retrieveContent();
+					}
+				}	
+				
+				
 
 				// add rendered content to buffer
 				arguments.bodyContentBuffer.set( tmpHTML );
@@ -67,10 +91,10 @@
 	<!---------------------------------------->		
 	<cffunction name="getContentCache" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
 		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
-		<cfset var cacheName = "contentCacheService">
+		<cfset var cacheName = variables.EXT_CONTENT_CACHE>
 		<cfset var oCacheService = 0>
-		<cfset var cacheSize = getPageRenderer().getHomePortals().getConfig().getContentCacheSize()>
-		<cfset var cacheTTL = getPageRenderer().getHomePortals().getConfig().getContentCacheTTL()>
+		<cfset var cacheSize = getPageRenderer().getHomePortals().getConfig().getCatalogCacheSize()>
+		<cfset var cacheTTL = getPageRenderer().getHomePortals().getConfig().getCatalogCacheTTL()>
 
 		<cflock type="exclusive" name="contentCacheLock" timeout="30">
 			<cfif not oCacheRegistry.isRegistered(cacheName)>

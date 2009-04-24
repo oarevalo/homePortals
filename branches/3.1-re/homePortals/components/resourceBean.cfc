@@ -111,11 +111,15 @@
 		<cfset var resLibPath = getResourceLibrary().getPath()>
 		<cfset var href = getHref()>
 		
-		<cfif right(resLibPath,1) neq "/">
-			<cfreturn resLibPath & "/" & href />
-		<cfelse>
-			<cfreturn resLibPath & href />
+		<cfif left(href,4) neq "http">
+			<cfif right(resLibPath,1) neq "/">
+				<cfset href = resLibPath & "/" & href />
+			<cfelse>
+				<cfset href = resLibPath & href />
+			</cfif>
 		</cfif>
+		
+		<cfreturn href>
 	</cffunction>
 	
 	<cffunction name="setHref" access="public" output="false" returntype="void">
