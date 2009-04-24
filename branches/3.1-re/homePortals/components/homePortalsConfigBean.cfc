@@ -19,12 +19,8 @@
 			variables.stConfig.contentRoot = "";
 			variables.stConfig.pageCacheSize = "";
 			variables.stConfig.pageCacheTTL = "";
-			variables.stConfig.contentCacheSize = "";
-			variables.stConfig.contentCacheTTL = "";
 			variables.stConfig.catalogCacheSize = "";
 			variables.stConfig.catalogCacheTTL = "";
-			variables.stConfig.rssCacheSize = "";
-			variables.stConfig.rssCacheTTL = "";
 			variables.stConfig.baseResourceTypes = "";
 			variables.stConfig.pageProviderClass = "";
 			variables.stConfig.lstResourceTypes = "";
@@ -189,10 +185,6 @@
 					case "contentRoot": tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentRoot"); break;
 					case "pageCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageCacheSize"); break;
 					case "pageCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageCacheTTL"); break;
-					case "contentCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentCacheSize"); break;
-					case "contentCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentCacheTTL"); break;
-					case "rssCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"rssCacheSize"); break;
-					case "rssCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"rssCacheTTL"); break;
 					case "catalogCacheSize": tmpXmlNode = xmlElemNew(xmlConfigDoc,"catalogCacheSize"); break;
 					case "catalogCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"catalogCacheTTL"); break;
 					case "baseResourceTypes": tmpXmlNode = xmlElemNew(xmlConfigDoc,"baseResourceTypes"); break;
@@ -353,11 +345,11 @@
 	</cffunction>
 
 	<cffunction name="getCatalogCacheSize" access="public" returntype="any" hint="The maximum number of items to hold in the catalog cache">
-		<cfreturn val(variables.stConfig.contentCacheSize)>	
+		<cfreturn val(variables.stConfig.catalogCacheSize)>	
 	</cffunction>
 
 	<cffunction name="getCatalogCacheTTL" access="public" returntype="any" hint="Default TTL in minutes for content items on the catalog cache">
-		<cfreturn val(variables.stConfig.contentCacheTTL)>
+		<cfreturn val(variables.stConfig.catalogCacheTTL)>
 	</cffunction>
 
 	<cffunction name="getBaseResourceTypes" access="public" returntype="string" hint="List with allowed types of base resources">
