@@ -100,11 +100,6 @@
 																			variables.oHomePortalsConfigBean.getCatalogCacheTTL());
 			oCacheRegistry.register("catalogCacheService", oCacheService);
 
-
-			// initialize cache for RSSService 
-			// (there is no need to register the service with the registry since it registers itself)
-			oRSSService = createObject("component","homePortals.components.lib.RSSService").init(variables.oHomePortalsConfigBean.getCatalogCacheSize(), 
-																								variables.oHomePortalsConfigBean.getCatalogCacheTTL());
 						
 			// register and initialize plugins
 			variables.oPluginManager = createObject("component","pluginManager").init(this);
