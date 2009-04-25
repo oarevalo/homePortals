@@ -111,7 +111,7 @@
 		<cfset var resLibPath = getResourceLibrary().getPath()>
 		<cfset var href = getHref()>
 		
-		<cfif left(href,4) neq "http">
+		<cfif not isExternalTarget()>
 			<cfif right(resLibPath,1) neq "/">
 				<cfset href = resLibPath & "/" & href />
 			<cfelse>
@@ -206,6 +206,9 @@
 
 	
 	<!--- Target File Methods --->
+	<cffunction name="isExternalTarget" access="public" output="false" returntype="boolean" hint="Returns whether this resource points to an external target by using its URL address instead of a file path">
+		<cfreturn (left(getHref(),4) eq "http")>
+	</cffunction>
 
 	<cffunction name="targetFileExists" access="public" output="false" returntype="boolean" hint="Returns whether the file associated with this resources exists on the local file system or not. This only works for target files within the resource library">
 		<cfreturn getHref() neq "" and fileExists(expandPath(getFullHref()))>
@@ -223,6 +226,15 @@
 					<cffile action="read" file="#expandPath(href)#" variable="doc">
 				</cfif>
 				<cfset variables.instance.fileContents = doc>
+			<cfelseif isExternalTarget()>
+				<cfhttp url="#href#" 
+						method="get" 
+						getasbinary="#arguments.readAsBinary#" 
+						redirect="true" 
+						throwonerror="true" 
+						timeout="#httpTimeout#">
+				</cfhttp>
+				<cfset variables.instance.fileContents = cfhttp.FileContent>
 			<cfelse>
 				<cfthrow message="Resource has no associated file or file does not exists" type="homePortals.resourceBean.missingTargetFile">
 			</cfif>

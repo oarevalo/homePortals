@@ -23,13 +23,14 @@
 			var oCache = 0;
 			var cache = getContentTag().getAttribute("cache",false);
 			var cacheTTL = getContentTag().getAttribute("cacheTTL");
+			var resourceID = getContentTag().getAttribute("resourceID");
 			var gotContent = false;
 			
 			try {
 				// for content resources, we try to get it first from the catalog
 				// there is no need for us to worry about caching here since the catalog
 				// itself caches local resources
-				if(getContentTag().getAttribute("resourceID") neq "") {
+				if(resourceID neq "") {
 					oResBean = getPageRenderer()
 									.getHomePortals()
 									.getCatalog()
@@ -49,7 +50,7 @@
 						oCache = getContentCache();
 	
 						// generate a key for the cache entry
-						cacheKey = getContentTag().getAttribute("resourceID") & "/" 
+						cacheKey = resourceID & "/" 
 									& getContentTag().getAttribute("href");
 						
 						try {
