@@ -21,20 +21,16 @@
 				$PAGE_LAYOUTSECTION["HEADER"]["DIV"]$
 	
 				<!-- Column sections -->
-				<div style="##height:1%;">
-					<table border="0" cellspacing="0" cellpadding="0" width="100%" id="h_body_main">
-						<tr>
-							$PAGE_LAYOUTSECTION["COLUMN"]["TD"]$
-						</tr>
-					</table>
-				</div>
+				<table border="0" cellspacing="0" cellpadding="0" width="100%">
+					<tr>
+						$PAGE_LAYOUTSECTION["COLUMN"]["TD"]$
+					</tr>
+				</table>
 	
 				<!-- Footer sections -->
 				$PAGE_LAYOUTSECTION["FOOTER"]["DIV"]$
-			</div>
 
-			<!-- Custom footers -->
-			<div id="h_footer">
+				<!-- Custom footers -->
 				$PAGE_CUSTOMSECTION["FOOTER"]$
 			</div>
 		</body>
