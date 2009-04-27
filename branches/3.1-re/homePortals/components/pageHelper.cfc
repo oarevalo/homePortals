@@ -315,6 +315,9 @@
 			<cfset tmpCSS = replaceNoCase(tmpCSS,"eval","","ALL")>
 			<cfset tmpCSS = REReplaceNoCase(tmpCSS, "j.*a.*v.*a.*s.*c.*r.*i.*p.*t", "","ALL")>
 			
+			<!--- create _res dir if needed --->
+			<cfset verifyResFolder()>
+			
 			<!--- write the css file --->
 			<cffile action="write" file="#expandpath(localStyleHREF)#" output="#tmpCSS#">
 
@@ -346,7 +349,22 @@
 	<!--- getPageCSSHREF		           --->
 	<!---------------------------------------->	
 	<cffunction name="getPageCSSHREF" access="public" returntype="string" output="False" hint="Returns the location of the local stylesheet">
-		<cfreturn getPageHREF() & ".css">
+		<cfset var tmp = getPageHREF()>
+		<cfset tmp = listDeleteAt(tmp,listLen(tmp,"/"),"/")>
+		<cfset tmp = tmp & "/_res/" & getFileFromPath(getPageHREF()) & ".css">
+		<cfreturn tmp>
+	</cffunction>
+
+	<!---------------------------------------->
+	<!--- verifyResFolder		           --->
+	<!---------------------------------------->	
+	<cffunction name="verifyResFolder" access="public" returntype="void" hint="Checks if a resources folder exists, otherwise creates it">
+		<cfset var tmp = getPageHREF()>
+		<cfset tmp = listDeleteAt(tmp,listLen(tmp,"/"),"/")>
+		<cfset tmp = tmp & "/_res">
+		<cfif not directoryExists(expandPath(tmp))>
+			<cfdirectory action="create" directory="#expandPath(tmp)#">
+		</cfif>
 	</cffunction>
 
 
@@ -361,7 +379,7 @@
 
 	<cffunction name="setPageHREF" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
-		<cfset variables.instance.pageHREF = arguments.data>
+		<cfset variables.instance.pageHREF = reReplace(arguments.data,"//*","/","all")>
 	</cffunction>
 
 	<cffunction name="getPage" access="public" returntype="pageBean">
