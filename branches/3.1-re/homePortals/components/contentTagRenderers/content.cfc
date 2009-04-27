@@ -165,7 +165,9 @@
 	<cffunction name="readFile" access="private" returntype="string" hint="Reads a file from disk and returns the contents.">
 		<cfargument name="filePath" type="string" required="true">
 		<cfset var txtDoc = "">
-		<cffile action="read" file="#filePath#" variable="txtDoc">
+		<cfif arguments.filePath neq "">
+			<cffile action="read" file="#arguments.filePath#" variable="txtDoc">
+		</cfif>
 		<cfreturn txtDoc>
 	</cffunction>		
 	

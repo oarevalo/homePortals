@@ -62,16 +62,4 @@
 		<cfreturn resPath>
 	</cffunction>
 
-	<!---------------------------------------->
-	<!--- renderInclude	                   --->
-	<!---------------------------------------->		
-	<cffunction name="renderInclude" access="private" returntype="string" hint="Returns the output of an included file.">
-		<cfargument name="fileToInclude" type="any" required="true">
-		<cfset var tmpHTML = "">
-		<cfsavecontent variable="tmpHTML">
-			<cfinclude template="#arguments.fileToInclude#">	
-		</cfsavecontent>
-		<cfreturn tmpHTML>
-	</cffunction>	
-	
 </cfcomponent>

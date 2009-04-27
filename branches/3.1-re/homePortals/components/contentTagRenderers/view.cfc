@@ -33,9 +33,11 @@
 	<cffunction name="renderInclude" access="private" returntype="string" hint="Returns the output of an included file.">
 		<cfargument name="fileToInclude" type="any" required="true">
 		<cfset var tmpHTML = "">
-		<cfsavecontent variable="tmpHTML">
-			<cfinclude template="#arguments.fileToInclude#">	
-		</cfsavecontent>
+		<cfif arguments.fileToInclude neq "">
+			<cfsavecontent variable="tmpHTML">
+				<cfinclude template="#arguments.fileToInclude#">	
+			</cfsavecontent>
+		</cfif>
 		<cfreturn tmpHTML>
 	</cffunction>	
 	
