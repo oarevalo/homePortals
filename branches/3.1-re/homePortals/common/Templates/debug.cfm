@@ -174,12 +174,16 @@
 					<td><a href="#request.oPageRenderer.getPageHREF()#" target="_blank">#request.oPageRenderer.getPageHREF()#</td>
 				</tr>
 				<tr>
-					<td><b>Owner:</b></td>
-					<td>#request.oPageRenderer.getPage().getOwner()#</td>
-				</tr>
-				<tr>
-					<td><b>Access:</b></td>
-					<td>#request.oPageRenderer.getPage().getAccess()#</td>
+					<td><b>Custom Properties:</b></td>
+					<td>
+						<cfset stProps = request.oPageRenderer.getPage().getProperties()>
+						<cfloop collection="#stProps#" item="key">
+							<strong>&bull; #key#:</strong> '#stProps[key]#'<br />
+						</cfloop>
+						<cfif structIsEmpty(stProps)>
+							<em>None</em>
+						</cfif>
+					</td>
 				</tr>
 			</table>
 			<br><br>

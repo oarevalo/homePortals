@@ -1,10 +1,7 @@
 <cfcomponent>
 
 	<cfscript>
-		variables.ACCESS_TYPES = "general,owner,friend";
 		variables.DEFAULT_PAGE_TITLE = "";
-		variables.DEFAULT_PAGE_OWNER = "";
-		variables.DEFAULT_PAGE_ACCESS = "general";
 		variables.DEFAULT_PAGE_SKINID = "";
 		variables.DEFAULT_MODULE_TITLE = "";
 		variables.DEFAULT_MODULE_ICON = "";
@@ -16,8 +13,6 @@
 		variables.instance = structNew();
 		variables.instance.title = variables.DEFAULT_PAGE_TITLE;
 		variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
-		variables.instance.owner = variables.DEFAULT_PAGE_OWNER;
-		variables.instance.access = variables.DEFAULT_PAGE_ACCESS;
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
 		variables.instance.aEventListeners = ArrayNew(1);
@@ -25,6 +20,7 @@
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
+		variables.instance.stProperties = structNew();
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
@@ -56,13 +52,10 @@
 			// initialize default page properties
 			initPageProperties();
 
-			// set page owner
-			if(structKeyExists(xmlDoc.xmlRoot.xmlAttributes, "owner"))
-				setOwner(xmlDoc.xmlRoot.xmlAttributes.owner);
-
-			// set page access level
-			if(structKeyExists(xmlDoc.xmlRoot.xmlAttributes, "access"))
-				setAccess(xmlDoc.xmlRoot.xmlAttributes.access);
+			// read custom page properties
+			for(i in xmlDoc.xmlRoot.xmlAttributes) {
+				setProperty(i, xmlDoc.xmlRoot.xmlAttributes[i]);
+			}
 
 			// process top level nodes
 			for(i=1;i lte ArrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
@@ -208,9 +201,11 @@
 			xmlDoc = xmlNew();
 			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "Page");
 
-			if(getOwner() neq variables.DEFAULT_PAGE_OWNER) xmlDoc.xmlRoot.xmlAttributes["owner"] = xmlFormat(getOwner());
-			if(getAccess() neq variables.DEFAULT_PAGE_ACCESS) xmlDoc.xmlRoot.xmlAttributes["access"] = xmlFormat(getAccess());
-			
+			// add custom properties
+			for(i in getProperties()) {
+				xmlDoc.xmlRoot.xmlAttributes[i] = xmlFormat(getProperty(i));
+			}
+
 			// add title
 			xmlNode = xmlElemNew(xmlDoc,"title");
 			xmlNode.xmlText = xmlFormat(getTitle());
@@ -334,40 +329,6 @@
 	</cffunction>
 
 
-	<!---------------------------------------->
-	<!--- Owner					           --->
-	<!---------------------------------------->	
-	<cffunction name="getOwner" access="public" returntype="string" hint="Returns the name of the page owner">
-		<cfreturn variables.instance.owner>
-	</cffunction>
-	
-	<cffunction name="setOwner" access="public" returnType="pageBean" hint="Sets the name of the page owner">
-		<cfargument name="data" type="string" required="true">
-		<cfif arguments.data eq "">
-			<cfthrow message="Page owner cannot be empty" type="homePortals.pageBean.ownerIsEmpty">
-		</cfif>
-		<cfset variables.instance.owner = trim(arguments.data)>
-		<cfreturn this>
-	</cffunction>
-		
-
-	<!---------------------------------------->
-	<!--- Access				           --->
-	<!---------------------------------------->		
-	<cffunction name="getAccess" access="public" returntype="string" hint="Returns the access level for this page">
-		<cfreturn variables.instance.access>
-	</cffunction>
-	
-	<cffunction name="setAccess" access="public" returnType="pageBean" hint="Sets the access level for this page">
-		<cfargument name="accessType" type="string" required="true">
-		<cfif not listFindNoCase(variables.ACCESS_TYPES, arguments.accessType)>
-			<cfthrow message="Invalid access type. Valid types are: #variables.ACCESS_TYPES#" type="homePortals.pageBean.invalidAccessType">
-		</cfif>
-		<cfset variables.instance.access = arguments.accessType>
-		<cfreturn this>
-	</cffunction>
-				
-		
 	<!---------------------------------------->
 	<!--- Stylesheets			           --->
 	<!---------------------------------------->			
@@ -727,14 +688,41 @@
 	</cffunction>
 
 
-
 	<!---------------------------------------->
-	<!--- getAccessTypes		           --->
+	<!--- Custom Properties		           --->
 	<!---------------------------------------->	
-	<cffunction name="getAccessTypes" access="public" returntype="array" output="False"
-				hint="Returns an array with possible values for page access">
-		<cfreturn listToArray(variables.ACCESS_TYPES)>
+	<cffunction name="getProperties" access="public" returntype="struct" hint="returns a struct with all custom properties">
+		<cfreturn duplicate(variables.instance.stProperties)>
 	</cffunction>
+
+	<cffunction name="getProperty" access="public" returnType="string" hint="returns the value of a custom property">
+		<cfargument name="name" type="string" required="true">
+		<cfif structKeyExists(variables.instance.stProperties, arguments.name)>
+			<cfreturn variables.instance.stProperties[arguments.name]>
+		<cfelse>
+			<cfthrow message="Property '#arguments.name#' is not defined" type="homePortals.pageBean.invalidProperty">
+		</cfif>
+	</cffunction>
+
+	<cffunction name="hasProperty" access="public" returnType="string" hint="returns whether a given custom property exists">
+		<cfargument name="name" type="string" required="true">
+		<cfreturn structKeyExists(variables.instance.stProperties, arguments.name)>
+	</cffunction>
+
+	<cffunction name="setProperty" access="public" returnType="pageBean" hint="sets the value of a custom property">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfset variables.instance.stProperties[arguments.name] = arguments.value>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="removeProperty" access="public" returnType="pageBean" hint="removes a custom property">
+		<cfargument name="name" type="string" required="true">
+		<cfset structDelete(variables.instance.stProperties, arguments.name,false)>
+		<cfreturn this>
+	</cffunction>	
+	
+
 
 	<!---------------------------------------->
 	<!--- getMemento			           --->
@@ -751,8 +739,6 @@
 			variables.instance = structNew();
 			variables.instance.title = variables.DEFAULT_PAGE_TITLE;
 			variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
-			variables.instance.owner = variables.DEFAULT_PAGE_OWNER;
-			variables.instance.access = variables.DEFAULT_PAGE_ACCESS;
 			variables.instance.aStyles = ArrayNew(1);
 			variables.instance.aScripts = ArrayNew(1);
 			variables.instance.aEventListeners = ArrayNew(1);
@@ -760,6 +746,7 @@
 			variables.instance.aModules = ArrayNew(1);		// holds modules		
 			variables.instance.stModuleIndex = structNew();	// an index of modules	
 			variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
+			variables.instance.stProperties = structNew();
 		</cfscript>	
 	</cffunction>
 

@@ -303,8 +303,6 @@
 			variables.stPage.page = StructNew();
 			variables.stPage.page.href = variables.pageHREF;			// address of the page
 			variables.stPage.page.title = getPage().getTitle();		// page title
-			variables.stPage.page.owner = getPage().getOwner();		// the account to which the current page belongs to
-			variables.stPage.page.access = getPage().getAccess();	// page access level
 			variables.stPage.page.eventListeners = getPage().getEventListeners();
 			variables.stPage.page.meta = getPage().getMetaTags();			// holds html meta tags
 
