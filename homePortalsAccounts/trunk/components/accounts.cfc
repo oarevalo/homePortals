@@ -281,8 +281,8 @@
 			var oUserRegistry = 0;
 			var stUserInfo = 0;
 			var oFriendsService = 0;
-			var accessLevel = arguments.page.getAccess();
-			var owner = arguments.page.getOwner();
+			var accessLevel = arguments.page.getProperty("access");
+			var owner = arguments.page.getProperty("owner");
 			
 			if(accessLevel eq "friend" or accessLevel eq "owner") {
 				// access to this page is restricted, so we must
