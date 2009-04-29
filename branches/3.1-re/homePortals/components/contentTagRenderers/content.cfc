@@ -119,7 +119,7 @@
 			var contentSrc = "";
 			var tmpHTML = "";
 			var st = structNew();
-			var oCatalog = getPageRenderer().getHomePortals().getCatalog();
+			var oCatalog = 0;
 			var oHPConfig = getPageRenderer().getHomePortals().getConfig();
 			
 			var resourceID = getContentTag().getAttribute("resourceID");
@@ -128,6 +128,7 @@
 			
 			// define source of content (resource or external)
 			if(resourceID neq "") {
+				oCatalog = getPageRenderer().getHomePortals().getCatalog();
 				oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
 				contentSrc = oResourceBean.getFullHref();
 			
