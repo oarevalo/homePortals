@@ -11,7 +11,6 @@
 			variables.stConfig = structNew();
 			variables.stConfig.version = variables.hpEngineBaseVersion;
 			variables.stConfig.initialEvent = "";
-			variables.stConfig.layoutSections = "";
 			variables.stConfig.bodyOnLoad = "";
 			variables.stConfig.homePortalsPath = "";
 			variables.stConfig.defaultPage = "";
@@ -177,7 +176,6 @@
 				tmpXmlNode = 0;
 				switch(thisKey) {
 					case "initialEvent": tmpXmlNode = xmlElemNew(xmlConfigDoc,"initialEvent"); break;
-					case "layoutSections": tmpXmlNode = xmlElemNew(xmlConfigDoc,"layoutSections"); break;
 					case "bodyOnLoad": tmpXmlNode = xmlElemNew(xmlConfigDoc,"bodyOnLoad"); break;
 					case "homePortalsPath": tmpXmlNode = xmlElemNew(xmlConfigDoc,"homePortalsPath"); break;
 					case "defaultPage": tmpXmlNode = xmlElemNew(xmlConfigDoc,"defaultPage"); break;
@@ -313,9 +311,41 @@
 	</cffunction>
 
 	<cffunction name="getLayoutSections" access="public" returntype="string">
-		<cfreturn variables.stConfig.layoutSections>
-	</cffunction>
+		<cfargument name="pageTemplate" type="string" required="false" default="">
+		<cfscript>
+			var index = 1;
+			var finished = false;
+			var renderTemplateBody = "";
+			var lstSections = "";
+			var stResult = structNew();
+			var token = ""; var arg1 = ""; var arg2 = "";
+			
+			if(arguments.pageTemplate eq "") arguments.pageTemplate = "page";
+			renderTemplateBody = getRenderTemplateBody(arguments.pageTemplate);
 
+			while(Not finished) {
+				stResult = reFindNoCase("\$PAGE_LAYOUTSECTION\[""([A-Z]*)""]\[""([A-Z]*)""]\$", renderTemplateBody, index, true);
+				dump(stResult);
+				if(stResult.len[1] gt 0) {
+					// match found
+					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
+					dump(token);
+					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
+					arg2 = mid(renderTemplateBody,stResult.pos[3],stResult.len[3]);
+					lstSections = listAppend(lstSections,arg1);
+						
+					renderTemplateBody = replace(renderTemplateBody, token, "_________________", "ALL");
+					
+					index = stResult.pos[1] + stResult.len[1];
+				} else {
+					finished = true;
+				}
+			}		
+			
+			return lstSections;
+		</cfscript>
+	</cffunction>
+					
 	<cffunction name="getBodyOnLoad" access="public" returntype="string">
 		<cfreturn variables.stConfig.bodyOnLoad>
 	</cffunction>
@@ -453,11 +483,6 @@
 	<cffunction name="setInitialEvent" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.initialEvent = arguments.data>
-	</cffunction>
-
-	<cffunction name="setLayoutSections" access="public" returntype="void">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.layoutSections = arguments.data>
 	</cffunction>
 
 	<cffunction name="setHomePortalsPath" access="public" returntype="void">

@@ -3,6 +3,7 @@
 	<cfscript>
 		variables.DEFAULT_PAGE_TITLE = "";
 		variables.DEFAULT_PAGE_SKINID = "";
+		variables.DEFAULT_PAGE_TEMPLATE = "page";
 		variables.DEFAULT_MODULE_TITLE = "";
 		variables.DEFAULT_MODULE_ICON = "";
 		variables.DEFAULT_MODULE_STYLE = "";
@@ -13,6 +14,7 @@
 		variables.instance = structNew();
 		variables.instance.title = variables.DEFAULT_PAGE_TITLE;
 		variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
+		variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
 		variables.instance.aEventListeners = ArrayNew(1);
@@ -182,6 +184,10 @@
 						setSkinID(xmlNode.xmlAttributes.id);
 						break;
 						
+					// page template
+					case "pageTemplate":
+						setPageTemplate(xmlNode.xmlText);
+						break;
 						
 				}
 			}		
@@ -309,6 +315,13 @@
 				xmlNode.xmlAttributes["id"] = variables.instance.skinID;
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
+
+			// add pagetemplate
+			if(variables.instance.pageTemplate neq variables.DEFAULT_PAGE_TEMPLATE) {
+				xmlNode = xmlElemNew(xmlDoc,"pageTemplate");
+				xmlNode.xmlText = variables.instance.pageTemplate;
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			}
 		</cfscript>
 		<cfreturn xmlDoc>
 	</cffunction>
@@ -327,6 +340,21 @@
 		<cfset variables.instance.title = trim(arguments.data)>
 		<cfreturn this>
 	</cffunction>
+
+
+	<!---------------------------------------->
+	<!--- pageTemplate			           --->
+	<!---------------------------------------->		
+	<cffunction name="getPageTemplate" access="public" returntype="string" hint="Returns the page template">
+		<cfreturn variables.instance.pageTemplate>
+	</cffunction>
+
+	<cffunction name="setPageTemplate" access="public" returnType="pageBean" hint="Sets the page template">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.instance.pageTemplate = trim(arguments.data)>
+		<cfreturn this>
+	</cffunction>
+
 
 
 	<!---------------------------------------->
@@ -739,6 +767,7 @@
 			variables.instance = structNew();
 			variables.instance.title = variables.DEFAULT_PAGE_TITLE;
 			variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
+			variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 			variables.instance.aStyles = ArrayNew(1);
 			variables.instance.aScripts = ArrayNew(1);
 			variables.instance.aEventListeners = ArrayNew(1);

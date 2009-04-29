@@ -16,9 +16,6 @@
 	<!-- Event raised when a HomePortals page finishes loading -->
 	<initialEvent>Framework.onPageLoaded</initialEvent>
 
-	<!-- layout section names -->
-	<layoutSections>header,column,footer</layoutSections>
-
 	<!-- The maximum number of homeportals pages to cache at any given time -->
 	<pageCacheSize>50</pageCacheSize>
 

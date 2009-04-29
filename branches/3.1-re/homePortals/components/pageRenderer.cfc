@@ -49,12 +49,13 @@
 			var arg2 = "";
 			var rendered = "";
 			var start = getTickCount();
+			var pageTemplate = getPage().getPageTemplate();
 
 			// pre-render output of all content tags on page		
 			processContentTags();
 
 			// get the render template for the full page
-			renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("page");
+			renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody(pageTemplate);
 
 			// replace simple values
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", getPage().getTitle(), "ALL");
@@ -291,7 +292,6 @@
 			
 			var aScriptResources = oHPConfig.getBaseResourcesByType("script");
 			var aStyleResources = oHPConfig.getBaseResourcesByType("style");
-			var lstLayoutSections = oHPConfig.getLayoutSections();
 			
 			var oResourceBean = 0;
 		
@@ -334,16 +334,11 @@
 
 
 			// layout sections
-			for(i=1;i lte ListLen(lstLayoutSections);i=i+1) {
-				thisSection = ListGetAt(lstLayoutSections,i);
-				variables.stPage.page.layout[thisSection] = ArrayNew(1);
-			}
-			
 			tmp = getPage().getLayoutRegions();
-
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				if(listFindNoCase(lstLayoutSections, tmp[i].type))
-					ArrayAppend(variables.stPage.page.layout[tmp[i].type], tmp[i] );
+				if(not structKeyExists(variables.stPage.page.layout, tmp[i].type))
+					variables.stPage.page.layout[tmp[i].type] = ArrayNew(1);
+				ArrayAppend(variables.stPage.page.layout[tmp[i].type], tmp[i] );
 			}
 
 			
@@ -379,7 +374,7 @@
 			var j = 1;
 			var k = 1;
 			var location = "";
-			var aLayoutSectionTypes = listToArray( getHomePortals().getConfig().getLayoutSections() );
+			var aLayoutSectionTypes = listToArray( structKeyList(variables.stPage.page.layout) );
 			var sectionType = "";
 			var aSections = 0;
 			var start = getTickCount();
