@@ -475,67 +475,79 @@
 	
 	
 	<!--- Setters --->
-	<cffunction name="setVersion" access="public" returntype="void">
+	<cffunction name="setVersion" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.version = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setInitialEvent" access="public" returntype="void">
+	<cffunction name="setInitialEvent" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.initialEvent = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setHomePortalsPath" access="public" returntype="void">
+	<cffunction name="setHomePortalsPath" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.homePortalsPath = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setResourceLibraryPath" access="public" returntype="void">
+	<cffunction name="setResourceLibraryPath" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.resourceLibraryPaths[1] = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setDefaultPage" access="public" returntype="void">
+	<cffunction name="setDefaultPage" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.defaultPage = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setAppRoot" access="public" returnType="void">
+	<cffunction name="setAppRoot" access="public" returnType="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.appRoot = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setContentRoot" access="public" returnType="void">
+	<cffunction name="setContentRoot" access="public" returnType="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.contentRoot = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setPageCacheSize" access="public" returntype="void">
+	<cffunction name="setPageCacheSize" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="numeric" required="true">
 		<cfset variables.stConfig.pageCacheSize = arguments.data>	
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setPageCacheTTL" access="public" returntype="void">
+	<cffunction name="setPageCacheTTL" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="numeric" required="true">
 		<cfset variables.stConfig.pageCacheTTL = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setCatalogCacheSize" access="public" returntype="void">
+	<cffunction name="setCatalogCacheSize" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="numeric" required="true">
-		<cfset variables.stConfig.CatalogCacheSize = arguments.data>	
+		<cfset variables.stConfig.CatalogCacheSize = arguments.data>
+		<cfreturn this>	
 	</cffunction>
 
-	<cffunction name="setCatalogCacheTTL" access="public" returntype="void">
+	<cffunction name="setCatalogCacheTTL" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="numeric" required="true">
 		<cfset variables.stConfig.CatalogCacheTTL = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setBaseResourceTypes" access="public" returnType="void">
+	<cffunction name="setBaseResourceTypes" access="public" returnType="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.baseResourceTypes = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="addBaseResource" access="public" returntype="void">
+	<cffunction name="addBaseResource" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="href" type="string" required="true">
 		
@@ -549,9 +561,11 @@
 		</cfif>
 
 		<cfset arrayAppend(variables.stConfig.resources[arguments.type], arguments.href)>
+		
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeBaseResource" access="public" returntype="void">
+	<cffunction name="removeBaseResource" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="href" type="string" required="true">
 		<cfset var aTmp = arrayNew(1)>
@@ -561,40 +575,46 @@
 			<cfloop from="1" to="#arrayLen(aTmp)#" index="i">
 				<cfif aTmp[i] eq arguments.href>
 					<cfset arrayDeleteAt(variables.stConfig.resources[arguments.type], i)>
-					<cfreturn>
+					<cfreturn this>
 				</cfif>
 			</cfloop>
 		</cfif>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setRenderTemplate" access="public" returntype="void">
+	<cffunction name="setRenderTemplate" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="href" type="string" required="true">
 		<cfset variables.stConfig.renderTemplates[arguments.type] = arguments.href>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeRenderTemplate" access="public" returntype="void">
+	<cffunction name="removeRenderTemplate" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="type" type="string" required="true">
 		<cfset structDelete(variables.stConfig.renderTemplates, arguments.type, false)>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setPageProviderClass" access="public" returnType="void">
+	<cffunction name="setPageProviderClass" access="public" returnType="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.pageProviderClass = arguments.data>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setContentRenderer" access="public" returntype="void">
+	<cffunction name="setContentRenderer" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="path" type="string" required="true">
 		<cfset variables.stConfig.contentRenderers[arguments.name] = arguments.path>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeContentRenderer" access="public" returntype="void">
+	<cffunction name="removeContentRenderer" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
 		<cfset structDelete(variables.stConfig.contentRenderers, arguments.name, false)>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setPlugin" access="public" returntype="void">
+	<cffunction name="setPlugin" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="path" type="string" required="true">
 		<cfif arguments.path neq "">
@@ -602,14 +622,16 @@
 		<cfelseif structKeyExists(variables.stConfig.plugins, arguments.name)>
 			<cfset structDelete(variables.stConfig.plugins, arguments.name)>
 		</cfif>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removePlugin" access="public" returntype="void">
+	<cffunction name="removePlugin" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
 		<cfset structDelete(variables.stConfig.plugins, arguments.name, false)>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setResourceType" access="public" returntype="void">
+	<cffunction name="setResourceType" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="folderName" type="string" required="false" default="">
 		<cfargument name="description" type="string" required="false" default="">
@@ -624,9 +646,10 @@
 		<cfset variables.stConfig.resourceTypes[arguments.name].description = arguments.description>
 		<cfset variables.stConfig.resourceTypes[arguments.name].resBeanPath = arguments.resBeanPath>
 		<cfset variables.stConfig.resourceTypes[arguments.name].fileTypes = arguments.fileTypes>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setResourceTypeProperty" access="public" returntype="void">
+	<cffunction name="setResourceTypeProperty" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="resType" type="string" required="true">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="description" type="string" required="false" default="">
@@ -660,39 +683,45 @@
 		<cfelse>
 			<cfset variables.stConfig.resourceTypes[arguments.resType].properties[index] = duplicate(st)>
 		</cfif>
+		
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeResourceType" access="public" returntype="void">
+	<cffunction name="removeResourceType" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
 		<cfset structDelete(variables.stConfig.resourceTypes, arguments.name, false)>
+		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="removeResourceTypeProperty" access="public" returntype="void">
+	<cffunction name="removeResourceTypeProperty" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="resType" type="string" required="true">
 		<cfargument name="name" type="string" required="true">
 		<cfset var aProps = variables.stConfig.resourceTypes[arguments.resType].properties>
 		<cfloop from="1" to="#arrayLen(aProps)#" index="i">
 			<cfif aProps[i].name eq arguments.name>
 				<cfset arrayDeleteAt(variables.stConfig.resourceTypes[arguments.resType].properties, i)>
-				<cfreturn>
+				<cfreturn this>
 			</cfif>
 		</cfloop>
+		<cfreturn this>
 	</cffunction>
 		
-	<cffunction name="addResourceLibraryPath" access="public" returntype="void">
+	<cffunction name="addResourceLibraryPath" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="path" type="string" required="true">
 		<cfset arrayAppend(variables.stConfig.resourceLibraryPaths, arguments.path)>
+		<cfreturn this>
 	</cffunction>	
 
-	<cffunction name="removeResourceLibraryPath" access="public" returntype="void">
+	<cffunction name="removeResourceLibraryPath" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="path" type="string" required="true">
 		<cfset var i = 0>
 		<cfloop from="1" to="#arrayLen(variables.stConfig.resourceLibraryPaths)#" index="i">
 			<cfif variables.stConfig.resourceLibraryPaths[i] eq arguments.path>
 				<cfset arrayDeleteAt(variables.stConfig.resourceLibraryPaths, i)>
-				<cfreturn>
+				<cfreturn this>
 			</cfif>
 		</cfloop>
+		<cfreturn this>
 	</cffunction>	
 	
 	<cffunction name="throw" access="private">
