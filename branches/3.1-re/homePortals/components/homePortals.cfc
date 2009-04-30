@@ -32,6 +32,7 @@
 		variables.oPageProvider = 0;			// a handle to the provider of pages
 		variables.oPluginManager = 0;			// a handle to the object responsible for managing extension plugins
 		variables.oResourceLibraryManager = 0;	// a handle to the resource library manager
+		variables.oTemplateManager = 0;			// a handle to the template manager
 		
 		variables.stTimers = structNew();
 	</cfscript>
@@ -99,6 +100,10 @@
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getCatalogCacheSize(), 
 																			variables.oHomePortalsConfigBean.getCatalogCacheTTL());
 			oCacheRegistry.register("catalogCacheService", oCacheService);
+
+
+			// initialize template manager
+			variables.oTemplateManager = createObject("component","templateManager").init(variables.oHomePortalsConfigBean);
 
 						
 			// register and initialize plugins
@@ -274,6 +279,13 @@
 	<!--------------------------------------->		
 	<cffunction name="getResourceLibraryManager" access="public" returntype="resourceLibraryManager">
 		<cfreturn variables.oResourceLibraryManager>
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  getTemplateManager			----->
+	<!--------------------------------------->		
+	<cffunction name="getTemplateManager" access="public" returntype="templateManager">
+		<cfreturn variables.oTemplateManager>
 	</cffunction>
 		
 		

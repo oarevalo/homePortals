@@ -2,7 +2,6 @@
 
 	<cfset variables.stConfig = StructNew()>
 	<cfset variables.hpEngineBaseVersion = "3.1.x">
-	<cfset variables.stRenderTemplatesCache = structNew()>
 
 	<cffunction name="init" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -309,42 +308,6 @@
 	<cffunction name="getInitialEvent" access="public" returntype="string">
 		<cfreturn variables.stConfig.initialEvent>
 	</cffunction>
-
-	<cffunction name="getLayoutSections" access="public" returntype="string">
-		<cfargument name="pageTemplate" type="string" required="false" default="">
-		<cfscript>
-			var index = 1;
-			var finished = false;
-			var renderTemplateBody = "";
-			var lstSections = "";
-			var stResult = structNew();
-			var token = ""; var arg1 = ""; var arg2 = "";
-			
-			if(arguments.pageTemplate eq "") arguments.pageTemplate = "page";
-			renderTemplateBody = getRenderTemplateBody(arguments.pageTemplate);
-
-			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_LAYOUTSECTION\[""([A-Z]*)""]\[""([A-Z]*)""]\$", renderTemplateBody, index, true);
-				dump(stResult);
-				if(stResult.len[1] gt 0) {
-					// match found
-					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
-					dump(token);
-					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
-					arg2 = mid(renderTemplateBody,stResult.pos[3],stResult.len[3]);
-					lstSections = listAppend(lstSections,arg1);
-						
-					renderTemplateBody = replace(renderTemplateBody, token, "_________________", "ALL");
-					
-					index = stResult.pos[1] + stResult.len[1];
-				} else {
-					finished = true;
-				}
-			}		
-			
-			return lstSections;
-		</cfscript>
-	</cffunction>
 					
 	<cffunction name="getBodyOnLoad" access="public" returntype="string">
 		<cfreturn variables.stConfig.bodyOnLoad>
@@ -404,18 +367,8 @@
 		</cfif>
 	</cffunction>
 
-	<cffunction name="getRenderTemplateBody" access="public" returntype="string" hint="returns the contents of a rendertemplate">
-		<cfargument name="type" type="string" required="true">
-			
-		<cfif Not StructKeyExists(variables.stRenderTemplatesCache, arguments.type)>
-			<cfset xmlDoc = xmlParse(expandPath( getRenderTemplate(arguments.type) ))>
-			<cfset templateBody = toString(xmlDoc.xmlRoot.xmlChildren[1])>
-			<cfset variables.stRenderTemplatesCache[arguments.type] = templateBody>
-		<cfelse>
-			<cfset templateBody = variables.stRenderTemplatesCache[arguments.type]>
-		</cfif>
-
-		<cfreturn templateBody>
+	<cffunction name="getRenderTemplates" access="public" returntype="struct" hint="returns a key-value map with all declared render templates">
+		<cfreturn duplicate(variables.stConfig.renderTemplates)>
 	</cffunction>
 
 	<cffunction name="getPageProviderClass" access="public" returntype="string" hint="Returns the path in dot notation for the class responsible for storing/retrieving HomePortals pages">

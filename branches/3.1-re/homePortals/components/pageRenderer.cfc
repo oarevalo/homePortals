@@ -50,12 +50,13 @@
 			var rendered = "";
 			var start = getTickCount();
 			var pageTemplate = getPage().getPageTemplate();
+			var originalRenderTemplate = "";
 
 			// pre-render output of all content tags on page		
 			processContentTags();
 
 			// get the render template for the full page
-			renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody(pageTemplate);
+			renderTemplateBody = getHomePortals().getTemplateManager().getRenderTemplateBody(pageTemplate);
 
 			// replace simple values
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", getPage().getTitle(), "ALL");
@@ -66,7 +67,7 @@
 			index = 1;
 			finished = false;
 			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_CUSTOMSECTION\[""([A-Z]*)""]\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase("\$PAGE_CUSTOMSECTION\[""([A-Za-z0-9_]*)""]\$", renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
@@ -75,7 +76,7 @@
 					
 					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
 					
-					index = stResult.pos[1] + stResult.len[1];
+					index = stResult.pos[1] + len(rendered);
 				} else {
 					finished = true;
 				}
@@ -85,7 +86,7 @@
 			index = 1;
 			finished = false;
 			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_LAYOUTSECTION\[""([A-Z]*)""]\[""([A-Z]*)""]\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase("\$PAGE_LAYOUTSECTION\[""([A-Za-z0-9_]*)""\]\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
@@ -95,7 +96,7 @@
 						
 					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
 					
-					index = stResult.pos[1] + stResult.len[1];
+					index = stResult.pos[1] + len(rendered);
 				} else {
 					finished = true;
 				}
@@ -118,10 +119,14 @@
 		<cfset var i = 0>
 		<cfset var j = 0>
 		<cfset var aModules = ArrayNew(1)>
-		<cfset var aLocations = variables.stPage.page.layout[arguments.layoutSection]>
+		<cfset var aLocations = ArrayNew(1)>
 		<cfset var stModuleNode = structNew()>
 		
 		<cfset var tmpHTML = "">
+
+		<cfif structKeyExists(variables.stPage.page.layout, arguments.layoutSection)>
+			<cfset aLocations = variables.stPage.page.layout[arguments.layoutSection]>
+		</cfif>
 
 		<!--- Loop through each section --->
 		<cfloop from="1" to="#ArrayLen(aLocations)#" index="i">
@@ -440,9 +445,9 @@
 				tmpIconURL = "<img src='#arguments.contentTagNode.icon#' width='16' height='16' align='absmiddle'>";
 			
 			if(arguments.contentTagNode.Container)
-				renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("module");
+				renderTemplateBody = getHomePortals().getTemplateManager().getRenderTemplateBody("module");
 			else
-				renderTemplateBody = getHomePortals().getConfig().getRenderTemplateBody("moduleNoContainer");
+				renderTemplateBody = getHomePortals().getTemplateManager().getRenderTemplateBody("moduleNoContainer");
 				
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ID$", id, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_TITLE$", arguments.contentTagNode.title, "ALL");
