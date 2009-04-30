@@ -50,13 +50,12 @@
 			var rendered = "";
 			var start = getTickCount();
 			var pageTemplate = getPage().getPageTemplate();
-			var originalRenderTemplate = "";
 
 			// pre-render output of all content tags on page		
 			processContentTags();
 
 			// get the render template for the full page
-			renderTemplateBody = getHomePortals().getTemplateManager().getRenderTemplateBody(pageTemplate);
+			renderTemplateBody = getHomePortals().getTemplateManager().getTemplateBody("page", pageTemplate);
 
 			// replace simple values
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", getPage().getTitle(), "ALL");
@@ -439,16 +438,28 @@
 		<cfscript>
 			var id = arguments.contentTagNode.id;
 			var renderTemplateBody = "";
+			var renderTemplate = "";
 			var tmpIconURL = "";
+			var tm = getHomePortals().getTemplateManager();
 
 			if(arguments.contentTagNode.icon neq "") 
 				tmpIconURL = "<img src='#arguments.contentTagNode.icon#' width='16' height='16' align='absmiddle'>";
-			
-			if(arguments.contentTagNode.Container)
-				renderTemplateBody = getHomePortals().getTemplateManager().getRenderTemplateBody("module");
-			else
-				renderTemplateBody = getHomePortals().getTemplateManager().getRenderTemplateBody("moduleNoContainer");
+
+			// if moduleTemplate is defined, then use that for the name of the render template,
+			// otherwise fall into the container property
+			if(structKeyExists(arguments.contentTagNode, "moduleTemplate") and arguments.contentTagNode.moduleTemplate neq "") {
+				renderTemplate = arguments.contentTagNode.moduleTemplate;
+			} else {
+				if(arguments.contentTagNode.Container)
+					renderTemplate = "";	// this will force the template manager to use the default template
+				else
+					renderTemplate = "moduleNoContainer";
+			}
 				
+			// get template source
+			renderTemplateBody = tm.getTemplateBody("module",renderTemplate);	
+
+			// replace token
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ID$", id, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_TITLE$", arguments.contentTagNode.title, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_STYLE$", arguments.contentTagNode.style, "ALL");

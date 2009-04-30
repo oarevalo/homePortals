@@ -90,7 +90,17 @@
 				} else if(xmlNode.xmlName eq "renderTemplates") {
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
-						variables.stConfig.renderTemplates[ xmlNode.xmlChildren[j].xmlAttributes.type ] = xmlNode.xmlChildren[j].xmlAttributes.href;
+						key = xmlNode.xmlChildren[j].xmlAttributes.name;
+						
+						variables.stConfig.renderTemplates[ key ] = {
+																		name = key,
+																		type = xmlNode.xmlChildren[j].xmlAttributes.type,
+																		href = xmlNode.xmlChildren[j].xmlAttributes.href,
+																		description = xmlNode.xmlChildren[j].xmlText
+																	};
+						
+						if(structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"default")) 
+							variables.stConfig.renderTemplates[key].isDefault = xmlNode.xmlChildren[j].xmlAttributes.default;
 					}
 
 				} else if(xmlNode.xmlName eq "contentRenderers") {
@@ -359,11 +369,11 @@
 	</cffunction>
 
 	<cffunction name="getRenderTemplate" access="public" returntype="string" hint="returns the location of the template that should be used to rendering a particular type of output">
-		<cfargument name="type" type="string" required="true">
-		<cfif structKeyExists( variables.stConfig.renderTemplates, arguments.type )>
-			<cfreturn variables.stConfig.renderTemplates[arguments.type]>
+		<cfargument name="name" type="string" required="true">
+		<cfif structKeyExists( variables.stConfig.renderTemplates, arguments.name )>
+			<cfreturn variables.stConfig.renderTemplates[arguments.name]>
 		<cfelse>
-			<cfthrow message="Unknown render template type" type="homePortals.config.invalidRenderTemplateType">
+			<cfthrow message="Unknown render template name" type="homePortals.config.invalidRenderTemplateName">
 		</cfif>
 	</cffunction>
 
@@ -536,15 +546,24 @@
 	</cffunction>
 
 	<cffunction name="setRenderTemplate" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="name" type="string" required="true">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="href" type="string" required="true">
-		<cfset variables.stConfig.renderTemplates[arguments.type] = arguments.href>
+		<cfargument name="description" type="string" required="false">
+		<cfargument name="isDefault" type="boolean" required="false" default="false">
+		<cfset variables.stConfig.renderTemplates[arguments.name] = {
+																		name = arguments.name,
+																		type = arguments.type,
+																		href = arguments.href,
+																		description = arguments.description,
+																		isDefault = arguments.isdefault
+																	}>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="removeRenderTemplate" access="public" returntype="homePortalsConfigBean">
-		<cfargument name="type" type="string" required="true">
-		<cfset structDelete(variables.stConfig.renderTemplates, arguments.type, false)>
+		<cfargument name="name" type="string" required="true">
+		<cfset structDelete(variables.stConfig.renderTemplates, arguments.name, false)>
 		<cfreturn this>
 	</cffunction>
 

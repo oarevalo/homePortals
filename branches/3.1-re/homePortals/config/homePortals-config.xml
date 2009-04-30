@@ -41,9 +41,9 @@
 
 	<!-- The following templates determine how homeportals will render the html content -->
 	<renderTemplates>
-		<renderTemplate type="module" href="/homePortals/common/Templates/Render/module.xml" />
-		<renderTemplate type="moduleNoContainer" href="/homePortals/common/Templates/Render/moduleNoContainer.xml" />
-		<renderTemplate type="page" href="/homePortals/common/Templates/Render/page.xml" />
+		<renderTemplate name="module" type="module" default="true" href="/homePortals/templates/module.htm" />
+		<renderTemplate name="moduleNoContainer" type="module" href="/homePortals/templates/moduleNoContainer.htm" />
+		<renderTemplate name="page" type="page" default="true" href="/homePortals/templates/page.htm" />
 	</renderTemplates>
 	
 	<!-- The following are the different types of modules or content renderers that will be supported on a page -->

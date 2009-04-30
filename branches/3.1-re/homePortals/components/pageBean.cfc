@@ -3,7 +3,7 @@
 	<cfscript>
 		variables.DEFAULT_PAGE_TITLE = "";
 		variables.DEFAULT_PAGE_SKINID = "";
-		variables.DEFAULT_PAGE_TEMPLATE = "page";
+		variables.DEFAULT_PAGE_TEMPLATE = "";
 		variables.DEFAULT_MODULE_TITLE = "";
 		variables.DEFAULT_MODULE_ICON = "";
 		variables.DEFAULT_MODULE_STYLE = "";

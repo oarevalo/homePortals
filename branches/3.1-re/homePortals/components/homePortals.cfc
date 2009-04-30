@@ -47,10 +47,6 @@
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
 			var start = getTickCount();
-			var oCacheRegistry = 0;
-			var oCacheService = 0;
-			var oRSSService = 0;
-			var ppClass = "";
 
 			// check that appRoot has the right format
 			if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";
@@ -76,6 +72,46 @@
 			// set the appRoot to the given parameter, this way, we can get away without having a local config 
 			// and only pass the appRoot on the constructor
 			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
+
+			// initialize environment with current config
+			initEnv();
+						
+			variables.stTimers.init = getTickCount()-start;
+			return this;
+		</cfscript>
+	</cffunction>
+	
+	<!--------------------------------------->
+	<!----  reinit	 					----->
+	<!--------------------------------------->
+	<cffunction name="reinit" access="public" returntype="homePortals" hint="Reinitializes the homeportals instance. This will re-read the configuration and clear all caches.">
+		<cfscript>
+			var oCacheRegistry = 0;
+			
+			// clear up instance variables
+			variables.oHomePortalsConfigBean = 0;
+			variables.oCatalog = 0;	
+			variables.stTimers = structNew();
+			
+			// clear caches
+			oCacheRegistry = createObject("component","cacheRegistry").init();
+			oCacheRegistry.flush();		// clear registry
+			
+			// initialize application
+			init(variables.appRoot);
+			
+			return this;
+		</cfscript>
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  initEnv	 					----->
+	<!--------------------------------------->
+	<cffunction name="initEnv" access="public" returntype="void" hint="Initializes the environment based on the current configuration bean">
+		<cfscript>
+			var oCacheRegistry = 0;
+			var oCacheService = 0;
+			var ppClass = "";
 
 			// initialize resource library manager
 			variables.oResourceLibraryManager = CreateObject("Component","resourceLibraryManager").init(variables.oHomePortalsConfigBean);
@@ -110,33 +146,7 @@
 			variables.oPluginManager = createObject("component","pluginManager").init(this);
 			
 			// ask plugins to perform their own initialization tasks
-			getPluginManager().notifyPlugins("appInit");
-			
-						
-			variables.stTimers.init = getTickCount()-start;
-			return this;
-		</cfscript>
-	</cffunction>
-	
-
-	<!--------------------------------------->
-	<!----  reinit	 					----->
-	<!--------------------------------------->
-	<cffunction name="reinit" access="public" returntype="homePortals" hint="Reinitializes the homeportals instance. This will re-read the configuration and clear all caches.">
-		<cfscript>
-			// clear up instance variables
-			variables.oHomePortalsConfigBean = 0;
-			variables.oCatalog = 0;	
-			variables.stTimers = structNew();
-			
-			// clear caches
-			oCacheRegistry = createObject("component","cacheRegistry").init();
-			oCacheRegistry.flush();		// clear registry
-			
-			// initialize application
-			init(variables.appRoot);
-			
-			return this;
+			getPluginManager().notifyPlugins("appInit");		
 		</cfscript>
 	</cffunction>
 
