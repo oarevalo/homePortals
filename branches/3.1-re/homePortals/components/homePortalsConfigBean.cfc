@@ -549,7 +549,7 @@
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="href" type="string" required="true">
-		<cfargument name="description" type="string" required="false">
+		<cfargument name="description" type="string" required="false" default="">
 		<cfargument name="isDefault" type="boolean" required="false" default="false">
 		<cfset variables.stConfig.renderTemplates[arguments.name] = {
 																		name = arguments.name,
