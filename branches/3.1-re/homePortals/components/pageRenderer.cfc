@@ -100,6 +100,31 @@
 					finished = true;
 				}
 			}
+			
+			// search and replace "Page Properties"
+			index = 1;
+			finished = false;
+			while(Not finished) {
+				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				if(stResult.len[1] gt 0) {
+					// match found
+					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
+					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
+					rendered = "";
+					
+					if(getPage().hasProperty(arg1)) {
+						rendered = getPage().getProperty(arg1);
+					}
+						
+					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					
+					index = stResult.pos[1] + len(rendered);
+				} else {
+					finished = true;
+				}
+			}
+			
+			
 
 			variables.stTimers.renderPage = getTickCount()-start;
 			
@@ -129,7 +154,9 @@
 
 		<!--- Loop through each section --->
 		<cfloop from="1" to="#ArrayLen(aLocations)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<#arguments.TagName# class=""#aLocations[i].Class#"" style=""#aLocations[i].Style#"" id=""#aLocations[i].ID#"" valign=""top"">">
+			<cfif arguments.TagName neq "">
+				<cfset tmpHTML = tmpHTML & "<#arguments.TagName# class=""#aLocations[i].Class#"" style=""#aLocations[i].Style#"" id=""#aLocations[i].ID#"" valign=""top"">">
+			</cfif>
 			
 			<cfif StructKeyExists(variables.stPage.page.modules, aLocations[i].name)>
 				<!--- Display all modules within this section --->
@@ -142,7 +169,9 @@
 				</cfloop>
 			</cfif>
 			
-			<cfset tmpHTML = tmpHTML & "</#arguments.TagName#>">
+			<cfif arguments.TagName neq "">
+				<cfset tmpHTML = tmpHTML & "</#arguments.TagName#>">
+			</cfif>
 		</cfloop>
 		
 		<cfreturn tmpHTML>
@@ -441,6 +470,12 @@
 			var renderTemplate = "";
 			var tmpIconURL = "";
 			var tm = getHomePortals().getTemplateManager();
+			var index = 1;
+			var finished = false;
+			var stResult = 0;
+			var token = "";
+			var arg1 = "";
+			var rendered = "";
 
 			if(arguments.contentTagNode.icon neq "") 
 				tmpIconURL = "<img src='#arguments.contentTagNode.icon#' width='16' height='16' align='absmiddle'>";
@@ -460,11 +495,32 @@
 			renderTemplateBody = tm.getTemplateBody("module",renderTemplate);	
 
 			// replace token
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ID$", id, "ALL");
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_TITLE$", arguments.contentTagNode.title, "ALL");
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_STYLE$", arguments.contentTagNode.style, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", variables.contentBuffer.body.get(id),  "ALL");	
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
+			
+			// search and replace generic module attributes
+			index = 1;
+			finished = false;
+			while(Not finished) {
+				stResult = reFindNoCase("\$MODULE_([A-Za-z0-9_]*)\$", renderTemplateBody, index, true);
+				if(stResult.len[1] gt 0) {
+					// match found
+					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
+					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
+					rendered = "";
+					
+					if(structKeyExists(arguments.contentTagNode,arg1) and isSimpleValue(arguments.contentTagNode[arg1])) {
+						rendered = arguments.contentTagNode[arg1];
+					}
+						
+					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					
+					index = stResult.pos[1] + len(rendered);
+				} else {
+					finished = true;
+				}
+			}
+			
 		</cfscript>
 		<cfreturn renderTemplateBody>
 	</cffunction>
