@@ -64,6 +64,7 @@
 	<cffunction name="getResourceNode" access="public" returntype="any" hint="Returns the tree node for a given resource on this catalog">
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
 		<cfargument name="resourceID" type="string" required="true" hint="Path to the resource.">
+		<cfargument name="forceReload" type="boolean" required="false" default="false" hint="forces a reload of the resource, ignoring any cached instance">
 		
 		<cfscript>
 			var stResourceInfo = structNew();
@@ -96,6 +97,9 @@
 				cacheKey = "//" & arguments.resourceType & "/" & stResourceInfo.package & "/" & arguments.resourceID;
 				
 				try {
+					// if we are forcing a reload, then we make it look like it wasnt in the cache
+					if(forceReload) throw("","homePortals.cacheService.itemNotFound");
+					
 					// read from cache
 					oResBean = getCacheService().retrieve(cacheKey);
 				
