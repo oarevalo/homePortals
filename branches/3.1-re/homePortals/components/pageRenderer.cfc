@@ -494,10 +494,6 @@
 			// get template source
 			renderTemplateBody = tm.getTemplateBody("module",renderTemplate);	
 
-			// replace token
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", variables.contentBuffer.body.get(id),  "ALL");	
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
-			
 			// search and replace generic module attributes
 			index = 1;
 			finished = false;
@@ -521,6 +517,9 @@
 				}
 			}
 			
+			// replace custom token
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", variables.contentBuffer.body.get(id),  "ALL");	
 		</cfscript>
 		<cfreturn renderTemplateBody>
 	</cffunction>
