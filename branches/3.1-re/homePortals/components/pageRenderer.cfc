@@ -155,7 +155,17 @@
 		<!--- Loop through each section --->
 		<cfloop from="1" to="#ArrayLen(aLocations)#" index="i">
 			<cfif arguments.TagName neq "">
-				<cfset tmpHTML = tmpHTML & "<#arguments.TagName# class=""#aLocations[i].Class#"" style=""#aLocations[i].Style#"" id=""#aLocations[i].ID#"" valign=""top"">">
+				<cfset tmpHTML = tmpHTML & "<#arguments.TagName#">
+				<cfif aLocations[i].Class neq "">
+					<cfset tmpHTML = tmpHTML & " class=""#aLocations[i].class#""">
+				</cfif>
+				<cfif aLocations[i].Style neq "">
+					<cfset tmpHTML = tmpHTML & " style=""#aLocations[i].style#""">
+				</cfif>
+				<cfif aLocations[i].id neq "">
+					<cfset tmpHTML = tmpHTML & " id=""#aLocations[i].id#""">
+				</cfif>
+				<cfset tmpHTML = tmpHTML & ">">
 			</cfif>
 			
 			<cfif StructKeyExists(variables.stPage.page.modules, aLocations[i].name)>
@@ -494,6 +504,9 @@
 			// get template source
 			renderTemplateBody = tm.getTemplateBody("module",renderTemplate);	
 
+			// replace module icon token
+			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
+
 			// search and replace generic module attributes
 			index = 1;
 			finished = false;
@@ -505,20 +518,24 @@
 					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
 					rendered = "";
 					
-					if(structKeyExists(arguments.contentTagNode,arg1) and isSimpleValue(arguments.contentTagNode[arg1])) {
-						rendered = arguments.contentTagNode[arg1];
+					if(arg1 neq "CONTENT") {
+						if(structKeyExists(arguments.contentTagNode,arg1) 
+							and isSimpleValue(arguments.contentTagNode[arg1])) {
+							rendered = arguments.contentTagNode[arg1];
+						}
+							
+						renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+						index = stResult.pos[1] + len(rendered);
+					} else {
+						index = stResult.pos[1] + stResult.len[1];
 					}
-						
-					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
 					
-					index = stResult.pos[1] + len(rendered);
 				} else {
 					finished = true;
 				}
 			}
 			
-			// replace custom token
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
+			// replace content token
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", variables.contentBuffer.body.get(id),  "ALL");	
 		</cfscript>
 		<cfreturn renderTemplateBody>
