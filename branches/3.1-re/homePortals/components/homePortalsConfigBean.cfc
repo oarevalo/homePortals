@@ -101,6 +101,8 @@
 						
 						if(structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"default")) 
 							variables.stConfig.renderTemplates[key].isDefault = xmlNode.xmlChildren[j].xmlAttributes.default;
+						else
+							variables.stConfig.renderTemplates[key].isDefault = false;
 					}
 
 				} else if(xmlNode.xmlName eq "contentRenderers") {
@@ -231,8 +233,12 @@
 			
 			for(thisKey in variables.stConfig.renderTemplates) {
 				tmpXmlNode = xmlElemNew(xmlConfigDoc,"renderTemplate");
-				tmpXmlNode.xmlAttributes["type"] = thisKey;
-				tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[thisKey];
+				tmpXmlNode.xmlAttributes["name"] = thisKey;
+				tmpXmlNode.xmlAttributes["type"] = variables.stConfig.renderTemplates[thisKey].type;
+				tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[thisKey].href;
+				if(isBoolean(variables.stConfig.renderTemplates[thisKey].isDefault) and variables.stConfig.renderTemplates[thisKey].isDefault)
+					tmpXmlNode.xmlAttributes["default"] = variables.stConfig.renderTemplates[thisKey].isDefault;
+				tmpXmlNode.xmlText = variables.stConfig.renderTemplates[thisKey].description;
 				ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
 			}
 
@@ -368,7 +374,7 @@
 		<cfreturn aResources>
 	</cffunction>
 
-	<cffunction name="getRenderTemplate" access="public" returntype="string" hint="returns the location of the template that should be used to rendering a particular type of output">
+	<cffunction name="getRenderTemplate" access="public" returntype="struct" hint="returns the location of the template that should be used to rendering a particular type of output">
 		<cfargument name="name" type="string" required="true">
 		<cfif structKeyExists( variables.stConfig.renderTemplates, arguments.name )>
 			<cfreturn variables.stConfig.renderTemplates[arguments.name]>

@@ -6,7 +6,7 @@
 <!------- Page parameters ----------->
 <cfparam name="action" default="">
 <cfparam name="cacheName" default="">
-<cfparam name="refreshApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
+<cfparam name="resetApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
 
 <cfparam name="pageHREF" default="">			<!--- Path to a homeportals account --->
 <!----------------------------------->
@@ -20,7 +20,7 @@
 <cfsilent>
 <cfscript>
 	// Initialize application if requested or needed
-	if((isBoolean(refreshApp) and refreshApp) or Not StructKeyExists(application, "homePortals")) {
+	if((isBoolean(resetApp) and resetApp) or Not StructKeyExists(application, "homePortals")) {
 		application.homePortals = CreateObject("component","homePortals.components.homePortals").init(request.appRoot);
 		refreshApp = true;
 	}
@@ -115,7 +115,7 @@
 				<tr>
 					<th colspan="2">
 						<div style="float:right;">
-							<a href="#cgi.SCRIPT_NAME#?refreshapp=1&pageHREF=#pageHREF#">Reset App</a> |
+							<a href="#cgi.SCRIPT_NAME#?resetApp=1&pageHREF=#pageHREF#">Reset App</a> |
 							<a href="#cgi.SCRIPT_NAME#?pageHREF=#pageHREF#">Reload Page</a>
 						</div>
 						Application:

@@ -28,7 +28,7 @@
 <cfsilent>
 	<!------- Page parameters ----------->
 	<cfparam name="page" default=""> 				<!--- page to load --->
-	<cfparam name="refreshApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
+	<cfparam name="resetApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
 	<!----------------------------------->
 	
 	<!------- Application Root ----------->
@@ -39,7 +39,7 @@
 
 	<cfscript>
 		// Initialize application if requested or needed
-		if((isBoolean(refreshApp) and refreshApp) or Not StructKeyExists(application, "homePortals")) {
+		if((isBoolean(resetApp) and resetApp) or Not StructKeyExists(application, "homePortals")) {
 			application.homePortals = CreateObject("component","homePortals.components.homePortals").init(request.appRoot);
 		}
 
