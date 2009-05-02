@@ -95,7 +95,7 @@
 				arguments.pageTemplate = st.name;
 			}
 			
-			renderTemplateBody = getRenderTemplateBody("page", arguments.pageTemplate);
+			renderTemplateBody = getTemplateBody("page", arguments.pageTemplate);
 
 			while(Not finished) {
 				stResult = reFindNoCase("\$PAGE_LAYOUTSECTION\[""([A-Za-z0-9_]*)""\]\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
