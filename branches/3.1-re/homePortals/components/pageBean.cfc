@@ -10,6 +10,7 @@
 		variables.DEFAULT_MODULE_CLASS = "";
 		variables.DEFAULT_MODULE_CONTAINER = true;
 		variables.DEFAULT_MODULE_OUTPUT = true;
+		variables.DEFAULT_MODULE_TEMPLATE = "";
 
 		variables.instance = structNew();
 		variables.instance.title = variables.DEFAULT_PAGE_TITLE;
@@ -93,11 +94,13 @@
 								args.class = "";
 								args.style = "";
 								args.id = "";
+								args.moduleTemplate = "";
 								
 								if(structKeyExists(xmlThisNode.xmlAttributes, "name")) args.name = xmlThisNode.xmlAttributes.name;
 								if(structKeyExists(xmlThisNode.xmlAttributes, "type")) args.type = xmlThisNode.xmlAttributes.type; 
 								if(structKeyExists(xmlThisNode.xmlAttributes, "class")) args.class = xmlThisNode.xmlAttributes.class; 
 								if(structKeyExists(xmlThisNode.xmlAttributes, "style")) args.style = xmlThisNode.xmlAttributes.style; 
+								if(structKeyExists(xmlThisNode.xmlAttributes, "moduleTemplate")) args.moduleTemplate = xmlThisNode.xmlAttributes.moduleTemplate; 
 								if(structKeyExists(xmlThisNode.xmlAttributes, "id")) 
 									args.id = xmlThisNode.xmlAttributes.id;
 								else
@@ -298,6 +301,9 @@
 							break;
 						case "class":
 							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_CLASS);
+							break;
+						case "moduleTemplate":
+							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_TEMPLATE);
 							break;
 						default:
 							bWriteAttribute = true;		// write down all other attributes
@@ -656,6 +662,7 @@
 			if(not structKeyExists(stMod,"class"))		stMod.class = variables.DEFAULT_MODULE_CLASS;
 			if(not structKeyExists(stMod,"container") or not isBoolean(stMod.container)) 	stMod.container = variables.DEFAULT_MODULE_CONTAINER;
 			if(not structKeyExists(stMod,"output") or not isBoolean(stMod.output)) 			stMod.output = variables.DEFAULT_MODULE_OUTPUT;
+			if(not structKeyExists(stMod,"moduleTemplate"))		stMod.moduleTemplate = variables.DEFAULT_MODULE_TEMPLATE;
 			
 			return stMod;
 		</cfscript>

@@ -41,6 +41,11 @@
 		</cfif>										
 										
 	</cffunction>
+
+	<cffunction name="getTemplates" access="public" returntype="struct">
+		<cfargument name="type" type="string" required="true">
+		<cfreturn duplicate(variables.instance.stTemplates[arguments.type])>
+	</cffunction>
 	
 	<cffunction name="getTemplate" access="public" returntype="struct">
 		<cfargument name="type" type="string" required="true">
