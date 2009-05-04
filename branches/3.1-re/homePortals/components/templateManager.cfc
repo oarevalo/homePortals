@@ -8,9 +8,13 @@
 	<cffunction name="init" access="public" returntype="templateManager">
 		<cfargument name="config" type="homePortalsConfigBean" required="true">
 		<cfset var st = arguments.config.getRenderTemplates()>
+		<cfset var rtName = "">
+		<cfset var rtType = "">
 		
-		<cfloop collection="#st#" item="key">
-			<cfset setTemplate(argumentCollection = st[key])>
+		<cfloop collection="#st#" item="rtType">
+			<cfloop collection="#st[rtType]#" item="rtName">
+				<cfset setTemplate(argumentCollection = st[rtType][rtName])>
+			</cfloop>
 		</cfloop>
 		
 		<cfreturn this>

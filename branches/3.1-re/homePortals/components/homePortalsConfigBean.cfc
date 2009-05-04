@@ -90,19 +90,28 @@
 				} else if(xmlNode.xmlName eq "renderTemplates") {
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
-						key = xmlNode.xmlChildren[j].xmlAttributes.name;
+
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"name"))
+							throw("HomePortals config file is malformed. Missing NAME attribute for renderTemplate","","homePortals.config.configFileNotValid");
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"type"))
+							throw("HomePortals config file is malformed. Missing TYPE attribute for renderTemplate","","homePortals.config.configFileNotValid");
 						
-						variables.stConfig.renderTemplates[ key ] = {
-																		name = key,
-																		type = xmlNode.xmlChildren[j].xmlAttributes.type,
-																		href = xmlNode.xmlChildren[j].xmlAttributes.href,
-																		description = xmlNode.xmlChildren[j].xmlText
-																	};
+						key = xmlNode.xmlChildren[j].xmlAttributes.name;
+						thisKey = xmlNode.xmlChildren[j].xmlAttributes.type;
+
+						if(not structKeyExists(variables.stConfig.renderTemplates, thisKey)) 
+							variables.stConfig.renderTemplates[thisKey] = structNew();
+							
+						variables.stConfig.renderTemplates[thisKey][ key ] = {
+																			name = key,
+																			type = thisKey,
+																			href = xmlNode.xmlChildren[j].xmlAttributes.href,
+																			description = xmlNode.xmlChildren[j].xmlText,
+																			isDefault = false
+																		};
 						
 						if(structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"default")) 
-							variables.stConfig.renderTemplates[key].isDefault = xmlNode.xmlChildren[j].xmlAttributes.default;
-						else
-							variables.stConfig.renderTemplates[key].isDefault = false;
+							variables.stConfig.renderTemplates[thisKey][key].isDefault = xmlNode.xmlChildren[j].xmlAttributes.default;
 					}
 
 				} else if(xmlNode.xmlName eq "contentRenderers") {
@@ -231,17 +240,19 @@
 			// ****** [renderTemplates] *****
 			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"renderTemplates") );
 			
-			for(thisKey in variables.stConfig.renderTemplates) {
-				tmpXmlNode = xmlElemNew(xmlConfigDoc,"renderTemplate");
-				tmpXmlNode.xmlAttributes["name"] = thisKey;
-				tmpXmlNode.xmlAttributes["type"] = variables.stConfig.renderTemplates[thisKey].type;
-				tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[thisKey].href;
-				if(isBoolean(variables.stConfig.renderTemplates[thisKey].isDefault) and variables.stConfig.renderTemplates[thisKey].isDefault)
-					tmpXmlNode.xmlAttributes["default"] = variables.stConfig.renderTemplates[thisKey].isDefault;
-				tmpXmlNode.xmlText = variables.stConfig.renderTemplates[thisKey].description;
-				ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
+			for(key in variables.stConfig.renderTemplates) {
+				for(thisKey in variables.stConfig.renderTemplates[key]) {
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,"renderTemplate");
+					tmpXmlNode.xmlAttributes["name"] = thisKey;
+					tmpXmlNode.xmlAttributes["type"] = key;
+					tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[key][thisKey].href;
+					if(isBoolean(variables.stConfig.renderTemplates[key][thisKey].isDefault) and variables.stConfig.renderTemplates[key][thisKey].isDefault)
+						tmpXmlNode.xmlAttributes["default"] = variables.stConfig.renderTemplates[key][thisKey].isDefault;
+					tmpXmlNode.xmlText = variables.stConfig.renderTemplates[key][thisKey].description;
+					ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
+				}
 			}
-
+			
 			// ****** [contentRenderers] *****
 			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"contentRenderers") );
 			
@@ -376,10 +387,15 @@
 
 	<cffunction name="getRenderTemplate" access="public" returntype="struct" hint="returns the location of the template that should be used to rendering a particular type of output">
 		<cfargument name="name" type="string" required="true">
-		<cfif structKeyExists( variables.stConfig.renderTemplates, arguments.name )>
-			<cfreturn variables.stConfig.renderTemplates[arguments.name]>
+		<cfargument name="type" type="string" required="true">
+		<cfif structKeyExists( variables.stConfig.renderTemplates, arguments.type )>
+			<cfif structKeyExists( variables.stConfig.renderTemplates[arguments.type], arguments.name )>
+				<cfreturn variables.stConfig.renderTemplates[arguments.type][arguments.name]>
+			<cfelse>
+				<cfthrow message="Unknown render template name" type="homePortals.config.invalidRenderTemplateName">
+			</cfif>
 		<cfelse>
-			<cfthrow message="Unknown render template name" type="homePortals.config.invalidRenderTemplateName">
+			<cfthrow message="Unknown render template type" type="homePortals.config.invalidRenderTemplateType">
 		</cfif>
 	</cffunction>
 
@@ -557,19 +573,26 @@
 		<cfargument name="href" type="string" required="true">
 		<cfargument name="description" type="string" required="false" default="">
 		<cfargument name="isDefault" type="boolean" required="false" default="false">
-		<cfset variables.stConfig.renderTemplates[arguments.name] = {
-																		name = arguments.name,
-																		type = arguments.type,
-																		href = arguments.href,
-																		description = arguments.description,
-																		isDefault = arguments.isdefault
-																	}>
+		
+		<cfif not structKeyExists(variables.stConfig.renderTemplates, arguments.type)>
+			<cfset variables.stConfig.renderTemplates[arguments.type] = structNew()>
+		</cfif>
+		<cfset variables.stConfig.renderTemplates[arguments.type][arguments.name] = {
+																						name = arguments.name,
+																						type = arguments.type,
+																						href = arguments.href,
+																						description = arguments.description,
+																						isDefault = arguments.isdefault
+																					}>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="removeRenderTemplate" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
-		<cfset structDelete(variables.stConfig.renderTemplates, arguments.name, false)>
+		<cfargument name="type" type="string" required="true">
+		<cfif structKeyExists(variables.stConfig.renderTemplates, arguments.type)>
+			<cfset structDelete(variables.stConfig.renderTemplates[arguments.type], arguments.name, false)>
+		</cfif>
 		<cfreturn this>
 	</cffunction>
 
