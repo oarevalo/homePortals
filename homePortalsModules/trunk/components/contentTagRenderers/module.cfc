@@ -42,8 +42,11 @@
 				moduleNode = getContentTag().getNode();
 				moduleNode["name"] = modResBean.getPackage() & "/" & modResBean.getID();
 				moduleNode["_page"] = structNew();
-				moduleNode["_page"].owner =  getPageRenderer().getPage().getOwner();
 				moduleNode["_page"].href =  getPageRenderer().getPageHREF();
+				if(getPageRenderer().getPage().hasProperty("owner")) 
+					moduleNode["_page"].owner = getPageRenderer().getPage().getProperty("owner");
+				else
+					moduleNode["_page"].owner = "";
 				
 				// instantiate module controller and call constructor
 				oModuleController = createObject("component","homePortalsModules.components.moduleController");
