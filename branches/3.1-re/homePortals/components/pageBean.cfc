@@ -41,7 +41,7 @@
 		<cfscript>
 			var xmlDoc = 0;
 			var st = structNew(); var xmlNode = 0;
-			var i = 0; var j = 0;
+			var i = 0; var j = 0; var oModuleBean = 0;
 			var args = structNew();
 				
 			if(isXML(arguments.pageXML)) 
@@ -121,6 +121,7 @@
 
 							xmlThisNode = xmlNode.xmlChildren[j];
 	
+	
 							args = structNew();	// this structure is used to hold the module attributes
 							args.moduleType = xmlThisNode.xmlName;	// store the "type" of module
 	
@@ -129,23 +130,14 @@
 							for(item in xmlThisNode.xmlAttributes) {
 								args[item] = xmlThisNode.xmlAttributes[item];
 							}
-	
-							// define common attributes for module tags
-							if(Not structKeyExists(args, "id")) args["id"] = ""; 
-							if(Not structKeyExists(args, "location")) throw("Invalid HomePortals page. Module node does not have a Location.","","homePortals.engine.invalidPage");
-							if(Not structKeyExists(args, "container")) args["container"] = variables.DEFAULT_MODULE_CONTAINER; 
-							if(Not structKeyExists(args, "title")) args["title"] = variables.DEFAULT_MODULE_TITLE; 
-							if(Not structKeyExists(args, "icon")) args["icon"] = variables.DEFAULT_MODULE_ICON; 
-							if(Not structKeyExists(args, "style")) args["style"] = variables.DEFAULT_MODULE_STYLE; 
-							if(Not structKeyExists(args, "output")) args["output"] = variables.DEFAULT_MODULE_OUTPUT; 
-							if(Not structKeyExists(args, "class")) args["class"] = variables.DEFAULT_MODULE_CLASS; 
-	
+
 							// Provide a unique ID for each module 
 							if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
 	
+							oModuleBean = createObject("component","moduleBean").init( args );
+	
 							// add module to instance
-							addModule(args.id, args.location, args);
-						
+							addModule(oModuleBean, args.location);
 						}
 						
 						break;
@@ -203,7 +195,7 @@
 			var xmlNode = 0;
 			var i = 0; var j = 0;
 			var aTemp = arrayNew(1);
-			var attr = "";
+			var attr = ""; var st = structNew();
 			var bWriteAttribute = false;
 
 			// create a blank xml document and add the root node
@@ -276,40 +268,57 @@
 			xmlNode = xmlElemNew(xmlDoc,"body");
 			aTemp = getModules();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
-				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i].moduleType);
-				for(attr in aTemp[i]) {
+				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i].getModuleType());
+				st = aTemp[i].toStruct();
+				for(attr in st) {
 					bWriteAttribute = true;
 					
 					switch(attr) {
+						case "id": 
+							attr = "id";
+							bWriteAttribute = true; 	
+							break;
+						case "location": 
+							attr = "location";
+							bWriteAttribute = true; 	
+							break;
 						case "moduleType":
+							attr = "moduleType";
 							bWriteAttribute = false; 	// this attribute is ignored
 							break;
 						case "container":
-							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_CONTAINER);	
+							attr = "container";
+							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_CONTAINER);	
 							break;
 						case "output":
-							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_OUTPUT);
+							attr = "output";
+							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_OUTPUT);
 							break;
 						case "icon":
-							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_ICON);
+							attr = "icon";
+							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_ICON);
 							break;
 						case "title":
-							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_TITLE);
+							attr = "title";
+							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_TITLE);
 							break;
 						case "style":
-							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_STYLE);
+							attr = "style";
+							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_STYLE);
 							break;
 						case "class":
-							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_CLASS);
+							attr = "class";
+							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_CLASS);
 							break;
 						case "moduleTemplate":
-							bWriteAttribute = (aTemp[i][attr] neq variables.DEFAULT_MODULE_TEMPLATE);
+							attr = "moduleTemplate";
+							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_TEMPLATE);
 							break;
 						default:
 							bWriteAttribute = true;		// write down all other attributes
 					}
 					
-					if(bWriteAttribute) xmlNode2.xmlAttributes[attr] = xmlFormat(aTemp[i][attr]);
+					if(bWriteAttribute) xmlNode2.xmlAttributes[attr] = xmlFormat(st[attr]);
 				}
 				arrayAppend(xmlNode.xmlChildren, xmlNode2);
 			}
@@ -564,35 +573,29 @@
 		<cfreturn duplicate(variables.instance.aModules)>
 	</cffunction>
 
-	<cffunction name="getModule" access="public" returntype="struct" hint="returns a structure with information about the given module">
+	<cffunction name="getModule" access="public" returntype="moduleBean" hint="returns a bean with information about the given module">
 		<cfargument name="moduleID" type="string" required="true">
 		<cfreturn duplicate(variables.instance.aModules[getModuleIndex(arguments.moduleID)])>
 	</cffunction>
 
 	<cffunction name="setModule" access="public" returntype="pageBean" hint="adds or updates a module to the page">
-		<cfargument name="moduleID" type="string" required="true">
+		<cfargument name="moduleBean" type="moduleBean" required="true">
 		<cfargument name="location" type="string" required="false" default="">
-		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
 		<cfscript>
-			var stMod = normalizeModule(arguments.moduleID, 
-										arguments.location,
-										arguments.moduleAttributes);
-			variables.instance.aModules[getModuleIndex(arguments.moduleID)] = arguments.moduleAttributes;
+			arguments.moduleBean = normalizeModule(arguments.moduleBean, arguments.location);
+			variables.instance.aModules[getModuleIndex(arguments.moduleBean.getID())] = arguments.moduleBean;
 			return this;
 		</cfscript>
 	</cffunction>
 
 	<cffunction name="addModule" access="public" returntype="pageBean" hint="adds a module to the page">
-		<cfargument name="moduleID" type="string" required="true">
+		<cfargument name="moduleBean" type="moduleBean" required="true">
 		<cfargument name="location" type="string" required="false" default="">
-		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
 		<cfscript>
-			var stMod = normalizeModule(arguments.moduleID, 
-										arguments.location,
-										arguments.moduleAttributes);
-			if(structKeyExists(variables.instance.stModuleIndex, arguments.moduleID))
+			arguments.moduleBean = normalizeModule(arguments.moduleBean, arguments.location);
+			if(structKeyExists(variables.instance.stModuleIndex, arguments.moduleBean.getID()))
 				throw("Module ID already in use","homePortals.pageBean.duplicateModuleID");
-			arrayAppend(variables.instance.aModules, stMod);
+			arrayAppend(variables.instance.aModules, arguments.moduleBean);
 			indexModules();
 			return this;
 		</cfscript>
@@ -622,49 +625,40 @@
 	<cffunction name="indexModules" access="private" returntype="void" hint="creates an index of modules on the modules array">
 		<cfset variables.instance.stModuleIndex = structNew()>
 		<cfloop from="1" to="#arrayLen(variables.instance.aModules)#" index="i">
-			<cfset variables.instance.stModuleIndex[variables.instance.aModules[i].id] = i>
+			<cfset variables.instance.stModuleIndex[variables.instance.aModules[i].getID()] = i>
 		</cfloop>
 	</cffunction>
 
 	<cffunction name="normalizeModule" access="private" returntype="struct" hint="checks module properties and assign correct default values when needed">
-		<cfargument name="moduleID" type="string" required="true">
+		<cfargument name="moduleBean" type="moduleBean" required="true">
 		<cfargument name="location" type="string" required="false" default="">
-		<cfargument name="moduleAttributes" type="struct" required="false" default="#structNew()#">
 		<cfscript>
-			var stMod = duplicate(moduleAttributes);
+			var aRegions = getLayoutRegions();
+
+			/* set default location */
+						
+			if(arguments.location neq "")
+				arguments.moduleBean.setLocation(arguments.location);
 			
-			if(arguments.moduleID eq "")
+			if(arguments.moduleBean.getLocation() eq "" 
+					and arguments.location neq ""
+					and arrayLen(aRegions) gt 0) {
+				arguments.moduleBean.setLocation(aRegions[1]);
+			}
+
+
+			/* validate required fields */
+
+			if(arguments.moduleBean.getID() eq "") 
 				throw("Module ID cannot be empty","homePortals.pageBean.blankModuleID");
-			
-			if(not structKeyExists(stMod,"id") or stMod.id eq "")
-				stMod.id = arguments.moduleID;
-			
-			if(arguments.moduleID neq stMod.id)
-				throw("Module ID attribute mismatch", "homePortals.pageBean.mismatchModuleID");
-			
-			if(not structKeyExists(stMod,"location") and arguments.location neq "")
-				stMod.location = arguments.location;
 				
-			if(arguments.location eq "" and structKeyExists(stMod,"location") and stMod.location neq "")
-				arguments.location = stMod.location;
-			
-			// check required params
-			if(arguments.location eq "")
+			if(arguments.moduleBean.getLocation() eq "") 
 				throw("Module location cannot be empty","homePortals.pageBean.blankModuleLocation");
 				
-			if(not structKeyExists(stMod,"moduleType") or stMod.moduleType eq "")
+			if(arguments.moduleBean.getModuleType() eq "") 
 				throw("Module type cannot be empty","homePortals.pageBean.missingModuleType");
 
-			// set defaults
-			if(not structKeyExists(stMod,"style")) 		stMod.style = variables.DEFAULT_MODULE_STYLE;
-			if(not structKeyExists(stMod,"icon"))		stMod.icon = variables.DEFAULT_MODULE_ICON;
-			if(not structKeyExists(stMod,"title"))		stMod.title = variables.DEFAULT_MODULE_TITLE;
-			if(not structKeyExists(stMod,"class"))		stMod.class = variables.DEFAULT_MODULE_CLASS;
-			if(not structKeyExists(stMod,"container") or not isBoolean(stMod.container)) 	stMod.container = variables.DEFAULT_MODULE_CONTAINER;
-			if(not structKeyExists(stMod,"output") or not isBoolean(stMod.output)) 			stMod.output = variables.DEFAULT_MODULE_OUTPUT;
-			if(not structKeyExists(stMod,"moduleTemplate"))		stMod.moduleTemplate = variables.DEFAULT_MODULE_TEMPLATE;
-			
-			return stMod;
+			return arguments.moduleBean;
 		</cfscript>
 	</cffunction>
 

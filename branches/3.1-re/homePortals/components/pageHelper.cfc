@@ -27,6 +27,7 @@
 
 		<cfscript>
 			var oResourceBean = arguments.moduleResourceBean;
+			var oModuleBean = 0;
 			var stModule = structNew();
 			var moduleID = "";
 			var aModules = arrayNew(1);
@@ -67,11 +68,13 @@
 
 
 			// add basic properties to module
-			stModule["id"] = moduleID;
-			stModule["location"] = arguments.locationID;
-			stModule["name"] = moduleName;
-			stModule["title"] = moduleID;
-			stModule["moduleType"] = "module";
+			oModuleBean = createObject("component","moduleBean")
+							.init()
+							.setID(moduleID)
+							.setLocation(arguments.locationID)
+							.setTitle(moduleID)
+							.setModuleType("module")
+							.setProperty("name", moduleName);
 			
 			// add default properties from resourceBean
 			aTemp = oResourceBean.getAttributes();
@@ -79,16 +82,16 @@
 				thisAttr = aTemp[i]; 
 				def = "";
 				if(structKeyExists(thisAttr, "default")) def = thisAttr.default;
-				stModule[thisAttr.name] = def;
+				oModuleBean.setProperty(thisAttr.name, def);
 			}
 			
 			// add custom properties 
 			for(attr in arguments.customAttributes) {
-				stModule[attr] = arguments.customAttributes[attr];
+				oModuleBean.setProperty(attr, arguments.customAttributes[attr]);
 			}
 
 			// add module to page
-			oPage.addModule(moduleID, arguments.locationID, stModule);
+			oPage.addModule(oModuleBean);
 
 
 			// add resources used by this module
@@ -133,6 +136,7 @@
 			var thisAttr = "";
 			var def = "";
 			var oPage = getPage();
+			var oModuleBean = 0;
 			
 			// define a unique id for the new module based on the tag name
 			while(keepLooping) {
@@ -158,18 +162,20 @@
 
 
 			// add basic properties to module
-			stModule["id"] = moduleID;
-			stModule["moduleType"] = tag;
-			stModule["location"] = arguments.locationID;
-			stModule["title"] = moduleID;
-						
+			oModuleBean = createObject("component","moduleBean")
+							.init()
+							.setID(moduleID)
+							.setLocation(arguments.locationID)
+							.setTitle(moduleID)
+							.setModuleType(tag);
+
 			// add custom properties 
 			for(attr in arguments.customAttributes) {
-				stModule[attr] = arguments.customAttributes[attr];
+				oModuleBean.setProperty(attr, arguments.customAttributes[attr]);
 			}
 
 			// add module to page
-			oPage.addModule(moduleID, arguments.locationID, stModule);
+			oPage.addModule(oModuleBean);
 
 			return moduleID;		
 		</cfscript>
@@ -188,7 +194,7 @@
 			var lstModules = 0;
 			var aModules = arrayNew(1);
 			var aNewModules = arrayNew(1);
-			var stModule = structNew();
+			var oModule = 0;
 			var j = 0;
 			var oPage = getPage();
 			
@@ -207,13 +213,13 @@
 				
 					for(j=1;j lte arrayLen(aModules);j=j+1) {
 						// find module node in original page
-						stModule = oPage.getModule(aModules[j]);
+						oModule = oPage.getModule(aModules[j]);
 						
 						// update location in module
-						stModule["location"] = thisLocation;
+						oModule.setLocation(thisLocation);
 						
 						// add module to new modules array
-						arrayAppend(aNewModules, stModule);
+						arrayAppend(aNewModules, oModule);
 					}
 				}
 			}
@@ -223,7 +229,7 @@
 
 			// attach all modules again in the new order
 			for(i=1;i lte arrayLen(aNewModules);i=i+1) {
-				oPage.addModule(aNewModules[i].id, aNewModules[i].location, aNewModules[i]);
+				oPage.addModule(aNewModules[i]);
 			}
 		</cfscript>
 	</cffunction>

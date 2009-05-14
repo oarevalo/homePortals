@@ -173,7 +173,7 @@
 				<cfset aModules = variables.stPage.page.modules[aLocations[i].name]>
 				<cfloop from="1" to="#ArrayLen(aModules)#" index="j">
 					<cfset stModuleNode = variables.stPage.page.modules[aLocations[i].name][j]>
-					<cfif stModuleNode.output>
+					<cfif stModuleNode.getOutput()>
 						<cfset tmpHTML = tmpHTML & renderContentTag(stModuleNode)>
 					</cfif>
 				</cfloop>
@@ -330,7 +330,7 @@
 		<cfscript>
 			var i = 0;
 			var tmrStart = getTickCount();
-			var tmp = "";
+			var tmp = ""; var tmpLoc = "";
 			var oHPConfig = getHomePortals().getConfig();
 			
 			var aScriptResources = oHPConfig.getBaseResourcesByType("script");
@@ -397,10 +397,11 @@
 			tmp = getPage().getModules();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				// create structure for modules that belong to the same location
-				if(Not StructKeyExists(variables.stPage.page.modules, tmp[i].location) )
-					variables.stPage.page.modules[tmp[i].location] = ArrayNew(1);
+				tmpLoc = tmp[i].getLocation();
+				if(Not StructKeyExists(variables.stPage.page.modules, tmpLoc) )
+					variables.stPage.page.modules[tmpLoc] = ArrayNew(1);
 				
-				ArrayAppend(variables.stPage.page.modules[tmp[i].location], tmp[i] );
+				ArrayAppend(variables.stPage.page.modules[tmpLoc], tmp[i] );
 			}
 		</cfscript>	
 	</cffunction>
@@ -440,11 +441,12 @@
 						
 						// loop through all modules in this location
 						for(k=1;k lte arrayLen(aTags);k=k+1) {
-							stTagNode = stTags[location][k];
+							oModBean = stTags[location][k];
+							stTagNode = oModBean.getMemento();
 							startTag = getTickCount();
 
 							try {
-								oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, stTagNode);
+								oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, oModBean);
 								oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.head),
 																	createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body)
 																);
@@ -473,9 +475,10 @@
 	<!----  renderContentTag			----->
 	<!--------------------------------------->
 	<cffunction name="renderContentTag" access="private" returntype="string" hint="Initializes and renders a content tag instance." output="false">
-		<cfargument name="contentTagNode" type="struct" required="true">
+		<cfargument name="contentTagNode" type="moduleBean" required="true">
 		<cfscript>
-			var id = arguments.contentTagNode.id;
+			var id = arguments.contentTagNode.getID();
+			var stNodeData = arguments.contentTagNode.getMemento();
 			var renderTemplateBody = "";
 			var renderTemplate = "";
 			var tmpIconURL = "";
@@ -487,15 +490,15 @@
 			var arg1 = "";
 			var rendered = "";
 
-			if(arguments.contentTagNode.icon neq "") 
-				tmpIconURL = "<img src='#arguments.contentTagNode.icon#' width='16' height='16' align='absmiddle'>";
+			if(stNodeData.icon neq "") 
+				tmpIconURL = "<img src='#stNodeData.icon#' width='16' height='16' align='absmiddle'>";
 
 			// if moduleTemplate is defined, then use that for the name of the render template,
 			// otherwise fall into the container property
-			if(structKeyExists(arguments.contentTagNode, "moduleTemplate") and arguments.contentTagNode.moduleTemplate neq "") {
-				renderTemplate = arguments.contentTagNode.moduleTemplate;
+			if(stNodeData.moduleTemplate neq "") {
+				renderTemplate = stNodeData.moduleTemplate;
 			} else {
-				if(arguments.contentTagNode.Container)
+				if(stNodeData.Container)
 					renderTemplate = "";	// this will force the template manager to use the default template
 				else
 					renderTemplate = "moduleNoContainer";
@@ -519,9 +522,11 @@
 					rendered = "";
 					
 					if(arg1 neq "CONTENT") {
-						if(structKeyExists(arguments.contentTagNode,arg1) 
-							and isSimpleValue(arguments.contentTagNode[arg1])) {
-							rendered = arguments.contentTagNode[arg1];
+						if(structKeyExists(stNodeData,arg1) and isSimpleValue(stNodeData[arg1])) {
+							rendered = stNodeData[arg1];
+						
+						} else if(arguments.contentTagNode.hasProperty(arg1)) {
+							rendered = arguments.contentTagNode.getProperty(arg1);
 						}
 							
 						renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
@@ -557,9 +562,9 @@
 	<!---------------------------------------->		
 	<cffunction name="getContentTagRenderer" access="private" returntype="contentTagRenderer">
 		<cfargument name="contentTagType" type="string" required="true">
-		<cfargument name="contentTagNode" type="struct" required="true">
+		<cfargument name="moduleBean" type="moduleBean" required="true">
 		<cfscript>
-			var oContentTag = createObject("component", "contentTag").init(arguments.contentTagNode);
+			var oContentTag = createObject("component", "contentTag").init(arguments.moduleBean);
 			var contentTagRendererClassName = getHomePortals().getConfig().getContentRenderer( arguments.contentTagType );
 			var oContentTagRenderer = createObject("component", contentTagRendererClassName).init(this, oContentTag);
 			return oContentTagRenderer;
