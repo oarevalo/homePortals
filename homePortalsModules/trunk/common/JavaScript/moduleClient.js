@@ -89,9 +89,10 @@ function moduleClient() {
 
 	function openWindow() {
 		var d = document.getElementById("h_moduleWindow");
+		var b = document.getElementsByTagName("body")[0];
 		if(!d) {
 			var tmpHTML = "<div id='h_moduleWindow'><div id='h_moduleWindow_BodyRegion'></div></div>";
-			new Insertion.Before("h_body_main",tmpHTML);
+			new Insertion.Top(b,tmpHTML);
 
 			tmpHTML = "<a href='javascript:" + this.moduleID + ".closeWindow();'>" +
 							"<img id='h_moduleWindowClose' " +

@@ -21,7 +21,7 @@ function h_setLoadingImg(secID) {
 
 	if(!d) {
 		var tmpHTML = "<div id='h_loading'><img src='" + url_loadingImage + "'></div>";
-		new Insertion.Before("h_body_main",tmpHTML);
+		new Insertion.Before(secID,tmpHTML);
 
 		if(window.innerWidth)  clientWidth = window.innerWidth;
 		else if (document.body) clientWidth = document.body.clientWidth;

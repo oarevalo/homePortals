@@ -15,19 +15,22 @@
 <!------------------------------>
 <!--- Assemble Page			 --->
 <!------------------------------>
-<cfset feed1 = {
-				moduleType = "module",
-				name="RSSReader/rssReader",
-				title="HomePortals News",
-				rss="http://www.homeportals.net/blog/rss.cfm"
-			}>
+<cfset feed1 = createObject("component","homePortals.components.moduleBean")
+				.init()
+				.setID("feed1")
+				.setModuleType("module")
+				.setTitle("HomePortals News")
+				.setProperty("name","RSSReader/rssReader")
+				.setProperty("rss","http://www.homeportals.net/blog/rss.cfm")>
 
-<cfset feed2 = {
+<cfset st = {
+				id = "feed2",
 				moduleType = "module",
 				name="RSSReader/rssReader",
 				title="OscarArevalo.com",
 				rss="http://www.oscararevalo.com/rss.cfm"
 			}>
+<cfset feed2 = createObject("component","homePortals.components.moduleBean").init(st)>
 
 <cfset oPage = createObject("component","homePortals.components.pageBean")
 				.init()
@@ -35,8 +38,8 @@
 				.setTitle("HomePortals Modules Framework")
 				.addLayoutRegion("col1","column")
 				.addLayoutRegion("col2","column")
-				.addModule("feed1","col1",feed1)
-				.addModule("feed2","col2",feed2)
+				.addModule(feed1,"col1")
+				.addModule(feed2,"col2")
 				>
 				
 

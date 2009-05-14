@@ -39,7 +39,7 @@
 				bIsFirstInClass = (not arguments.bodyContentBuffer.containsClass(moduleName));
 				
 				// add information about the page to moduleNode
-				moduleNode = getContentTag().getNode();
+				moduleNode = getContentTag().getModuleBean().toStruct();
 				moduleNode["name"] = modResBean.getPackage() & "/" & modResBean.getID();
 				moduleNode["_page"] = structNew();
 				moduleNode["_page"].href =  getPageRenderer().getPageHREF();
