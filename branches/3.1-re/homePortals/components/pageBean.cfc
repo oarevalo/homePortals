@@ -402,7 +402,7 @@
 		<cfloop from="1" to="#arrayLen(variables.instance.aStyles)#" index="i">
 			<cfif variables.instance.aStyles[i] eq arguments.href>
 				<cfset arrayDeleteAt(variables.instance.aStyles, i)>
-				<cfreturn>
+				<cfreturn this>
 			</cfif>
 		</cfloop>
 		<cfreturn this>
@@ -444,7 +444,7 @@
 		<cfloop from="1" to="#arrayLen(variables.instance.aScripts)#" index="i">
 			<cfif variables.instance.aScripts[i] eq arguments.src>
 				<cfset arrayDeleteAt(variables.instance.aScripts, i)>
-				<cfreturn>
+				<cfreturn this>
 			</cfif>
 		</cfloop>
 		<cfreturn this>
