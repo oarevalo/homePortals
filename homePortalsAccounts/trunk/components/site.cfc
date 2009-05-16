@@ -305,7 +305,7 @@
 				oPage.setTitle(pName);
 
 			// set page owner
-			oPage.setOwner(getOwner());
+			oPage.setProperty("owner",getOwner());
 			
 			// get location of new page
 			newPageHREF = getPageHREF(pname, false);
