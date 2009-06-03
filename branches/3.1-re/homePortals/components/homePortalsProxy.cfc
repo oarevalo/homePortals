@@ -74,9 +74,8 @@
 	<cffunction name="clearCache" access="remote" returntype="boolean" hint="Removes the requested cache from memory">
 		<cfargument name="cacheName" type="string" required="true">
 		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
-		<cfset var oCache = oCacheRegistry.getCache(arguments.cacheName)>
 		<cfif left(arguments.cacheName,2) neq "hp">
-			<cfset oCache.flush(arguments.cache)>
+			<cfset oCacheRegistry.flush(arguments.cacheName)>
 		<cfelse>
 			<cfthrow message="You are not allowed to clear the requested cache" type="homePortals.proxy.cacheClearNotAllowed">
 		</cfif>
@@ -87,10 +86,26 @@
 		<cfargument name="cacheName" type="string" required="true">
 		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 		<cfset var oCache = oCacheRegistry.getCache(arguments.cacheName)>
-		<cfset oCache.cleanup(arguments.cache)>
+		<cfset oCache.cleanup()>
 		<cfreturn true>
 	</cffunction>
 	
+	<cffunction name="listCache" access="remote" returntype="array" hint="Returns an array with the cache contents">
+		<cfargument name="cacheName" type="string" required="true">
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
+		<cfset var oCache = oCacheRegistry.getCache(arguments.cacheName)>
+		<cfreturn oCache.list()>
+	</cffunction>
+	
+	<cffunction name="flushCacheItem" access="remote" returntype="boolean" hint="Flushes an item from the given cache">
+		<cfargument name="cacheName" type="string" required="true">
+		<cfargument name="itemKey" type="string" required="true">
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
+		<cfset var oCache = oCacheRegistry.getCache(arguments.cacheName)>
+		<cfset oCache.flush(arguments.itemKey)>
+		<cfreturn true>
+	</cffunction>
+		
 	
 	<!--- Page Processing --->
 	<cffunction name="renderPage" access="remote" returntype="string" hint="Returns the output generated from rendering the requested page">
