@@ -230,7 +230,15 @@
 		
 		<!--- Add user-defined meta tags --->
 		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#aMeta[i].content#"" />">
+			<cfif aMeta[i].name eq "RSS">
+				<cfif listLen(aMeta[i].content,"|") eq 2>
+					<cfset tmpHTML = tmpHTML & "<link rel=""alternate"" type=""application/rss+xml"" title=""#listFirst(aMeta[i].content,"|")#"" href=""#listLast(aMeta[i].content,"|")#"" />">
+				<cfelse>
+					<cfset tmpHTML = tmpHTML & "<link rel=""alternate"" type=""application/rss+xml"" href=""#aMeta[i].content#"" />">
+				</cfif>
+			<cfelse>
+				<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#aMeta[i].content#"" />">
+			</cfif>
 		</cfloop>
 			
 		<!--- Include basic and user-defined CSS styles --->
