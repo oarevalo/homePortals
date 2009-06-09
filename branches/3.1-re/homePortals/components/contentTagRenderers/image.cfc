@@ -1,10 +1,11 @@
 <cfcomponent extends="homePortals.components.contentTagRenderer"
 			 hint="Use this content renderer to include an existing CFML view or template on a page.">
-	<cfproperty name="imageID" type="resource:image">
-	<cfproperty name="href" type="string">
-	<cfproperty name="width" type="string" />
-	<cfproperty name="height" type="string" />
-	<cfproperty name="showLabel" type="boolean" default="true" />
+	<cfproperty name="imageID" type="resource:image" hint="Image resource from the resource library">
+	<cfproperty name="href" type="string" hint="Source URL for the image (when not using an image from the resource library)">
+	<cfproperty name="width" type="string" hint="Image width (pixels). Leave empty for full width." />
+	<cfproperty name="height" type="string" hint="Image width (pixels). Leave empty for full height." />
+	<cfproperty name="label" type="string" hint="Image label" />
+	<cfproperty name="link" type="string" hint="If not empty, indicates a URL to go to when clicking on the image." />
 
 
 	<!---------------------------------------->
@@ -18,12 +19,22 @@
 			var moduleID = getContentTag().getAttribute("id");
 			var width = getContentTag().getAttribute("width");
 			var height = getContentTag().getAttribute("height");
+			var label = getContentTag().getAttribute("label");
+			var link = getContentTag().getAttribute("link");
 			var tmpHTML = "";
 			var imgpath = "";
+			var alt = label;
 
 			try {
 				imgpath = retrieveResourceFilePath();
-				tmpHTML = "<img src='#imgpath#' width='#width#' height='#height#'>";
+				
+				if(alt eq "") alt = getFileFromPath(imgPath);
+				
+				tmpHTML = "<img src='#imgpath#' width='#width#' height='#height#' border='0' alt='#htmlEditFormat(alt)#' title='#htmlEditFormat(alt)#'>";
+				
+				if(link neq "") tmpHTML = "<a href='#link#'>" & tmpHTML & "</a>";
+				if(label neq "") tmpHTML = tmpHTML & "<br/>" & label;
+				
 				arguments.bodyContentBuffer.set( tmpHTML );
 				
 			} catch(any e) {
