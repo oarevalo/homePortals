@@ -52,6 +52,7 @@
 		<contentRenderer moduleType="view" path="homePortals.components.contentTagRenderers.view" />
 		<contentRenderer moduleType="image" path="homePortals.components.contentTagRenderers.image" />
 		<contentRenderer moduleType="navMenu" path="homePortals.components.contentTagRenderers.navMenu" />
+		<contentRenderer moduleType="rss" path="homePortals.components.contentTagRenderers.rss" />
 	</contentRenderers>
 	
 	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
@@ -64,9 +65,6 @@
 		<resourceType name="content">
 			<folderName>Contents</folderName>
 			<description>Content resources are blocks of formatted text that can be reused across a site</description>
-			<property name="author" type="string" />
-			<property name="owner" type="string" />
-			<property name="accessType" type="list" values="public,private" />
 			<fileTypes>htm</fileTypes>
 		</resourceType>
 						
