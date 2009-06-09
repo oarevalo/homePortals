@@ -182,6 +182,7 @@
 		<cfscript>
 			var href = "";
 			var packageDir = "";
+			var resDir = "";
 			var rb = arguments.resourceBean;
 			var resType = rb.getType();
 			var resTypeDir = getResourceType(resType).getFolderName();
@@ -197,10 +198,16 @@
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( rb.getType(), rb.getPackage() );
 
-			// setup base directory
-			packageDir = variables.resourcesRoot & "/" & resTypeDir & "/" & rb.getPackage();
+			// setup directories
+
+			// check if we need to create the res type directory
+			resDir = variables.resourcesRoot & "/" & resTypeDir;
+			if(not directoryExists(expandPath(resDir))) {
+				createDir( resDir );
+			}
 
 			// check if we need to create the package directory
+			packageDir = resDir & "/" & rb.getPackage();
 			if(not directoryExists(expandPath(packageDir))) {
 				createDir( packageDir );
 			}

@@ -21,7 +21,7 @@
 				arguments.bodyContentBuffer.set( renderMenu() );
 				
 			} catch(any e) {
-				tmpHTML = "<b>An unexpected error ocurred while retrieving content for content module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
+				tmpHTML = "<b>An unexpected error ocurred while processing module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
 				arguments.bodyContentBuffer.set( tmpHTML );
 			}
 		</cfscript>
@@ -38,7 +38,7 @@
 		
 		<cfif pages eq "">
 			<cfset pp = getPageRenderer().getHomePortals().getPageProvider()>
-			<cfset qry = pp.listFolder()>
+			<cfset qry = pp.listFolder("/")>
 			<cfloop query="qry">
 				<cfset pages = listAppend(pages,qry.name)>
 			</cfloop>

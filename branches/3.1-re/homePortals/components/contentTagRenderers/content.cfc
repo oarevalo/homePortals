@@ -90,7 +90,7 @@
 	<!---------------------------------------->
 	<!--- getContentCache                  --->
 	<!---------------------------------------->		
-	<cffunction name="getContentCache" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
+	<cffunction name="getContentCache" access="private" returntype="homePortals.components.cacheService" hint="Retrieves a cacheService instance used for caching content for content modules">
 		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 		<cfset var cacheName = variables.EXT_CONTENT_CACHE>
 		<cfset var oCacheService = 0>
@@ -100,7 +100,7 @@
 		<cflock type="exclusive" name="contentCacheLock" timeout="30">
 			<cfif not oCacheRegistry.isRegistered(cacheName)>
 				<!--- crate cache instance --->
-				<cfset oCacheService = createObject("component","cacheService").init(cacheSize, cacheTTL)>
+				<cfset oCacheService = createObject("component","homePortals.components.cacheService").init(cacheSize, cacheTTL)>
 
 				<!--- add cache to registry --->
 				<cfset oCacheRegistry.register(cacheName, oCacheService)>
