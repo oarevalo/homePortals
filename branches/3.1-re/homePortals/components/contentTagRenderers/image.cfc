@@ -30,7 +30,11 @@
 				
 				if(alt eq "") alt = getFileFromPath(imgPath);
 				
-				tmpHTML = "<img src='#imgpath#' width='#width#' height='#height#' border='0' alt='#htmlEditFormat(alt)#' title='#htmlEditFormat(alt)#'>";
+				tmpHTML = "<img src=""#imgpath#"" border=""0"" alt=""#htmlEditFormat(alt)#"" title=""#htmlEditFormat(alt)#""";
+				
+				if(width neq "") tmpHTML = tmpHTML & " width='#width#'";
+				if(height neq "") tmpHTML = tmpHTML & " height='#height#'";
+				tmpHTML = tmpHTML & ">";
 				
 				if(link neq "") tmpHTML = "<a href='#link#'>" & tmpHTML & "</a>";
 				if(label neq "") tmpHTML = tmpHTML & "<br/>" & label;
