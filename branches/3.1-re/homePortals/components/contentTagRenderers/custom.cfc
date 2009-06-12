@@ -21,6 +21,15 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="getHead" access="public" returntype="string">
+		<cfreturn getContent("head")>
+	</cffunction>
+
+	<cffunction name="getBody" access="public" returntype="string">
+		<cfreturn getContent("body")>
+	</cffunction>
+	
+
 	<cffunction name="renderOutput" access="private" returntype="string">
 		<cfargument name="source" required="true" type="string">
 		<cfscript>
