@@ -57,7 +57,7 @@
 			variables.oHomePortalsConfigBean = createObject("component", "homePortalsConfigBean").init();
 
 			// load default configuration settings
-			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & pathSeparator & ".." & pathSeparator & "Config" & pathSeparator & "homePortals-config.xml";
+			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & ".." & pathSeparator & "config" & pathSeparator & "homePortals-config.xml";
 			variables.oHomePortalsConfigBean.load(defaultConfigFilePath);
 
 			// load configuration settings for the application (overrides specific settings)
