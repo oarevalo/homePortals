@@ -4,7 +4,7 @@
 		<cfargument name="config" type="homePortalsConfigBean" hint="main configuration bean for the application">
 	</cffunction>
 
-	<cffunction name="query" access="public" returntype="struct" hint="returns a struct with information about a page. Struct must contain the following elements: lastModified, size, readOnly and createdOn">
+	<cffunction name="getInfo" access="public" returntype="struct" hint="returns a struct with information about a page. Struct must contain the following elements: lastModified, size, readOnly and createdOn">
 		<cfargument name="path" type="string" hint="the location of the page document">
 	</cffunction>
 

@@ -21,7 +21,7 @@
 			var stInfo = structNew();
 
 			// get information about the page
-			stInfo = oPageProvider.query(arguments.href);
+			stInfo = oPageProvider.getInfo(arguments.href);
 
 			// if the page exists on the cache, and the page hasnt been modified after
 			// storing it on the cache, then get it from the cache

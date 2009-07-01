@@ -10,7 +10,7 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="query" access="public" returntype="struct" hint="returns a struct with information about a page">
+	<cffunction name="getInfo" access="public" returntype="struct" hint="returns a struct with information about a page">
 		<cfargument name="path" type="string" hint="the location of the page document">
 
 		<cfscript>
