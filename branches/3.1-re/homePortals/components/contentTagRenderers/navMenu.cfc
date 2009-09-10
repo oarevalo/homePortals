@@ -35,12 +35,25 @@
 		<cfset var bgcolor = getContentTag().getAttribute("bgcolor","##ccc")>
 		<cfset var fontcolor = getContentTag().getAttribute("fontcolor","##000")>
 		<cfset var tmpCSS = "">
+		<cfset var thisFolder = "/">
+		<cfset var qryPages = 0>
+		<cfset var pp = getPageRenderer().getHomePortals().getPageProvider()>
+
+		<cfif listLen(thisPageHREF,"/") gt 1>
+			<cfset thisFolder = listDeleteAt(thisPageHREF,listLen(thisPageHREF,"/"),"/") & "/">
+		</cfif>
 		
 		<cfif pages eq "">
-			<cfset pp = getPageRenderer().getHomePortals().getPageProvider()>
-			<cfset qry = pp.listFolder("/")>
-			<cfloop query="qry">
-				<cfset pages = listAppend(pages,qry.name)>
+			<cfset qryPages = pp.listFolder(thisFolder)>
+			
+			<cfquery name="qryPages" dbtype="query">
+				SELECT name, UPPER(name) as name_u
+					FROM qryPages
+					ORDER BY name_u
+			</cfquery>
+			
+			<cfloop query="qryPages">
+				<cfset pages = listAppend(pages,qryPages.name)>
 			</cfloop>
 		</cfif>
 		
@@ -61,10 +74,10 @@
 									<cfset href = page>
 									<cfset label = listLast(page,"/")>
 								</cfif>
-								<cfif href eq thisPageHREF or "/" & href eq thisPageHREF>
+								<cfif href eq thisPageHREF or thisFolder & href eq thisPageHREF>
 									<cfset tmpCSSClass = "navMenu_selectedItem">
 								</cfif>
-								<tr><td style="padding-top:0px;"><a href="index.cfm?page=#href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td></tr>
+								<tr><td style="padding-top:0px;"><a href="index.cfm?page=#thisFolder##href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td></tr>
 							</cfloop>
 						</table>
 					<cfelse>
@@ -82,10 +95,10 @@
 										<cfset href = page>
 										<cfset label = listLast(page,"/")>
 									</cfif>
-									<cfif href eq thisPageHREF or "/" & href eq thisPageHREF>
+									<cfif href eq thisPageHREF or thisFolder & href eq thisPageHREF>
 										<cfset tmpCSSClass = "navMenu_selectedItem">
 									</cfif>
-									<td><a href="index.cfm?page=#href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td>
+									<td><a href="index.cfm?page=#thisFolder##href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td>
 								</cfloop>
 							</tr>
 						</table>
