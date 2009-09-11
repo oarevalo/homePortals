@@ -62,8 +62,8 @@
 
 			// load configuration settings for the application (overrides specific settings)
 			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
-				if(fileExists(expandPath(variables.appRoot & "/" & variables.configFilePath))) {
-					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & "/" & variables.configFilePath));
+				if(fileExists(expandPath(variables.appRoot & variables.configFilePath))) {
+					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
 				}
 			} else {
 				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
