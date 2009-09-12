@@ -53,7 +53,7 @@
 			</cfquery>
 			
 			<cfloop query="qryPages">
-				<cfset pages = listAppend(pages,qryPages.name)>
+				<cfset pages = listAppend(pages,thisFolder & qryPages.name)>
 			</cfloop>
 		</cfif>
 		
@@ -74,10 +74,13 @@
 									<cfset href = page>
 									<cfset label = listLast(page,"/")>
 								</cfif>
-								<cfif href eq thisPageHREF or thisFolder & href eq thisPageHREF>
+								<cfif left(href,1) neq "/">
+									<cfset href = "/" & href>
+								</cfif>
+								<cfif href eq thisPageHREF>
 									<cfset tmpCSSClass = "navMenu_selectedItem">
 								</cfif>
-								<tr><td style="padding-top:0px;"><a href="index.cfm?page=#thisFolder##href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td></tr>
+								<tr><td style="padding-top:0px;"><a href="index.cfm?page=#href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td></tr>
 							</cfloop>
 						</table>
 					<cfelse>
@@ -95,10 +98,13 @@
 										<cfset href = page>
 										<cfset label = listLast(page,"/")>
 									</cfif>
-									<cfif href eq thisPageHREF or thisFolder & href eq thisPageHREF>
+									<cfif left(href,1) neq "/">
+										<cfset href = "/" & href>
+									</cfif>
+									<cfif href eq thisPageHREF>
 										<cfset tmpCSSClass = "navMenu_selectedItem">
 									</cfif>
-									<td><a href="index.cfm?page=#thisFolder##href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td>
+									<td><a href="index.cfm?page=#href#" <cfif tmpCSS neq "">style="#tmpCSS#"</cfif> <cfif tmpCSSClass neq "">class="#tmpCSSClass#"</cfif>>#label#</a></td>
 								</cfloop>
 							</tr>
 						</table>
