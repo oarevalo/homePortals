@@ -29,6 +29,7 @@
 			variables.stConfig.contentRenderers = structNew();
 			variables.stConfig.plugins = structNew();
 			variables.stConfig.resourceTypes = structNew();
+			variables.stConfig.pageProperties = structNew();
 			
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -156,6 +157,17 @@
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						arrayAppend( variables.stConfig.resourceLibraryPaths , xmlNode.xmlChildren[j].xmlText );
 					}
+
+				} else if(xmlNode.xmlName eq "pageProperties") {
+		
+					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+						xmlThisNode = xmlNode.xmlChildren[j];
+						if(xmlThisNode.xmlName eq "property" 
+								and structKeyExists(xmlThisNode.xmlAttributes,"name")
+								and structKeyExists(xmlThisNode.xmlAttributes,"value")) {
+							variables.stConfig.pageProperties[xmlThisNode.xmlAttributes.name] = xmlThisNode.xmlAttributes.value;
+						}
+					}
 							
 				} else
 					variables.stConfig[xmlNode.xmlName] = xmlNode.xmlText;
@@ -181,7 +193,6 @@
 			var key = ""; var st = structNew();
 			var thisResourceType = "";
 			var tmpXmlNode = 0; var tmpXmlNode2 = 0;
-			var lstKeysIgnore = "version,renderTemplates,resources,contentRenderers,plugins,resourceTypes,resourceLibraryPaths";
 
 			// create a blank xml document and add the root node
 			xmlConfigDoc = xmlNew();
@@ -216,112 +227,136 @@
 			
 			
 			// ****** [baseResources] *****
-			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"baseResources") );
-			
-			if(getBaseResourceTypes() neq "") {
-				lstResourceTypes = getBaseResourceTypes();
-			} else {
-				lstResourceTypes = variables.stConfig.lstResourceTypes;
-			}
-			
-			for(i=1;i lte ListLen(lstResourceTypes);i=i+1) {
-				thisResourceType = ListGetAt(lstResourceTypes, i);
+			if(getBaseResourceTypes() neq "" or variables.stConfig.lstResourceTypes neq "") {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"baseResources") );
 				
-				if(structKeyExists(variables.stConfig.resources, thisResourceType)) {
-					for(j=1;j lte ArrayLen(variables.stConfig.resources[thisResourceType]);j=j+1) {
-						tmpXmlNode = xmlElemNew(xmlConfigDoc,"resource");
-						tmpXmlNode.xmlAttributes["type"] = thisResourceType;
-						tmpXmlNode.xmlAttributes["href"] = variables.stConfig.resources[thisResourceType][j];
-						ArrayAppend(xmlConfigDoc.xmlRoot.baseResources.xmlChildren, tmpXmlNode);
-					}		
+				if(getBaseResourceTypes() neq "") {
+					lstResourceTypes = getBaseResourceTypes();
+				} else {
+					lstResourceTypes = variables.stConfig.lstResourceTypes;
+				}
+				
+				for(i=1;i lte ListLen(lstResourceTypes);i=i+1) {
+					thisResourceType = ListGetAt(lstResourceTypes, i);
+					
+					if(structKeyExists(variables.stConfig.resources, thisResourceType)) {
+						for(j=1;j lte ArrayLen(variables.stConfig.resources[thisResourceType]);j=j+1) {
+							tmpXmlNode = xmlElemNew(xmlConfigDoc,"resource");
+							tmpXmlNode.xmlAttributes["type"] = thisResourceType;
+							tmpXmlNode.xmlAttributes["href"] = variables.stConfig.resources[thisResourceType][j];
+							ArrayAppend(xmlConfigDoc.xmlRoot.baseResources.xmlChildren, tmpXmlNode);
+						}		
+					}
 				}
 			}
 
 			// ****** [renderTemplates] *****
-			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"renderTemplates") );
-			
-			for(key in variables.stConfig.renderTemplates) {
-				for(thisKey in variables.stConfig.renderTemplates[key]) {
-					tmpXmlNode = xmlElemNew(xmlConfigDoc,"renderTemplate");
-					tmpXmlNode.xmlAttributes["name"] = thisKey;
-					tmpXmlNode.xmlAttributes["type"] = key;
-					tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[key][thisKey].href;
-					if(isBoolean(variables.stConfig.renderTemplates[key][thisKey].isDefault) and variables.stConfig.renderTemplates[key][thisKey].isDefault)
-						tmpXmlNode.xmlAttributes["default"] = variables.stConfig.renderTemplates[key][thisKey].isDefault;
-					tmpXmlNode.xmlText = variables.stConfig.renderTemplates[key][thisKey].description;
-					ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
+			if(not structIsEmpty(variables.stConfig.renderTemplates)) {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"renderTemplates") );
+				
+				for(key in variables.stConfig.renderTemplates) {
+					for(thisKey in variables.stConfig.renderTemplates[key]) {
+						tmpXmlNode = xmlElemNew(xmlConfigDoc,"renderTemplate");
+						tmpXmlNode.xmlAttributes["name"] = thisKey;
+						tmpXmlNode.xmlAttributes["type"] = key;
+						tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[key][thisKey].href;
+						if(isBoolean(variables.stConfig.renderTemplates[key][thisKey].isDefault) and variables.stConfig.renderTemplates[key][thisKey].isDefault)
+							tmpXmlNode.xmlAttributes["default"] = variables.stConfig.renderTemplates[key][thisKey].isDefault;
+						tmpXmlNode.xmlText = variables.stConfig.renderTemplates[key][thisKey].description;
+						ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
+					}
 				}
 			}
 			
 			// ****** [contentRenderers] *****
-			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"contentRenderers") );
-			
-			for(thisKey in variables.stConfig.contentRenderers) {
-				tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentRenderer");
-				tmpXmlNode.xmlAttributes["moduleType"] = thisKey;
-				tmpXmlNode.xmlAttributes["path"] = variables.stConfig.contentRenderers[thisKey];
-				ArrayAppend(xmlConfigDoc.xmlRoot.contentRenderers.xmlChildren, tmpXmlNode );
+			if(not structIsEmpty(variables.stConfig.contentRenderers)) {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"contentRenderers") );
+				
+				for(thisKey in variables.stConfig.contentRenderers) {
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentRenderer");
+					tmpXmlNode.xmlAttributes["moduleType"] = thisKey;
+					tmpXmlNode.xmlAttributes["path"] = variables.stConfig.contentRenderers[thisKey];
+					ArrayAppend(xmlConfigDoc.xmlRoot.contentRenderers.xmlChildren, tmpXmlNode );
+				}
 			}
 
 			// ****** [plugins] *****
-			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"plugins") );
-			
-			for(thisKey in variables.stConfig.plugins) {
-				tmpXmlNode = xmlElemNew(xmlConfigDoc,"plugin");
-				tmpXmlNode.xmlAttributes["name"] = thisKey;
-				tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[thisKey];
-				ArrayAppend(xmlConfigDoc.xmlRoot.plugins.xmlChildren, tmpXmlNode );
+			if(not structIsEmpty(variables.stConfig.plugins)) {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"plugins") );
+				
+				for(thisKey in variables.stConfig.plugins) {
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,"plugin");
+					tmpXmlNode.xmlAttributes["name"] = thisKey;
+					tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[thisKey];
+					ArrayAppend(xmlConfigDoc.xmlRoot.plugins.xmlChildren, tmpXmlNode );
+				}
 			}
 
 			// ****** [resourceTypes] *****
-			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceTypes") );
-			
-			for(thisKey in variables.stConfig.resourceTypes) {
-				st = variables.stConfig.resourceTypes[thisKey];
+			if(not structIsEmpty(variables.stConfig.resourceTypes)) {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceTypes") );
 				
-				tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceType");
-				tmpXmlNode.xmlAttributes["name"] = st.name;
-				
-				for(key in st) {
-					tmpXmlNode2 = 0;
-					switch(key) {
-						case "description":  tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"description"); break;
-						case "folderName": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"folderName"); break;
-						case "resBeanPath": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"resBeanPath"); break;
-						case "fileTypes": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"fileTypes"); break;
+				for(thisKey in variables.stConfig.resourceTypes) {
+					st = variables.stConfig.resourceTypes[thisKey];
+					
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceType");
+					tmpXmlNode.xmlAttributes["name"] = st.name;
+					
+					for(key in st) {
+						tmpXmlNode2 = 0;
+						switch(key) {
+							case "description":  tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"description"); break;
+							case "folderName": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"folderName"); break;
+							case "resBeanPath": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"resBeanPath"); break;
+							case "fileTypes": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"fileTypes"); break;
+						}
+						if(isXmlNode(tmpXmlNode2) and st[key] neq "") {
+							tmpXmlNode2.xmlText = xmlFormat(st[key]);
+							ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+						}
 					}
-					if(isXmlNode(tmpXmlNode2) and st[key] neq "") {
-						tmpXmlNode2.xmlText = xmlFormat(st[key]);
-						ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+					
+					if(structKeyExists(st,"properties")) {
+						aProperties = st.properties;
+						for(k=1;k lte arrayLen(aProperties);k=k+1) {
+							tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"property");
+							if(structKeyExists(aProperties[k],"name") and aProperties[k].name neq "") tmpXmlNode2.xmlAttributes["name"] = aProperties[k].name;
+							if(structKeyExists(aProperties[k],"description") and aProperties[k].description neq "") tmpXmlNode2.xmlAttributes["description"] = aProperties[k].description;
+							if(structKeyExists(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
+							if(structKeyExists(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
+							if(structKeyExists(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
+							if(structKeyExists(aProperties[k],"default") and aProperties[k]["default"] neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k]["default"];
+							if(structKeyExists(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
+							ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+						}
 					}
+					
+					ArrayAppend(xmlConfigDoc.xmlRoot.resourceTypes.xmlChildren, tmpXmlNode );
 				}
-				
-				if(structKeyExists(st,"properties")) {
-					aProperties = st.properties;
-					for(k=1;k lte arrayLen(aProperties);k=k+1) {
-						tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"property");
-						if(structKeyExists(aProperties[k],"name") and aProperties[k].name neq "") tmpXmlNode2.xmlAttributes["name"] = aProperties[k].name;
-						if(structKeyExists(aProperties[k],"description") and aProperties[k].description neq "") tmpXmlNode2.xmlAttributes["description"] = aProperties[k].description;
-						if(structKeyExists(aProperties[k],"type") and aProperties[k].type neq "") tmpXmlNode2.xmlAttributes["type"] = aProperties[k].type;
-						if(structKeyExists(aProperties[k],"values") and aProperties[k].values neq "") tmpXmlNode2.xmlAttributes["values"] = aProperties[k].values;
-						if(structKeyExists(aProperties[k],"required") and aProperties[k].required neq "") tmpXmlNode2.xmlAttributes["required"] = aProperties[k].required;
-						if(structKeyExists(aProperties[k],"default") and aProperties[k]["default"] neq "") tmpXmlNode2.xmlAttributes["default"] = aProperties[k]["default"];
-						if(structKeyExists(aProperties[k],"label") and aProperties[k].label neq "") tmpXmlNode2.xmlAttributes["label"] = aProperties[k].label;
-						ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
-					}
-				}
-				
-				ArrayAppend(xmlConfigDoc.xmlRoot.resourceTypes.xmlChildren, tmpXmlNode );
 			}
 
 			// ****** [resourceLibrary] *****	
-			ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceLibraryPaths") );
-			for(i=1;i lte arrayLen(variables.stConfig.resourceLibraryPaths);i=i+1) {
-				tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceLibraryPath");
-				tmpXmlNode.xmlText = variables.stConfig.resourceLibraryPaths[i];
-				ArrayAppend(xmlConfigDoc.xmlRoot.resourceLibraryPaths.xmlChildren, tmpXmlNode );
+			if(arrayLen(variables.stConfig.resourceLibraryPaths) gt 0) {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceLibraryPaths") );
+				for(i=1;i lte arrayLen(variables.stConfig.resourceLibraryPaths);i=i+1) {
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceLibraryPath");
+					tmpXmlNode.xmlText = variables.stConfig.resourceLibraryPaths[i];
+					ArrayAppend(xmlConfigDoc.xmlRoot.resourceLibraryPaths.xmlChildren, tmpXmlNode );
+				}
 			}
-
+			
+			// ***** [pageProperties] ******
+			if(not structIsEmpty(variables.stConfig.pageProperties)) {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"pageProperties") );
+				
+				for(thisKey in variables.stConfig.pageProperties) {
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,"property");
+					tmpXmlNode.xmlAttributes["name"] = thisKey;
+					tmpXmlNode.xmlAttributes["value"] = variables.stConfig.pageProperties[thisKey];
+					ArrayAppend(xmlConfigDoc.xmlRoot.pageProperties.xmlChildren, tmpXmlNode );
+				}
+			}
+				
 			// return document
 			return xmlConfigDoc;
 		</cfscript>		
@@ -453,7 +488,20 @@
 	<cffunction name="getResourceLibraryPaths" access="public" returntype="array" hint="Array with all registered resource paths">
 		<cfreturn variables.stConfig.resourceLibraryPaths>
 	</cffunction>
-	
+
+	<cffunction name="getPageProperty" access="public" returntype="any" hint="returns the value for a given page property, if exists">
+		<cfargument name="name" type="string" required="true">
+		<cfif structKeyExists( variables.stConfig.pageProperties, arguments.name )>
+			<cfreturn variables.stConfig.pageProperties[arguments.name]>
+		<cfelse>
+			<cfthrow message="Unknown page property" type="homePortals.config.invalidPageProperty">
+		</cfif>
+	</cffunction>	
+
+	<cffunction name="getPageProperties" access="public" returntype="struct" hint="returns a key-value map with all declared page properties and their values">
+		<cfreturn duplicate(variables.stConfig.pageProperties)>
+	</cffunction>	
+		
 	<cffunction name="getMemento" access="public" returntype="struct" hint="returns a struct with a copy of all settings">
 		<cfreturn duplicate(variables.stConfig)>
 	</cffunction>
@@ -724,6 +772,24 @@
 		</cfloop>
 		<cfreturn this>
 	</cffunction>	
+
+	<cffunction name="setPageProperty" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="any" required="true">
+		<cfset variables.stConfig.pageProperties[arguments.name] = arguments.value>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="removePageProperty" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="name" type="string" required="true">
+		<cfset structDelete(variables.stConfig.pageProperties, arguments.name, false)>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="hasPageProperty" access="public" returntype="boolean">
+		<cfargument name="name" type="string" required="true">
+		<cfreturn structKeyExists(variables.stConfig.pageProperties, arguments.name)>
+	</cffunction>
 	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">

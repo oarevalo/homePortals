@@ -203,8 +203,11 @@
 			xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "Page");
 
 			// add custom properties
-			for(i in getProperties()) {
-				xmlDoc.xmlRoot.xmlAttributes[i] = xmlFormat(getProperty(i));
+			st = getProperties();
+			for(i in st) {
+				if(not st[i].transient) {
+					xmlDoc.xmlRoot.xmlAttributes[st[i].name] = xmlFormat(st[i].value);
+				}
 			}
 
 			// add title
@@ -727,7 +730,7 @@
 	<cffunction name="getProperty" access="public" returnType="string" hint="returns the value of a custom property">
 		<cfargument name="name" type="string" required="true">
 		<cfif structKeyExists(variables.instance.stProperties, arguments.name)>
-			<cfreturn variables.instance.stProperties[arguments.name]>
+			<cfreturn variables.instance.stProperties[arguments.name].value>
 		<cfelse>
 			<cfthrow message="Property '#arguments.name#' is not defined" type="homePortals.pageBean.invalidProperty">
 		</cfif>
@@ -741,7 +744,11 @@
 	<cffunction name="setProperty" access="public" returnType="pageBean" hint="sets the value of a custom property">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="value" type="string" required="true">
-		<cfset variables.instance.stProperties[arguments.name] = arguments.value>
+		<cfargument name="transient" type="boolean" required="false" default="false">
+		<cfset variables.instance.stProperties[arguments.name] = structNew()>
+		<cfset variables.instance.stProperties[arguments.name].name = arguments.name>
+		<cfset variables.instance.stProperties[arguments.name].value = arguments.value>
+		<cfset variables.instance.stProperties[arguments.name].transient = arguments.transient>
 		<cfreturn this>
 	</cffunction>
 

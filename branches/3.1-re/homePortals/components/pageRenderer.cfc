@@ -30,6 +30,7 @@
 		
 		<cfset resetPageContentBuffer()>
 		<cfset loadPage()>
+		<cfset injectGlobalPageProperties()>
 		
 		<cfset variables.stTimers.init = getTickCount()-start>
 		<cfreturn this>
@@ -548,6 +549,29 @@
 				}
 			}
 			
+			// search and replace "Page Properties"
+			index = 1;
+			finished = false;
+			while(Not finished) {
+				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				if(stResult.len[1] gt 0) {
+					// match found
+					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
+					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
+					rendered = "";
+					
+					if(getPage().hasProperty(arg1)) {
+						rendered = getPage().getProperty(arg1);
+					}
+						
+					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					
+					index = stResult.pos[1] + len(rendered);
+				} else {
+					finished = true;
+				}
+			}
+			
 			// replace content token
 			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", variables.contentBuffer.body.get(id),  "ALL");	
 		</cfscript>
@@ -579,6 +603,22 @@
 		</cfscript>
 	</cffunction>
 
+	<!---------------------------------------->
+	<!--- injectGlobalPageProperties       --->
+	<!---------------------------------------->		
+	<cffunction name="injectGlobalPageProperties" access="private" returntype="void">
+		<cfscript>
+			var stGlobalProps = getHomePortals().getConfig().getPageProperties();
+			var p = "";
+			
+			for(p in stGlobalProps) {
+				if(not variables.oPage.hasProperty(p)) {
+					variables.oPage.setProperty(p, stGlobalProps[p], true);
+				}
+			}
+		</cfscript>
+	</cffunction>
+	
 
 	<!--------------------------------------->
 	<!----  Facades for cf tags			----->
