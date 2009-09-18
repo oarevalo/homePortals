@@ -27,6 +27,7 @@
 		<cfset var maxitems = getContentTag().getAttribute("maxitems",variables.DEFAULT_MAX_ITEMS)>	
 		<cfset var titlesonly = getContentTag().getAttribute("titlesonly",variables.DEFAULT_TITLES_ONLY)>	
 		<cfset var readMoreURL = getContentTag().getAttribute("readMoreURL")>
+		<cfset var showRSSTitle = getContentTag().getAttribute("showRSSTitle",true)>
 		<cfset var data = 0>
 		<cfset var i = 0>
 
@@ -36,8 +37,10 @@
 
 		<cfsavecontent variable="tmpHTML">
 			<cfoutput>
-				<cfif structKeyExists(data,"title") and structKeyExists(data,"link")>
-					<h3><a href="#data.link#">#data.title#</a></h3>
+				<cfif isBoolean(showRSSTitle) and showRSSTitle>
+					<cfif structKeyExists(data,"title") and structKeyExists(data,"link")>
+						<h3><a href="#data.link#">#data.title#</a></h3>
+					</cfif>
 				</cfif>
 				<cfif structKeyExists(data,"item") and isArray(data.item)>
 					<cfloop from="1" to="#min(arrayLen(data.item),val(maxItems))#" index="i">
