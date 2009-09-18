@@ -190,7 +190,6 @@
 
 	<cffunction name="getRSSURL" access="private" returntype="any">
 		<cfset var oResourceBean = 0>
-		<cfset var rssURL = "">
 		<cfset var resourceID = getContentTag().getAttribute("feedID")>
 		<cfset var rssurl = getContentTag().getAttribute("rssurl")>
 		<cfset var oCatalog = getPageRenderer().getHomePortals().getCatalog()>
