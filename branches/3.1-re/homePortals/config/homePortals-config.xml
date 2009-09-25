@@ -36,7 +36,7 @@
 	
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>
-		<resource href="/homePortals/common/CSS/Main.css" type="style"/>
+		<!-- <resource href="/path/to/resource/file.xxx" type="style"/> -->	
 	</baseResources>
 
 	<!-- The following templates determine how homeportals will render the html content -->
