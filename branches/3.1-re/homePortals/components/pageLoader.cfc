@@ -9,7 +9,7 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="load" access="public" returntype="pageRenderer" hint="returns a cached reference to the page object for the requested page">
+	<cffunction name="load" access="public" returntype="pageBean" hint="returns a cached reference to the page object for the requested page">
 		<cfargument name="href" type="string" hint="the location of the page document">
 		<cfscript>
 			var oPageRenderer = 0;
