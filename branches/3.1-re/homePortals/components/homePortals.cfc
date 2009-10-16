@@ -30,6 +30,7 @@
 		
 		variables.oCatalog = 0;					// a handle to the resources catalog 
 		variables.oPageProvider = 0;			// a handle to the provider of pages
+		variables.oPageLoader = 0;				// a handle to the page loader (handles the caching)
 		variables.oPluginManager = 0;			// a handle to the object responsible for managing extension plugins
 		variables.oResourceLibraryManager = 0;	// a handle to the resource library manager
 		variables.oTemplateManager = 0;			// a handle to the template manager
@@ -122,6 +123,9 @@
 			// initialize page provider
 			variables.oPageProvider = createObject("component", variables.oHomePortalsConfigBean.getPageProviderClass() ).init(variables.oHomePortalsConfigBean);
 		
+			// initialize page loader
+			variables.oPageLoader = createObject("component","pageLoader").init( variables.oPageProvider );
+
 			// initialize cache registry
 			oCacheRegistry = createObject("component","cacheRegistry").init();
 			oCacheRegistry.flush();		// clear registry
@@ -188,7 +192,7 @@
 		<cfargument name="pageHREF" type="string" required="true" hint="the page to load">
 		<cfscript>
 			var oPageRenderer = 0;
-			var oPageLoader = 0;
+			var oPage = 0;
 			var start = getTickCount();
 			
 			// notify plugins
@@ -198,8 +202,8 @@
 			if(arguments.pageHREF eq "") arguments.pageHREF = getConfig().getDefaultPage();			
 						
 			// load page 
-			oPageLoader = createObject("component","pageLoader").init(this);
-			oPageRenderer = oPageLoader.load(arguments.pageHREF);	
+			oPage = getPageLoader().load(arguments.pageHREF);	
+			oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, oPage, this);
 
 			// notify plugins
 			oPageRenderer = getPluginManager().notifyPlugins("afterPageLoad", oPageRenderer);
@@ -297,7 +301,13 @@
 	<cffunction name="getTemplateManager" access="public" returntype="templateManager">
 		<cfreturn variables.oTemplateManager>
 	</cffunction>
-		
+
+	<!--------------------------------------->
+	<!----  getPageLoader				----->
+	<!--------------------------------------->		
+	<cffunction name="getPageLoader" access="public" returntype="pageLoader">
+		<cfreturn variables.oPageLoader>
+	</cffunction>	
 		
 		
 	<!--------------------------------------->
