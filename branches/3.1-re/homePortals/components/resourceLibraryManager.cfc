@@ -6,6 +6,7 @@
 										.synchronizedList( 
 											createObject("java","java.util.ArrayList").init() 
 										);
+		variables.defaultResourceLibraryClass = "defaultResourceLibrary";
 	</cfscript>
 
 	<!------------------------------------------------->
@@ -19,10 +20,12 @@
 			var oResType = 0;
 			var stResTypes = arguments.config.getResourceTypes();
 			var aResLibs = arguments.config.getResourceLibraryPaths();
+			var resLibClass = "";
 
 			// create and register the resource library instances
 			for(i=1;i lte arrayLen(aResLibs);i=i+1) {
-				oResLib = createObject("component","resourceLibrary").init( aResLibs[i] );
+				resLibClass = getResourceLibraryClassByPath( aResLibs[i] );
+				oResLib = createObject("component",resLibClass).init( aResLibs[i] );
 				addResourceLibrary( oResLib );
 			}
 
@@ -61,7 +64,8 @@
 	<!------------------------------------------------->
 	<cffunction name="registerResourceLibraryPath" access="public" returntype="void">
 		<cfargument name="resLibPath" type="string" required="true">
-		<cfset var oResLib = createObject("component","resourceLibrary").init( arguments.resLibPath )>
+		<cfset var resLibClass = getResourceLibraryClassByPath( arguments.resLibPath )>
+		<cfset var oResLib = createObject("component",resLibClass).init( arguments.resLibPath )>
 		<cfset addResourceLibrary( oResLib )>
 	</cffunction>
 	
@@ -232,7 +236,19 @@
 		</cfloop>
 	</cffunction>
 
-	
+	<!------------------------------------------------->
+	<!--- getResourceLibraryClassByPath        	   ---->
+	<!------------------------------------------------->
+	<cffunction name="getResourceLibraryClassByPath" access="private" returntype="string" hint="returns the cfc name of the resource library that corresponds to a given path">
+		<cfargument name="path" type="string" required="true">
+		<cfscript>
+			var name = variables.defaultResourceLibraryClass;
+			if(find("://",arguments.path)) {
+				name = left(arguments.path,find("://",arguments.path)-1) & "ResourceLibrary";
+			}
+			return name;
+		</cfscript>
+	</cffunction>
 	
 
 </cfcomponent>
