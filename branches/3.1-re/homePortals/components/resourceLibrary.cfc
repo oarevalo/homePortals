@@ -5,29 +5,15 @@
 	<!------------------------------------------------->
 	<cffunction name="init" returntype="resourceLibrary" access="public" hint="This is the constructor">
 		<cfargument name="resourceLibraryPath" type="string" required="true">
-		<cfargument name="resourceTypesStruct" type="struct" required="false" default="#structNew()#">
+		<cfargument name="resourceTypeRegistry" type="resourceTypeRegistry" required="true">
 	</cffunction>
 
 	<!------------------------------------------------->
-	<!--- registerResourceType                	   ---->
+	<!--- getResourceTypeRegistry              	   ---->
 	<!------------------------------------------------->
-	<cffunction name="registerResourceType" access="public" returntype="void">
-		<cfargument name="resType" type="resourceType" required="true">
+	<cffunction name="getResourceTypeRegistry" access="public" returntype="resourceTypeRegistry" hint="returns a reference to the registry for resource types">
 	</cffunction>
 
-	<!------------------------------------------------->
-	<!--- getResourceTypes	                	   ---->
-	<!------------------------------------------------->
-	<cffunction name="getResourceTypes" access="public" returntype="array" hint="returns an array with the allowed resource types">
-	</cffunction>
-
-	<!------------------------------------------------->
-	<!--- hasResourceType	                	   ---->
-	<!------------------------------------------------->
-	<cffunction name="hasResourceType" access="public" returntype="boolean" hint="checks whether a given resource types is supported">
-		<cfargument name="resourceType" type="string" required="true">
-	</cffunction>
-	
 	<!---------------------------------------->
 	<!--- getResourcePackagesList		   --->
 	<!---------------------------------------->	

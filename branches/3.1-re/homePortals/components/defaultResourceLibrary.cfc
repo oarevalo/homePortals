@@ -4,7 +4,7 @@
 		variables.resourceDescriptorFile = "info.xml";
 		variables.resourcesRoot = "";
 		variables.stTimers = structNew();
-		variables.stResourceTypes = structNew();
+		variables.resourceTypeRegistry = 0;
 		
 		variables.IGNORED_DIR_NAMES = ".svn,.cvs";
 	</cfscript>
@@ -14,49 +14,19 @@
 	<!------------------------------------------------->
 	<cffunction name="init" returntype="resourceLibrary" access="public" hint="This is the constructor">
 		<cfargument name="resourceLibraryPath" type="string" required="true">
-		<cfargument name="resourceTypesStruct" type="struct" required="false" default="#structNew()#">
-		<cfset var res = "">
-		<cfset var args = structNew()>
+		<cfargument name="resourceTypeRegistry" type="resourceTypeRegistry" required="true">
 		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
-		<cfloop collection="#arguments.resourceTypesStruct#" item="res">
-			<cfset args = arguments.resourceTypesStruct[res]>
-			<cfset args.resourceType = res>
-			<cfset registerResourceType(argumentCollection = args)>
-		</cfloop>
+		<cfset variables.resourceTypeRegistry = arguments.resourceTypeRegistry>
 		<cfreturn this>
 	</cffunction>
 
-
-
 	<!------------------------------------------------->
-	<!--- registerResourceType                	   ---->
+	<!--- getResourceTypeRegistry             	   ---->
 	<!------------------------------------------------->
-	<cffunction name="registerResourceType" access="public" returntype="void">
-		<cfargument name="resType" type="resourceType" required="true">
-		
-		<cfif arguments.resType.getName() eq "">
-			<cfthrow message="Resource type name cannot be empty" type="homePortals.resourceLibrary.invalidResourceType">
-		</cfif>
-		<cfset variables.stResourceTypes[arguments.resType.getName()] = arguments.resType>
+	<cffunction name="getResourceTypeRegistry" access="public" returntype="resourceTypeRegistry" hint="Returns the registry object for resourceType information">
+		<cfreturn variables.resourceTypeRegistry>
 	</cffunction>
 
-	<!------------------------------------------------->
-	<!--- getResourceTypes	                	   ---->
-	<!------------------------------------------------->
-	<cffunction name="getResourceTypes" access="public" returntype="array" hint="returns an array with the allowed resource types">
-		<cfreturn listToArray(structKeyList(variables.stResourceTypes))>
-	</cffunction>
-
-	<!------------------------------------------------->
-	<!--- hasResourceType	                	   ---->
-	<!------------------------------------------------->
-	<cffunction name="hasResourceType" access="public" returntype="boolean" hint="checks whether a given resource types is supported">
-		<cfargument name="resourceType" type="string" required="true">
-		<cfreturn structKeyExists(variables.stResourceTypes,arguments.resourceType)>
-	</cffunction>
-
-
-	
 	<!---------------------------------------->
 	<!--- getResourcePackagesList		   --->
 	<!---------------------------------------->	
@@ -64,6 +34,7 @@
 		<cfargument name="resourceType" type="string" required="false" default="">
 		<cfscript>
 			var qry = QueryNew("ResType,Name");
+			var reg = getResourceTypeRegistry();
 			var tmpDir = "";
 			var start = getTickCount();
 			var res = "";
@@ -80,7 +51,7 @@
 			
 			for(i=1;i lte arrayLen(aResTypes);i=i+1) {
 				res = aResTypes[i];
-				tmpDir = ExpandPath(variables.resourcesRoot & "/" & getResourceType(res).getFolderName());
+				tmpDir = ExpandPath(variables.resourcesRoot & "/" & reg.getResourceType(res).getFolderName());
 				
 				if(directoryExists(tmpDir)) {
 					aItems = createObject("java","java.io.File").init(tmpDir).list();
@@ -183,9 +154,10 @@
 			var href = "";
 			var packageDir = "";
 			var resDir = "";
+			var reg = getResourceTypeRegistry();
 			var rb = arguments.resourceBean;
 			var resType = rb.getType();
-			var resTypeDir = getResourceType(resType).getFolderName();
+			var resTypeDir = reg.getResourceType(resType).getFolderName();
 			var xmlNode = 0;
 			var infoHREF = "";
 		
@@ -193,7 +165,7 @@
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(rb.getType() eq "") throw("No resource type has been specified for the resource","homePortals.resourceLibrary.validation");
 			if(rb.getPackage() eq "") throw("No package has been specified for the resource","homePortals.resourceLibrary.validation");
-			if(not hasResourceType(resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
+			if(not reg.hasResourceType(resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
 
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( rb.getType(), rb.getPackage() );
@@ -250,7 +222,7 @@
 		<cfargument name="fileName" type="string" required="false" default="" hint="The filename to use when saving the file. If empty then the resource ID will be used. Also, if there is no extension, then the defaultExtension property (if defined) will be used as extension">
 		<cfscript>
 			var rb = arguments.resourceBean;
-			var rt = getResourceType( rb.getType() );
+			var rt = getResourceTypeRegistry().getResourceType( rb.getType() );
 			var defaultExtension = listFirst(rt.getFileTypes());
 			var href = "";
 
@@ -287,16 +259,18 @@
 			var resHref = "";
 			var resTypeDir = "";
 			var infoHREF = "";
-			var defaultExtension = listFirst(getResourceType(arguments.resourceType).getFileTypes());
+			var reg = getResourceTypeRegistry();
+			var resType = reg.getResourceType(arguments.resourceType);
+			var defaultExtension = listFirst(resType.getFileTypes());
 			
 			if(arguments.id eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(arguments.package eq "") throw("No folder has been specified","homePortals.resourceLibrary.validation");
-			if(not hasResourceType(arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
+			if(not reg.hasResourceType(arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
 
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( arguments.resourceType, arguments.package  );
 			
-			resTypeDir = getResourceType(arguments.resourceType).getFolderName();
+			resTypeDir = resType.getFolderName();
 
 			// remove from descriptor (if exists)
 			packageDir = resourcesRoot & "/" & resTypeDir & "/" & arguments.package;
@@ -337,7 +311,7 @@
 	<!------------------------------------------------->
 	<cffunction name="getNewResource" access="public" returntype="resourceBean" hint="creates a new empty instance of a given resource type for this library">
 		<cfargument name="resourceType" type="string" required="true">
-		<cfset var rt = getResourceType(arguments.resourceType)>
+		<cfset var rt = getResourceTypeRegistry().getResourceType(arguments.resourceType)>
 		<cfset var oResBean = rt.createBean(this)>
 		<cfreturn oResBean>
 	</cffunction>
@@ -359,7 +333,7 @@
 		<cfargument name="packageName" type="string" required="true">
 		<cfreturn variables.resourcesRoot 
 					& "/" 
-					& getResourceType(arguments.resourceType).getFolderName() 
+					& getResourceTypeRegistry().getResourceType(arguments.resourceType).getFolderName() 
 					& "/" 
 					& arguments.packageName 
 					& "/" 
@@ -424,7 +398,7 @@
 		<cfscript>
 			var tmpHREF = "";
 			var oResourceBean = 0;
-			var rt = getResourceType( arguments.resourceType );
+			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
 			var defaultExtension = listFirst(rt.getFileTypes());
 			
 			// build the default name of the resource to register
@@ -450,16 +424,6 @@
 			return oResourceBean;
 		</cfscript>
 	</cffunction>
-
-	<cffunction name="getResourceType" access="private" returntype="resourceType" hint="Returns a the given resource type">
-		<cfargument name="resourceType" type="string" required="true">
-		<cfif structKeyExists(variables.stResourceTypes, arguments.resourceType)>
-			<cfreturn variables.stResourceTypes[arguments.resourceType] />
-		<cfelse>
-			<cfthrow message="Invalid resource type" type="homePortals.resourceLibrary.invalidResourceType">
-		</cfif>
-	</cffunction>
-
 
 
 

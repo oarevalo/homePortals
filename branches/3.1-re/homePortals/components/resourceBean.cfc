@@ -248,7 +248,7 @@
 		<cfargument name="fileName" type="string" required="true" hint="filename to use">
 		<cfargument name="fileContent" type="any" required="true" hint="File contents">
 		
-		<cfset var rt = getResourceLibrary().getResourceType( getType() )>
+		<cfset var rt = getResourceLibrary().getResourceTypeRegistry().getResourceType( getType() )>
 		<cfset var defaultExtension = listFirst(rt.getFileTypes())>
 		<cfset var href = "">
 		
