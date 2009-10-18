@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<homePortals version="3.1.464">
+<homePortals version="3.1.470">
 
 	<!-- base path for the HomePortals installation -->
 	<homePortalsPath>/homePortals/</homePortalsPath>
@@ -93,10 +93,6 @@
 	<!-- Directories where HomePortals will look for resources  -->
 	<resourceLibraryPaths>
 		<resourceLibraryPath>/homePortals/resourceLibrary/</resourceLibraryPath>
-		<!-- 
-		<resourceLibraryPath>s3://key@secretkey/webassets/</resourceLibraryPath>
-		<resourceLibraryPath>db://website</resourceLibraryPath>
-		 -->
 	</resourceLibraryPaths>
 	
 </homePortals>
