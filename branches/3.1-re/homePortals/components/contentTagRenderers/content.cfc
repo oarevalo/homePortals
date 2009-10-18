@@ -116,7 +116,6 @@
 	<cffunction name="retrieveContent" access="private" returntype="string" hint="retrieves content from source for a content module">
 		<cfscript>
 			var oResourceBean = 0;
-			var contentSrc = "";
 			var tmpHTML = "";
 			var st = structNew();
 			var oCatalog = 0;
@@ -130,21 +129,20 @@
 			if(resourceID neq "") {
 				oCatalog = getPageRenderer().getHomePortals().getCatalog();
 				oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
-				contentSrc = oResourceBean.getFullHref();
+				if(oResourceBean.getHref() neq "") {
+					tmpHTML = oResourceBean.readFile();
+				}
 			
 			} else if(href neq "") {
-				contentSrc = href;
-			}
-
-			// retrieve content
-			if(contentSrc neq "") {
-				if(left(contentSrc,4) eq "http") {
-					st = httpget(contentSrc);
+				// retrieve content directly
+				if(left(href,4) eq "http") {
+					st = httpget(href);
 					tmpHTML = st.fileContent;
 				} else {
-					tmpHTML = readFile( expandPath( contentSrc) );
+					tmpHTML = readFile( expandPath( href ) );
 				}
 			}
+
 		</cfscript>
 		<cfreturn tmpHTML>
 	</cffunction>

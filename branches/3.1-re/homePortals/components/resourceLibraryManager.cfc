@@ -116,16 +116,20 @@
 		<cfset var aRes = ArrayNew(1)>
 		<cfset var i = 0>
 		<cfset var j = 0>
+		<cfset qryPackages = 0>
 
 		<cfif not getResourceTypeRegistry().hasResourceType(arguments.resourceType)>
 			<cfthrow message="Unknown resource type [#arguments.resourceType#]" type="homePortals.resourceLibraryManager.resourceTypeNotFound">
 		</cfif>
 		
 		<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
-			<cfset aRes = aResLibs[i].getResourcesInPackage(arguments.resourceType, arguments.packageName)>
-			<cfloop from="1" to="#arrayLen(aRes)#" index="j">
-				<cfset arrayAppend(aResFull,aRes[j])>
-			</cfloop>
+			<cfset qryPackages = aResLibs[i].getResourcePackagesList(arguments.resourceType)>
+			<cfif listFind(valueList(qryPackages.name), arguments.packageName)>
+				<cfset aRes = aResLibs[i].getResourcesInPackage(arguments.resourceType, arguments.packageName)>
+				<cfloop from="1" to="#arrayLen(aRes)#" index="j">
+					<cfset arrayAppend(aResFull,aRes[j])>
+				</cfloop>
+			</cfif>
 		</cfloop>
 
 		<cfreturn aResFull>

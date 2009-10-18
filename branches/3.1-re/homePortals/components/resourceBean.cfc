@@ -10,6 +10,7 @@
 
 	<cfscript>
 		variables.FILE_NOT_READ  = "___FILE_NOT_READ___";
+		variables.HTTP_TIMEOUT = 60;
 		
 		// initialize here in case someone extends this and forget to call super.init() on their own init()
 		variables.instance = structNew();
@@ -106,21 +107,6 @@
 	<cffunction name="getHref" access="public" output="false" returntype="string">
 		<cfreturn variables.instance.Href />
 	</cffunction>
-
-	<cffunction name="getFullHref" access="public" output="false" returntype="string">
-		<cfset var resLibPath = getResourceLibrary().getPath()>
-		<cfset var href = getHref()>
-		
-		<cfif not isExternalTarget()>
-			<cfif right(resLibPath,1) neq "/">
-				<cfset href = resLibPath & "/" & href />
-			<cfelse>
-				<cfset href = resLibPath & href />
-			</cfif>
-		</cfif>
-		
-		<cfreturn href>
-	</cffunction>
 	
 	<cffunction name="setHref" access="public" output="false" returntype="void">
 		<cfargument name="Href" type="string" required="true" />
@@ -177,7 +163,6 @@
 		<cfset variables.instance.ResourceLibrary = arguments.data>
 	</cffunction>
 	
-	
 	<cffunction name="getProperties" access="public" output="false" returntype="struct">
 		<cfreturn duplicate(variables.instance.customProperties) />
 	</cffunction>
@@ -206,12 +191,28 @@
 
 	
 	<!--- Target File Methods --->
+	<cffunction name="getFullHref" access="public" output="false" returntype="string">
+		<cfif isExternalTarget()>
+			<cfreturn getHref()>
+		<cfelse>
+			<cfreturn getResourceLibrary().getResourceFileHREF(this) />
+		</cfif>
+	</cffunction>
+
+	<cffunction name="getFullPath" access="public" output="false" returntype="string">
+		<cfif isExternalTarget()>
+			<cfreturn "">
+		<cfelse>
+			<cfreturn getResourceLibrary().getResourceFilePath(this) />
+		</cfif>
+	</cffunction>
+
 	<cffunction name="isExternalTarget" access="public" output="false" returntype="boolean" hint="Returns whether this resource points to an external target by using its URL address instead of a file path">
 		<cfreturn (left(getHref(),4) eq "http")>
 	</cffunction>
 
 	<cffunction name="targetFileExists" access="public" output="false" returntype="boolean" hint="Returns whether the file associated with this resources exists on the local file system or not. This only works for target files within the resource library">
-		<cfreturn getHref() neq "" and fileExists(expandPath(getFullHref()))>
+		<cfreturn getResourceLibrary().resourceFileExists(this) />
 	</cffunction>
 	
 	<cffunction name="readFile" access="public" output="false" returntype="any" hint="Reads the file associated with this resource. If there is no associated file then returns a missingTargetFile error. This only works for target files stored within the resource library">
@@ -219,62 +220,31 @@
 		<cfset var doc = "">
 		<cfset var href = getFullHref()>
 		<cfif variables.instance.fileContents eq variables.FILE_NOT_READ>
-			<cfif targetFileExists()>
-				<cfif arguments.readAsBinary>
-					<cffile action="readbinary" file="#expandPath(href)#" variable="doc">
-				<cfelse>
-					<cffile action="read" file="#expandPath(href)#" variable="doc">
-				</cfif>
-				<cfset variables.instance.fileContents = doc>
-			<cfelseif isExternalTarget()>
+			<cfif isExternalTarget()>
 				<cfhttp url="#href#" 
 						method="get" 
 						getasbinary="#arguments.readAsBinary#" 
 						redirect="true" 
 						throwonerror="true" 
-						timeout="#httpTimeout#">
+						timeout="#variables.HTTP_TIMEOUT#">
 				</cfhttp>
 				<cfset variables.instance.fileContents = cfhttp.FileContent>
 			<cfelse>
-				<cfthrow message="Resource has no associated file or file does not exists" type="homePortals.resourceBean.missingTargetFile">
+				<cfset variables.instance.fileContents = getResourceLibrary().readResourceFile(this, arguments.readAsBinary)>
 			</cfif>
-		<cfelse>
-			<cfset doc = variables.instance.fileContents>
 		</cfif>
-		<cfreturn doc>
+		<cfreturn variables.instance.fileContents>
 	</cffunction>
 
 	<cffunction name="saveFile" access="public" output="false" returntype="void" hint="Saves a file associated to this resource">
 		<cfargument name="fileName" type="string" required="true" hint="filename to use">
 		<cfargument name="fileContent" type="any" required="true" hint="File contents">
-		
-		<cfset var rt = getResourceLibrary().getResourceTypeRegistry().getResourceType( getType() )>
-		<cfset var defaultExtension = listFirst(rt.getFileTypes())>
-		<cfset var href = "">
-		
-		<cfif arguments.fileName eq "">
-			<cfthrow message="resource file name cannot be empty" type="homePortals.resourceBean.blankFileName">
-		</cfif>
-
-		<cfset href = rt.getFolderName() 
-					& "/" 
-					& getPackage() 
-					& "/" 
-					& arguments.fileName>
-		
-		<cfset setHREF(href)>
-		
-		<cffile action="write" file="#expandPath(getFullHREF())#" output="#arguments.fileContent#">
-
+		<cfset getResourceLibrary().readResourceFile(this, arguments.fileContent, arguments.fileName)>
 		<cfset variables.instance.fileContents = arguments.fileContent>
 	</cffunction>
 
 	<cffunction name="deleteFile" access="public" output="false" returntype="void" hint="Deletes the file associated with this resource">
-		<cfset var href = getFullHref()>
-		<cfif targetFileExists()>
-			<cffile action="delete" file="#expandPath(href)#">
-		</cfif>
-		<cfset setHREF("")>
+		<cfset getResourceLibrary().deleteResourceFile(this)>
 		<cfset variables.instance.fileContents = variables.FILE_NOT_READ>
 	</cffunction>
 
