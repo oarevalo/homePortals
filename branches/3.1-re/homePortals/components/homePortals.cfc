@@ -22,10 +22,15 @@
 ---->
 	
 	<cfscript>
+		/// PUBLIC PROPERTIES ///
+		this.CONFIG_FILE_NAME = "homePortals-config.xml.cfm";
+		this.CONFIG_FILE_DIR =  "config";
+		/////////////////////////
+		
 		variables.hpEngineRoot = "/homePortals/";		// root directory for the homeportals engine
 		variables.appRoot = "";					// Root directory of the application as a relative URL
 		variables.oHomePortalsConfigBean = 0;	// bean to store config settings
-		variables.configFilePath = "config/homePortals-config.xml";  
+		variables.configFilePath = "#this.CONFIG_FILE_DIR#/#this.CONFIG_FILE_NAME#";  
 												// path of the config file relative to the root of the application
 		
 		variables.oCatalog = 0;					// a handle to the resources catalog 
@@ -58,7 +63,7 @@
 			variables.oHomePortalsConfigBean = createObject("component", "homePortalsConfigBean").init();
 
 			// load default configuration settings
-			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & ".." & pathSeparator & "config" & pathSeparator & "homePortals-config.xml";
+			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & ".." & pathSeparator & this.CONFIG_FILE_DIR & pathSeparator & this.CONFIG_FILE_NAME;
 			variables.oHomePortalsConfigBean.load(defaultConfigFilePath);
 
 			// load configuration settings for the application (overrides specific settings)
