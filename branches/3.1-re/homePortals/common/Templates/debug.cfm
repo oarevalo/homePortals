@@ -22,7 +22,7 @@
 	// Initialize application if requested or needed
 	if((isBoolean(resetApp) and resetApp) or Not StructKeyExists(application, "homePortals")) {
 		application.homePortals = CreateObject("component","homePortals.components.homePortals").init(request.appRoot);
-		refreshApp = true;
+		resetApp = true;
 	}
 	hp = application.homePortals;
 
@@ -196,7 +196,7 @@
 					<th>Task</th>
 					<th width="100">Time (ms)</th>
 				</tr>
-				<cfif refreshApp>
+				<cfif resetApp>
 					<tr>
 						<td width="10" align="right"><b>#row#.</b></td>
 						<td><em><b>Engine Initialization</b></em></td>
