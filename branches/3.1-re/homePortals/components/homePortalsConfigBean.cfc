@@ -30,6 +30,7 @@
 			variables.stConfig.plugins = structNew();
 			variables.stConfig.resourceTypes = structNew();
 			variables.stConfig.pageProperties = structNew();
+			variables.stConfig.resourceLibraryTypes = structNew();
 			
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -166,6 +167,27 @@
 								and structKeyExists(xmlThisNode.xmlAttributes,"name")
 								and structKeyExists(xmlThisNode.xmlAttributes,"value")) {
 							variables.stConfig.pageProperties[xmlThisNode.xmlAttributes.name] = xmlThisNode.xmlAttributes.value;
+						}
+					}
+
+				} else if(xmlNode.xmlName eq "resourceLibraryTypes") {
+		
+					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+						xmlThisNode = xmlNode.xmlChildren[j];
+						
+						if(xmlThisNode.xmlName eq "resourceLibraryType") {
+							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ] = structNew();
+							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].prefix = xmlThisNode.xmlAttributes.prefix;
+							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].path = xmlThisNode.xmlAttributes.path;
+							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].properties = structNew();
+					
+							for(k=1;k lte arrayLen(xmlThisNode.xmlChildren);k=k+1) {
+								if(xmlThisNode.xmlChildren[k].xmlName eq "property") {
+									variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].properties[xmlThisNode.xmlChildren[k].xmlAttributes.name] = structNew();
+									variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].properties[xmlThisNode.xmlChildren[k].xmlAttributes.name].name = xmlThisNode.xmlChildren[k].xmlAttributes.name;
+									variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].properties[xmlThisNode.xmlChildren[k].xmlAttributes.name].value = xmlThisNode.xmlChildren[k].xmlAttributes.value;
+								}
+							}
 						}
 					}
 							
@@ -356,6 +378,28 @@
 					ArrayAppend(xmlConfigDoc.xmlRoot.pageProperties.xmlChildren, tmpXmlNode );
 				}
 			}
+
+			// ****** [resourceLibraryTypes] *****
+			if(not structIsEmpty(variables.stConfig.resourceLibraryTypes)) {
+				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceLibraryTypes") );
+				
+				for(thisKey in variables.stConfig.resourceLibraryTypes) {
+					st = variables.stConfig.resourceLibraryTypes[thisKey];
+					
+					tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceLibraryType");
+					tmpXmlNode.xmlAttributes["prefix"] = st.prefix;
+					tmpXmlNode.xmlAttributes["path"] = st.path;
+					
+					for(k in st.properties) {
+						tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"property");
+						tmpXmlNode2.xmlAttributes["name"] = st.properties[k].name;
+						tmpXmlNode2.xmlAttributes["value"] = st.properties[k].value;
+						ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+					}
+					
+					ArrayAppend(xmlConfigDoc.xmlRoot.resourceLibraryTypes.xmlChildren, tmpXmlNode );
+				}
+			}
 				
 			// return document
 			return xmlConfigDoc;
@@ -501,6 +545,10 @@
 	<cffunction name="getPageProperties" access="public" returntype="struct" hint="returns a key-value map with all declared page properties and their values">
 		<cfreturn duplicate(variables.stConfig.pageProperties)>
 	</cffunction>	
+	
+	<cffunction name="getResourceLibraryTypes" access="public" returntype="struct" hint="returns a key-value map with all custom resourcelibrary types">
+		<cfreturn duplicate(variables.stConfig.resourceLibraryTypes)>
+	</cffunction>		
 		
 	<cffunction name="getMemento" access="public" returntype="struct" hint="returns a struct with a copy of all settings">
 		<cfreturn duplicate(variables.stConfig)>
@@ -790,6 +838,44 @@
 		<cfargument name="name" type="string" required="true">
 		<cfreturn structKeyExists(variables.stConfig.pageProperties, arguments.name)>
 	</cffunction>
+
+	<cffunction name="setResourceLibraryType" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="prefix" type="string" required="true">
+		<cfargument name="path" type="string" required="true">
+		<cfif not structKeyExists(variables.stConfig.resourceLibraryTypes, arguments.prefix)>
+			<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix] = structNew()>
+			<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].prefix = arguments.prefix>
+			<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].properties = structNew()>
+		</cfif>
+		<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].path = arguments.prefix>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="setResourceLibraryTypeProperty" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="prefix" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].properties[arguments.name] = structNew()>
+		<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].properties[arguments.name].name = arguments.name>
+		<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].properties[arguments.name].value = arguments.value>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="removeResourceLibraryType" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="prefix" type="string" required="true">
+		<cfset structDelete(variables.stConfig.resourceLibraryTypes, arguments.prefix, false)>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="removeResourceLibraryTypeProperty" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="prefix" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfif structKeyExists(variables.stConfig.resourceLibraryTypes, arguments.prefix)>
+			<cfset structDelete(variables.stConfig.resourceLibraryTypes[arguments.prefix].properties, arguments.name, false)>
+		</cfif>
+		<cfreturn this>
+	</cffunction>
+
 	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">

@@ -12,9 +12,10 @@
 	<!------------------------------------------------->
 	<!--- init				                	   ---->
 	<!------------------------------------------------->
-	<cffunction name="init" returntype="resourceLibrary" access="public" hint="This is the constructor">
+	<cffunction name="init" returntype="homePortals.components.resourceLibrary" access="public" hint="This is the constructor">
 		<cfargument name="resourceLibraryPath" type="string" required="true">
-		<cfargument name="resourceTypeRegistry" type="resourceTypeRegistry" required="true">
+		<cfargument name="resourceTypeRegistry" type="homePortals.components.resourceTypeRegistry" required="true">
+		<cfargument name="configStruct" type="struct" required="false" default="#structNew()#">
 		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
 		<cfset variables.resourceTypeRegistry = arguments.resourceTypeRegistry>
 		<cfreturn this>
@@ -23,7 +24,7 @@
 	<!------------------------------------------------->
 	<!--- getResourceTypeRegistry             	   ---->
 	<!------------------------------------------------->
-	<cffunction name="getResourceTypeRegistry" access="public" returntype="resourceTypeRegistry" hint="Returns the registry object for resourceType information">
+	<cffunction name="getResourceTypeRegistry" access="public" returntype="homePortals.components.resourceTypeRegistry" hint="Returns the registry object for resourceType information">
 		<cfreturn variables.resourceTypeRegistry>
 	</cffunction>
 
@@ -107,7 +108,7 @@
 	<!------------------------------------------------->
 	<!--- getResource		                	   ---->
 	<!------------------------------------------------->
-	<cffunction name="getResource" access="public" returntype="resourceBean" hint="returns the resource bean for the given resource">
+	<cffunction name="getResource" access="public" returntype="homePortals.components.resourceBean" hint="returns the resource bean for the given resource">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="packageName" type="string" required="true">
 		<cfargument name="resourceID" type="string" required="true">
@@ -149,7 +150,7 @@
 	<!--- saveResource	                       	   ---->
 	<!------------------------------------------------->
 	<cffunction name="saveResource" access="public" returntype="void" hint="Adds or updates a resource in the library">
-		<cfargument name="resourceBean" type="resourceBean" required="true" hint="the resource to add or update"> 		
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true" hint="the resource to add or update"> 		
 		<cfscript>
 			var href = "";
 			var packageDir = "";
@@ -275,7 +276,7 @@
 	<!------------------------------------------------->
 	<!--- getNewResource	                       ---->
 	<!------------------------------------------------->
-	<cffunction name="getNewResource" access="public" returntype="resourceBean" hint="creates a new empty instance of a given resource type for this library">
+	<cffunction name="getNewResource" access="public" returntype="homePortals.components.resourceBean" hint="creates a new empty instance of a given resource type for this library">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfset var rt = getResourceTypeRegistry().getResourceType(arguments.resourceType)>
 		<cfset var oResBean = rt.createBean(this)>
@@ -318,7 +319,7 @@
 	<!--- Resource (Target) File Operations   	   ---->
 	<!------------------------------------------------->
 	<cffunction name="getResourceFileHREF" access="public" returntype="string" hint="returns the full (web accessible) path to a file object on the library">
-		<cfargument name="resourceBean" type="resourceBean" required="true"> 
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
 		<cfset var resLibPath = getPath()>
 		<cfset var href = arguments.resourceBean.getHref()>
 		
@@ -332,17 +333,17 @@
 	</cffunction>
 
 	<cffunction name="getResourceFilePath" access="public" returntype="string" hint="If the object can be reached through the file system, then returns the absolute path on the file system to a file object on the library">
-		<cfargument name="resourceBean" type="resourceBean" required="true"> 
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
 		<cfreturn expandPath(getResourceFileHREF(arguments.resourceBean))>
 	</cffunction>
 
 	<cffunction name="resourceFileExists" access="public" output="false" returntype="boolean" hint="Returns whether the file associated with a resource exists on the local file system or not.">
-		<cfargument name="resourceBean" type="resourceBean" required="true"> 
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
 		<cfreturn arguments.resourceBean.getHref() neq "" and fileExists(expandPath(arguments.resourceBean.getFullHref()))>
 	</cffunction>
 	
 	<cffunction name="readResourceFile" access="public" output="false" returntype="any" hint="Reads the file associated with a resource. If there is no associated file then returns a missingTargetFile error. This only works for target files stored within the resource library">
-		<cfargument name="resourceBean" type="resourceBean" required="true"> 
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
 		<cfargument name="readAsBinary" type="boolean" required="false" default="false" hint="Reads the file as a binary document">
 		<cfset var href = getResourceFileHREF(arguments.resourceBean)>
 		<cfset var doc = "">
@@ -361,7 +362,7 @@
 	</cffunction>
 	
 	<cffunction name="saveResourceFile" access="public" output="false" returntype="void" hint="Saves a file associated to this resource">
-		<cfargument name="resourceBean" type="resourceBean" required="true"> 
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
 		<cfargument name="fileContent" type="any" required="true" hint="File contents">
 		<cfargument name="fileName" type="string" required="false" hint="filename to use" default="">
 		<cfargument name="contentType" type="string" required="false" hint="MIME content type of the resource file" default="">
@@ -399,7 +400,7 @@
 	</cffunction>
 
 	<cffunction name="addResourceFile" access="public" output="false" returntype="void" hint="Copies an existing file to the resource library">
-		<cfargument name="resourceBean" type="resourceBean" required="true"> 
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
 		<cfargument name="filePath" type="string" required="true" hint="absolute location of the file">
 		<cfargument name="fileName" type="string" required="false" hint="filename to use" default="">
 		<cfargument name="contentType" type="string" required="false" hint="MIME content type of the resource file" default="">
@@ -436,7 +437,7 @@
 	</cffunction>
 
 	<cffunction name="deleteResourceFile" access="public" output="false" returntype="void" hint="Deletes the file associated with a resource">
-		<cfargument name="resourceBean" type="resourceBean" required="true"> 
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
 		<cfset var href = "">
 		<cfif resourceFileExists(arguments.resourceBean)>
 			<cfset href = getResourceFileHREF(arguments.resourceBean)>

@@ -1,4 +1,4 @@
-<cfcomponent hint="This manages and controls access to multiple resource libraries on an application">
+@<cfcomponent hint="This manages and controls access to multiple resource libraries on an application">
 
 	<cfscript>
 		variables.resourceTypeRegistry = 0;
@@ -7,6 +7,7 @@
 											createObject("java","java.util.ArrayList").init() 
 										);
 		variables.defaultResourceLibraryClass = "defaultResourceLibrary";
+		variables.customResLibTypes = structNew();
 	</cfscript>
 
 	<!------------------------------------------------->
@@ -15,13 +16,22 @@
 	<cffunction name="init" returntype="resourceLibraryManager" access="public" hint="This is the constructor">
 		<cfargument name="config" type="homePortalsConfigBean" required="true">
 		<cfscript>
-			var i = 0;
-			var oResLib = 0;
+			var i = 0; var x = 0;
+			var props = structNew();
+			var stResLibTypes = arguments.config.getResourceLibraryTypes();
 			var aResLibs = arguments.config.getResourceLibraryPaths();
-			var resLibClass = "";
 
 			// create and populate the resourceTypeRegistry
 			variables.resourceTypeRegistry = createObject("component","resourceTypeRegistry").init( arguments.config );
+
+			// register custom resource library types
+			for(i in stResLibTypes) {
+				props = structNew();
+				for(x in stResLibTypes[i].properties) {
+					props[x] = stResLibTypes[i].properties[x].value;
+				}
+				registerResourceLibraryImpl( stResLibTypes[i].prefix, stResLibTypes[i].path, props );
+			}
 
 			// create and register the resource library instances
 			for(i=1;i lte arrayLen(aResLibs);i=i+1) {
@@ -46,7 +56,7 @@
 	<cffunction name="registerResourceLibraryPath" access="public" returntype="void">
 		<cfargument name="resLibPath" type="string" required="true">
 		<cfset var resLibClass = getResourceLibraryClassByPath( arguments.resLibPath )>
-		<cfset var oResLib = createObject("component",resLibClass).init( arguments.resLibPath, variables.resourceTypeRegistry )>
+		<cfset var oResLib = createObject("component",resLibClass.path).init( arguments.resLibPath, variables.resourceTypeRegistry, resLibClass.properties)>
 		<cfset addResourceLibrary( oResLib )>
 	</cffunction>
 	
@@ -176,14 +186,25 @@
 	<!------------------------------------------------->
 	<!--- getResourceLibraryClassByPath        	   ---->
 	<!------------------------------------------------->
-	<cffunction name="getResourceLibraryClassByPath" access="private" returntype="string" hint="returns the cfc name of the resource library that corresponds to a given path">
+	<cffunction name="getResourceLibraryClassByPath" access="private" returntype="struct" hint="returns a struct with info on the cfc of the resource library that corresponds to a given path">
 		<cfargument name="path" type="string" required="true">
 		<cfscript>
-			var name = variables.defaultResourceLibraryClass;
+			var st = structNew();
+			
+			st.path = variables.defaultResourceLibraryClass;
+			st.prefix = "";
+			st.properties = structNew();
+			
 			if(find("://",arguments.path)) {
-				name = left(arguments.path,find("://",arguments.path)-1) & "ResourceLibrary";
+				st.prefix = left(arguments.path,find("://",arguments.path)-1);
+				if(structKeyExists(variables.customResLibTypes,st.prefix)) {
+					st.path = variables.customResLibTypes[st.prefix].path;
+					st.properties = variables.customResLibTypes[st.prefix].properties;
+				} else {
+					st.path = st.prefix & "ResourceLibrary";
+				}
 			}
-			return name;
+			return st;
 		</cfscript>
 	</cffunction>
 	
@@ -240,5 +261,23 @@
 		<cfreturn getResourceTypeRegistry().hasResourceType(arguments.resourceType)>
 	</cffunction>
 
+	<!------------------------------------------------->
+	<!--- registerResourceLibraryImpl          	   ---->
+	<!------------------------------------------------->
+	<cffunction name="registerResourceLibraryImpl" access="public" returntype="void" hint="Registers a resource library implementation and associates it with a protocol prefix. Resource libraries must implement the resourceLibrary interface">
+		<cfargument name="prefix" type="string" required="true">
+		<cfargument name="path" type="string" required="true">
+		<cfargument name="properties" type="struct" required="false" default="#structNew()#">
+		<cfif trim(arguments.prefix) eq "">
+			<cfthrow message="Prefix cannot be empty" type="homePortals.invalidArgument">
+		</cfif>
+		<cfif trim(arguments.path) eq "">
+			<cfthrow message="cfcpath cannot be empty" type="homePortals.invalidArgument">
+		</cfif>
+		<cfset variables.customResLibTypes[arguments.prefix] = structNew()>
+		<cfset variables.customResLibTypes[arguments.prefix].prefix = arguments.prefix>
+		<cfset variables.customResLibTypes[arguments.prefix].path = arguments.path>
+		<cfset variables.customResLibTypes[arguments.prefix].properties = arguments.properties>
+	</cffunction>
 
 </cfcomponent>
