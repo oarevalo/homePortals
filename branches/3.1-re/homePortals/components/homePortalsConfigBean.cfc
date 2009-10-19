@@ -847,7 +847,7 @@
 			<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].prefix = arguments.prefix>
 			<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].properties = structNew()>
 		</cfif>
-		<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].path = arguments.prefix>
+		<cfset variables.stConfig.resourceLibraryTypes[arguments.prefix].path = arguments.path>
 		<cfreturn this>
 	</cffunction>
 
