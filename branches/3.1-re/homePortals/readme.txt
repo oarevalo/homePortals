@@ -4,7 +4,7 @@
 /**************************************************************/	
 
 /*
-	Copyright 2007-2008 - Oscar Arevalo (http://www.oscararevalo.com)
+	Copyright 2007-2009 - Oscar Arevalo (http://www.oscararevalo.com)
 
     This file is part of HomePortals.
 
@@ -30,27 +30,26 @@ Contents:
 2. Release Notes
 3. System Requirements
 4. Installing HomePortals
-5. Database Support
-6. Creating HomePortals Applications
-7. Default URL Parameters
-8. Acknowledgements / Thanks / Credits
-9. Bugs / suggestions
+5. Using HomePortals / Documentation
+6. Acknowledgements / Thanks / Credits
+7. Bugs / suggestions
 
 
 -----------------------------------------------------------------------
 1. About HomePortals
 -----------------------------------------------------------------------
-HomePortals is a platform that allows developers to build rich and modular
-web applications by combining existing reusable resources into a single page.
+HomePortals is a CFML framework used to facilitate the layout and rendering 
+of modular components on web-based applications. Since HomePortals only deals 
+with the layout management of a web page, it can easily integrate with more 
+general MVC frameworks. 
 
 HomePortals provides a runtime engine that processes documents called 
 HomePortals Pages that provide information as to what resources to include on
 a page and how to organize them.
 
-Additionally, it provides a simple yet powerful framework on which to develop
-"modules" which are the basic functionality units that can be embedded within
-a page. Modules can range from the very basic (simple static html content) to 
-full fledged AJAX powered mini applications.
+HomePortals modular architecture allows it to be extended and customized on
+almost every aspect. Developers can register custom resource types, custom
+renderers and even custom templates.
 
 HomePortals provides an extensive set of tools and features that allow 
 developers to create multiple types of applications like start pages, personal
@@ -111,102 +110,15 @@ current version of your HomePortals installation.
 
 
 
-
 -----------------------------------------------------------------------
-5. Database Support
+5. Using HomePortals / Documentation
 -----------------------------------------------------------------------
-By default HomePortals does not require a database to function, however it does provide the option
-to use a database to store account information. The HomePortals distribution includes SQL scripts
-for MySQL and Microsoft SQL Server, however you can create a table with the same structure in any
-database supported by ColdFusion and it should work with no problems.
-
+See http://wiki.homeportals.net for more information
 
 
 
 -----------------------------------------------------------------------
-6. Creating HomePortals Applications
------------------------------------------------------------------------
-To create a homeportals application, all you need is a subdirectory named "config" right under the
-root of the application directory (can be the webserver root itself). The /config directory should
-contain at least the following files:
-
-- homePortals-config.xml
-- accounts-config.xml.cfm
-- module-properties.xml
-
-These files provide the configuration for the new application. You only need to define the overriding 
-properties on these files, this means that any property not defined will have whatever value is defined
-on the main config files in /Home/config.
-
-In homePortals-config.xml the most important settings to define are:
-appRoot: This is the path to the application directory relative to the webserver root. Always start with "/" 
-		(i.e. if the application is on the root directory, then use /)
-accountsRoot: This is the path to the directory where all account files will be stored.
-resourceLibraryPath: This is the path to the directory where all resources for the application will be stored.
-		(resources are modules, skins, feeds, contents, etc)
-
-You can have multiple HomePortals applications on the same server. The only restriction is that they all have
-their own appRoot. All other directories can be anything. For example, you may have multiple applications with
-the same accounts root but different resource library root; or many applications with different accounts, but that
-share the same resources.
-
-Besides the config files, each homeportals application must have the following files at the application root level:
-
-Application.cfc / Application.cfm : To define the ColdFusion application
-gateway.cfm : This file is used to provide communication between module clients and servers (think Ajax)
-			This file only needs to have the following content:
-				<cfinclude template="/Home/Common/Templates/gateway.cfm">
-index.cfm : This file is the one responsible for calling the HomePortals engine and rendering a page.
-			On its simplest form this file only needs to have the following content:
-				<cfinclude template="/Home/Common/Templates/page.cfm">
-			This assumes that HomePortals pages will be called by passing the "Account" and "Page" URL 
-			parameters into this page.
-
-However, if you do not wish to use URL parameters to identify pages and wish to use a more search engine friendly,
-or even use a fancy SES URL, you can also create your own .cfm pages with any name you desire and then manually set 
-the Account and Page variables yourself using any method you want BEFORE the <cfinclude /> tag.
-
-NOTE: when using files other than the index.cfm at the application root level to call HomePortals pages, it is very 
-important that you define a variable named "request.appRoot" BEFORE calling the <cfinclude /> tag. This will tell the
-engine where to locate the config files for the current application. An ideal place to set this variable is on the 
-Application.cfc or Application.cfm
-
-
-
-
-
------------------------------------------------------------------------
-7. Default URL Parameters
------------------------------------------------------------------------
-By default, the HomePortals engine responds to the following URL parameters: Account, Page and RefreshApp
-
-Account and Page are used to control which HomePortals page to display. You may use only the Account parameter or 
-both parameters. When specifying both parameters HomePortals will load the page with the name given by the 
-"page" belonging to the account identified with the "Account" parameter. 
-
-The actual page that will be loaded would be:
-<accounts_root>/<account_url_param>/layouts/<page_url_param>.xml
-
-If no page is given, then the default page for the given account will be loaded.
-When no account and no page are given, then HomePortals will display the default page for the account set as the default
-account on the <defaultAccount> setting in /config/homePortals-config.xml
-
-<< Application Reset >>
-HomePortals uses the application scope to store multiple settings and to perform caching, however if you need to reset
-the application and force the HomePortals engine to reload the configuration, you may use the "refreshApp=1" URL parameter.
-Please bear in mind that application startup may take a bit of time to complete depending on the amount of resources
-on the resource library of the application. 
-
-NOTE: Since the HomePortals engine does not kick in until the <cfinclude /> tag is used, any of these parameters can be
-overloaded with any value by the calling template. This is especially useful for production scenarios in which you may 
-want to think about blocking the "refreshApp" parameter to avoid malicious use of the application reset feature.
-
-
-
-
-
------------------------------------------------------------------------
-8. Acknowledgements / Thanks / Credits
+6. Acknowledgements / Thanks / Credits
 -----------------------------------------------------------------------
 A lot of people have contributed ideas, inspiration and/or good vibrations during all the time I have been developing
 this project, in particular I'd like to thank Luis Majano (the master of all things CF), 
@@ -217,7 +129,7 @@ my wife Isa, Tom DeManincor and Anabel Fernandez (you were there when it all beg
 
 
 -----------------------------------------------------------------------
-9. Bugs, suggestions, criticisms, well-wishes, good vibrations, etc
+8. Bugs, suggestions, criticisms, well-wishes, good vibrations, etc
 ---------------------------------------------------------------------------
 Please send them to info@homeportals.net or share them on the forum at http://www.homeportals.net/
 
