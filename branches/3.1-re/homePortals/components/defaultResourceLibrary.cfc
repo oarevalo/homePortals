@@ -15,7 +15,7 @@
 	<cffunction name="init" returntype="homePortals.components.resourceLibrary" access="public" hint="This is the constructor">
 		<cfargument name="resourceLibraryPath" type="string" required="true">
 		<cfargument name="resourceTypeRegistry" type="homePortals.components.resourceTypeRegistry" required="true">
-		<cfargument name="configStruct" type="struct" required="false" default="#structNew()#">
+		<cfargument name="configStruct" type="struct" required="true">
 		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
 		<cfset variables.resourceTypeRegistry = arguments.resourceTypeRegistry>
 		<cfreturn this>

@@ -88,13 +88,11 @@ and more ...
 -----------------------------------------------------------------------
 3. System Requirements
 -----------------------------------------------------------------------
-HomePortals have been developed primarily using ColdFusion MX 7, 
-but it also works in: ColdFusion 8 and Railo 2. 
-* HomePortals have not yet been tested for BlueDragon. 
+This version of HomePortals have been developed primarily using 
+ColdFusion 8.01 and Railo 3.
+Also, HomePortals requires that creation of CFC and Java objects is
+enabled. 
 
-Database support is optional, and have been tested for MySQL 4 (and up),
-and Microsoft SQL Server (2000 and up). However any relation database that
-supports SQL should work with no problem.
 
 
 
@@ -103,9 +101,9 @@ supports SQL should work with no problem.
 4. Installing HomePortals
 -----------------------------------------------------------------------
 Installing HomePortals is as easy as unzipping the installation package at the webserver root. 
-All HomePortals files are contained within a single directory called /Home that must sit at the
+All HomePortals files are contained within a single directory called /homePortals that must sit at the
 root level of your site. 
-To verify the installation, use your browser to go to the /Home directory and you will see the
+To verify the installation, use your browser to go to the /homePortals directory and you will see the
 current version of your HomePortals installation.
 
 
