@@ -44,19 +44,36 @@
 	<cffunction name="load" access="public" returntype="void" hint="Loads config settings from the given file">
 		<cfargument name="configFilePath" type="string" required="true" 
 					hint="The absolute path to the config file.">
-
 		<cfscript>
-			var i = 0;
-			var xmlNode = 0;
-			var j = 0; var k = 0;
-			var xmlThisNode = 0;
-			var key = "";
+			var xmlConfigDoc = 0;
 			
 			// read configuration file
 			if(Not fileExists(arguments.configFilePath))
 				throw("Configuration file not found [#configFilePath#]","","homePortals.config.configFileNotFound");
 			else
 				xmlConfigDoc = xmlParse(arguments.configFilePath);
+
+			loadXML(xmlConfigDoc);
+		</cfscript>	
+	</cffunction>
+
+	<cffunction name="loadXML" access="public" returntype="void" hint="Loads config settings from an XML object or string">
+		<cfargument name="configXML" type="any" required="true">
+		<cfscript>
+			var xmlConfigDoc = 0;
+			var i = 0;
+			var xmlNode = 0;
+			var j = 0; var k = 0;
+			var xmlThisNode = 0;
+			var key = "";
+				
+			if(isXML(arguments.configXML)) 
+				xmlConfigDoc = xmlParse(arguments.configXML);
+			else if(isXMLDoc(arguments.configXML))
+				xmlConfigDoc = arguments.configXML;
+			else
+				throw("Invalid argument. Argument must be either an xml string or an xml object","homePortals.homePortalsConfigBean.invalidArgument");
+
 
 			// get version
 			if(structKeyExists(xmlConfigDoc.xmlRoot.xmlAttributes,"version")) 
@@ -94,9 +111,11 @@
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"name"))
-							throw("HomePortals config file is malformed. Missing NAME attribute for renderTemplate","","homePortals.config.configFileNotValid");
+							throw("HomePortals config file is malformed. Missing 'name' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"type"))
-							throw("HomePortals config file is malformed. Missing TYPE attribute for renderTemplate","","homePortals.config.configFileNotValid");
+							throw("HomePortals config file is malformed. Missing 'type' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"href"))
+							throw("HomePortals config file is malformed. Missing 'href' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
 						
 						key = xmlNode.xmlChildren[j].xmlAttributes.name;
 						thisKey = xmlNode.xmlChildren[j].xmlAttributes.type;
@@ -119,12 +138,24 @@
 				} else if(xmlNode.xmlName eq "contentRenderers") {
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"moduleType"))
+							throw("HomePortals config file is malformed. Missing 'moduleType' attribute for element 'contentRenderer'","","homePortals.config.configFileNotValid");
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"path"))
+							throw("HomePortals config file is malformed. Missing 'path' attribute for element 'contentRenderer'","","homePortals.config.configFileNotValid");
+
 						variables.stConfig.contentRenderers[ xmlNode.xmlChildren[j].xmlAttributes.moduleType ] = xmlNode.xmlChildren[j].xmlAttributes.path;
 					}
 
 				} else if(xmlNode.xmlName eq "plugins") {
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"name"))
+							throw("HomePortals config file is malformed. Missing 'name' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"path"))
+							throw("HomePortals config file is malformed. Missing 'path' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
+
 						variables.stConfig.plugins[ xmlNode.xmlChildren[j].xmlAttributes.name ] = xmlNode.xmlChildren[j].xmlAttributes.path;
 					}
 
@@ -134,6 +165,10 @@
 						xmlThisNode = xmlNode.xmlChildren[j];
 						
 						if(xmlThisNode.xmlName eq "resourceType") {
+
+							if(Not structKeyExists(xmlThisNode.xmlAttributes,"name"))
+								throw("HomePortals config file is malformed. Missing 'name' attribute for element 'resourceType'","","homePortals.config.configFileNotValid");
+
 							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ] = structNew();
 							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ].name = xmlThisNode.xmlAttributes.name;
 							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ].properties = arrayNew(1);
@@ -176,6 +211,12 @@
 						xmlThisNode = xmlNode.xmlChildren[j];
 						
 						if(xmlThisNode.xmlName eq "resourceLibraryType") {
+							
+							if(Not structKeyExists(xmlThisNode.xmlAttributes,"prefix"))
+								throw("HomePortals config file is malformed. Missing 'prefix' attribute for element 'resourceLibraryType'","","homePortals.config.configFileNotValid");
+							if(Not structKeyExists(xmlThisNode.xmlAttributes,"path"))
+								throw("HomePortals config file is malformed. Missing 'path' attribute for element 'resourceLibraryType'","","homePortals.config.configFileNotValid");
+							
 							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ] = structNew();
 							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].prefix = xmlThisNode.xmlAttributes.prefix;
 							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].path = xmlThisNode.xmlAttributes.path;
@@ -199,9 +240,7 @@
 			// set initial javascript event
 			if(ListLen(variables.stConfig.initialEvent,".") eq 2)
 				variables.stConfig.bodyOnLoad = "h_raiseEvent('#ListFirst(variables.stConfig.initialEvent,".")#', '#ListLast(variables.stConfig.initialEvent,".")#')";
-				
-		
-		</cfscript>	
+		</cfscript>
 	</cffunction>
 
 	<cffunction name="toXML" access="public" returnType="xml" hint="Returns the bean settings as an XML document">
