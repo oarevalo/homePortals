@@ -23,6 +23,7 @@
 			var oCache = 0;
 			var cache = getContentTag().getAttribute("cache",false);
 			var cacheTTL = getContentTag().getAttribute("cacheTTL");
+			var resourceType = getContentTag().getAttribute("resourceType",variables.CONTENT_RES_TYPE );
 			var resourceID = getContentTag().getAttribute("resourceID");
 			var gotContent = false;
 			
@@ -34,7 +35,7 @@
 					oResBean = getPageRenderer()
 									.getHomePortals()
 									.getCatalog()
-									.getResourceNode(variables.CONTENT_RES_TYPE, resourceID);
+									.getResourceNode(resourceType, resourceID);
 					
 					if(oResBean.targetFileExists()) {
 						tmpHTML = oResBean.readFile();
@@ -122,7 +123,7 @@
 			var oHPConfig = getPageRenderer().getHomePortals().getConfig();
 			
 			var resourceID = getContentTag().getAttribute("resourceID");
-			var resourceType = getContentTag().getAttribute("resourceType","content");
+			var resourceType = getContentTag().getAttribute("resourceType",variables.CONTENT_RES_TYPE );
 			var href = getContentTag().getAttribute("href");
 			
 			// define source of content (resource or external)
