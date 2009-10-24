@@ -132,6 +132,9 @@
 						<cfif arg2 eq "href" or arg2 eq "fullhref">
 							<cfreturn oResourceBean.getFullHref()>
 
+						<cfelseif arg2 eq "_content">
+							<cfreturn oResourceBean.readFile()>
+
 						<cfelseif structKeyExists(stProps,arg2) and isSimpleValue(stProps[arg2])>
 							<cfreturn stProps[arg2]>
 
