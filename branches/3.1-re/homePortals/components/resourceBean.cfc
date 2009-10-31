@@ -217,9 +217,10 @@
 	
 	<cffunction name="readFile" access="public" output="false" returntype="any" hint="Reads the file associated with this resource. If there is no associated file then returns a missingTargetFile error. This only works for target files stored within the resource library">
 		<cfargument name="readAsBinary" type="boolean" required="false" default="false" hint="Reads the file as a binary document">
+		<cfargument name="forceReload" type="boolean" required="false" default="false" hint="Forces a reload of the file">
 		<cfset var doc = "">
 		<cfset var href = getFullHref()>
-		<cfif variables.instance.fileContents eq variables.FILE_NOT_READ>
+		<cfif variables.instance.fileContents eq variables.FILE_NOT_READ or arguments.forceReload>
 			<cfif isExternalTarget()>
 				<cfhttp url="#href#" 
 						method="get" 
@@ -239,7 +240,7 @@
 	<cffunction name="saveFile" access="public" output="false" returntype="void" hint="Saves a file associated to this resource">
 		<cfargument name="fileName" type="string" required="true" hint="filename to use">
 		<cfargument name="fileContent" type="any" required="true" hint="File contents">
-		<cfset getResourceLibrary().readResourceFile(this, arguments.fileContent, arguments.fileName)>
+		<cfset getResourceLibrary().saveResourceFile(this, arguments.fileContent, arguments.fileName)>
 		<cfset variables.instance.fileContents = arguments.fileContent>
 	</cffunction>
 
