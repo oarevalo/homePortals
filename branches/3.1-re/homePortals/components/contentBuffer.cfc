@@ -40,7 +40,9 @@
 		<cfset var tmpHTML = "">
 		<cfif structKeyExists(variables.instance.buffer, arguments.id)>
 			<cfset tmpHTML = variables.instance.buffer[arguments.id]>
+			<!---
 			<cfset tmpHTML = REReplace(tmpHTML, "[[:space:]]{2,}"," ","ALL")>
+			--->
 			<cfreturn tmpHTML>
 		<cfelse>
 			<cfthrow message="Content ID [#arguments.id#] not found in content buffer" type="homePortals.contentBuffer.IDNotFound">
