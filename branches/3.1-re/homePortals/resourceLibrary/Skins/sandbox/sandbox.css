@@ -1,14 +1,34 @@
 /* CSS Document */
-
 html{
 	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
 	font-size: 11px;
 }
-
-body{
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	margin:0px;
+	padding:0px;
 	color: #333;
 	background:  url("bg.gif");
 }
+th, td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+A:link, A:visited,  A:active, A.highlighted {
+	text-decoration: none;
+	font-size: 11px;
+	color:#333;
+}
+A:hover {
+	color: black;
+	text-decoration: underline;
+}
+h2 {
+	margin:0px;
+	padding:0px;
+}
+
 
 .Section {
 	margin: 5px;
@@ -19,10 +39,26 @@ body{
 	font-size: 11px;	
 }
 .SectionTitle {
+	text-align: left;
+	padding:0px;
+	white-space:nowrap;
+	display:block;
 	font-weight: bold;
 	background-color:#F7FEE7;
 	color: #00368F;
 	border-bottom:1px solid silver;
+}
+.SectionTitleLabel {
+	font-weight:bold;
+	font-size:12px;
+	line-height:20px;
+	margin-left:5px;
+}
+.SectionBody {
+	display:block;
+}
+.SectionBodyRegion {
+	padding: 15px;
 }
 
 .leftcolumn {

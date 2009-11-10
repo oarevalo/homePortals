@@ -1,6 +1,30 @@
+/*********** CSS Styles for default appearance of HTML tags ********/
 body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	margin:0px;
+	padding:0px;
 	background-color:#FFFFFF;
 }
+th, td {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+A:link, A:visited,  A:active, A.highlighted {
+	text-decoration: none;
+	font-size: 11px;
+	color:#333;
+}
+A:hover {
+	color: black;
+	text-decoration: underline;
+}
+h2 {
+	margin:0px;
+	padding:0px;
+}
+
+/*********** CSS Styles for default appearance of all modules and sections ********/
 .Section {
 	margin:10px;
 	font-size:11px;
@@ -9,23 +33,33 @@ body {
 	background-color:#F9F9EC;
 	border-bottom:1px solid silver;
 }
-
 .SectionTitle {
+	text-align: left;
+	padding:0px;
+	white-space:nowrap;
+	display:block;
 	background-color:#FFFFCC;
 	padding-top:5px;
 	padding-bottom:5px;
 }
 .SectionTitleLabel {
+	font-weight:bold;
+	margin-left:5px;
 	color:#990000;
 	font-weight:bold;
 	font-size:1.3em;
 	line-height: 1em;
 	font-stretch:expanded;
 }
-
 .SectionBody {
+	display:block;
 	border-top:1px solid silver;
 }
+.SectionBodyRegion {
+	padding: 15px;
+}
+
+
 .header {
 	padding:0px;
 	margin:0px;
