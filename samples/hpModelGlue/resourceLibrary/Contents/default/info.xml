@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resLib type="content">
+	<resource href="Contents/default/header.htm" id="header"/>
+	<resource href="Contents/default/welcome.htm" id="welcome"/>
+</resLib>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modelglue>
+
+<controllers>
+	<controller id="Controller" type="hpModelGlue.controller.Controller" beans="homePortals">
+		<message-listener message="loadPage" function="loadPage" />
+	</controller>
+</controllers>
+	
+<event-types />
+		
+<event-handlers>
+
+	<event-handler name="page.index">
+		<broadcasts>
+			<message name="loadPage" />  
+		</broadcasts>
+		<views>
+			<include name="main" template="templates/main.cfm" />
+		</views>
+	</event-handler>
+
+	<event-handler name="widgets.hello">
+		<broadcasts />
+		<results />
+		<views>
+			<include name="body" template="pages/hello.cfm" />
+		</views>
+	</event-handler>
+
+	<event-handler name="widgets.info">
+		<broadcasts />
+		<results />
+		<views>
+			<include name="body" template="pages/info.cfm" />
+		</views>
+	</event-handler>
+
+
+	<!-- An error event to show when an error occurs, much like <cferror>. -->
+	<event-handler name="page.error">
+		<broadcasts />
+		<results>
+			<result do="template.plain" />
+		</results>
+		<views>
+			<include name="body" template="pages/exception.cfm" />
+		</views>
+	</event-handler>
+
+	<!-- A "404" event to show when the requested event isn't defined. -->
+	<event-handler name="page.missing">
+		<broadcasts />
+		<results>
+			<result do="template.plain" />
+		</results>
+		<views>
+			<include name="body" template="pages/missingEvent.cfm" />
+		</views>
+	</event-handler>
+	
+	<!-- Private events:  can't be accessed through a URL -->
+	<event-handler access="private" name="template.plain">
+		<views>
+			<include name="main" template="templates/plain.cfm" />
+		</views>
+	</event-handler>
+</event-handlers>
+	
+</modelglue>
+
