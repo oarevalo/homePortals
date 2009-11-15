@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+    <title>HomePortals/ColdBox App</title>
+    <layout>
+        <location id="headerRegion" name="header" type="header"/>
+		<location id="mainRegion" name="main" type="main"/>
+		<location id="sidebarRegion" name="sidebar" type="sidebar"/>
+    </layout>
+    <body>
+    	<!-- Display some static content -->
+		<content id="c1" 
+				resourceID="header"
+				location="header" 
+				moduleTemplate="moduleNoContainer" />
+
+		<content id="c2" 
+				resourceID="welcome"
+				location="main" 
+				title="Welcome!" />
+
+
+    	<!-- Render framework events as widgets -->
+		<widget id="w1" 
+				event="widgets.hello" 
+				title="A Framework Event" 
+				location="main" />
+
+		<widget id="w2" 
+				event="widgets.info" 
+				title="Some Framework Info" 
+				location="main" />
+
+		
+		<!-- Show some RSS Readers on the side -->
+		<rss id="r1" 
+				rssurl="http://www.riaforge.org/index.cfm?event=page.rss" 
+				title="RIAForge News" 
+				showRSSTitle="false" 
+				location="sidebar" 
+				maxitems="7" />
+
+		<rss id="r2" 
+				rssurl="http://blog.coldboxframework.com/feeds/rss.cfm" 
+				title="ColdBox Blog" 
+				showRSSTitle="false" 
+				location="sidebar" 
+				maxitems="7" />
+
+		<!-- Show an image widget -->
+		<image id="img1"
+		 		href="http://www.homeportals.net/images/hp3_label.gif" 
+		 		location="sidebar"
+		 		style="margin-top:50px;text-align:center;"
+		 		link="http://www.homeportals.net" />
+    </body>
+</Page>

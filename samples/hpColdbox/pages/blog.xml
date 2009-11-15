@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+    <title>HomePortals/ColdBox App</title>
+    <layout>
+        <location id="headerRegion" name="header" type="header"/>
+		<location id="mainRegion" name="main" type="main"/>
+		<location id="sidebarRegion" name="sidebar" type="sidebar"/>
+    </layout>
+    <body>
+    	<!-- Display some static content -->
+		<content id="c1" 
+				resourceID="header"
+				location="header" 
+				moduleTemplate="moduleNoContainer" />
+
+		<!-- Show an expanded RSS feed -->
+		<rss id="r0" 
+				rssurl="http://blog.coldboxframework.com/feeds/rss.cfm" 
+				title="ColdBox Blog" 
+				showRSSTitle="false" 
+				location="main"
+				titlesonly="false" 
+				maxitems="3" />
+
+		<!-- Show some RSS Readers on the side -->
+		<rss id="r1" 
+				rssurl="http://www.riaforge.org/index.cfm?event=page.rss" 
+				title="RIAForge News" 
+				showRSSTitle="false" 
+				location="sidebar" 
+				maxitems="10" />
+
+		<rss id="r2" 
+				rssurl="http://blog.coldboxframework.com/feeds/rss.cfm" 
+				title="ColdBox Blog" 
+				showRSSTitle="false" 
+				location="sidebar" 
+				maxitems="10" />
+
+		<!-- Show an image widget -->
+		<image id="img1"
+		 		href="http://www.homeportals.net/images/hp3_label.gif" 
+		 		location="sidebar"
+		 		style="margin-top:50px;text-align:center;"
+		 		link="http://www.homeportals.net" />
+    </body>
+</Page>

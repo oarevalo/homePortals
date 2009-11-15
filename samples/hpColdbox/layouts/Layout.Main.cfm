@@ -1,0 +1,1 @@
+<cfsilent>	<cfset page = event.getValue("hp.page","")>	<cfset pageRenderer = getColdboxOCM().get("homePortalsEngine").load(page)></cfsilent><cfoutput>#pageRenderer.renderPage()#</cfoutput>
