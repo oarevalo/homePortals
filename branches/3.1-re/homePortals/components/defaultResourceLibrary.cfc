@@ -86,6 +86,11 @@
 			var aResources = arrayNew(1);
 			var start = getTickCount();
 			var oResourceBean = 0;
+			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
+			var fileTypes = rt.getFileTypes();
+			var j = 0;
+			var aItems = 0;
+			var tmpDir = "";
 			
 			// check if there is a resource descriptor for the package
 			tmpHREF = getResourceDescriptorFilePath(arguments.resourceType, arguments.packageName);
@@ -93,6 +98,28 @@
 			if(fileExists(expandPath(tmpHREF))) {
 				// resource descriptor exists, so read all resources on the descriptor
 				aResources = getResourcesInDescriptorFile(arguments.resourceType, arguments.packageName);
+
+			} else if(fileTypes neq "") {
+				// there is no resource descriptor, but we know the file types for these resource,
+				// so we will treat any files on the package dir with those extensions as resources
+				tmpDir = getPath()
+							& "/" 
+							& rt.getFolderName() 
+							& "/" 
+							& arguments.packageName;
+				if(directoryExists(expandPath(tmpDir))) {
+					aItems = createObject("java","java.io.File").init(expandPath(tmpDir)).list();
+					for (j=1;j lte arraylen(aItems); j=j+1){
+						if(listLen(aItems[j],".") gt 1 and listFindNoCase(fileTypes,listLast(aItems[j],"."))) {
+							oResourceBean = getNewResource(arguments.resourceType);
+							oResourceBean.setID( listDeleteAt(aItems[j],listLen(aItems[j],"."),".") );
+							oResourceBean.setHREF( rt.getFolderName() & "/" & arguments.packageName & "/" & aItems[j] );
+							oResourceBean.setPackage( arguments.packageName );
+							arrayAppend(aResources, oResourceBean);
+						}
+					}
+				}
+			
 			} else {
 				// no resource descriptor, so register resources based on package name
 				// this will only register ONE resource per package
@@ -118,6 +145,8 @@
 			var start = getTickCount();
 			var aResources = arrayNew(1);
 			var infoHREF = "";
+			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
+			var fileTypes = rt.getFileTypes();
 			
 			// check that resourceID is not empty
 			if(arguments.resourceID eq "") throw("Resource ID cannot be blank","HomePortals.resourceLibrary.blankResourceID");
@@ -131,6 +160,23 @@
 				if(arrayLen(aResources) gt 0) {
 					oResourceBean = aResources[1];
 				}
+	
+			} else if(fileTypes neq "") {
+				tmpHREF = rt.getFolderName() 
+							& "/" 
+							& arguments.packageName
+							& "/"
+							& arguments.resourceID;
+				for(i=1;i lte listLen(fileTypes);i++) {
+					if(fileExists(expandPath(getPath() & "/" & tmpHREF & "." & listGetAt(fileTypes,i)))) {
+						oResourceBean = getNewResource(arguments.resourceType);
+						oResourceBean.setID( arguments.resourceID );
+						oResourceBean.setHREF( tmpHREF & "." & listGetAt(fileTypes,i) );
+						oResourceBean.setPackage( arguments.packageName );
+						break;
+					}
+				}
+				
 			} else {
 				// no resource descriptor, so create resource based on package name
 				oResourceBean = getDefaultResourceInPackage(arguments.resourceType, arguments.packageName);
@@ -161,6 +207,8 @@
 			var resTypeDir = reg.getResourceType(resType).getFolderName();
 			var xmlNode = 0;
 			var infoHREF = "";
+			var aRes = arrayNew(1);
+			var i = 0;
 		
 			// validate bean			
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
@@ -193,6 +241,14 @@
 				xmlDoc = xmlNew();
 				xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "resLib");
 				xmlDoc.xmlRoot.xmlAttributes["type"] = rb.getType();
+				
+				// check if there are already resources in this package
+				// that can be inferred from the directory contents
+				aRes = getResourcesInPackage(rb.getType(), rb.getPackage());
+				for(i=1;i lte arrayLen(aRes);i=i+1) {
+					xmlNode = aRes[i].toXMLNode(xmlDoc);
+					arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+				}
 			}
 			
 			// check if we need to update the file descriptor

@@ -65,7 +65,7 @@
 		<resourceType name="content">
 			<folderName>Contents</folderName>
 			<description>Content resources are blocks of formatted text that can be reused across a site</description>
-			<fileTypes>htm</fileTypes>
+			<fileTypes>htm,html</fileTypes>
 		</resourceType>
 						
 		<resourceType name="feed">
@@ -86,6 +86,7 @@
 			<description>This resource type is used to represent an image document</description>
 			<property name="label" type="string" hint="Image title" />
 			<property name="url" type="string" hint="An URL address associated to this image" />
+			<fileTypes>gif,png,jpg,jpeg,pjpg,bmp</fileTypes>
 		</resourceType>
 		
 	</resourceTypes>
