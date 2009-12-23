@@ -1,6 +1,7 @@
 <cfcomponent extends="homePortals.components.plugin">
 
 	<cfset variables.oAccounts = 0>
+	<cfset variables.delim = "::">
 
 
 	<cffunction name="onAppInit" access="public" returntype="void">
@@ -14,10 +15,12 @@
 	
 		<!--- if there is no default page, then check if the pagehref has the format for an account page 
 			or if there is a default account page --->
-		<cfif arguments.eventArg eq "" or findNoCase("::",arguments.eventArg)>
-			<cfset account = listFirst(arguments.eventArg,"::")>
-			<cfif listLen(arguments.eventArg,"::") gt 1>
-				<cfset page = listLast(arguments.eventArg,"::")>
+		<cfif arguments.eventArg eq "" 
+				or arguments.eventArg eq variables.delim
+					or findNoCase(variables.delim,arguments.eventArg)>
+			<cfset account = listFirst(arguments.eventArg,variables.delim)>
+			<cfif listLen(arguments.eventArg,variables.delim) gt 1>
+				<cfset page = listLast(arguments.eventArg,variables.delim)>
 			</cfif>
 			<cfset arguments.eventArg = getAccountsService().getAccountPageHREF(account,page)>
 		</cfif>

@@ -30,6 +30,7 @@
 	<cfparam name="account" default=""> 			<!--- HomePortals account --->
 	<cfparam name="page" default=""> 				<!--- page to load within account --->
 	<cfparam name="resetApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
+	<cfparam name="pageHREF" default="#account#::#page#">
 	<!----------------------------------->
 	
 	<!------- Application Root ----------->
@@ -43,9 +44,6 @@
 		if((isBoolean(resetApp) and resetApp) or Not StructKeyExists(application, "homePortals")) {
 			application.homePortals = CreateObject("component","homePortals.components.homePortals").init(request.appRoot);
 		}
-
-		// get location of page
-		pageHREF = account & "::" & page;		
 			
 		// load and parse page
 		request.oPageRenderer = application.homePortals.loadPage(pageHREF);
