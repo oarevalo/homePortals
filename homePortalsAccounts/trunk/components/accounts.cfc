@@ -350,11 +350,13 @@
 			// determine the page to load
 			if(arguments.account eq "") arguments.account = getConfig().getDefaultAccount();
 			
-			if(arguments.page eq "") 
-				pageHREF = getAccountDefaultPage(arguments.account);
-			else {
-				oSite = getSite(arguments.account);				
-				pageHREF = oSite.getPageHREF(arguments.page);	// turn off page checking because since we didnt read the site, there is no index
+			if(arguments.account neq "") {
+				if(arguments.page eq "") 
+					pageHREF = getAccountDefaultPage(arguments.account);
+				else {
+					oSite = getSite(arguments.account);				
+					pageHREF = oSite.getPageHREF(arguments.page);	// turn off page checking because since we didnt read the site, there is no index
+				}
 			}
 
 			return pageHREF;
