@@ -320,7 +320,4 @@
 <cffunction name="abort">
 	<cfabort>
 </cffunction>
-<cffunction name="dump">
-	<cfargument name="data" type="any">
-	<cfdump var="#arguments.data#">
-</cffunction>
+
