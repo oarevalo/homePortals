@@ -38,7 +38,7 @@
 			xmlDoc = myContentStore.getXMLData();
 	
 			// check if current user is owner
-			bIsContentOwner = (stUser.username eq myContentStore.getOwner());
+			bIsContentOwner = stUser.username neq "" and (stUser.username eq myContentStore.getOwner());
 			
 			// get real URL
 			realURL = myContentStore.getURL();

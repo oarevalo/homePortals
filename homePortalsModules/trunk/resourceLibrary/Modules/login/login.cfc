@@ -23,11 +23,18 @@ Also processes cookie logins.
 
 		<cfset var qryUser = QueryNew("")>
 		<cfset var oHP = this.controller.getHomePortals()>
-		<cfset var oAccountsPlugin = oHP.getPluginManager().getPlugin("accounts")>
-		<cfset var oAccountsService = oAccountsPlugin.getAccountsService()>
+		<cfset var oAccountsPlugin = 0>
+		<cfset var oAccountsService = 0>
 		<cfset var appRoot = oHP.getConfig().getAppRoot()>	
 		
 		<cftry>
+			<cfif not oHP.getPluginManager().hasPlugin("accounts")>
+				<cfthrow message="Accounts plugin not found!">
+			</cfif>
+			
+			<cfset oAccountsPlugin = oHP.getPluginManager().getPlugin("accounts")>
+			<cfset oAccountsService = oAccountsPlugin.getAccountsService()>
+
 			<!--- check login --->
 			<cfset qryUser = oAccountsService.loginUser(arguments.username, Arguments.password)>
 
