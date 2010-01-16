@@ -74,7 +74,7 @@
 			} else {
 				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
 			}
-			
+
 			// set the appRoot to the given parameter, this way, we can get away without having a local config 
 			// and only pass the appRoot on the constructor
 			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
@@ -114,6 +114,7 @@
 	<!----  initEnv	 					----->
 	<!--------------------------------------->
 	<cffunction name="initEnv" access="public" returntype="void" hint="Initializes the environment based on the current configuration bean">
+		<cfargument name="initPlugins" type="boolean" required="false" default="true">
 		<cfscript>
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
@@ -151,11 +152,11 @@
 			variables.oTemplateManager = createObject("component","templateManager").init(variables.oHomePortalsConfigBean);
 
 						
-			// register and initialize plugins
-			variables.oPluginManager = createObject("component","pluginManager").init(this);
-			
-			// ask plugins to perform their own initialization tasks
-			getPluginManager().notifyPlugins("appInit");		
+			// register and initialize plugins (this flag is to allow plugins to reinit the environment without getting into an infinite loop)
+			if(arguments.initPlugins) {
+				variables.oPluginManager = createObject("component","pluginManager").init(this);
+				getPluginManager().notifyPlugins("appInit");		
+			}
 		</cfscript>
 	</cffunction>
 
@@ -240,8 +241,6 @@
 			return oPageRenderer;
 		</cfscript>
 	</cffunction>	
-	
-
 	
 	
 	<!--------------------------------------->
