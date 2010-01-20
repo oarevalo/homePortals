@@ -608,11 +608,11 @@
 		</cfif>
 	</cffunction>
 
-	<cffunction name="getSitesDAO" access="private" returntype="homePortalsAccounts.components.lib.DAOFactory.DAO" hint="returns the sites DAO">
+	<cffunction name="getSitesDAO" access="private" returntype="homePortals.plugins.accounts.components.lib.DAOFactory.DAO" hint="returns the sites DAO">
 		<cfreturn getAccountsService().getDAO("sites")>
 	</cffunction>	
 	
-	<cffunction name="getLinkedPagesDAO" access="private" returntype="homePortalsAccounts.components.lib.DAOFactory.DAO" hint="returns the linked pages DAO">
+	<cffunction name="getLinkedPagesDAO" access="private" returntype="homePortals.plugins.accounts.components.lib.DAOFactory.DAO" hint="returns the linked pages DAO">
 		<cfreturn getAccountsService().getDAO("linkedPages")>
 	</cffunction>	
 

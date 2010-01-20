@@ -3,7 +3,7 @@
 	<!-- Directory where account files are stored
 		(relative to contentRoot)
 	 -->
-	<accountsRoot>/</accountsRoot>
+	<accountsRoot></accountsRoot>
 
 	<!-- Account to load when no page has been provided -->
 	<defaultAccount>default</defaultAccount>
@@ -17,7 +17,7 @@
 	<!-- File-based storage info 
 	** only applicable when storageType is xml
 	-->
-	<dataRoot>/homePortalsAccounts/contentRoot</dataRoot>
+	<dataRoot></dataRoot>
 	
 	<!-- Database connection info 
 	** only applicable when storageType is db
@@ -26,12 +26,12 @@
 	<username></username>
 	<password></password>
 	<dbtype></dbtype>	<!-- mysql, mssql -->
-	
-	<!-- Default templates 
+
+	<!-- Default templates (optional)
 	newAccountTemplate : used as the template for the initial page when creating a new account
 	newPageTemplate : used as the template when adding a new page to an account
 	-->
-	<newAccountTemplate>/homePortalsAccounts/common/pages/default.xml</newAccountTemplate>
-	<newPageTemplate>/homePortalsAccounts/common/pages/newPage.xml</newPageTemplate>
-	
+	<newAccountTemplate></newAccountTemplate>
+	<newPageTemplate></newPageTemplate>
+		
 </homePortalsAccounts>

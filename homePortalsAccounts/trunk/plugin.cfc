@@ -5,7 +5,7 @@
 
 
 	<cffunction name="onAppInit" access="public" returntype="void">
-		<cfset variables.oAccounts = createObject("component","accounts").init( getHomePortals() )>
+		<cfset variables.oAccounts = createObject("component","homePortals.plugins.accounts.components.accounts").init( getHomePortals() )>
 	</cffunction>
 
 	<cffunction name="onBeforePageLoad" access="public" returntype="string">

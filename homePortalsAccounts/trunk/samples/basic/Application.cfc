@@ -24,6 +24,6 @@
 	<cfset this.sessionManagement = true>
 	
 	<cffunction name="onRequestStart">
-		<cfset request.appRoot = "/homePortalsAccounts">
+		<cfset request.appRoot = "/homePortals/plugins/accounts/samples/basic">
 	</cffunction>
 </cfcomponent>

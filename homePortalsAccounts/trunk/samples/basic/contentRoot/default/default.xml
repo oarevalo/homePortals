@@ -8,7 +8,9 @@
 		<location class="footer" name="footer" type="footer" />
 	</layout>
 	<modules>
-		<content id="welcome" href="/homePortalsAccounts/contentRoot/default/_res/welcome.html" title="Welcome to HomePortals" location="middle"
+		<content id="welcome" 
+				href="/homePortals/plugins/accounts/samples/basic/contentRoot/default/_res/welcome.html" 
+				title="Welcome to HomePortals" location="middle"
 				container="false" style="padding-right:20px;" />
 	</modules>
 </Page>

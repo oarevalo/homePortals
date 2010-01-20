@@ -1,4 +1,4 @@
-<cfcomponent extends="homePortalsAccounts.components.lib.DAOFactory.DAO">
+<cfcomponent extends="homePortals.plugins.accounts.components.lib.DAOFactory.DAO">
 
 	<cffunction name="initTableParams" access="package" returntype="void" hint="setup table specific settings">
 		<cfset setTableName("sites")>

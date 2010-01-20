@@ -2,7 +2,7 @@
 	
 	<cfset variables.oAccountsConfigBean = structNew()>
 	<cfset variables.docName = "friends.xml">
-	<cfset variables.clientDAOPath = "homePortalsAccounts.components.db."> <!--- here is where the DAO objects are located --->
+	<cfset variables.clientDAOPath = "homePortals.plugins.accounts.components.db."> <!--- here is where the DAO objects are located --->
 	<cfset variables.oDataProvider = 0>	<!--- provides access to account data storage --->
 
 	<cffunction name="init" returntype="friends" access="public">
@@ -167,11 +167,11 @@
 	<cffunction name="loadDataProvider" access="private" returntype="void" hint="Loads and configures the instance of the dataprovider to be used">
 		<cfscript>
 			var storageType = variables.oAccountsConfigBean.getStorageType();
-			var pkgPath = "homePortalsAccounts.components.lib.DAOFactory.";
+			var pkgPath = "homePortals.plugins.accounts.components.lib.DAOFactory.";
 			var oConfigBean = 0;
 
 			// check that dataprovider exists
-			if(not fileExists(expandPath("/homePortalsAccounts/components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc")))
+			if(not fileExists(expandPath("/homePortals/plugins/accounts/components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc")))
 				throw("Accounts storage type [#storageType#] is not supported","","homePortals.accounts.invalidStorageType");
 					
 			// create config		
@@ -196,7 +196,7 @@
 		</cfscript>	
 	</cffunction>	
 
-	<cffunction name="getFriendsDAO" access="package" returntype="homePortalsAccounts.components.lib.DAOFactory.DAO" hint="returns a properly configured instance of a DAO">
+	<cffunction name="getFriendsDAO" access="package" returntype="homePortals.plugins.accounts.components.lib.DAOFactory.DAO" hint="returns a properly configured instance of a DAO">
 		<cfset var oDAO = createObject("component", variables.clientDAOPath & "friendsDAO")>
 		<cfset oDAO.init(variables.oDataProvider)>
 		<cfreturn oDAO>
