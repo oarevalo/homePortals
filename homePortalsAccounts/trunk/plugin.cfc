@@ -69,5 +69,31 @@
 	<cffunction name="getAccountsService" access="public" returntype="accounts">
 		<cfreturn variables.oAccounts>
 	</cffunction>		
+
+	<cffunction name="getPageAlias" access="public" returntype="string">
+		<cfargument name="account" type="string" required="false" default="" hint="Account name, if empty will load the default account">
+		<cfargument name="page" type="string" required="false" default="" hint="Page within the account, if empty will load the default page for the account">
+		<cfset var href = "">
+		<cfset var accRoot = getAccountsService().getConfig().getAccountsRoot()>
+
+		<cfif right(accRoot,1) neq "/">
+			<cfset accRoot = accRoot & "/">
+		</cfif>
+		<cfif left(accRoot,1) neq "/">
+			<cfset accRoot = "/" & accRoot>
+		</cfif>
+		
+		<cfif arguments.account neq "">
+			<cfset href = listAppend(accRoot,arguments.account,"/")>
+
+			<cfif arguments.page neq "">
+				<cfset href = listAppend(href,arguments.page,"/")>
+			</cfif>
+		</cfif>
+		
+		<cfset href = reReplace(href,"//*","/","all")>
+		
+		<cfreturn href>
+	</cffunction>		
 	
 </cfcomponent>
