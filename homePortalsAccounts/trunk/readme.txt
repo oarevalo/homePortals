@@ -11,13 +11,21 @@ Instructions:
 <plugin name="accounts" path="homePortals.plugins.accounts.plugin" />
 
 
-2. [OPTIONAL] If you are using HomePortals in standalone mode, replace your index.cfm with:
+2. All page paths requested that fall within the accounts root will be treated as account pages,
+being the first level above the account root considered the account name and anything after that
+will be the account page. 
 
-<cfinclude template="/homePortals/plugins/accounts/page.cfm">
+Examples:
 
-*** The format to invoke pages within an account is to use "::" as a separator between the account
-name and the page name, as in:
+** Considering /accounts to be the accounts root:
 
-page = some_account::some_page
+a) page = /accounts/some_account/some_page
+	This will load the page named "some_page" within the account named "some_account"
 
-This will load the page named "some_page" within the account named "some_account"
+b) page = /accounts
+	This will load the default account and default page
+   
+c) page = /accounts/some_account
+	This will load the default page on the account "some_account"
+	
+	
