@@ -25,12 +25,14 @@
 			var hpPagePath = "";
 			var tmp = "";
 			var ext = "";
-			var accountsRoot = variables.oContentStoreConfigBean.getAccountsRoot();
+			var accountsRoot = "";
 			
 			// store settings
 			variables.oContentStoreConfigBean = arguments.contentStoreConfigBean;
 			variables.owner = variables.oContentStoreConfigBean.getOwner();
 			variables.type = variables.oContentStoreConfigBean.getType();
+
+			accountsRoot = variables.oContentStoreConfigBean.getAccountsRoot();
 			
 			// get document file extension to use
 			ext = variables.oContentStoreConfigBean.getExtension();

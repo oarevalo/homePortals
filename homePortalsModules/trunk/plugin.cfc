@@ -14,6 +14,9 @@
 			// load plugin config settings
 			oConfig.load(expandPath(configPath));
 
+			// reinitialize environment to include new settings
+			getHomePortals().initEnv(false);
+
 			// load module properties
 			variables.oModuleProperties = createObject("component","homePortals.plugins.modules.components.moduleProperties").init(oConfig);
 
@@ -32,9 +35,6 @@
 			// clear all stored pages/module contexts (configbeans)
 			oConfigBeanStore = createObject("component","homePortals.plugins.modules.components.configBeanStore").init();
 			oConfigBeanStore.flushAll();
-
-			// reinitialize environment to include new settings
-			getHomePortals().initEnv(false);
 		</cfscript>
 	</cffunction>
 
