@@ -16,7 +16,7 @@ History:
 					- TODO: make cache directory and feed timout time a configrable setting.
 --->
 
-<cfcomponent displayname="RSSReader" extends="homePortalsModules.components.baseModule">
+<cfcomponent displayname="RSSReader" extends="homePortals.plugins.modules.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

@@ -4,7 +4,7 @@
 	// get the moduleID
 	moduleID = this.controller.getModuleID();
 
-	uploaderPath =  "/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/views/uploader.cfm";
+	uploaderPath =  "/homePortals/plugins/modules/resourceLibrary/Modules/PhotoAlbums/views/uploader.cfm";
 	
 	// get content store
 	myContentStore = this.controller.getContentStore();

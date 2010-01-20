@@ -1,4 +1,4 @@
-<cfcomponent displayname="htmlBox" extends="homePortalsModules.components.baseModule">
+<cfcomponent displayname="htmlBox" extends="homePortals.plugins.modules.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

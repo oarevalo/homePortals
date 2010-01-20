@@ -1,4 +1,4 @@
-<cfcomponent displayname="simpleAdapter" extends="homePortalsModules.components.baseModule">
+<cfcomponent displayname="simpleAdapter" extends="homePortals.plugins.modules.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

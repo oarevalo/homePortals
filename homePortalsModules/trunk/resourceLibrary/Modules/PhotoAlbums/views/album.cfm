@@ -76,6 +76,6 @@
 		</div>
 	</cfif>
 	
-	<script type="text/javascript" src="/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/lighterbox2.js" ></script>
+	<script type="text/javascript" src="/homePortals/plugins/modules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/lighterbox2.js" ></script>
 </cfoutput>
 	

@@ -12,6 +12,7 @@
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
+			var appConfigFilePath = "";
 			
 			// create object to store configuration settings
 			variables.oConfigBean = createObject("component", "modulePropertiesConfigBean").init();
@@ -22,9 +23,9 @@
 				variables.oConfigBean.load(defaultConfigFilePath);
 
 			// load configuration settings for the application
-			configFilePath = listAppend(arguments.configBean.getAppRoot(), variables.configFilePath, "/");
-			if(fileExists(expandPath(configFilePath)))
-				variables.oConfigBean.load(expandPath(configFilePath));
+			appConfigFilePath = listAppend(arguments.configBean.getAppRoot(), variables.configFilePath, "/");
+			if(fileExists(expandPath(appConfigFilePath)))
+				variables.oConfigBean.load(expandPath(appConfigFilePath));
 		
 			return this;
 		</cfscript>

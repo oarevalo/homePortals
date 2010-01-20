@@ -3,7 +3,7 @@ This module allows users to login to their accounts.
 Also processes cookie logins.
 ---->
 
-<cfcomponent displayname="login" extends="homePortalsModules.components.baseModule">
+<cfcomponent displayname="login" extends="homePortals.plugins.modules.components.baseModule">
 	<cffunction name="init">
 		<cfscript>
 			var cfg = this.controller.getModuleConfigBean();

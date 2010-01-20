@@ -1,7 +1,7 @@
 //By: Richard Lee - Transcendent Design - tdesignonline.com
-var closeimagelink="/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/close.gif"
-var nextimagelink="/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/next.gif"
-var previmagelink="/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/prev.gif"
+var closeimagelink="/homePortals/plugins/modules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/close.gif"
+var nextimagelink="/homePortals/plugins/modules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/next.gif"
+var previmagelink="/homePortals/plugins/modules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/prev.gif"
 var IE6=(navigator.userAgent.indexOf("MSIE 6")>=0)
 var safari=(navigator.userAgent.indexOf("Safari")>=0)
 var IE=(navigator.userAgent.indexOf("MSIE")>=0)

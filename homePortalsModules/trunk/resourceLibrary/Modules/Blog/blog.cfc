@@ -13,7 +13,7 @@
 	- 2/8/06 - oarevalo - added icon & link to get RSS feed for the blog
 --->
 
-<cfcomponent displayname="Blog" extends="homePortalsModules.components.baseModule">
+<cfcomponent displayname="Blog" extends="homePortals.plugins.modules.components.baseModule">
 
 	<cffunction name="init">
 		<cfscript>

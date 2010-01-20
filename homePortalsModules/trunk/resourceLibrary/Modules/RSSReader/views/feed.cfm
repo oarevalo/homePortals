@@ -44,7 +44,7 @@
 	imgRoot = tmpModulePath & "/images";
 	
 	// get reader service
-	oRSSReaderService = createObject("component","homePortalsModules.components.RSSService").init();
+	oRSSReaderService = createObject("component","homePortals.plugins.modules.components.RSSService").init();
 
 	// check that the feed refresh argument is boolean
 	if(not isBoolean(arguments.refresh)) arguments.refresh = false;

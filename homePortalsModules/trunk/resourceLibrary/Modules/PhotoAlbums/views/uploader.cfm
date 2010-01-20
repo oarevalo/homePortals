@@ -7,7 +7,7 @@
 <cfoutput>
 	<html>
 		<head>
-			<script src="/homePortalsModules/resourceLibrary/Modules/PhotoAlbums/scripts/multifile.js"></script>
+			<script src="/homePortals/plugins/modules/resourceLibrary/Modules/PhotoAlbums/scripts/multifile.js"></script>
 			<style type="text/css">
 				body {
 					font-family:arial;

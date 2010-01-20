@@ -25,12 +25,12 @@
 			var hpPagePath = "";
 			var tmp = "";
 			var ext = "";
+			var accountsRoot = variables.oContentStoreConfigBean.getAccountsRoot();
 			
 			// store settings
 			variables.oContentStoreConfigBean = arguments.contentStoreConfigBean;
 			variables.owner = variables.oContentStoreConfigBean.getOwner();
 			variables.type = variables.oContentStoreConfigBean.getType();
-			
 			
 			// get document file extension to use
 			ext = variables.oContentStoreConfigBean.getExtension();
@@ -39,26 +39,20 @@
 
 			// if not storage URL is given, then use the default storage
 			if(tmpURL eq "") {
-				tmpURL = variables.oContentStoreConfigBean.getAccountsRoot() 
+				tmpURL = accountsRoot
 								& "/" & variables.owner
 								& "/" & variables.oContentStoreConfigBean.getDefaultName()
 								& "." & ext;
 				
-				if(not directoryExists(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.owner)))				
-					createDir(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.owner));
-								
 				variables.oContentStoreConfigBean.setURL(tmpURL);
 			}
 			
 			// if url is not a relative path, then default to owner's directory
 			// (this is to avoid writing files in random places)
 			if(listLen(tmpURL,"/") lte 1 or left(tmpURL,1) neq "/") {
-				tmpURL = variables.oContentStoreConfigBean.getAccountsRoot() 
-								& "/" & variables.oContentStoreConfigBean.getOwner()
+				tmpURL = accountsRoot
+								& "/" & variables.owner
 								& "/" & tmpURL;
-
-				if(not directoryExists(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.oContentStoreConfigBean.getOwner())))				
-					createDir(expandPath(variables.oContentStoreConfigBean.getAccountsRoot() & "/" & variables.oContentStoreConfigBean.getOwner()));
 				
 				// append .xml if necessary
 				if(listLast(tmpURL,".") neq ext)
@@ -146,17 +140,27 @@
 		<cfset var tmpURL = variables.oContentStoreConfigBean.getURL()>
 		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 		<cfset var tmpName = "">
-		
-		<!--- write to file system --->
-		<cffile action="write" 
-				file="#ExpandPath(tmpURL)#" 
-				output="#toString(variables.xmlDoc)#">
+		<cfset var accountsRoot = variables.oContentStoreConfigBean.getAccountsRoot()>
 
 		<!--- create a name for the lock to single-thread access to this resource --->
 		<cfset tmpName = replace(hash(tmpURL),"-","")>
 		
-		<!--- invalidate cache entry (if exists) --->	
         <cflock type="exclusive" name="#variables.lockName#_#tmpName#" timeout="30">
+			<cfscript>
+				// create the storage directory for module data
+				if(not directoryExists(expandPath( accountsRoot ))) 
+					createDir(expandPath( accountsRoot ));
+	
+				if(not directoryExists(expandPath(accountsRoot & "/" & variables.owner)))				
+					createDir(expandPath(accountsRoot & "/" & variables.owner));
+			</cfscript>
+			
+			<!--- write to file system --->
+			<cffile action="write" 
+					file="#ExpandPath(tmpURL)#" 
+					output="#toString(variables.xmlDoc)#">
+	
+			<!--- invalidate cache entry (if exists) --->	
 			<cfset oCacheRegistry.getCache(variables.cacheServiceName).flush(hash(tmpURL))>	
         </cflock>
 	</cffunction>

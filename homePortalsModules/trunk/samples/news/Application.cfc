@@ -20,10 +20,7 @@
 	
 	*/ 
 	---->
-	<cfset this.name = "hpModulesExtension"> 
+	<cfset this.name = "hpModulesSamples_News"> 
 	<cfset this.sessionManagement = true>
 	
-	<cffunction name="onRequestStart">
-		<cfset request.appRoot = "/homePortalsModules">
-	</cffunction>
 </cfcomponent>
