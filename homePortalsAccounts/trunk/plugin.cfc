@@ -19,6 +19,12 @@
 		<cfif right(accRoot,1) neq "/">
 			<cfset accRoot = accRoot & "/">
 		</cfif>
+		<cfif left(accRoot,1) neq "/">
+			<cfset accRoot =  "/" & accRoot>
+		</cfif>
+		<cfif accRoot eq "//">
+			<cfset accRoot = "/">
+		</cfif>
 		<cfif right(eventArgWithSlash,1) neq "/">
 			<cfset eventArgWithSlash = eventArgWithSlash & "/">
 		</cfif>
