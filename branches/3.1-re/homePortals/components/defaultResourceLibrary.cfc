@@ -246,7 +246,7 @@
 				// that can be inferred from the directory contents
 				aRes = getResourcesInPackage(rb.getType(), rb.getPackage());
 				for(i=1;i lte arrayLen(aRes);i=i+1) {
-					xmlNode = aRes[i].toXMLNode(xmlDoc);
+					xmlNode = convertResourceToXMLNode( xmlDoc, aRes[i] );
 					arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 				}
 			}
@@ -262,7 +262,7 @@
 			}
 
 			// create and append new xml node for res bean			
-			xmlNode = rb.toXMLNode(xmlDoc);
+			xmlNode = convertResourceToXMLNode( xmlDoc, rb );
 			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			
 			// save resource descriptor file
@@ -536,7 +536,7 @@
 			for(i=1;i lte ArrayLen(aNodes);i=i+1) {
 				oResourceBean = getNewResource(arguments.resourceType);
 
-				oResourceBean.loadFromXMLNode( aNodes[i] );
+				loadResourceFromXMLNode( oResourceBean, aNodes[i] );
 				oResourceBean.setPackage( arguments.packageName );
 
 				// add resource bean to returning array
@@ -577,6 +577,71 @@
 			}
 			
 			return oResourceBean;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="loadResourceFromXMLNode" access="public" output="false" returntype="void" hint="populates the a resource bean instance from an xml node from a resource descriptor file">
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" hint="The resource to load" required="true" />
+		<cfargument name="resourceNode" type="XML" hint="XML node from a descriptor document that represents the resource" required="true" />
+		<cfscript>
+			var resBean = arguments.resourceBean;
+			var xmlNode = arguments.resourceNode;
+			var i = 0;
+			var stSrc = 0;
+			var stTgt = 0;
+
+			// populate bean
+			resBean.setID(xmlNode.xmlAttributes.id);
+
+			if(structKeyExists(xmlNode.xmlAttributes,"href")) 
+				resBean.setHref(xmlNode.xmlAttributes.href);
+							
+			if(structKeyExists(xmlNode,"description")) 
+				resBean.setDescription(xmlNode.description.xmlText);
+
+			if(structKeyExists(xmlNode,"property")) {
+				for(i=1;i lte arrayLen(xmlNode.xmlChildren);i=i+1) {
+					stSrc = xmlNode.xmlChildren[i];
+					if(stSrc.xmlName eq "property" and structKeyExists(stSrc.xmlAttributes,"name")) {
+						resBean.setProperty(stSrc.xmlAttributes.name, stSrc.xmlText);
+					}
+				}
+			}
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="convertResourceToXMLNode" access="public" output="false" returntype="xml" hint="creates the xml node corresponding to this resource instance on the resource descriptor file">
+		<cfargument name="xmlDoc" type="XML" hint="XML object representing the resource descriptor file" required="true" />
+		<cfargument name="resourceBean" type="homePortals.components.resourceBean" hint="The resource bean" required="true" />
+		<cfscript>
+			var resBean = arguments.resourceBean;
+			var xmlNode = 0;
+			var xmlNode2 = 0;
+			var stProps = 0;
+			var key = 0;
+			
+			xmlNode = xmlElemNew(arguments.xmlDoc, "resource");
+			xmlNode.xmlAttributes["id"] = resBean.getID();
+			xmlNode.xmlAttributes["HREF"] = resBean.getHREF();
+
+			if(getDescription() neq "") {
+				xmlNode2 = xmlElemNew(arguments.xmlDoc, "description");
+				xmlNode2.xmlText = resBean.getDescription();
+				arrayAppend(xmlNode.xmlChildren, xmlNode2);
+			}
+
+			// set custom properties (if any)
+			stProps = resBean.getProperties();
+			if(not structIsEmpty(stProps)) {
+				for(key in stProps) {
+					xmlNode2 = xmlElemNew(arguments.xmlDoc, "property");
+					xmlNode2.xmlAttributes["name"] = key;
+					xmlNode2.xmlText = stProps[key];
+					arrayAppend(xmlNode.xmlChildren, xmlNode2);
+				}
+			}
+			
+			return xmlNode;
 		</cfscript>
 	</cffunction>
 
