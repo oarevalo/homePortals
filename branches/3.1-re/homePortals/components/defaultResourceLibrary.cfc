@@ -581,7 +581,7 @@
 	</cffunction>
 
 	<cffunction name="loadResourceFromXMLNode" access="public" output="false" returntype="void" hint="populates the a resource bean instance from an xml node from a resource descriptor file">
-		<cfargument name="resourceBean" type="homePortals.components.resourceBean" hint="The resource to load" required="true" />
+		<cfargument name="resourceBean" type="any" hint="The resource to load" required="true" />
 		<cfargument name="resourceNode" type="XML" hint="XML node from a descriptor document that represents the resource" required="true" />
 		<cfscript>
 			var resBean = arguments.resourceBean;
@@ -607,6 +607,14 @@
 					}
 				}
 			}
+
+			// this is to allow resource bean extensions to provide their own
+			// mechanism to load from an XML node. Provided for backward compatibility
+			// with Modules resources
+			if(structKeyExists(resBean,"loadFromXMLNode")) {
+				resBean.loadFromXMLNode(xmlNode);		
+			}
+						
 		</cfscript>
 	</cffunction>
 
@@ -619,28 +627,33 @@
 			var xmlNode2 = 0;
 			var stProps = 0;
 			var key = 0;
+
+			if(structKeyExists(resBean,"toXMLNode")) {
+				xmlNode = resBean.toXMLNode(arguments.xmlDoc);		
 			
-			xmlNode = xmlElemNew(arguments.xmlDoc, "resource");
-			xmlNode.xmlAttributes["id"] = resBean.getID();
-			xmlNode.xmlAttributes["HREF"] = resBean.getHREF();
-
-			if(getDescription() neq "") {
-				xmlNode2 = xmlElemNew(arguments.xmlDoc, "description");
-				xmlNode2.xmlText = resBean.getDescription();
-				arrayAppend(xmlNode.xmlChildren, xmlNode2);
-			}
-
-			// set custom properties (if any)
-			stProps = resBean.getProperties();
-			if(not structIsEmpty(stProps)) {
-				for(key in stProps) {
-					xmlNode2 = xmlElemNew(arguments.xmlDoc, "property");
-					xmlNode2.xmlAttributes["name"] = key;
-					xmlNode2.xmlText = stProps[key];
+			} else {
+				xmlNode = xmlElemNew(arguments.xmlDoc, "resource");
+				xmlNode.xmlAttributes["id"] = resBean.getID();
+				xmlNode.xmlAttributes["HREF"] = resBean.getHREF();
+	
+				if(getDescription() neq "") {
+					xmlNode2 = xmlElemNew(arguments.xmlDoc, "description");
+					xmlNode2.xmlText = resBean.getDescription();
 					arrayAppend(xmlNode.xmlChildren, xmlNode2);
 				}
+	
+				// set custom properties (if any)
+				stProps = resBean.getProperties();
+				if(not structIsEmpty(stProps)) {
+					for(key in stProps) {
+						xmlNode2 = xmlElemNew(arguments.xmlDoc, "property");
+						xmlNode2.xmlAttributes["name"] = key;
+						xmlNode2.xmlText = stProps[key];
+						arrayAppend(xmlNode.xmlChildren, xmlNode2);
+					}
+				}
 			}
-			
+						
 			return xmlNode;
 		</cfscript>
 	</cffunction>

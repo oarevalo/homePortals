@@ -39,9 +39,6 @@
 			var i = 0;
 			var stSrc = 0;
 			var stTgt = 0;
-
-			// load default stuff
-			super.loadFromXMLNode(arguments.resourceNode);
 			
 			// populate bean
 			if(structKeyExists(xmlNode.xmlAttributes,"owner")) variables.instance.owner = xmlNode.xmlAttributes.owner;
