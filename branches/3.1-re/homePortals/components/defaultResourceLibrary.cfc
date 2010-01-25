@@ -209,13 +209,14 @@
 			var infoHREF = "";
 			var aRes = arrayNew(1);
 			var i = 0;
+			var isNew = true;
 		
 			// validate bean			
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(rb.getType() eq "") throw("No resource type has been specified for the resource","homePortals.resourceLibrary.validation");
 			if(rb.getPackage() eq "") throw("No package has been specified for the resource","homePortals.resourceLibrary.validation");
 			if(not reg.hasResourceType(resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
-
+			
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( rb.getType(), rb.getPackage() );
 
@@ -257,9 +258,13 @@
 				if(xmlNode.xmlAttributes.id eq rb.getID()) {
 					// node found so we will delete it to add it again
 					arrayDeleteAt(xmlDoc.xmlRoot.xmlChildren, i);
+					isNew = false;
 					break;
 				}
 			}
+
+			// timestamp bean
+			if(isNew) rb.setCreatedOn(now());
 
 			// create and append new xml node for res bean			
 			xmlNode = convertResourceToXMLNode( xmlDoc, rb );
@@ -599,6 +604,9 @@
 			if(structKeyExists(xmlNode,"description")) 
 				resBean.setDescription(xmlNode.description.xmlText);
 
+			if(structKeyExists(xmlNode.xmlAttributes,"createdOn") and xmlNode.xmlAttributes.createdOn neq "") 
+				resBean.setCreatedOn(parseDateTime(xmlNode.xmlAttributes.createdOn));
+
 			if(structKeyExists(xmlNode,"property")) {
 				for(i=1;i lte arrayLen(xmlNode.xmlChildren);i=i+1) {
 					stSrc = xmlNode.xmlChildren[i];
@@ -635,8 +643,9 @@
 				xmlNode = xmlElemNew(arguments.xmlDoc, "resource");
 				xmlNode.xmlAttributes["id"] = resBean.getID();
 				xmlNode.xmlAttributes["HREF"] = resBean.getHREF();
+				xmlNode.xmlAttributes["createdOn"] = resBean.getCreatedOn();
 	
-				if(getDescription() neq "") {
+				if(resBean.getDescription() neq "") {
 					xmlNode2 = xmlElemNew(arguments.xmlDoc, "description");
 					xmlNode2.xmlText = resBean.getDescription();
 					arrayAppend(xmlNode.xmlChildren, xmlNode2);

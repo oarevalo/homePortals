@@ -115,6 +115,9 @@
 			<cfset oResourceBean.setPackage(qry.package)>
 			<cfset oResourceBean.setHREF(qry.href)>
 			<cfset oResourceBean.setDescription(qry.description)>
+			<cfif qry.createdOn neq "">
+				<cfset oResourceBean.setCreatedOn(qry.createdOn)>
+			</cfif>
 			<cfloop collection="#rtProps#" item="prop">
 				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop])>
 			</cfloop>
@@ -142,6 +145,9 @@
 			<cfset oResourceBean.setPackage(qry.package)>
 			<cfset oResourceBean.setHREF(qry.href)>
 			<cfset oResourceBean.setDescription(qry.description)>
+			<cfif qry.createdOn neq "">
+				<cfset oResourceBean.setCreatedOn(qry.createdOn)>
+			</cfif>
 			<cfloop collection="#rtProps#" item="prop">
 				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop])>
 			</cfloop>
@@ -189,6 +195,7 @@
 		</cfquery>		
 		
 		<cfif qry.recordCount eq 0>
+			<cfset rb.setCreatedOn(now())>
 			<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#" maxrows="1">
 				INSERT INTO #tableName# (#lstFields#)
 					VALUES (
@@ -205,6 +212,9 @@
 								</cfcase>
 								<cfcase value="description">
 									<cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getDescription()#">
+								</cfcase>
+								<cfcase value="createdOn">
+									<cfqueryparam cfsqltype="cf_sql_timestamp" value="#rb.getCreatedOn()#">
 								</cfcase>
 								<cfdefaultcase>
 									<cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getProperty(fld)#">
@@ -471,7 +481,7 @@
 
 	<cffunction name="getResourceTableColumnList" access="private" returntype="string">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfset var lstBaseFields = "id,package,href,description">
+		<cfset var lstBaseFields = "id,package,href,description,createdOn">
 		<cfset var lstPropFields = "">
 		<cfset var rtProps = arguments.resourceType.getProperties()>
 		<cfloop collection="#rtProps#" item="prop">
@@ -496,7 +506,6 @@
 			<cfcase value="mysql">
 				<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
 					CREATE TABLE  `#tableName#` (
-						`_resourceID` int(11) NOT NULL auto_increment,
 						<cfloop list="#lstFields#" index="fld">
 							<cfswitch expression="#fld#">
 								<cfcase value="id">
@@ -509,10 +518,13 @@
 									`href` VARCHAR(1000) default NULL,
 								</cfcase>
 								<cfcase value="description">
-									`description` VARCHAR(10000) default NULL,
+									`description` VARCHAR(8000) default NULL,
+								</cfcase>
+								<cfcase value="createdOn">
+									`createdOn` DATETIME default NULL,
 								</cfcase>
 								<cfdefaultcase>
-									`#fld#` VARCHAR(10000) default NULL,
+									`#fld#` VARCHAR(8000) default NULL,
 								</cfdefaultcase>
 							</cfswitch>
 						</cfloop>
@@ -523,7 +535,6 @@
 			<cfcase value="mssql">
 				<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
 					CREATE TABLE  [#tableName#] (
-						[_resourceID] int IDENTITY (1,1) NOT NULL,
 						<cfloop list="#lstFields#" index="fld">
 							<cfswitch expression="#fld#">
 								<cfcase value="id">
@@ -536,10 +547,13 @@
 									[href] VARCHAR(1000) NULL,
 								</cfcase>
 								<cfcase value="description">
-									[description] VARCHAR(10000) NULL,
+									[description] VARCHAR(8000) NULL,
+								</cfcase>
+								<cfcase value="createdOn">
+									[createdOn] DATETIME NULL,
 								</cfcase>
 								<cfdefaultcase>
-									[#fld#] VARCHAR(10000) NULL,
+									[#fld#] VARCHAR(8000) NULL,
 								</cfdefaultcase>
 							</cfswitch>
 						</cfloop>
