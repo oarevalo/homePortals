@@ -395,7 +395,7 @@
 
 			
 			// skin
-			if(getPage().getSkinID() neq "") {
+			if(getPage().getSkinID() neq "" and getHomePortals().getResourceLibraryManager().hasResourceType("skin")) {
 				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", getPage().getSkinID());
 				variables.stPage.page.skinHREF = oResourceBean.getFullHref();
 			}
