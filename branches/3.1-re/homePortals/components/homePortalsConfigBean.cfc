@@ -791,7 +791,7 @@
 		<cfargument name="description" type="string" required="false" default="">
 		<cfargument name="type" type="string" required="false" default="">
 		<cfargument name="values" type="string" required="false" default="">
-		<cfargument name="required" type="string" required="false" default="">
+		<cfargument name="required" type="boolean" required="false" default="false">
 		<cfargument name="default" type="string" required="false" default="">
 		<cfargument name="label" type="string" required="false" default="">
 		<cfset var st = structNew()>

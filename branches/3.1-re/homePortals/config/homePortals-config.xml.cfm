@@ -96,4 +96,25 @@
 		<resourceLibraryPath>/homePortals/resourceLibrary/</resourceLibraryPath>
 	</resourceLibraryPaths>
 	
+	<!-- Additional resource library types  -->
+	<resourceLibraryTypes>
+		<resourceLibraryType prefix="db" path="homePortals.components.dbResourceLibrary">
+			<!--
+			Optional properties:
+				dsn: datasource name, can also be given in the library path
+				username: datasource username, if needed
+				password: datasource password, if needed
+				dbtype: type of database, if empty then is obtained from the JDBC driver
+				tblPrefix: a prefix to prepend to table names used to store resource types
+				resFilesPath: a web-accessible path to store resource files
+			<property name="dsn" value="" />
+			<property name="username" value="" /> //
+			<property name="password" value="" />
+			<property name="dbtype" value="" />
+			<property name="tblPrefix" value="" />
+			<property name="resFilesPath" value="" />
+			-->
+		</resourceLibraryType>
+	</resourceLibraryTypes>
+	
 </homePortals>

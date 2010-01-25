@@ -20,10 +20,10 @@
 				oResType = createObject("component","resourceType").init();
 				
 				if(structKeyExists(stResTypes[i],"name")) oResType.setName( stResTypes[i].name );
-				if(structKeyExists(stResTypes[i],"description")) oResType.setDescription( stResTypes[i].description );
-				if(structKeyExists(stResTypes[i],"folderName")) oResType.setFolderName( stResTypes[i].folderName );
-				if(structKeyExists(stResTypes[i],"resBeanPath")) oResType.setResBeanPath( stResTypes[i].resBeanPath );
-				if(structKeyExists(stResTypes[i],"fileTypes")) oResType.setFileTypes( stResTypes[i].fileTypes );
+				if(structKeyExists(stResTypes[i],"description") and stResTypes[i].description neq "") oResType.setDescription( stResTypes[i].description );
+				if(structKeyExists(stResTypes[i],"folderName") and stResTypes[i].folderName neq "") oResType.setFolderName( stResTypes[i].folderName );
+				if(structKeyExists(stResTypes[i],"resBeanPath") and stResTypes[i].resBeanPath neq "") oResType.setResBeanPath( stResTypes[i].resBeanPath );
+				if(structKeyExists(stResTypes[i],"fileTypes") and stResTypes[i].fileTypes neq "") oResType.setFileTypes( stResTypes[i].fileTypes );
 				
 				for(j=1;j lte arrayLen(stResTypes[i].properties);j=j+1) {
 					oResType.setProperty(argumentCollection = stResTypes[i].properties[j]);
