@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resLib type="feed">
-	<resource href="http://rss.cnn.com/rss/cnn_topstories.rss" id="CNN"><description>Top Stories from CNN</description></resource>
-	<resource href="http://rss.cnn.com/rss/cnn_us.rss" id="CNN - US"><description>US News From CNN</description></resource>
-	<resource href="http://rss.cnn.com/rss/cnn_world.rss" id="CNN - World"><description>World News From CNN</description></resource>
-	<resource href="http://rss.msnbc.msn.com/id/3032524/device/rss/rss.xml" id="MSNBC - US"><description>US News From MSNBC</description></resource>
-	<resource href="http://rss.msnbc.msn.com/id/3032506/device/rss/rss.xml" id="MSNBC - World"><description>World News From MSNBC</description></resource>
-</resLib>

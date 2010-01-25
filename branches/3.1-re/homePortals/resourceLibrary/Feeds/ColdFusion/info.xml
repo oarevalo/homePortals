@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resLib type="feed">
-	<resource href="http://www.forta.com/blog/rss.cfm?mode=full" id="Forta" title="Ben Forta"/>
-	<resource href="http://www.cfunited.com/blog/rss.cfm?mode=full" id="CFUnited" title="CFUNITED blog"><description>CFUNITED news and ColdFusion news. Weekly podcast of sessions</description></resource>
-	<resource href="http://www.coldfusionjedi.com/rss.cfm" id="CFJedi" title="Raymond Camden's ColdFusion Blog"><description>Raymond Camden's blog on ColdFusion, Flex, AJAX, and other topics.</description></resource>
-	<resource href="http://www.remotesynthesis.com/blog/rss.cfm?mode=short" id="RemoteSynthesis" title="Remote Synthesis"><description>Mostly discussion of technical issues and resources related to ColdFusion and SQL development. </description></resource>
-	<resource href="http://www.cfframeworks.com/blog/rss.cfm" id="CFFrameworks" title="cfFrameworks.com"><description>ColdFusion frameworks site</description></resource>
-	<resource href="http://www.easycfm.com/syndication/easyfeed.xml" id="EasyCFM" title="EasyCFM.COM Tutorials"><description>Learn ColdFusion Easily... With over 300 FREE ColdFusion Tutorials!</description></resource>
-</resLib>

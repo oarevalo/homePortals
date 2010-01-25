@@ -75,12 +75,6 @@
 			<property name="htmlurl" type="string" hint="Location of the website associated with this feed" label="Website URL" />
 		</resourceType>
 		
-		<resourceType name="skin">
-			<folderName>Skins</folderName>
-			<description>Skins are a way to customize the look and feel of a page. Skins dictate things like colors, fonts, margins and other visual attributes of the page</description>
-			<fileTypes>css</fileTypes>
-		</resourceType>
-
 		<resourceType name="image">
 			<folderName>Images</folderName>
 			<description>This resource type is used to represent an image document</description>
@@ -93,7 +87,7 @@
 	
 	<!-- Directories where HomePortals will look for resources  -->
 	<resourceLibraryPaths>
-		<resourceLibraryPath>/homePortals/resourceLibrary/</resourceLibraryPath>
+		<!-- <resourceLibraryPath>/path/to/library/</resourceLibraryPath> -->
 	</resourceLibraryPaths>
 	
 	<!-- Additional resource library types  -->

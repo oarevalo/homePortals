@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resLib type="feed">
-	<resource href="http://digg.com/rss/index.xml" id="Digg"><description>Front stories from Digg.com</description></resource>
-	<resource href="http://reddit.com/.rss" id="Reddit"><description>Latest stories on Reddit.com</description></resource>
-	<resource href="http://del.icio.us/rss/" id="Del.icio.us"><description>Top bookmarks from del.icio.us</description></resource>
-</resLib>
