@@ -72,7 +72,7 @@
 	</cffunction>
 		
 
-	<cffunction name="getAccountsService" access="public" returntype="accounts">
+	<cffunction name="getAccountsService" access="public" returntype="homePortals.plugins.accounts.components.accounts">
 		<cfreturn variables.oAccounts>
 	</cffunction>		
 
