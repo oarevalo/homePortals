@@ -38,43 +38,49 @@
 	<!------------------------------------------------->
 	<cffunction name="saveResource" access="public" returntype="void">
 		<cfargument name="resourceID" type="string" required="true" hint="resource id">
-		<cfargument name="name" type="string" required="true" hint="Content resource name">
+		<cfargument name="newResourceID" type="string" required="false" hint="the resource id for new resources" default="">
 		<cfargument name="description" type="string" required="true" hint="resource description">
 		<cfargument name="body" type="string" required="true" hint="resource body">
 		
         <cfset var oResourceBean = 0>
  		<cfset var oHP = this.controller.getHomePortals()>
+		<cfset var oResourceLibrary = 0>
+		<cfset var oResourceLibraryManager = oHP.getResourceLibraryManager()>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = getResourceType()>
 		<cfset var siteOwner = "">
+		<cfset var resID = "">
 				
 		<cfscript>
-				if(arguments.body eq "") throw("The content body cannot be empty"); 
+			if(arguments.body eq "") throw("The content body cannot be empty"); 
 
-				// get owner
-				stUser = this.controller.getUserInfo();
-				siteOwner = stUser.username;
+			// get owner
+			stUser = this.controller.getUserInfo();
+			siteOwner = stUser.username;
 
-				// if this is a new resource, generate an ID
-				if(arguments.resourceID eq "")
-					arguments.resourceID = createUUID();
+			// get the default resource library
+			oResourceLibrary = oResourceLibraryManager.getResourceLibrary(resourceLibraryPath);
 
-				// create the bean for the new resource
-				oResourceBean = createObject("component","homePortals.components.resourceBean").init();	
-				oResourceBean.setID(arguments.resourceID);
-				oResourceBean.setName(arguments.name);
-				oResourceBean.setDescription(arguments.description); 
-				oResourceBean.setPackage(siteOwner); 
-				oResourceBean.setType(resourceType); 
-				
-				/// add the new resource to the library
-				oResourceLibrary = createObject("component","homePortals.components.resourceLibrary").init(resourceLibraryPath);
-				oResourceLibrary.saveResource(oResourceBean, arguments.body);
-			
-				// update catalog
-				oHP.getCatalog().reloadPackage(resourceType,siteOwner);
-						
-				setResourceID(arguments.resourceID);
+			// if this is a new resource, generate an ID
+			if(arguments.resourceID eq "") {
+				resID = arguments.newResourceID;
+				oResourceBean = oResourceLibrary.getNewResource(resourceType);
+				oResourceBean.setID(arguments.newResourceID);
+				oResourceBean.setPackage(siteOwner);
+			} else {
+				resID = arguments.resourceID;
+				oResourceBean = oResourceLibrary.getResource(resourceType, siteOwner, arguments.resourceID);
+			}
+
+			// update resource
+			oResourceBean.setDescription(arguments.description); 
+			oResourceBean.saveFile(resID & ".htm", arguments.body);
+			oResourceLibrary.saveResource(oResourceBean);
+		
+			// update catalog
+			oHP.getCatalog().reloadPackage(resourceType,siteOwner);
+					
+			setResourceID(resID);
 		</cfscript>
 	</cffunction>
 	
@@ -85,6 +91,7 @@
 		<cfargument name="resourceID" type="string" required="true" hint="resource id">
 	
  		<cfset var oHP = this.controller.getHomePortals()>
+		<cfset var oResourceLibraryManager = oHP.getResourceLibraryManager()>
 		<cfset var resourceLibraryPath = oHP.getConfig().getResourceLibraryPath()>
 		<cfset var resourceType = getResourceType()>
 		<cfset var siteOwner = "">
@@ -98,8 +105,10 @@
 			stUser = this.controller.getUserInfo();
 			siteOwner = stUser.username;
 
+			// get the default resource library
+			oResourceLibrary = oResourceLibraryManager.getResourceLibrary(resourceLibraryPath);
+
 			/// remove resource from the library
-			oResourceLibrary = createObject("component","homePortals.components.resourceLibrary").init(resourceLibraryPath);
 			oResourceLibrary.deleteResource(arguments.resourceID, resourceType, siteOwner);
 
 			// remove from catalog

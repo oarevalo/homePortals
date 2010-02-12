@@ -335,20 +335,22 @@
 			var oConfigBeanStore = 0;
 			var tmpField = "";
 			var stSettings = structNew();
-			var stModule = structNew();
+			var oModule = 0;
 
 			// get container page			
 			oPage = getPage();
 				
-			stModule = oPage.getModule( id );
+			oModule = oPage.getModule( id );
+			stModule = oModule.toStruct();
 			stSettings = cfg.getPageSettings();
 			
 			// update all attributes sent
 			for(tmpField in stSettings) {
 				if(isSimpleValue(stSettings[tmpField])) 
 					stModule[tmpField] = stSettings[tmpField]; 	
-			}			
-			oPage.setModule(id, stModule.location, stModule);
+			}	
+			oModule.init(stModule);	
+			oPage.setModule(oModule);
 
 			// save changes in configBean store
 			oConfigBeanStore = createObject("component", "configBeanStore").init();
@@ -532,15 +534,13 @@
 	<cffunction name="getPage" access="public" returntype="homePortals.components.pageBean" hint="returns the pageBean that contains this module">
 		<cfscript>
 			var oPage = 0;
-			var oPageRenderer = 0;
 			var oPageProvider = getHomePortals().getPageProvider();
 			var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init();			
 			var oCache = oCacheRegistry.getCache("hpPageCache");
 			var href = getModuleConfigBean().getPageHREF();
 
 			try {
-				oPageRenderer = oCache.retrieve(href);
-				oPage = oPageRenderer.getPage();
+				oPage = oCache.retrieve(href);
 			
 			} catch(homePortals.cacheService.itemNotFound e) {
 				oPage = oPageProvider.load(href);

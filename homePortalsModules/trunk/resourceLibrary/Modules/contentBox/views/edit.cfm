@@ -1,3 +1,4 @@
+<cftry>
 <cfparam name="arguments.resourceID" default="">
 <cfscript>
 	// get module path
@@ -5,13 +6,11 @@
 	tmpModulePath = cfg.getModuleRoot();	
 	imgRoot = tmpModulePath & "/images";
 	
-	resourceID = arguments.resourceID;	
-	
 	stUser = this.controller.getUserInfo();
 	siteOwner = stUser.username;
 	
-	if(resourceID neq "") {
-		oResourceBean = this.controller.getHomePortals().getCatalog().getResourceNode(getResourceType(),resourceID);
+	if(arguments.resourceID neq "") {
+		oResourceBean = this.controller.getHomePortals().getCatalog().getResourceNode(getResourceType(),arguments.resourceID);
 		description = oResourceBean.getDescription();
 		content = "";
 		contentLocation = oResourceBean.getFullHref();
@@ -51,11 +50,18 @@
 			</div>
 	
 			<form name="frmEditContent" action="##" method="post" style="margin:0px;padding:0px;">
+				<input type="hidden" name="resourceID" value="#arguments.resourceID#">
 				<div style="border:1px solid silver;background-color:##fff;margin:5px;">
 					<table>
 						<tr>
 							<td width="100"><b>Name:</b></td>
-							<td><input type="text" name="resourceID" value="#resourceID#" style="width:300px;"></td>
+							<td>
+								<cfif arguments.resourceID eq "">
+									<input type="text" name="newResourceID" value="" style="width:300px;">
+								<cfelse>
+									<b>#arguments.resourceID#</b>
+								</cfif>
+							</td>
 						</tr>
 						<tr valign="top">
 							<td><strong>Description:</strong></td>
@@ -71,8 +77,8 @@
 				
 				<div style="margin-top:10px;padding-bottom:10px;text-align:center;">
 					<input type="button" name="btnSave" value="Save" onclick="#moduleID#.doFormAction('saveResource',this.form);#moduleID#.closeWindow();">&nbsp;&nbsp;&nbsp;
-					<cfif resourceID neq "">
-						<input type="button" name="btnDelete" value="Delete" onclick="if(confirm('Delete entry?')){#moduleID#.doAction('deleteResource',{resourceID:'#resourceID#'});#moduleID#.closeWindow();}">
+					<cfif arguments.resourceID neq "">
+						<input type="button" name="btnDelete" value="Delete" onclick="if(confirm('Delete entry?')){#moduleID#.doAction('deleteResource',{resourceID:'#arguments.resourceID#'});#moduleID#.closeWindow();}">
 					</cfif>
 				</div>
 				
@@ -81,3 +87,7 @@
 		</div>
 	</div>
 </cfoutput>
+	<cfcatch >
+	<cfdump var="#cfcatch#">
+	</cfcatch>
+	</cftry>
