@@ -32,7 +32,7 @@
 		<cfif isRegistered(arguments.cacheName)>
 			<cfreturn st[arguments.cacheName]>
 		<cfelse>
-			<cfthrow message="Requested cache not found" type="cacheManager.cacheNotFound">
+			<cfthrow message="Requested cache '#arguments.cacheName#' not found" type="cacheManager.cacheNotFound">
 		</cfif>
 	</cffunction>
 	
