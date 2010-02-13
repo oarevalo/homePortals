@@ -134,7 +134,9 @@
 
 			// initialize cache registry
 			oCacheRegistry = createObject("component","cacheRegistry").init();
-			oCacheRegistry.flush();		// clear registry
+			if(arguments.initPlugins) {
+				oCacheRegistry.flush();		// clear registry
+			}
 
 			// crate page cache instance
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
