@@ -3,7 +3,7 @@
 
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>
-		<resource href="/homePortals/resourceLibrary/Skins/basic/basic.css" type="style"/>	
+		<resource href="/homePortals/plugins/skins/resourceLibrary/Skins/basic/basic.css" type="style"/>	
 		<resource href="/homePortals/plugins/modules/common/CSS/modules.css" type="style"/>	
 		<resource href="/homePortals/plugins/modules/common/JavaScript/prototype-1.4.0.js" type="script"/>	
 		<resource href="/homePortals/plugins/modules/common/JavaScript/Main.js" type="script"/>	
