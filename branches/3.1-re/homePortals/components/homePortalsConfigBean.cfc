@@ -1,7 +1,7 @@
 <cfcomponent displayname="homePortalsConfigBean" hint="A bean to store the HomePortals configuration. Configuration is per-application">
 
 	<cfset variables.stConfig = StructNew()>
-	<cfset variables.hpEngineBaseVersion = "3.1.x">
+	<cfset variables.hpEngineBaseVersion = "">
 
 	<cffunction name="init" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -258,7 +258,10 @@
 			// create a blank xml document and add the root node
 			xmlConfigDoc = xmlNew();
 			xmlConfigDoc.xmlRoot = xmlElemNew(xmlConfigDoc, "homePortals");		
-			xmlConfigDoc.xmlRoot.xmlAttributes["version"] = variables.stConfig.version;
+			
+			if(variables.stConfig.version neq "") {
+				xmlConfigDoc.xmlRoot.xmlAttributes["version"] = variables.stConfig.version;
+			}
 			
 			// save simple value settings
 			lstKeys = structKeyList(variables.stConfig);
@@ -280,7 +283,7 @@
 					case "baseResourceTypes": tmpXmlNode = xmlElemNew(xmlConfigDoc,"baseResourceTypes"); break;
 					case "pageProviderClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageProviderClass"); break;
 				}
-				if(isXMLNode(tmpXmlNode)) {
+				if(isXMLNode(tmpXmlNode) and variables.stConfig[thisKey] neq "") {
 					tmpXmlNode.xmlText = variables.stConfig[thisKey];
 					arrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, tmpXmlNode);
 				}	
