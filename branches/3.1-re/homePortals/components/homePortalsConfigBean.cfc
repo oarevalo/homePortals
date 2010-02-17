@@ -27,7 +27,7 @@
 			variables.stConfig.renderTemplates = structNew();
 			variables.stConfig.resources = structNew();
 			variables.stConfig.contentRenderers = structNew();
-			variables.stConfig.plugins = structNew();
+			variables.stConfig.plugins = arrayNew(1);
 			variables.stConfig.resourceTypes = structNew();
 			variables.stConfig.pageProperties = structNew();
 			variables.stConfig.resourceLibraryTypes = structNew();
@@ -65,7 +65,7 @@
 			var xmlNode = 0;
 			var j = 0; var k = 0;
 			var xmlThisNode = 0;
-			var key = "";
+			var key = ""; var stTemp = structNew();
 				
 			if(isXML(arguments.configXML)) 
 				xmlConfigDoc = xmlParse(arguments.configXML);
@@ -127,7 +127,7 @@
 																			name = key,
 																			type = thisKey,
 																			href = xmlNode.xmlChildren[j].xmlAttributes.href,
-																			description = xmlNode.xmlChildren[j].xmlText,
+																			description = trim(xmlNode.xmlChildren[j].xmlText),
 																			isDefault = false
 																		};
 						
@@ -156,7 +156,10 @@
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"path"))
 							throw("HomePortals config file is malformed. Missing 'path' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
 
-						variables.stConfig.plugins[ xmlNode.xmlChildren[j].xmlAttributes.name ] = xmlNode.xmlChildren[j].xmlAttributes.path;
+						stTemp = structNew();
+						stTemp.name = xmlNode.xmlChildren[j].xmlAttributes.name;
+						stTemp.path = xmlNode.xmlChildren[j].xmlAttributes.path;
+						arrayAppend(variables.stConfig.plugins, stTemp);
 					}
 
 				} else if(xmlNode.xmlName eq "resourceTypes") {
@@ -178,7 +181,7 @@
 									arrayAppend(variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ].properties,
 												xmlThisNode.xmlChildren[k].xmlAttributes);								
 								} else {
-									variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ][ xmlThisNode.xmlChildren[k].xmlName ] = xmlThisNode.xmlChildren[k].xmlText;
+									variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ][ xmlThisNode.xmlChildren[k].xmlName ] = trim(xmlThisNode.xmlChildren[k].xmlText);
 								}
 							}
 						}
@@ -186,12 +189,12 @@
 
 				} else if(xmlNode.xmlName eq "resourceLibraryPath") {
 
-					arrayAppend( variables.stConfig.resourceLibraryPaths, xmlNode.xmlText ); 
+					arrayAppend( variables.stConfig.resourceLibraryPaths, trim(xmlNode.xmlText) ); 
 
 				} else if(xmlNode.xmlName eq "resourceLibraryPaths") {
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
-						arrayAppend( variables.stConfig.resourceLibraryPaths , xmlNode.xmlChildren[j].xmlText );
+						arrayAppend( variables.stConfig.resourceLibraryPaths , trim(xmlNode.xmlChildren[j].xmlText) );
 					}
 
 				} else if(xmlNode.xmlName eq "pageProperties") {
@@ -233,7 +236,7 @@
 					}
 							
 				} else
-					variables.stConfig[xmlNode.xmlName] = xmlNode.xmlText;
+					variables.stConfig[xmlNode.xmlName] = trim(xmlNode.xmlText);
 				
 			}
 		
@@ -345,13 +348,13 @@
 			}
 
 			// ****** [plugins] *****
-			if(not structIsEmpty(variables.stConfig.plugins)) {
+			if(ArrayLen(variables.stConfig.plugins) gt 0) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"plugins") );
 				
-				for(thisKey in variables.stConfig.plugins) {
+				for(i=1;i lte arrayLen(variables.stConfig.plugins);i=i+1) {
 					tmpXmlNode = xmlElemNew(xmlConfigDoc,"plugin");
-					tmpXmlNode.xmlAttributes["name"] = thisKey;
-					tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[thisKey];
+					tmpXmlNode.xmlAttributes["name"] = variables.stConfig.plugins[i].name;
+					tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[i].path;
 					ArrayAppend(xmlConfigDoc.xmlRoot.plugins.xmlChildren, tmpXmlNode );
 				}
 			}
@@ -543,14 +546,16 @@
 	
 	<cffunction name="getPlugin" access="public" returntype="string" hint="returns the path to the given extension plugin cfc">
 		<cfargument name="name" type="string" required="true">
-		<cfif structKeyExists( variables.stConfig.plugins, arguments.name )>
-			<cfreturn variables.stConfig.plugins[arguments.name]>
-		<cfelse>
-			<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
-		</cfif>
+		<cfset var i = 0>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+			<cfif variables.stConfig.plugins[i].name eq arguments.name>
+				<cfreturn variables.stConfig.plugins[i].path>
+			</cfif>
+		</cfloop>
+		<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
 	</cffunction>	
 
-	<cffunction name="getPlugins" access="public" returntype="struct" hint="returns a key-value map with all declared plugins and their paths">
+	<cffunction name="getPlugins" access="public" returntype="array" hint="returns an array of key-value entries with all declared plugins and their paths">
 		<cfreturn duplicate(variables.stConfig.plugins)>
 	</cffunction>	
 	
@@ -624,7 +629,7 @@
 
 	<cffunction name="setDefaultPage" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.defaultPage = arguments.data>
+		<cfset variables.stConfig.defaultPage = trim(arguments.data)>
 		<cfreturn this>
 	</cffunction>
 
@@ -756,17 +761,36 @@
 	<cffunction name="setPlugin" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="path" type="string" required="true">
+		<cfset var i = 0>
+		<cfset var found = false>
+		<cfset var st = structNew()>
 		<cfif arguments.path neq "">
-			<cfset variables.stConfig.plugins[arguments.name] = arguments.path>
-		<cfelseif structKeyExists(variables.stConfig.plugins, arguments.name)>
-			<cfset structDelete(variables.stConfig.plugins, arguments.name)>
+			<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+				<cfif variables.stConfig.plugins[i].name eq arguments.name>
+					<cfset variables.stConfig.plugins[i].path = arguments.path>
+					<cfset found = true>
+				</cfif>
+			</cfloop>
+			<cfif not found>
+				<cfset st.name = arguments.name>
+				<cfset st.path = arguments.path>
+				<cfset arrayAppend(variables.stConfig.plugins, st)>
+			</cfif>
+		<cfelse>
+			<cfset removePlugin(arguments.name)>
 		</cfif>
 		<cfreturn this>
 	</cffunction>
 
 	<cffunction name="removePlugin" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
-		<cfset structDelete(variables.stConfig.plugins, arguments.name, false)>
+		<cfset var i = 0>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+			<cfif variables.stConfig.plugins[i].name eq arguments.name>
+				<cfset arrayDeleteAt(variables.stConfig.plugins,i)>
+				<cfreturn this>
+			</cfif>
+		</cfloop>
 		<cfreturn this>
 	</cffunction>
 

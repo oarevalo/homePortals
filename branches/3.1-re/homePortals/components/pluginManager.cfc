@@ -7,13 +7,13 @@
 	<cffunction name="init" access="public" returntype="pluginManager" hint="constructor">
 		<cfargument name="homePortals" type="homePortals" required="true">
 		<cfscript>
-			var key = "";
-			var stPlugins = arguments.homePortals.getConfig().getPlugins();
+			var i = 0;
+			var aPlugins = arguments.homePortals.getConfig().getPlugins();
 			
 			variables.homePortals = arguments.homePortals;
 			
-			for(key in stPlugins) {
-				registerPlugin(key, stPlugins[key]);
+			for(i=1;i lte arrayLen(aPlugins);i++) {
+				registerPlugin(aPlugins[i].name, aPlugins[i].path);
 			}
 			
 			return this;
