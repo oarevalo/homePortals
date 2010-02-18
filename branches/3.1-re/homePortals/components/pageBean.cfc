@@ -70,7 +70,7 @@
 				
 					// title node
 					case "title":
-						setTitle(xmlNode.xmlText);
+						setTitle(trim(xmlNode.xmlText));
 						break;
 						
 					// stylesheets
@@ -181,7 +181,7 @@
 						
 					// page template
 					case "pageTemplate":
-						setPageTemplate(xmlNode.xmlText);
+						setPageTemplate(trim(xmlNode.xmlText));
 						break;
 						
 				}
