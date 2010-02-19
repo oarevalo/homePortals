@@ -1,0 +1,157 @@
+.cms-layoutRegion {
+}
+.cms-layoutRegionHighlighted {
+	/*background-color:#ebebeb;*/
+	border:1px dashed silver;
+	padding:10px;
+	min-height:100px;
+}
+.cms-layoutRegionPlaceHolder {
+	background-color:#f5f5f5;
+	border:1px dashed #ebebeb;
+}
+.cms-moduleHandleBar {
+	background-color:#666;
+	color:#fff;
+	font-size:11px;
+	font-family:Arial, Helvetica, sans-serif;
+	padding:2px;
+	font-weight:bold;
+	cursor:move;
+}
+
+.cms-layoutRegionHandleBar {
+	background-color:#000;
+	color:#fff;
+	font-size:11px;
+	padding:2px;
+	font-weight:bold;
+	font-family:Arial, Helvetica, sans-serif;
+	height:20px;
+	display:block;
+	border-bottom:1px solid silver;
+}
+	
+	
+.cms-formField {
+	width:160px;
+	font-size:12px;
+	border:1px solid silver;
+	padding:2px;
+}
+.cms-formFieldTip {
+    font-size:11px;
+    margin-bottom:5px;
+    color:#808080;	
+}
+	
+	
+#cms-statusMessage {
+	float:right;
+	margin-right:10px;
+	font-size:10px;
+	color:red;
+	font-weight:bold;
+	background-color:#fefcd8;
+	padding-left:10px;
+	padding-right:10px;
+}	
+	
+.cms-panel {
+	font-size:14px;
+	line-height:18px;
+	border:1px solid silver;
+	padding:8px;
+	margin:5px 0 5px 0;
+	background-color:#ebebeb;
+	color:#000;
+}
+.cms-panelTitle {
+	font-size:14px;
+	font-weight:bold;
+	margin-bottom:10px;
+	border-bottom:1px solid black;
+}
+.cms-lightPanel {
+	color:#333;
+	margin-top:3px;
+	background-color:#f5f5f5;
+	padding:8px;
+	line-height:20px;
+	font-size:12px;
+}
+#cms-navMenuContentPanel {
+	
+}	
+.cms-dataTable {
+	border-collapse:collapse;
+}	
+.cms-dataTable td,
+.cms-dataTable th {
+	border:1px solid silver;
+	padding:3px;
+}
+	
+	
+	
+	
+#cms-adminBar {
+	margin:0px;	
+	font-family:Arial, Helvetica, sans-serif;
+	background-color: #000;
+	margin-top: 0px;
+	border:0px;
+	color:#fff;
+	height:30px;
+	
+}
+#cms-adminSubBar a {
+	text-decoration: none;
+	font-size: 11px;
+	color:#333;
+}
+#cms-adminSubBar {
+	background-color: #333;
+	border-top:1px solid white; 
+	border-bottom:1px solid black; 
+	padding-top:3px;
+	padding-bottom:2px;
+	color:#fff;
+	height:19px;
+	line-height:19px;
+}
+#cms-adminSubBar a {
+	font-size:11px;
+	text-decoration:underline;
+	color:#fff;
+}
+#cms-adminBarActions {
+	float:right;
+	padding-right:10px;
+	padding-top:3px;
+}
+#cms-adminBarActions img {
+	margin-left:5px;
+	border:0px;
+}
+#cms-adminBarActions input {
+	font-size:10px;
+}
+
+#cms-mainTitle {
+	font-size:16px;
+	font-family:arial;
+	font-weight:bold;
+	font-variant:small-caps;
+	margin:0px;
+	padding:0px;
+	color:#fff;
+	padding-left:10px;	
+}
+
+.cms-divider {
+	height:6px;
+	margin-bottom:6px;
+	border-bottom:1px solid silver;
+}
+
