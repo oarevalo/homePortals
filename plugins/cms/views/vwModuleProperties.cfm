@@ -27,8 +27,9 @@
 				
 				<cfif tmpType eq "resource">
 					<cfset lstResPrefixes = listAppend(lstResPrefixes, "#thisAttr#:#resourceType#:res#i#")>
+					<cfset lstResPrefixesJs = listAppend(lstResPrefixesJs, "res#i#")>
 				</cfif>				
-				
+										
 				<tr valign="top">
 					<td nowrap="nowrap" style="width:80px;"><strong>#prop.displayName#:</strong></td>
 					<td>

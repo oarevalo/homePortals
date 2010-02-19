@@ -117,7 +117,7 @@
 			
 	<script>jQuery.noConflict();</script>		
 			
-	<div id="cms-adminBar" style="padding-top:5px;">
+	<div id="cms-adminBar">
 		<div id="cms-adminBarActions">
 			<cfif bUserLoggedIn>
 				<a href="##" onclick="navCmdAddPage('#currentPath#')"><img src="#cmsRoot#/images/btnAddPage.gif" align="absmiddle" alt="Add Page" title="Add Page"></a>
@@ -133,11 +133,11 @@
 				</form>
 			</cfif>
 		</div>
-		<span id="cms-mainTitle">#application.applicationName#</span>
+		<a id="cms-mainTitle" href="#appRoot#">#application.applicationName#</a>
 	</div>
-	<div id="cms-adminSubBar" style="margin-bottom:5px;padding-left:4px;">
+	<div id="cms-adminSubBar">
 		<div id="cms-statusMessage"></div>
-		Current Page: <span style="font-size:13px;font-weight:bold;">#currentPage#</span>
+		Current Page: <span class="cms-subTitle">#currentPage#</span>
 		<cfif bUserLoggedIn>
 			&nbsp;|&nbsp;
 			<a href="##" id="cms-btnEditPage">Page Settings</a>

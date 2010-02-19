@@ -32,15 +32,22 @@
 	fileContent = "";
 	fileName = "";
 	isText = false;
+	isPlainText = false;
+	isRichText = false;
 	isImage = false;
 	isEditable = (lstPropsConfig neq "" or resourceTypeConfig.getFileTypes() neq "");
 	
-	knownTextExtensions = listToArray("txt,htm,html,xhtml,xml");
+	knownPlainTextExtensions = listToArray("txt,xml");
+	knownRichTextExtensions = listToArray("htm,html,xhtml");
 	for(i=1;i lte arrayLen(extensions);i++) {
-		for(j=1;j lte arrayLen(knownTextExtensions);j++) {
-			if(extensions[i] eq knownTextExtensions[j]) isText = true;
+		for(j=1;j lte arrayLen(knownPlainTextExtensions);j++) {
+			if(extensions[i] eq knownPlainTextExtensions[j]) isPlainText = true;
+		}
+		for(j=1;j lte arrayLen(knownRichTextExtensions);j++) {
+			if(extensions[i] eq knownRichTextExtensions[j]) isRichText = true;
 		}
 	}
+	isText = (isPlainText or isRichText);
 
 	isImage = (tmpFullPath neq "" and fileExists(tmpFullPath) and isImageFile(tmpFullPath));
 
@@ -80,8 +87,33 @@
 				<tr>
 					<td colspan="2">
 						<cfif isText>
-							<input type="hidden" name="#arguments.prefix#__filecontenttype" value="text/plain">
-							<textarea name="#arguments.prefix#__filebody" rows="15" cols="50" class="cms-formField" style="width:100%;">#fileContent#</textarea><br />
+							<cfif isRichText>
+							    <script type="text/javascript">
+							        jQuery(function() {
+							            jQuery("###arguments.prefix#_btnEnableHtmlArea").click(function() { 
+											  jQuery("###arguments.prefix#__filebody").htmlarea({
+													toolbar: [
+													        ["html"], ["bold", "italic", "underline", "strikethrough","forecolor"],
+													        ["increasefontsize", "decreasefontsize"],
+													        ["orderedlist", "unorderedlist"],
+													        ["indent", "outdent"],
+													        ["justifyleft", "justifycenter", "justifyright"],
+													        ["link", "unlink", "image", "horizontalrule"],
+													        ["p", "h1", "h2", "h3", "h4"]
+													    ]
+								                });
+								              jQuery(this).hide();
+										 });
+										 
+										 setTimeout("jQuery('###arguments.prefix#_btnEnableHtmlArea').click()",500);
+						            });
+								</script>
+								<input type="hidden" name="#arguments.prefix#__filecontenttype" value="text/html">
+								<a href="##" id="#arguments.prefix#_btnEnableHtmlArea" style="font-weight:bold;color:green;">&raquo; Click to enable rich text editor</a>
+							<cfelse>
+								<input type="hidden" name="#arguments.prefix#__filecontenttype" value="text/plain">
+							</cfif>
+							<textarea name="#arguments.prefix#__filebody" rows="15" cols="50" id="#arguments.prefix#__filebody" class="cms-formField" style="width:100%;background-color:##fff;">#fileContent#</textarea><br />
 						<cfelseif isImage>
 							<cfimage action="resize"
 									    width="100" height="" 

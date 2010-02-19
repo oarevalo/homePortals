@@ -10,6 +10,7 @@
 	lstModuleAttribs = "";
 	lstIgnoreAttribs = "";
 	lstResPrefixes = "";
+	lstResPrefixesJs = "";
 	oCatalog = hp.getCatalog();
 	thisModule = oModuleBean.toStruct();
 	
@@ -63,10 +64,12 @@
 		<cfinclude template="vwModuleProperties.cfm">
 		<br />
 		<cfset lstModuleAttribs = listQualify(lstModuleAttribs,"'")>
+		<cfset lstResPrefixesJs = listQualify(lstResPrefixesJs,"'")>
 		<input type="hidden" name="moduleID" value="#modID#">
 		<input type="hidden" name="resPrefixes" value="#lstResPrefixes#">
-		<input type="button" value="Apply Changes" onclick="controlPanel.updateModule(this.form,[#lstModuleAttribs#],'#lstResPrefixes#')">
-		<a href="##" onclick="controlPanel.closePanel();">Close</a>
+		<input type="button" value="Apply Changes" onclick="controlPanel.updateModule(this.form,[#lstModuleAttribs#],'#lstResPrefixes#',[#lstResPrefixesJs#])">
+		&nbsp;&nbsp;
+		<input type="button" value="Close" onclick="controlPanel.closePanel()">
 	</form>
 	
 </cfoutput>

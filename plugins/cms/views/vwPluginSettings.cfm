@@ -17,7 +17,7 @@
 					<table>
 						<tr>
 							<td colspan="2">
-								<div style="font-weight:bold;font-size:13px;"><cfif structKeyExists(md,"displayName")>#md.displayName#<cfelse>#pluginName#</cfif></div>
+								<div class="cms-subTitle"><cfif structKeyExists(md,"displayName")>#md.displayName#<cfelse>#pluginName#</cfif></div>
 								<cfif structKeyExists(md,"hint")>
 									<div style="font-size:10px;margin-bottom:8px;">#md.hint#</div>
 								</cfif>
@@ -37,7 +37,7 @@
 							<cfif structKeyExists(prop,"hint")>
 								<tr>
 									<td>&nbsp;</td>
-									<td style="font-size:10px;">#prop.hint#</td>
+									<td class="cms-formFieldTip">#prop.hint#</td>
 								</tr>
 							</cfif>
 						</cfloop>

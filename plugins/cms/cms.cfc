@@ -367,13 +367,12 @@
 
 				// update module properties
    				for(arg in arguments) {
-   					if(left(arg,len(prefix)) eq prefix
-   						and listLast(arg,"_") neq "default"
-						and arguments[arg] neq arguments[arg & "_default"]) {
+   					if(left(arg,len(prefix)) eq prefix and listLast(arg,"_") neq "default") {
 						if(arguments[arg] eq "_NOVALUE_")
 	   						oModuleBean.setProperty(replace(arg,prefix,""),"");
-						else
+						else {
 	   						oModuleBean.setProperty(replace(arg,prefix,""),arguments[arg]);
+						}
 					}
    				}
 
@@ -420,13 +419,7 @@
 			   						and arg neq resPrefix & "_file"
 			   						and arg neq resPrefix & "_filebody"
 			   						and arg neq resPrefix & "_filename"
-			   						and arg neq resPrefix & "_filecontenttype"
-									and (
-											not structKeyExists(arguments,arg & "_default")
-											or
-											arguments[arg] neq arguments[arg & "_default"]
-										)
-									) {
+			   						and arg neq resPrefix & "_filecontenttype") {
 										
 									if(arguments[arg] eq "_NOVALUE_")
 				   						oResourceBean.setProperty(replace(arg,resPrefix,""),"");

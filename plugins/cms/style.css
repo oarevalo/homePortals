@@ -103,6 +103,7 @@
 	border:0px;
 	color:#fff;
 	height:30px;
+	padding-top:5px;
 	
 }
 #cms-adminSubBar a {
@@ -116,9 +117,11 @@
 	border-bottom:1px solid black; 
 	padding-top:3px;
 	padding-bottom:2px;
+	padding-left:4px;
 	color:#fff;
 	height:19px;
 	line-height:19px;
+	margin-bottom:5px;
 }
 #cms-adminSubBar a {
 	font-size:11px;
@@ -147,6 +150,10 @@
 	padding:0px;
 	color:#fff;
 	padding-left:10px;	
+}
+.cms-subTitle {
+	font-size:13px;
+	font-weight:bold;
 }
 
 .cms-divider {

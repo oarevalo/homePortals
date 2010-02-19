@@ -1,6 +1,7 @@
+<cfset appRoot = getHomePortals().getConfig().getAppRoot()>
 <cfoutput>
-	<div id="cms-adminBar" style="padding-top:5px;">
-		<span id="cms-mainTitle">SolariumCMS</span>
+	<div id="cms-adminBar">
+		<a id="cms-mainTitle" href="#appRoot#">#application.applicationName#</a>
 	</div>
 
 	<div class="cms-panel">

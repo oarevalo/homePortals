@@ -71,6 +71,7 @@
 		<input type="button" name="btnDelPage" value="Delete Page" onclick="navCmdDeletePage()">
 		<input type="button" name="btnDelFolder" value="Delete Folder" onclick="controlPanel.deleteFolder('#currentPath#')"
 				<cfif currentPath eq "/">disabled="true"</cfif>>
-		<a href="##" onclick="controlPanel.closePanel();">Close</a>
+		&nbsp;&nbsp;
+		<input type="button" value="Close" onclick="controlPanel.closePanel()">
 	</p>
 </cfoutput>

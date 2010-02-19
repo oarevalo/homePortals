@@ -60,7 +60,7 @@
 		</table>
 		<br />
 		<input type="button" value="Apply Changes" onclick="controlPanel.updatePage(this.form)">
-		&nbsp;
-		<a href="##" onclick="controlPanel.closePanel();">Close</a>
+		&nbsp;&nbsp;
+		<input type="button" value="Close" onclick="controlPanel.closePanel()">
 	</form>
 </cfoutput>

@@ -4,6 +4,10 @@
 	<baseResources>
 		<resource href="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js" type="script" />
 		<resource href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js" type="script" />
+		<resource href="/homePortals/plugins/cms/lib/jHtmlArea/jHtmlArea-0.7.0.min.js" type="script"/>
+		<resource href="/homePortals/plugins/cms/lib/jHtmlArea/jHtmlArea.ColorPickerMenu-0.7.0.min.js" type="script"/>
+		<resource href="/homePortals/plugins/cms/lib/jHtmlArea/jHtmlArea.css" type="style"/>
+		<resource href="/homePortals/plugins/cms/lib/jHtmlArea/jHtmlArea.ColorPickerMenu.css" type="style"/>
 		<resource href="/homePortals/plugins/cms/main.js" type="script"/>
 		<resource href="/homePortals/plugins/cms/style.css" type="style"/>
 		<resource href="/homePortals/plugins/cms/adminBar.cfm" type="header"/>

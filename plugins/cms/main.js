@@ -1,9 +1,9 @@
 
 /* *****************************************************/
-/* controlPanel.js								   		*/
+/* main.js								   		*/
 /*												   		*/
 /* This javascript contains all js functions for the  	*/
-/* of the startPage application.  				  		*/
+/* of the CMS plugin.  				  		*/
 /*												   		*/
 /* (c) 2007 - Oscar Arevalo - info@homeportals.net  	*/
 /*												   		*/
@@ -52,15 +52,6 @@ function controlPanelClient() {
 
 
 	// *****   Actions ****** //
-
-	function addModule(modID) {
-		controlPanel.setStatusMessage("Adding module to page...");
-		h_callServer("addModule","cms-statusMessage",{moduleID:modID});
-	}
-
-	function addFeed(feedURL, feedTitle) {
-		h_callServer("addFeed","cms-statusMessage",{feedURL:feedURL, feedTitle:feedTitle});
-	}			
 	
 	function addContentTag(frm) {
 		h_callServer("addContentTag","cms-statusMessage",{tag:frm.tag.value, location:frm.location.value});
@@ -107,7 +98,7 @@ function controlPanelClient() {
 		h_callServer("renamePage","cms-statusMessage",{pageName:title});
 	}	
 
-	function updateModule(frm, props, resPrefixes) {
+	function updateModule(frm, props, resPrefixes, resPrefixesJs) {
 		var hasFileToUpload = false;
 		var params = {
 				moduleID: frm.moduleID.value,
@@ -117,19 +108,34 @@ function controlPanelClient() {
 				resPrefixes: resPrefixes
 		};
 		
-		for(var i=0;i<props.length;i++) {
-			if(!(frm[props[i]].type=="radio" && !frm[props[i]].checked))  {
-				params[props[i]] = frm[props[i]].value;
-			}
-		}
-
 		for(var i=0;i<frm.elements.length;i++) {
-			for(var j=0;j<resPrefixes.length;j++) {
-				fieldName = frm.elements[i].name;
-				if(fieldName.substr(0,resPrefixes[j].length)==resPrefixes[j]) {
-					params[frm.elements[i].name] = frm.elements[i].value;
-					if(frm.elements[i].type == "file") {
+			var fieldName = frm.elements[i].name;
+			var fieldType = frm.elements[i].type
+			var fieldValue = frm.elements[i].value
+			var fieldChecked = frm.elements[i].checked
+
+			for(var j=0;j<props.length;j++) {
+				if(fieldName==props[j]) {
+					if(!(fieldType=="radio" && !fieldChecked)) {
+						params[props[j]] = fieldValue;
+					}
+				}
+			}
+
+			for(var j=0;j<resPrefixesJs.length;j++) {
+				if(fieldName.substr(0,resPrefixesJs[j].length)==resPrefixesJs[j]) {
+					if(fieldType == "file" && fieldValue!="") {
 						hasFileToUpload = true;
+					}
+					if(fieldName == resPrefixesJs[j]+"__filebody" ) {
+						jQuery("#"+resPrefixesJs[j]+"__filebody").htmlarea("updateTextArea");
+					}
+					if(fieldType=="radio")  {
+						 if(fieldChecked) {
+							params[fieldName] = fieldValue;
+						 }
+					} else {
+						params[fieldName] = fieldValue;
 					}
 				}
 			}
@@ -284,8 +290,6 @@ function controlPanelClient() {
 	controlPanelClient.prototype.getView = getView;
 	controlPanelClient.prototype.getPartialView = getPartialView;
 
-	controlPanelClient.prototype.addModule = addModule;
-	controlPanelClient.prototype.addFeed = addFeed;
 	controlPanelClient.prototype.deleteModule = deleteModule;
 	controlPanelClient.prototype.addPage = addPage;
 	controlPanelClient.prototype.deletePage = deletePage;

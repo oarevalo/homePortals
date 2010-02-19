@@ -36,6 +36,7 @@
 		</table>
 		<br />
 		<input type="button" value="Add To Page" onclick="controlPanel.addContentTag(this.form)">
-		<a href="##" onclick="controlPanel.closePanel();">Close</a>
+		&nbsp;&nbsp;
+		<input type="button" value="Close" onclick="controlPanel.closePanel()">
 	</form>	
 </cfoutput>
