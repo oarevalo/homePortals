@@ -487,6 +487,7 @@
 			<cfset appRoot = variables.homePortals.getConfig().getAppRoot()>
 			<cfset oCatalog = variables.homePortals.getCatalog()>
 			<cfset oUserRegistry = createObject("component","homePortals.components.userRegistry").init()>
+			<cfset link = buildLink(variables.pageHREF,true,true)>
 
 			<!--- check if user exists --->
 			<cftry>
@@ -503,7 +504,7 @@
 			</cftry>
 				
    			<script>
-  				window.location.replace("#appRoot#?admin");
+  				window.location.replace("#link#");
    			</script>
 			<cfcatch type="any">
 				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
@@ -968,6 +969,7 @@
 	<cffunction name="buildLink" access="private" returntype="string">
 		<cfargument name="page" type="string" required="true">
 		<cfargument name="makeUnique" type="boolean" required="false" default="true">
+		<cfargument name="admin" type="boolean" required="false" default="false">
 		<cfset var link = variables.homePortals.getPluginManager().getPlugin("cms").getCMSLinkFormat()>
 		<cfset link = replace(link,"{appRoot}",variables.homePortals.getConfig().getAppRoot())>
 		<cfset link = replace(link,"{page}",arguments.page)>
@@ -976,6 +978,13 @@
 				<cfset link = link & "&" & getTickCount()>
 			<cfelse>
 				<cfset link = link & "?" & getTickCount()>
+			</cfif>
+		</cfif>
+		<cfif arguments.admin>
+			<cfif find("?",link)>
+				<cfset link = link & "&admin=1">
+			<cfelse>
+				<cfset link = link & "?admin=1">
 			</cfif>
 		</cfif>
 		<cfreturn link>

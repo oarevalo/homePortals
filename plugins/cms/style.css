@@ -51,6 +51,7 @@
 	
 	
 #cms-statusMessage {
+	font-family:Arial, Helvetica, sans-serif;
 	float:right;
 	margin-right:10px;
 	font-size:10px;
@@ -65,22 +66,22 @@
 	font-family:Arial, Helvetica, sans-serif;
 	font-size:12px;
 	line-height:18px;
-	border:1px solid silver;
+	border:1px solid #dbdbdb;
 	padding:8px;
 	margin:5px 0 5px 0;
-	background-color:#ebebeb;
+	background-color:#f3f4ee;
 	color:#000;
 }
 .cms-panelTitle {
 	font-size:14px;
 	font-weight:bold;
 	margin-bottom:10px;
-	border-bottom:1px solid black;
+	border-bottom:1px solid #999;
 }
 .cms-lightPanel {
 	color:#333;
 	margin-top:3px;
-	background-color:#f5f5f5;
+	background-color:#fff;
 	padding:8px;
 	line-height:20px;
 	font-size:12px;
@@ -88,7 +89,20 @@
 }
 #cms-navMenuContentPanel {
 	
-}	
+}
+.cms-panel input[type="button"] {
+	border:1px solid #999;
+	font-size:12px;
+	background-color:#ebebeb;
+	color:#333;
+	cursor:pointer;
+	font-weight:bold;
+	padding:5px;
+}
+.cms-panel input[type="button"]:hover {
+	background-color:#f5f5f5;
+	color:#333;
+}
 .cms-dataTable {
 	border-collapse:collapse;
 }	
@@ -119,6 +133,7 @@
 	color:#333;
 }
 #cms-adminSubBar {
+	font-family:Arial, Helvetica, sans-serif;
 	background-color: #333;
 	border-top:1px solid white; 
 	border-bottom:1px solid black; 
@@ -148,7 +163,13 @@
 #cms-adminBarActions input {
 	font-size:10px;
 }
-
+#cms-frmLogin {
+	margin:0px;
+	padding:0px;
+	width:450px;
+	float:right;
+	text-align:right;
+}
 #cms-mainTitle {
 	font-size:16px;
 	font-family:arial;

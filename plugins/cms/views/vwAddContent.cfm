@@ -4,19 +4,34 @@
 <cfset tags = variables.homePortals.getConfig().getContentRenderers()>
 
 <cfoutput>
-	<div class="cms-panelTitle">Add Content</div>
+	<script>
+		jQuery(function() {
+			jQuery("##cms-contentTagName").change(function() {
+				controlPanel.getPartialView('ContentTagInfo',{tagName:this.value},'cms-contentTagInfoPanel');
+			});
+			<cfif arrayLen(structKeyArray(tags)) gt 0>
+				controlPanel.getPartialView('ContentTagInfo',{tagName:'#structKeyArray(tags)[1]#'},'cms-contentTagInfoPanel');
+			</cfif>
+		});
+	</script>
+
+	<div class="cms-panelTitle">Add Content <cfif arguments.locationName neq "">to '#arguments.locationName#'</cfif></div>
 	
 	<form name="frm" method="post" action="index.cfm">
 		<table>
 			<tr>
-				<td><b>Element Type:</b></td>
+				<td style="white-space:nowrap;"><b>Element Type:</b></td>
 				<td>
-					<select name="tag" class="cms-formField">
+					<select name="tag" class="cms-formField" id="cms-contentTagName">
 						<cfloop collection="#tags#" item="tag">
 							<option value="#tag#">#tag#</option>
 						</cfloop>
 					</select>
 				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td id="cms-contentTagInfoPanel"></td>
 			</tr>
 			<cfif arguments.locationName eq "">
 				<tr>
@@ -29,6 +44,7 @@
 							</cfloop>
 						</select>
 					</td>
+					<td></td>
 				</tr>
 			<cfelse>
 				<input type="hidden" name="location" value="#arguments.locationName#">

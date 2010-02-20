@@ -21,6 +21,7 @@
 		// get page object
 		currentPage = getPageHREF();
 		currentPath = getDirectoryFromPath(currentPage);
+		currentPath = replace(currentPath,"\","/","ALL");
 
 		// Get information on any currently logged-in user
 		oUserRegistry = createObject("Component","homePortals.components.userRegistry").init();
@@ -51,13 +52,11 @@
 	<!--- include css and javascript --->
 	
 		<script type="text/javascript">
-			xxx = '#getCurrentTemplatePath()#'
-			xxx = '#getBaseTemplatePath()#'
 			// initialize control panel client
 			stLocations = {#lstLocations#};
 			stModules = [#lstModules#];
-			_pageHREF = "#currentPage#";
-			_pageFileName = "#getFileFromPath(currentPage)#";
+			_pageHREF = "#jsStringFormat(currentPage)#";
+			_pageFileName = "#jsStringFormat(getFileFromPath(currentPage))#";
 			
 			var controlPanel = new controlPanelClient();
 			controlPanel.init("#appRoot#/#gateway#", "#cmsRoot#", stLocations);
@@ -123,15 +122,15 @@
 	<div id="cms-adminBar">
 		<div id="cms-adminBarActions">
 			<cfif bUserLoggedIn>
-				<a href="##" onclick="navCmdAddPage('#currentPath#')"><img src="#cmsRoot#/images/btnAddPage.gif" align="absmiddle" alt="Add Page" title="Add Page"></a>
+				<a href="##" onclick="navCmdAddPage('#jsStringFormat(currentPath)#')"><img src="#cmsRoot#/images/btnAddPage.gif" align="absmiddle" alt="Add Page" title="Add Page"></a>
 				<a href="##" id="cms-btnAddContent"><img src="#cmsRoot#/images/btnAddContent.gif" align="absmiddle" alt="Add Content" title="Add Content"></a>
 				<a href="##" id="cms-btnLogout"><img src="#cmsRoot#/images/btnLogOff.gif" align="absmiddle" alt="Log Off" title="Log Off"></a>
 				<a href="##" id="cms-btnSettings"><img src="#cmsRoot#/images/cog.png" align="absmiddle" alt="Settings" title="Settings"></a>
 				<a href="#cgi.script_name#?noadmin"><img src="#cmsRoot#/images/closePanel.gif" align="absmiddle" alt="Hide admin controls" title="Hide admin controls"></a>
 			<cfelse>
-				<form name="frmLogin" action="##" method="post">
-					User: <input type="text" name="username" value="" style="width:100px;">
-					Password: <input type="password" name="password" value="" style="width:100px;">
+				<form name="frmLogin" id="cms-frmLogin" action="##" method="post">
+					User: <input type="text" name="username" value="" class="cms-formField" style="width:100px;">
+					Password: <input type="password" name="password" value="" class="cms-formField" style="width:100px;">
 					<input type="button" value="Login" name="btnLogin" onclick="navCmdLogin(this.form)">
 				</form>
 			</cfif>

@@ -3,6 +3,7 @@
 <cfset stTemplates = hp.getTemplateManager().getTemplates("page")>
 <cfset mt = p.getMetaTags()>
 <cfset pageName = getFileFromPath(variables.pageHREF)>
+<cfset pageTitle = p.getTitle()>
 
 <cfset metadescription = "">
 <cfset metakeywords = "">
@@ -19,10 +20,11 @@
 	<form name="frm" method="post" action="##">
 		<div class="cms-panelTitle">
 			<div style="float:right;">
-				<a href='##' onclick='navCmdDeletePage()'><img 
+				<a href='##' onclick='navCmdDeletePage()'
+					style="color:red;text-decoration:none;font-size:11px;"><img 
 					src='#variables.cmsRoot#/images/omit-page-orange.gif' 
 					border='0' align='absmiddle' alt='Click to delete page' 
-					title='click to delete page'> <span style="color:red;">Delete Page</span></a>
+					title='click to delete page'> Delete Page</a>
 			</div>
 			Page Settings
 		</div>
@@ -43,7 +45,7 @@
 			</tr>
 			<tr>
 				<td><strong>Title:</strong></td>
-				<td><input type="text" name="title" value="#p.getTitle()#" class="cms-formField"></td>
+				<td><input type="text" name="title" value="#trim(pageTitle)#" class="cms-formField"></td>
 			</tr>
 			<tr>
 				<td><b>Template:</b></td>
