@@ -285,6 +285,9 @@
 			</cfif>
 		</cfloop>
 
+		<!--- Render pre-defined custom section for HTML Head code --->
+		<cfset tmpHTML = tmpHTML & renderCustomSection("HTMLHEAD")>
+
 		 <!--- 
 		 	Remove all whitespace from HEAD code
 		 	(for now is commented out because this can create problems with some JavaScript files)
