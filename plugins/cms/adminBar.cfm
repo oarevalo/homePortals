@@ -49,8 +49,10 @@
 <!--- display site map --->	
 <cfoutput>
 	<!--- include css and javascript --->
-	<cfsavecontent variable="tmpHTML">
+	
 		<script type="text/javascript">
+			xxx = '#getCurrentTemplatePath()#'
+			xxx = '#getBaseTemplatePath()#'
 			// initialize control panel client
 			stLocations = {#lstLocations#};
 			stModules = [#lstModules#];
@@ -59,54 +61,55 @@
 			
 			var controlPanel = new controlPanelClient();
 			controlPanel.init("#appRoot#/#gateway#", "#cmsRoot#", stLocations);
+		</script>
+
+	<cfif bUserLoggedIn>
+		<script type="text/javascript">
+			// setup UI
+			jQuery(function() {
+				controlPanel.setStatusMessage("attaching module icons...",700);
+				for(var i=0;i<stModules.length;i++) {
+					jQuery("##"+stModules[i])
+						.prepend("<div class='cms-moduleHandleBar'>" + stModules[i] + controlPanel.getModuleIconsHTML(stModules[i]) + "</div>");
+				}
 			
-			<cfif bUserLoggedIn>
-				// setup UI
-				jQuery(function() {
-					controlPanel.setStatusMessage("attaching module icons...",700);
-					for(var i=0;i<stModules.length;i++) {
-						jQuery("##"+stModules[i])
-							.prepend("<div class='cms-moduleHandleBar'>" + stModules[i] + controlPanel.getModuleIconsHTML(stModules[i]) + "</div>");
+				controlPanel.setStatusMessage("enabling drag and drop...",700);
+				for(loc in controlPanel.locations) {
+					jQuery("##"+controlPanel.locations[loc].id)
+						.addClass("cms-layoutRegion")
+						.prepend("<div class='cms-layoutRegionHandleBar'>" + controlPanel.locations[loc].name + controlPanel.getLocationIconsHTML(controlPanel.locations[loc].name) + "</div>");
+				}
+				jQuery(".cms-layoutRegion").sortable({
+					connectWith: '.cms-layoutRegion',
+				    forcePlaceholderSize: true,
+				    placeholder: 'cms-layoutRegionPlaceHolder',
+				    opacity: 0.6,
+				    delay:100,
+				    distance:5,
+				    handle: '.cms-moduleHandleBar',
+				    tolerance: 'pointer',
+				    
+				    start: function(event,ui) {
+						jQuery(".cms-layoutRegion")
+							.addClass("cms-layoutRegionHighlighted");
+					},
+				    stop: function(event,ui) {
+						jQuery(".cms-layoutRegion")
+							.removeClass("cms-layoutRegionHighlighted");
+						controlPanel.updateLayout();
 					}
 				
-					controlPanel.setStatusMessage("enabling drag and drop...",700);
-					for(loc in controlPanel.locations) {
-						jQuery("##"+controlPanel.locations[loc].id)
-							.addClass("cms-layoutRegion")
-							.prepend("<div class='cms-layoutRegionHandleBar'>" + controlPanel.locations[loc].name + controlPanel.getLocationIconsHTML(controlPanel.locations[loc].name) + "</div>");
-					}
-					jQuery(".cms-layoutRegion").sortable({
-						connectWith: '.cms-layoutRegion',
-					    forcePlaceholderSize: true,
-					    placeholder: 'cms-layoutRegionPlaceHolder',
-					    opacity: 0.6,
-					    delay:100,
-					    distance:5,
-					    handle: '.cms-moduleHandleBar',
-					    tolerance: 'pointer',
-					    
-					    start: function(event,ui) {
-							jQuery(".cms-layoutRegion")
-								.addClass("cms-layoutRegionHighlighted");
-						},
-					    stop: function(event,ui) {
-							jQuery(".cms-layoutRegion")
-								.removeClass("cms-layoutRegionHighlighted");
-							controlPanel.updateLayout();
-						}
-					
-					});			
-					jQuery(".cms-layoutRegion").disableSelection();
-					jQuery("##cms-btnEditPage").click(function(){ controlPanel.getView("PageProperties"); });
-					jQuery("##cms-btnSitemap").click(function(){ controlPanel.getView("SiteMap"); });
-					jQuery("##cms-btnSettings").click(function(){ controlPanel.getView("Settings"); });
-					jQuery("##cms-btnAddContent").click(function(){ controlPanel.getView("AddContent"); });
-					jQuery("##cms-btnLogout").click(function(){ navCmdLogout(); });
-				});
-			</cfif>
+				});			
+				jQuery(".cms-layoutRegion").disableSelection();
+				jQuery("##cms-btnEditPage").click(function(){ controlPanel.getView("PageProperties"); });
+				jQuery("##cms-btnSitemap").click(function(){ controlPanel.getView("SiteMap"); });
+				jQuery("##cms-btnSettings").click(function(){ controlPanel.getView("Settings"); });
+				jQuery("##cms-btnAddContent").click(function(){ controlPanel.getView("AddContent"); });
+				jQuery("##cms-btnLogout").click(function(){ navCmdLogout(); });
+			});
 		</script>
-	</cfsavecontent>
-	<cfhtmlhead text="#tmpHTML#">
+	</cfif>
+
 
 	<!--- check if there are users created --->
 	<cfset qryUserCheck = getHomePortals().getCatalog().getResourcesByType("cmsUser")>

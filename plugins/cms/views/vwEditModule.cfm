@@ -15,6 +15,7 @@
 	thisModule = oModuleBean.toStruct();
 	
 	modTitle = oModuleBean.getTitle();
+	modStyle = oModuleBean.getStyle();
 </cfscript>	
 <cfoutput>
 	<div class="cms-panelTitle">Edit Module: #modID#</div>
@@ -29,10 +30,20 @@
 			</div>
 		</cfif>
 		<table>
-			<tr>
+			<tr valign="top">
 				<td style="width:80px;"><b>Title:</b></td>
 				<td><input type="text" name="title" value="#modTitle#" class="cms-formField"></td>
-				<td style="width:30px;">&nbsp;</td>
+				<td style="width:30px;" rowspan="3">&nbsp;</td>
+				<td rowspan="3">
+					<strong>Custom CSS:</strong><br />
+					<textarea name="style" rows="2" class="cms-formField" style="width:180px;">#trim(modStyle)#</textarea>
+				</td>
+				<td rowspan="3" class="cms-formFieldTip">
+					<br />
+					Use <abbr title="Cascading Stylesheets">CSS</abbr> rules to customize the look and feel of individual page elements.
+				</td>
+			</tr>
+			<tr>
 				<td style="width:80px;"><b>Template:</b></td>
 				<td>
 					<select name="moduleTemplate" class="cms-formField">
@@ -45,9 +56,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
 				<td><b>Location:</b></td>
 				<td>
 					<select name="location" class="cms-formField">

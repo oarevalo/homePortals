@@ -10,7 +10,7 @@
 		<resource href="/homePortals/plugins/cms/lib/jHtmlArea/jHtmlArea.ColorPickerMenu.css" type="style"/>
 		<resource href="/homePortals/plugins/cms/main.js" type="script"/>
 		<resource href="/homePortals/plugins/cms/style.css" type="style"/>
-		<resource href="/homePortals/plugins/cms/adminBar.cfm" type="header"/>
+		<resource href="/homePortals/plugins/cms/adminBar.cfm" type="HTMLHEAD"/>
 	</baseResources>
 
 	<resourceTypes>

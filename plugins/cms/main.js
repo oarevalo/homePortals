@@ -105,6 +105,7 @@ function controlPanelClient() {
 				title: frm.title.value,
 				location: frm.location.value,
 				moduleTemplate: frm.moduleTemplate.value,
+				style: frm.style.value,
 				resPrefixes: resPrefixes
 		};
 		

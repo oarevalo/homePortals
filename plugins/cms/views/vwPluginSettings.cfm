@@ -1,6 +1,7 @@
 <cfset hp = variables.homePortals>
 <cfset plugins = hp.getPluginManager().getPlugins()>
 <cfset pageProperties = hp.getConfig().getPageProperties()>
+<cfset hasSettings = false>
 
 <cfoutput>
 	<div class="cms-panelTitle">
@@ -12,6 +13,7 @@
 		<cfset propList = "">
 		
 		<cfif structKeyExists(md,"properties")>
+			<cfset hasSettings = true>
 			<div class="cms-lightPanel" style="margin-bottom:15px;">
 				<form name="frm" method="post" action="##">
 					<table>
@@ -48,4 +50,7 @@
 			</div>
 		</cfif>
 	</cfloop>
+	<cfif not hasSettings>
+		<p>There are no configurable options for any of the installed plugins.</p>
+	</cfif>
 </cfoutput>

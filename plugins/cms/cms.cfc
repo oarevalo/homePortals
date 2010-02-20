@@ -355,15 +355,17 @@
    		<cfargument name="title" type="string" required="yes">
    		<cfargument name="location" type="string" required="yes">
   		<cfargument name="moduleTemplate" type="string" required="yes">
+  		<cfargument name="style" type="string" required="yes">
   		<cfargument name="resPrefixes" type="string" required="false" default="">
 		<cfset var prefix = "prop_">
    		<cftry>
    			<cfscript>
    				validateOwner();
    				oModuleBean = variables.oPage.getModule(arguments.moduleID);
-   				oModuleBean.setTitle(arguments.title);
+   				oModuleBean.setTitle(trim(arguments.title));
    				oModuleBean.setModuleTemplate(arguments.moduleTemplate);
    				oModuleBean.setLocation(arguments.location);
+   				oModuleBean.setStyle(trim(arguments.style));
 
 				// update module properties
    				for(arg in arguments) {
