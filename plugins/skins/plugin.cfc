@@ -1,4 +1,4 @@
-<cfcomponent extends="homePortals.components.plugin">
+<cfcomponent extends="homePortals.components.plugin" hint="This plugin provides a way of 'skinning' site pages. Skins are created as regular Resources and stored on the resource library. Skins are used on a per-page basis.">
 
 	<cffunction name="onAppInit" access="public" returntype="void">
 		<cfscript>
