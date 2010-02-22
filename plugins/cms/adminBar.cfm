@@ -18,6 +18,11 @@
 		cmsRoot = oHP.getPluginManager().getPlugin("cms").getCMSRoot();
 		gateway = oHP.getPluginManager().getPlugin("cms").getCMSGateway();
 
+		// create gateway if needed
+		if(not fileExists(expandPath("#appRoot#/#gateway#"))) {
+			fileCopy(expandPath(cmsRoot & "/default-cms-gateway.cfm"),expandPath("#appRoot#/#gateway#"))
+		}
+
 		// get page object
 		currentPage = getPageHREF();
 		currentPath = getDirectoryFromPath(currentPage);

@@ -1,4 +1,4 @@
-<cfcomponent extends="homePortals.components.plugin">
+<cfcomponent extends="homePortals.components.plugin" hint="This plugin provides an in-page authoring interface for managing site content and layout. The CMS user interface is invoked by appending the 'admin' parameter to the current URL">
 	
 	<cffunction name="onAppInit" access="public" returntype="void">
 		<cfscript>
