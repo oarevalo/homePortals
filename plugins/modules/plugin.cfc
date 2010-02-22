@@ -1,4 +1,4 @@
-<cfcomponent extends="homePortals.components.plugin">
+<cfcomponent extends="homePortals.components.plugin" hint="This plugin provides a resource library of ready-to-use interactive widgets that can be added directly to pages.">
 
 	<cfset variables.oModuleProperties = 0>
 
