@@ -1,5 +1,5 @@
 <cfcomponent extends="homePortals.components.contentTagRenderer"
-			 hint="Use this content renderer to include an existing CFML view or template on a page.">
+			 hint="Use this content renderer to display an image.">
 	<cfproperty name="imageID" type="resource:image" hint="Image resource from the resource library">
 	<cfproperty name="href" type="string" hint="Source URL for the image (when not using an image from the resource library)">
 	<cfproperty name="width" type="string" hint="Image width (pixels). Leave empty for full width." />
@@ -21,60 +21,54 @@
 			var height = getContentTag().getAttribute("height");
 			var label = getContentTag().getAttribute("label");
 			var link = getContentTag().getAttribute("link");
+			var imageID = getContentTag().getAttribute("imageID");
+			var href = getContentTag().getAttribute("href");
 			var tmpHTML = "";
 			var imgpath = "";
 			var alt = label;
 
-			try {
-				imgpath = retrieveResourceFilePath();
-				
-				if(alt eq "") alt = getFileFromPath(imgPath);
-				
-				tmpHTML = "<img src=""#imgpath#"" border=""0"" alt=""#htmlEditFormat(alt)#"" title=""#htmlEditFormat(alt)#""";
-				
-				if(width neq "") tmpHTML = tmpHTML & " width='#width#'";
-				if(height neq "") tmpHTML = tmpHTML & " height='#height#'";
-				tmpHTML = tmpHTML & ">";
-				
-				if(link neq "") tmpHTML = "<a href='#link#'>" & tmpHTML & "</a>";
-				if(label neq "") tmpHTML = tmpHTML & "<br/>" & label;
-				
-				arguments.bodyContentBuffer.set( tmpHTML );
-				
-			} catch(any e) {
-				tmpHTML = "<b>An unexpected error ocurred while retrieving content for content module #moduleID#.</b><br><br><b>Message:</b> #e.message# #e.detail#";
-				arguments.bodyContentBuffer.set( tmpHTML );
+			if(imageID neq "") {
+				resBean = retrieveResource()
+				imgpath = resBean.getFullHref();
+				alt = resBean.getProperty("label");
+				label = resBean.getProperty("label");
+				link = resBean.getProperty("url");
+			} else {
+				imgpath = href;
 			}
+			
+			if(alt eq "") alt = getFileFromPath(imgPath);
+			if(link eq "$") link = imgpath;
+			
+			tmpHTML = "<img src=""#imgpath#"" border=""0"" alt=""#htmlEditFormat(alt)#"" title=""#htmlEditFormat(alt)#""";
+			
+			if(width neq "") tmpHTML = tmpHTML & " width='#width#'";
+			if(height neq "") tmpHTML = tmpHTML & " height='#height#'";
+			tmpHTML = tmpHTML & ">";
+			
+			if(link neq "") tmpHTML = "<a href='#link#'>" & tmpHTML & "</a>";
+			if(label neq "") tmpHTML = tmpHTML & "<div>" & label & "</div>";
+			
+			arguments.bodyContentBuffer.set( tmpHTML );
+				
 		</cfscript>
 	</cffunction>
 
 	<!---------------------------------------->
-	<!--- retrieveResourceFilePath         --->
+	<!--- retrieveResource		           --->
 	<!---------------------------------------->		
-	<cffunction name="retrieveResourceFilePath" access="private" returntype="string" hint="retrieves res from source for a module">
+	<cffunction name="retrieveResource" access="private" returntype="any" hint="retrieves res from source for a module">
 		<cfscript>
-			var oResourceBean = 0;
-			var resPath = "";
-			var tmpHTML = "";
-			var st = structNew();
 			var oCatalog = getPageRenderer().getHomePortals().getCatalog();
-			var oHPConfig = getPageRenderer().getHomePortals().getConfig();
 			
 			var resourceID = getContentTag().getAttribute("imageID");
 			var resourceType = getContentTag().getAttribute("resourceType","image");
-			var href = getContentTag().getAttribute("href");
 			
 			// define source of content (resource or external)
-			if(resourceID neq "") {
-				oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
-				resPath = oResourceBean.getFullHref();
+			var oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
 			
-			} else if(href neq "") {
-				resPath = href;
-			}
-
+			return oResourceBean;
 		</cfscript>
-		<cfreturn resPath>
 	</cffunction>
 
 </cfcomponent>
