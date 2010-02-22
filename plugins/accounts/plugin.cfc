@@ -1,4 +1,4 @@
-<cfcomponent extends="homePortals.components.plugin">
+<cfcomponent extends="homePortals.components.plugin" hint="This plugin adds support for creating user accounts and assigning pages to each user.">
 
 	<cfset variables.oAccounts = 0>
 
