@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 2.5 License
+
+Name       : Zenlike
+Version    : 1.0
+Released   : 20080425
+
+-->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>$PAGE_TITLE$</title>
+$PAGE_HTMLHEAD$
+</head>
+<body>
+
+<div id="outer">
+
+	<div id="header">
+		<div id="headercontent">
+			<h1>$PAGE_PROPERTY["siteTitle"]$</h1>
+			<h2>$PAGE_PROPERTY["siteTagline"]$</h2>
+		</div>
+	</div>
+
+	<div id="headerpic"></div>
+	
+	<div id="menu">
+		<!-- HINT: Set the class of any menu link below to "active" to make it appear active -->
+		$PAGE_LAYOUTSECTION["menu"]["div"]$
+	</div>
+	<div id="menubottom"></div>
+	
+	<div id="content">
+		<!-- Normal content: Stuff that's not going to be put in the left or right column. -->
+		$PAGE_LAYOUTSECTION["Header"]["div"]$
+
+		<div class="divider1"></div>
+
+		<!-- Primary content: Stuff that goes in the primary content column (by default, the left column) -->
+		<div id="primarycontainer">
+			<div id="primarycontent">
+				<!-- Primary content area start -->
+				$PAGE_LAYOUTSECTION["Primary"]["div"]$
+				<!-- Primary content area end -->
+			</div>
+		</div>
+		
+		<!-- Secondary content: Stuff that goes in the secondary content column (by default, the narrower right column) -->
+		<div id="secondarycontent">
+			<!-- Secondary content area start -->
+			$PAGE_LAYOUTSECTION["Secondary"]["div"]$
+			<!-- Secondary content area end -->
+		</div>
+	</div>
+
+	<div id="footer">
+			<div class="left">$PAGE_PROPERTY["siteCopyright"]$</div>
+			<div class="right">Design by <a href="http://www.nodethirtythree.com/">NodeThirtyThree</a> + <a href="http://www.freecsstemplates.org/">Free CSS Templates</a></div>
+	</div>
+	
+</div>
+
+</body>
+</html>

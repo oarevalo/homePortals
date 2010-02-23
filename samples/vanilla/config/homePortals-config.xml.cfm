@@ -19,5 +19,6 @@
 		<property name="siteTagline" value="Amazing Stuff Everyday"/>
 		<property name="siteCopyright" value="&amp;copy; Copyright 2010 Goes Here"/>
 		<property name="siteTitle" value="Your Site"/>
+		<property name="plugins.cms.cmsLinkFormat" value="{appRoot}{page}.cfm"/>
 	</pageProperties>
 </homePortals>

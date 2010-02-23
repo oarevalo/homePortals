@@ -1,4 +1,4 @@
-<cfcomponent extends="homePortals.components.plugin" hint="This plugin applies the TerraFirma theme.">
+<cfcomponent extends="homePortals.components.plugin" displayName="ZenLikeTheme" hint="This plugin applies the ZenLike theme.">
 	<cfproperty name="siteTitle" type="string" displayname="Site Title" hint="Title to display on the page header">
 	<cfproperty name="siteTagline" type="string" displayname="Site Tagline" hint="Subtitle displayed under the main site title">
 	<cfproperty name="siteCopyright" type="string" displayname="Site Copyright" hint="Copyright line for the website">
