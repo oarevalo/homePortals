@@ -9,6 +9,7 @@
 .cms-layoutRegionPlaceHolder {
 	background-color:#f5f5f5;
 	border:1px dashed #ebebeb;
+	z-index:999;
 }
 .cms-moduleHandleBar {
 	background-color:#666;
@@ -21,6 +22,7 @@
 	height:20px;
 	border-bottom:1px solid silver;
 	border-right:1px solid silver;
+	z-index:999;
 }
 
 .cms-layoutRegionHandleBar {

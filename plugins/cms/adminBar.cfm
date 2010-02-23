@@ -20,7 +20,7 @@
 
 		// create gateway if needed
 		if(not fileExists(expandPath("#appRoot#/#gateway#"))) {
-			fileCopy(expandPath(cmsRoot & "/default-cms-gateway.cfm"),expandPath("#appRoot#/#gateway#"))
+			fileCopy(expandPath(cmsRoot & "/default-cms-gateway.cfm"),expandPath("#appRoot#/#gateway#"));
 		}
 
 		// get page object
