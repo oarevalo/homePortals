@@ -28,7 +28,7 @@
 			var alt = label;
 
 			if(imageID neq "") {
-				resBean = retrieveResource()
+				resBean = retrieveResource();
 				imgpath = resBean.getFullHref();
 				alt = resBean.getProperty("label");
 				label = resBean.getProperty("label");
