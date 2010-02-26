@@ -222,6 +222,7 @@
 				for(i=1;i lte arrayLen(arguments.xmlConfig.xmlRoot.settings.xmlChildren);i=i+1) {
 					xmlNode = arguments.xmlConfig.xmlRoot.settings.xmlChildren[i];
 					if(xmlNode.xmlName eq "setting") {
+						if(xmlNode.xmlAttributes.value eq "$APP_PATH") xmlNode.xmlAttributes.value = this.paths.app;
 						application[this.app_key][this.APP_KEYS.SETTINGS][xmlNode.xmlAttributes.name] = xmlNode.xmlAttributes.value;
 					}
 				}
@@ -261,7 +262,8 @@
 
 								} else {
 									// append to argument collection
-									stArguments[ xmlNode.xmlChildren[j].xmlAttributes.name ] = xmlNode.xmlChildren[j].xmlText;
+									if(trim(xmlNode.xmlChildren[j].xmlText) eq "$APP_PATH") xmlNode.xmlChildren[j].xmlText = this.paths.app;
+									stArguments[ xmlNode.xmlChildren[j].xmlAttributes.name ] = trim(xmlNode.xmlChildren[j].xmlText);
 								}
 							}
 						}

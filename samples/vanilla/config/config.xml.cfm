@@ -2,7 +2,7 @@
 <config>
 	<!-- This section describes application-specific settings -->
 	<settings>
-		<setting name="appRoot" value="/vanilla" />
+		<setting name="appRoot" value="$APP_PATH" />
 	</settings>
 
 

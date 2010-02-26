@@ -6,7 +6,6 @@
 
 	<!--- App Mapping --->
 	<cfset this.paths.app = "/vanilla">
-	<cfset request.appRoot = this.paths.app>
 	<!------------------->
 
 	<!--- Framework settings --->
@@ -16,6 +15,8 @@
 	<cfset this.dirs.layouts = "layouts">
 	<cfset this.dirs.views = "views">
 	<cfset this.configDoc = "config/config.xml.cfm">
+
+	<cfset request.appRoot = this.paths.app>
 
 	<cffunction name="onMissingTemplate" returnType="boolean">
 	    <cfargument type="string" name="targetPage" required="true" />
