@@ -1,0 +1,1 @@
+<cfinclude template="/homePortals/common/Templates/page.cfm">
