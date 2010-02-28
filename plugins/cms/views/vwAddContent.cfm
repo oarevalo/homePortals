@@ -10,7 +10,8 @@
 				controlPanel.getPartialView('ContentTagInfo',{tagName:this.value},'cms-contentTagInfoPanel');
 			});
 			<cfif arrayLen(structKeyArray(tags)) gt 0>
-				controlPanel.getPartialView('ContentTagInfo',{tagName:'#structKeyArray(tags)[1]#'},'cms-contentTagInfoPanel');
+				<cfset tmp = structKeyArray(tags)>
+				controlPanel.getPartialView('ContentTagInfo',{tagName:'#tmp[1]#'},'cms-contentTagInfoPanel');
 			</cfif>
 		});
 	</script>
