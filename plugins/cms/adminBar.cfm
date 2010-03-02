@@ -27,6 +27,7 @@
 		currentPage = getPageHREF();
 		currentPath = getDirectoryFromPath(currentPage);
 		currentPath = replace(currentPath,"\","/","ALL");
+		currentPath = replace(currentPath,"//","/","ALL");
 
 		// Get information on any currently logged-in user
 		oUserRegistry = createObject("Component","homePortals.components.userRegistry").init();
@@ -49,6 +50,9 @@
 		for(i=1;i lte arrayLen(aModules);i++) {
 			lstModules = listAppend(lstModules, "'" & aModules[i].getid() & "'");
 		}
+		
+		gatewayPath = appRoot & "/" & gateway;
+		gatewayPath = replace(gatewayPath,"//","/","ALL");
 	</cfscript>	
 </cfsilent>
 	
@@ -64,7 +68,7 @@
 			_pageFileName = "#jsStringFormat(getFileFromPath(currentPage))#";
 			
 			var controlPanel = new controlPanelClient();
-			controlPanel.init("#appRoot#/#gateway#", "#cmsRoot#", stLocations);
+			controlPanel.init("#gatewayPath#", "#cmsRoot#", stLocations);
 		</script>
 
 	<cfif bUserLoggedIn>

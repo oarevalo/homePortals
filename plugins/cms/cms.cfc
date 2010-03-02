@@ -987,6 +987,7 @@
 				<cfset link = link & "?admin=1">
 			</cfif>
 		</cfif>
+		<cfset link = replace(link,"//","/","ALL")>
 		<cfreturn link>
 	</cffunction>				
 					
