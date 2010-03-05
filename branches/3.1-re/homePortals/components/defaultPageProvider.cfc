@@ -7,6 +7,9 @@
 	<cffunction name="init" access="public" returntype="pageProvider" hint="constructor">
 		<cfargument name="config" type="homePortalsConfigBean" hint="main configuration bean for the application">
 		<cfset variables.contentRoot = arguments.config.getContentRoot()>
+		<cfif left(variables.contentRoot,1) neq "/">
+			<cfset variables.contentRoot = arguments.config.getAppRoot() & variables.contentRoot>
+		</cfif>
 		<cfreturn this>
 	</cffunction>
 

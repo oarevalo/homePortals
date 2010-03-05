@@ -19,6 +19,7 @@
 		<cfargument name="resourceLibraryPath" type="string" required="true">
 		<cfargument name="resourceTypeRegistry" type="homePortals.components.resourceTypeRegistry" required="true">
 		<cfargument name="configStruct" type="struct" required="true">
+		<cfargument name="appRoot" type="string" required="false" default="">
 		<cfscript>
 			variables.resourcesRoot = arguments.resourceLibraryPath;
 			variables.resourceTypeRegistry = arguments.resourceTypeRegistry;

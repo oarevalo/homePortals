@@ -3,6 +3,7 @@
 	<cfscript>
 		variables.resourceDescriptorFile = "info.xml";
 		variables.resourcesRoot = "";
+		variables.resourcesRootOriginal = "";
 		variables.stTimers = structNew();
 		variables.resourceTypeRegistry = 0;
 		
@@ -16,8 +17,14 @@
 		<cfargument name="resourceLibraryPath" type="string" required="true">
 		<cfargument name="resourceTypeRegistry" type="homePortals.components.resourceTypeRegistry" required="true">
 		<cfargument name="configStruct" type="struct" required="true">
-		<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
+		<cfargument name="appRoot" type="string" required="false" default="">
+		<cfset variables.resourcesRootOriginal = arguments.resourceLibraryPath>
 		<cfset variables.resourceTypeRegistry = arguments.resourceTypeRegistry>
+		<cfif left(arguments.resourceLibraryPath,1) neq "/">
+			<cfset variables.resourcesRoot = arguments.appRoot & arguments.resourceLibraryPath>
+		<cfelse>
+			<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
+		</cfif>
 		<cfreturn this>
 	</cffunction>
 
@@ -102,7 +109,7 @@
 			} else if(fileTypes neq "") {
 				// there is no resource descriptor, but we know the file types for these resource,
 				// so we will treat any files on the package dir with those extensions as resources
-				tmpDir = getPath()
+				tmpDir = variables.resourcesRoot
 							& "/" 
 							& rt.getFolderName() 
 							& "/" 
@@ -168,7 +175,7 @@
 							& "/"
 							& arguments.resourceID;
 				for(i=1;i lte listLen(fileTypes);i++) {
-					if(fileExists(expandPath(getPath() & "/" & tmpHREF & "." & listGetAt(fileTypes,i)))) {
+					if(fileExists(expandPath(variables.resourcesRoot & "/" & tmpHREF & "." & listGetAt(fileTypes,i)))) {
 						oResourceBean = getNewResource(arguments.resourceType);
 						oResourceBean.setID( arguments.resourceID );
 						oResourceBean.setHREF( tmpHREF & "." & listGetAt(fileTypes,i) );
@@ -350,7 +357,7 @@
 	<!--- getPath			                	   ---->
 	<!------------------------------------------------->
 	<cffunction name="getPath" access="public" returntype="string" hint="returns the root directory for this library">
-		<cfreturn variables.resourcesRoot>
+		<cfreturn variables.resourcesRootOriginal>
 	</cffunction>
 	
 	<!---------------------------------------->
@@ -381,13 +388,12 @@
 	<!------------------------------------------------->
 	<cffunction name="getResourceFileHREF" access="public" returntype="string" hint="returns the full (web accessible) path to a file object on the library">
 		<cfargument name="resourceBean" type="homePortals.components.resourceBean" required="true"> 
-		<cfset var resLibPath = getPath()>
 		<cfset var href = arguments.resourceBean.getHref()>
 		
-		<cfif right(resLibPath,1) neq "/">
-			<cfset href = resLibPath & "/" & href />
+		<cfif right(variables.resourcesRoot,1) neq "/">
+			<cfset href = variables.resourcesRoot & "/" & href />
 		<cfelse>
-			<cfset href = resLibPath & href />
+			<cfset href = variables.resourcesRoot & href />
 		</cfif>
 		
 		<cfreturn href>

@@ -73,6 +73,7 @@
 				}
 			} else {
 				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
+				if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";	//normalize approot if obtained from config
 			}
 
 			// set the appRoot to the given parameter, this way, we can get away without having a local config 

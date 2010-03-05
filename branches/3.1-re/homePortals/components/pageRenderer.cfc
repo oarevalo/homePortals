@@ -204,7 +204,7 @@
 		<cfsavecontent variable="tmpHTML">
 			<cfloop from="1" to="#ArrayLen(aResourceType)#" index="i">
 				<cftry>
-					<cfinclude template="#aResourceType[i]#">
+					<cfinclude template="#normalizePath(aResourceType[i])#">
 					<cfcatch type="any">
 						<cfinclude template="#variables.errorTemplate#">
 					</cfcatch>
@@ -244,7 +244,7 @@
 			
 		<!--- Include basic and user-defined CSS styles --->
 		<cfloop from="1" to="#ArrayLen(aStylesheets)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#aStylesheets[i]#""/>">
+			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#normalizePath(aStylesheets[i])#""/>">
 		</cfloop>
 		
 		<!--- Add page skin --->
@@ -254,7 +254,7 @@
 		
 		<!--- Include required and user-defined Javascript files --->
 		<cfloop from="1" to="#ArrayLen(aScripts)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<script src=""#aScripts[i]#"" type=""text/javascript""></script>">
+			<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
 		</cfloop>
 		
 		<!--- Process event listeners --->
@@ -601,7 +601,7 @@
 		<cfscript>
 			var oContentTag = createObject("component", "contentTag").init(arguments.moduleBean);
 			var contentTagRendererClassName = getHomePortals().getConfig().getContentRenderer( arguments.contentTagType );
-			var oContentTagRenderer = createObject("component", contentTagRendererClassName).init(this, oContentTag);
+			var oContentTagRenderer = createObject("component", normalizeContentTagRendererPath(contentTagRendererClassName) ).init(this, oContentTag);
 			return oContentTagRenderer;
 		</cfscript>
 	</cffunction>
@@ -646,5 +646,27 @@
 		<cfargument name="type" type="string" default="custom"> 
 		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
 	</cffunction>
+
+	<cffunction name="normalizeContentTagRendererPath" access="private">
+		<cfargument name="path" type="string" required="true">
+		<cfif left(arguments.path,1) eq ".">
+			<cfset arguments.path = getHomePortals().getConfig().getAppRoot() & arguments.path>
+			<cfset arguments.path = replace(arguments.path,"/",".","ALL")>
+			<cfset arguments.path = replace(arguments.path,"..",".","ALL")>
+			<cfif left(arguments.path,1) eq "/">
+				<cfset arguments.path = right(arguments.path,len(arguments.path)-1)>
+			</cfif>
+		</cfif>
+		<cfreturn arguments.path />
+	</cffunction>
+
+	<cffunction name="normalizePath" access="private">
+		<cfargument name="path" type="string" required="true">
+		<cfif left(arguments.path,1) neq "/" and not find("://",arguments.path)>
+			<cfreturn getHomePortals().getConfig().getAppRoot() & arguments.path>
+		</cfif>
+		<cfreturn arguments.path />
+	</cffunction>
+
 
 </cfcomponent>

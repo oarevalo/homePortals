@@ -4,6 +4,7 @@
 	<cfset variables.instance.stTemplates = structNew()>
 	<cfset variables.instance.stTemplateDefaults = structNew()>
 	<cfset variables.stRenderTemplatesCache = structNew()>
+	<cfset variables.appRoot = "">
 
 	<cffunction name="init" access="public" returntype="templateManager">
 		<cfargument name="config" type="homePortalsConfigBean" required="true">
@@ -16,6 +17,8 @@
 				<cfset setTemplate(argumentCollection = st[rtType][rtName])>
 			</cfloop>
 		</cfloop>
+		
+		<cfset variables.appRoot = arguments.config.getAppRoot()>
 		
 		<cfreturn this>
 	</cffunction>
@@ -80,7 +83,11 @@
 		<cfset key = arguments.type & "-" & arguments.name>	
 			
 		<cfif Not StructKeyExists(variables.stRenderTemplatesCache, key)>
-			<cffile action="read" file="#expandPath(st.href)#" variable="templateBody">
+			<cfif left(st.href,1) neq "/">
+				<cffile action="read" file="#expandPath(variables.appRoot & st.href)#" variable="templateBody">
+			<cfelse>
+				<cffile action="read" file="#expandPath(st.href)#" variable="templateBody">
+			</cfif>
 			<cfset variables.stRenderTemplatesCache[key] = templateBody>
 		<cfelse>
 			<cfset templateBody = variables.stRenderTemplatesCache[key]>

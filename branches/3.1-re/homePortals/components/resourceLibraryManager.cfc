@@ -8,6 +8,7 @@
 										);
 		variables.defaultResourceLibraryClass = "defaultResourceLibrary";
 		variables.customResLibTypes = structNew();
+		variables.appRoot = "";
 	</cfscript>
 
 	<!------------------------------------------------->
@@ -20,6 +21,8 @@
 			var props = structNew();
 			var stResLibTypes = arguments.config.getResourceLibraryTypes();
 			var aResLibs = arguments.config.getResourceLibraryPaths();
+			
+			variables.appRoot = arguments.config.getAppRoot();
 
 			// create and populate the resourceTypeRegistry
 			variables.resourceTypeRegistry = createObject("component","resourceTypeRegistry").init( arguments.config );
@@ -56,7 +59,7 @@
 	<cffunction name="registerResourceLibraryPath" access="public" returntype="void">
 		<cfargument name="resLibPath" type="string" required="true">
 		<cfset var resLibClass = getResourceLibraryClassByPath( arguments.resLibPath )>
-		<cfset var oResLib = createObject("component",resLibClass.path).init( arguments.resLibPath, variables.resourceTypeRegistry, resLibClass.properties)>
+		<cfset var oResLib = createObject("component",resLibClass.path).init(arguments.resLibPath, variables.resourceTypeRegistry, resLibClass.properties, variables.appRoot)>
 		<cfset addResourceLibrary( oResLib )>
 	</cffunction>
 	
