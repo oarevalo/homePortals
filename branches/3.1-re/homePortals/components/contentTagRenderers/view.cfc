@@ -17,7 +17,7 @@
 
 			try {
 				// if view location does not start with '/' then treat it as a relative location from the application's root
-				if(left(href,1) neq "/") href = getHomePortals().getConfig().getAppRoot() & href;
+				if(href neq "" and left(href,1) neq "/") href = getHomePortals().getConfig().getAppRoot() & href;
 				tmpHTML = renderInclude(href);
 				
 				arguments.bodyContentBuffer.set( tmpHTML );
