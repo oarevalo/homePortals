@@ -211,9 +211,11 @@
 			}
 
 			// add title
-			xmlNode = xmlElemNew(xmlDoc,"title");
-			xmlNode.xmlText = xmlFormat(getTitle());
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			if(getTitle() neq "") {
+				xmlNode = xmlElemNew(xmlDoc,"title");
+				xmlNode.xmlText = xmlFormat(getTitle());
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			}
 
 			// add meta tags
 			aTemp = getMetaTags();
@@ -242,90 +244,96 @@
 			}
 			
 			// add layout regions
-			xmlNode = xmlElemNew(xmlDoc,"layout");
 			aTemp = getLayoutRegions();
-			for(i=1;i lte arrayLen(aTemp);i=i+1) {
-				xmlNode2 = xmlElemNew(xmlDoc,"location");
-				xmlNode2.xmlAttributes["name"] = xmlFormat(aTemp[i].name);
-				xmlNode2.xmlAttributes["type"] = xmlFormat(aTemp[i].type);
-				if(aTemp[i].id neq "") xmlNode2.xmlAttributes["id"] = xmlFormat(aTemp[i].id);
-				if(aTemp[i].class neq "") xmlNode2.xmlAttributes["class"] = xmlFormat(aTemp[i].class);
-				if(aTemp[i].style neq "") xmlNode2.xmlAttributes["style"] = xmlFormat(aTemp[i].style);
-				arrayAppend(xmlNode.xmlChildren, xmlNode2);
+			if(arrayLen(aTemp) gt 0) {
+				xmlNode = xmlElemNew(xmlDoc,"layout");
+				for(i=1;i lte arrayLen(aTemp);i=i+1) {
+					xmlNode2 = xmlElemNew(xmlDoc,"location");
+					xmlNode2.xmlAttributes["name"] = xmlFormat(aTemp[i].name);
+					xmlNode2.xmlAttributes["type"] = xmlFormat(aTemp[i].type);
+					if(aTemp[i].id neq "") xmlNode2.xmlAttributes["id"] = xmlFormat(aTemp[i].id);
+					if(aTemp[i].class neq "") xmlNode2.xmlAttributes["class"] = xmlFormat(aTemp[i].class);
+					if(aTemp[i].style neq "") xmlNode2.xmlAttributes["style"] = xmlFormat(aTemp[i].style);
+					arrayAppend(xmlNode.xmlChildren, xmlNode2);
+				}
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			
 			// add event listeners
-			xmlNode = xmlElemNew(xmlDoc,"eventListeners");
 			aTemp = getEventListeners();
-			for(i=1;i lte arrayLen(aTemp);i=i+1) {
-				xmlNode2 = xmlElemNew(xmlDoc,"event");
-				xmlNode2.xmlAttributes["objectName"] = xmlFormat(aTemp[i].objectName);
-				xmlNode2.xmlAttributes["eventName"] = xmlFormat(aTemp[i].eventName);
-				xmlNode2.xmlAttributes["eventHandler"] = xmlFormat(aTemp[i].eventHandler);
-				arrayAppend(xmlNode.xmlChildren, xmlNode2);
+			if(arrayLen(aTemp) gt 0) {
+				xmlNode = xmlElemNew(xmlDoc,"eventListeners");
+				for(i=1;i lte arrayLen(aTemp);i=i+1) {
+					xmlNode2 = xmlElemNew(xmlDoc,"event");
+					xmlNode2.xmlAttributes["objectName"] = xmlFormat(aTemp[i].objectName);
+					xmlNode2.xmlAttributes["eventName"] = xmlFormat(aTemp[i].eventName);
+					xmlNode2.xmlAttributes["eventHandler"] = xmlFormat(aTemp[i].eventHandler);
+					arrayAppend(xmlNode.xmlChildren, xmlNode2);
+				}
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 
 			// add modules
-			xmlNode = xmlElemNew(xmlDoc,"body");
 			aTemp = getModules();
-			for(i=1;i lte arrayLen(aTemp);i=i+1) {
-				xmlNode2 = xmlElemNew(xmlDoc,aTemp[i].getModuleType());
-				st = aTemp[i].toStruct();
-				for(attr in st) {
-					bWriteAttribute = true;
-					
-					switch(attr) {
-						case "id": 
-							attr = "id";
-							bWriteAttribute = true; 	
-							break;
-						case "location": 
-							attr = "location";
-							bWriteAttribute = true; 	
-							break;
-						case "moduleType":
-							attr = "moduleType";
-							bWriteAttribute = false; 	// this attribute is ignored
-							break;
-						case "container":
-							attr = "container";
-							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_CONTAINER);	
-							break;
-						case "output":
-							attr = "output";
-							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_OUTPUT);
-							break;
-						case "icon":
-							attr = "icon";
-							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_ICON);
-							break;
-						case "title":
-							attr = "title";
-							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_TITLE);
-							break;
-						case "style":
-							attr = "style";
-							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_STYLE);
-							break;
-						case "class":
-							attr = "class";
-							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_CLASS);
-							break;
-						case "moduleTemplate":
-							attr = "moduleTemplate";
-							bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_TEMPLATE);
-							break;
-						default:
-							bWriteAttribute = true;		// write down all other attributes
+			if(arrayLen(aTemp) gt 0) {
+				xmlNode = xmlElemNew(xmlDoc,"body");
+				for(i=1;i lte arrayLen(aTemp);i=i+1) {
+					xmlNode2 = xmlElemNew(xmlDoc,aTemp[i].getModuleType());
+					st = aTemp[i].toStruct();
+					for(attr in st) {
+						bWriteAttribute = true;
+						
+						switch(attr) {
+							case "id": 
+								attr = "id";
+								bWriteAttribute = true; 	
+								break;
+							case "location": 
+								attr = "location";
+								bWriteAttribute = true; 	
+								break;
+							case "moduleType":
+								attr = "moduleType";
+								bWriteAttribute = false; 	// this attribute is ignored
+								break;
+							case "container":
+								attr = "container";
+								bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_CONTAINER);	
+								break;
+							case "output":
+								attr = "output";
+								bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_OUTPUT);
+								break;
+							case "icon":
+								attr = "icon";
+								bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_ICON);
+								break;
+							case "title":
+								attr = "title";
+								bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_TITLE);
+								break;
+							case "style":
+								attr = "style";
+								bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_STYLE);
+								break;
+							case "class":
+								attr = "class";
+								bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_CLASS);
+								break;
+							case "moduleTemplate":
+								attr = "moduleTemplate";
+								bWriteAttribute = (st[attr] neq variables.DEFAULT_MODULE_TEMPLATE);
+								break;
+							default:
+								bWriteAttribute = true;		// write down all other attributes
+						}
+						
+						if(bWriteAttribute) xmlNode2.xmlAttributes[attr] = xmlFormat(st[attr]);
 					}
-					
-					if(bWriteAttribute) xmlNode2.xmlAttributes[attr] = xmlFormat(st[attr]);
+					arrayAppend(xmlNode.xmlChildren, xmlNode2);
 				}
-				arrayAppend(xmlNode.xmlChildren, xmlNode2);
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
-			arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			
 			// add skin
 			if(variables.instance.skinID neq variables.DEFAULT_PAGE_SKINID) {
