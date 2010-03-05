@@ -132,7 +132,7 @@
 							}
 
 							// Provide a unique ID for each module 
-							if(args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
+							if(not structKeyExists(args,"id") or args.id eq "") args.id = "h_#xmlThisNode.xmlName#_#args.location#_#j#";
 	
 							oModuleBean = createObject("component","moduleBean").init( args );
 	
