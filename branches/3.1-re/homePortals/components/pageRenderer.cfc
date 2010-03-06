@@ -409,6 +409,18 @@
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				// create structure for modules that belong to the same location
 				tmpLoc = tmp[i].getLocation();
+				
+				// if location is empty, default to first available
+				if(tmpLoc eq "") {
+					tmp2 = getPage().getLayoutRegions();
+					if(arrayLen(tmp2) gt 0)
+						tmpLoc = tmp2[1].name;
+					else {
+						tmp2 = getHomePortals().getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+						tmpLoc = listFirst(tmp2);
+					}
+				}
+				
 				if(Not StructKeyExists(variables.stPage.page.modules, tmpLoc) )
 					variables.stPage.page.modules[tmpLoc] = ArrayNew(1);
 				

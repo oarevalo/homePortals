@@ -664,8 +664,8 @@
 			if(arguments.moduleBean.getID() eq "") 
 				throw("Module ID cannot be empty","homePortals.pageBean.blankModuleID");
 				
-			if(arguments.moduleBean.getLocation() eq "") 
-				throw("Module location cannot be empty","homePortals.pageBean.blankModuleLocation");
+		//	if(arguments.moduleBean.getLocation() eq "") 
+		//		throw("Module location cannot be empty","homePortals.pageBean.blankModuleLocation");
 				
 			if(arguments.moduleBean.getModuleType() eq "") 
 				throw("Module type cannot be empty","homePortals.pageBean.missingModuleType");
