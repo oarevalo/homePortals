@@ -36,11 +36,27 @@
 		
 		pageTitle = getPage().getTitle();
 		aLayoutRegions = getPage().getLayoutRegions();
+		usingImplicitLayout = 0;
+		if(arrayLen(aLayoutRegions) eq 0) {
+			tmp = oHP.getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+			tmp = listToArray(tmp);
+			for(i=1;i lte ArrayLen(tmp);i=i+1) {
+				st = {
+					type = tmp[i],
+					id = tmp[i],
+					class = "",
+					style = "",
+					name = tmp[i]
+				};
+				ArrayAppend(aLayoutRegions, st );
+			}
+			usingImplicitLayout = 1;
+		}
 		
 		// make a js struct with page locations
 		lstLocations = "";
 		for(i=1;i lte arrayLen(aLayoutRegions);i++) {
-			tmp = "#aLayoutRegions[i].id#: { id:'#aLayoutRegions[i].id#', name:'#aLayoutRegions[i].name#', type:'#aLayoutRegions[i].type#', theClass:'#aLayoutRegions[i].class#' }";
+			tmp = "#aLayoutRegions[i].id#: { id:'#aLayoutRegions[i].id#', name:'#aLayoutRegions[i].name#', type:'#aLayoutRegions[i].type#', theClass:'#aLayoutRegions[i].class#', usingImplicitLayout:#usingImplicitLayout# }";
 			lstLocations = listAppend(lstLocations, tmp);
 		}
 		
@@ -85,7 +101,7 @@
 				for(loc in controlPanel.locations) {
 					jQuery("##"+controlPanel.locations[loc].id)
 						.addClass("cms-layoutRegion")
-						.prepend("<div class='cms-layoutRegionHandleBar'>" + controlPanel.locations[loc].name + controlPanel.getLocationIconsHTML(controlPanel.locations[loc].name) + "</div>");
+						.prepend("<div class='cms-layoutRegionHandleBar'>" + controlPanel.locations[loc].name + controlPanel.getLocationIconsHTML(controlPanel.locations[loc].name,controlPanel.locations[loc].usingImplicitLayout) + "</div>");
 				}
 				jQuery(".cms-layoutRegion").sortable({
 					connectWith: '.cms-layoutRegion',

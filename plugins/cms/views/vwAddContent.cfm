@@ -3,6 +3,23 @@
 <cfset aLayoutRegions = variables.oPage.getLayoutRegions()>
 <cfset tags = variables.homePortals.getConfig().getContentRenderers()>
 
+<cfscript>
+	if(arrayLen(aLayoutRegions) eq 0) {
+		tmp = variables.homePortals.getTemplateManager().getLayoutSections( variables.oPage.getPageTemplate() );
+		tmp = listToArray(tmp);
+		for(i=1;i lte ArrayLen(tmp);i=i+1) {
+			st = {
+				type = tmp[i],
+				id = tmp[i],
+				class = "",
+				style = "",
+				name = tmp[i]
+			};
+			ArrayAppend(aLayoutRegions, st );
+		}
+	}
+</cfscript>
+
 <cfoutput>
 	<script>
 		jQuery(function() {

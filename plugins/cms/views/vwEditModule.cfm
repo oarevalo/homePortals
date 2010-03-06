@@ -16,6 +16,21 @@
 	
 	modTitle = oModuleBean.getTitle();
 	modStyle = oModuleBean.getStyle();
+	
+	if(arrayLen(aLayoutRegions) eq 0) {
+		tmp = variables.homePortals.getTemplateManager().getLayoutSections( variables.oPage.getPageTemplate() );
+		tmp = listToArray(tmp);
+		for(i=1;i lte ArrayLen(tmp);i=i+1) {
+			st = {
+				type = tmp[i],
+				id = tmp[i],
+				class = "",
+				style = "",
+				name = tmp[i]
+			};
+			ArrayAppend(aLayoutRegions, st );
+		}
+	}
 </cfscript>	
 <cfoutput>
 	<div class="cms-panelTitle">Edit Module: #modID#</div>

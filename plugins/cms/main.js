@@ -231,9 +231,12 @@ function controlPanelClient() {
 		return tmpHTML;	
 	}
 
-	function getLocationIconsHTML(id) {
-		var tmpHTML = "<a href=\"javascript:controlPanel.deleteLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/omit-page-orange.gif' alt='Remove from page' title='Remove from page' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
-		tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.addLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/page_copy.png' alt='Add container on this region' title='Add container on this region' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
+	function getLocationIconsHTML(id,implicitLayout) {
+		var tmpHTML = "";
+		if(implicitLayout==0) {
+			tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.deleteLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/omit-page-orange.gif' alt='Remove from page' title='Remove from page' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
+			tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.addLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/page_copy.png' alt='Add container on this region' title='Add container on this region' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
+		}
 		tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.getView('AddContent',{locationName:'" + id + "'});\"><img src='" + this.cmsRoot + "/images/brick_add.png' alt='Add element on this region' title='Add element on this region' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
 		return tmpHTML;	
 	}
