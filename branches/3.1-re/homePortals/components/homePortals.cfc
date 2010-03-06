@@ -53,6 +53,7 @@
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
 			var start = getTickCount();
+			var hpContentRoot = "";
 
 			// check that appRoot has the right format
 			if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";
@@ -65,6 +66,7 @@
 			// load default configuration settings
 			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & ".." & pathSeparator & this.CONFIG_FILE_DIR & pathSeparator & this.CONFIG_FILE_NAME;
 			variables.oHomePortalsConfigBean.load(defaultConfigFilePath);
+			hpContentRoot = variables.oHomePortalsConfigBean.getContentRoot();
 
 			// load configuration settings for the application (overrides specific settings)
 			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
@@ -79,6 +81,15 @@
 			// set the appRoot to the given parameter, this way, we can get away without having a local config 
 			// and only pass the appRoot on the constructor
 			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
+
+			// if the application has not overriden the default contentRoot in the config, 
+			// use the application root as content root
+			if(variables.oHomePortalsConfigBean.getContentRoot() eq hpContentRoot and arguments.appRoot neq variables.hpEngineRoot)
+				variables.oHomePortalsConfigBean.setContentRoot(arguments.appRoot);
+
+			// make sure we always have a resource library, defaulting to the application root
+			if(variables.oHomePortalsConfigBean.getResourceLibraryPath() eq "")
+				variables.oHomePortalsConfigBean.setResourceLibraryPath(arguments.appRoot);
 
 			// initialize environment with current config
 			initEnv();
