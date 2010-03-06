@@ -403,8 +403,7 @@
 				variables.stPage.page.skinHREF = oResourceBean.getFullHref();
 			}
 
-			
-			
+						
 			// modules and content
 			tmp = getPage().getModules();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
@@ -414,6 +413,25 @@
 					variables.stPage.page.modules[tmpLoc] = ArrayNew(1);
 				
 				ArrayAppend(variables.stPage.page.modules[tmpLoc], tmp[i] );
+			}
+			
+			
+			// if no explicit layout is given, then create a layout based on the page template
+			if(arrayLen(getPage().getLayoutRegions()) eq 0) {
+				tmp = getHomePortals().getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+				tmp = listToArray(tmp);
+				for(i=1;i lte ArrayLen(tmp);i=i+1) {
+					st = {
+						type = tmp[i],
+						id = tmp[i],
+						class = "",
+						style = "",
+						name = tmp[i]
+					};
+					if(not structKeyExists(variables.stPage.page.layout, st.type))
+						variables.stPage.page.layout[st.type] = ArrayNew(1);
+					ArrayAppend(variables.stPage.page.layout[st.type], st );
+				}
 			}
 		</cfscript>	
 	</cffunction>
