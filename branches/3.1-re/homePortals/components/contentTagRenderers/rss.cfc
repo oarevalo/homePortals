@@ -159,6 +159,10 @@
 		<cfset var oCache = getRSSCache()>
 		<cfset var cacheKey = rssurl>
 
+		<cfif rssURL eq "">
+			<cfthrow message="Error: URL for rss feed not set.">
+		</cfif>
+
 		<cftry>
 			<cfset data = oCache.retrieve(cacheKey)>
 			
