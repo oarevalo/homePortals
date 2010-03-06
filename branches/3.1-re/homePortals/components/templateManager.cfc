@@ -57,7 +57,13 @@
 	<cffunction name="getTemplate" access="public" returntype="struct">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="name" type="string" required="true">
-		<cfreturn duplicate(variables.instance.stTemplates[arguments.type][arguments.name])>
+		<cfset var st = structNew()>
+		<cfif structKeyExists(variables.instance.stTemplates[arguments.type],arguments.name)>
+			<cfset st = duplicate(variables.instance.stTemplates[arguments.type][arguments.name])>
+		<cfelse>		
+			<cfset st = {href = arguments.name}>
+		</cfif>
+		<cfreturn st />
 	</cffunction>
 
 	<cffunction name="getDefaultTemplate" access="public" returntype="struct">
