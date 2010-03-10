@@ -13,6 +13,8 @@
 		variables.contentBuffer = structNew();	// the content buffers are used to temporarily store the generated output
 		variables.contentBuffer.head = 0;
 		variables.contentBuffer.body = 0;
+		
+		variables.context = {};		// the context is a key-value map of values to replace at rendering time on the body section
 	</cfscript>
 
 	<!--------------------------------------->
@@ -40,6 +42,7 @@
 	<!----  renderPage					----->
 	<!--------------------------------------->
 	<cffunction name="renderPage" access="public" output="false" hint="Renders the entire page using the render template." returntype="string">
+		<cfargument name="context" type="struct" required="false" hint="The context object" default="#structNew()#">
 		<cfscript>
 			var renderTemplateBody = "";
 			var index = 1;
@@ -51,6 +54,10 @@
 			var rendered = "";
 			var start = getTickCount();
 			var pageTemplate = getPage().getPageTemplate();
+
+			// store the context object
+			if(not structIsEmpty(arguments.context)) 
+				variables.context = arguments.context;
 
 			// pre-render output of all content tags on page		
 			processContentTags();
@@ -465,6 +472,10 @@
 			var aSections = 0;
 			var start = getTickCount();
 			var startTag = 0;
+			var props = structNew();
+			var prop = "";
+			var token = "";
+			var stResult = "";
 			
 			// reset the content output buffer
 			resetPageContentBuffer();
@@ -488,6 +499,25 @@
 							startTag = getTickCount();
 
 							try {
+								// do dynamic replacement of properties from the context object
+								props = oModBean.getProperties();
+								for(prop in props) {
+									stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",props[prop],1,true);
+									if(stResult.len[1] gt 0) {
+										token = mid(props[prop],stResult.pos[1],stResult.len[1]);
+										arg1 = mid(props[prop],stResult.pos[2],stResult.len[2]);
+
+										if(left(token,1) neq "$" and structKeyExists(variables.context,arg1)) {
+											oModBean.setProperty(prop, replace(props[prop], token, variables.context[arg1], "ALL") );
+										} else if(getPage().hasProperty(arg1)) {
+											oModBean.setProperty(prop, replace(props[prop], token, getPage().getProperty(arg1), "ALL") );
+										} else if(props[prop] eq token) {
+											oModBean.removeProperty(prop);
+										}
+									}
+								}
+								
+								// process module content
 								oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, oModBean);
 								oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.head),
 																	createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body)

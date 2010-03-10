@@ -29,6 +29,7 @@
 	<!------- Page parameters ----------->
 	<cfparam name="page" default=""> 				<!--- page to load --->
 	<cfparam name="resetApp" default="false"> 	<!--- Force a reload and parse of the HomePortals application --->
+	<cfparam name="context" default="#structNew()#">
 	<!----------------------------------->
 	
 	<!------- Application Root ----------->
@@ -38,6 +39,11 @@
 	<!----------------------------------->
 
 	<cfscript>
+		if(structIsEmpty(context)) {
+			context = duplicate(context);
+			StructAppend(context, url);
+		}
+		
 		// Initialize application if requested or needed
 		if((isBoolean(resetApp) and resetApp) or Not StructKeyExists(application, "homePortals")) {
 			application.homePortals = CreateObject("component","homePortals.components.homePortals").init(request.appRoot);
@@ -47,7 +53,7 @@
 		request.oPageRenderer = application.homePortals.loadPage(page);
 
 		// render page html
-		html = request.oPageRenderer.renderPage();
+		html = request.oPageRenderer.renderPage(context);
 	</cfscript>
 </cfsilent>
 
