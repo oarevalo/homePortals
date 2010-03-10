@@ -516,7 +516,7 @@
 										}
 									}
 								}
-								
+								 
 								// process module content
 								oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, oModBean);
 								oContentTagRenderer.renderContent(createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.head),
