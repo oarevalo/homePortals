@@ -53,6 +53,7 @@
 		<contentRenderer moduleType="image" path="homePortals.components.contentTagRenderers.image" />
 		<contentRenderer moduleType="navMenu" path="homePortals.components.contentTagRenderers.navMenu" />
 		<contentRenderer moduleType="rss" path="homePortals.components.contentTagRenderers.rss" />
+		<contentRenderer moduleType="text" path="homePortals.components.contentTagRenderers.text" />
 	</contentRenderers>
 	
 	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
