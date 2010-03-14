@@ -713,7 +713,7 @@
 			<cfset arguments.path = getHomePortals().getConfig().getAppRoot() & arguments.path>
 			<cfset arguments.path = replace(arguments.path,"/",".","ALL")>
 			<cfset arguments.path = replace(arguments.path,"..",".","ALL")>
-			<cfif left(arguments.path,1) eq "/">
+			<cfif left(arguments.path,1) eq "/" or left(arguments.path,1) eq ".">
 				<cfset arguments.path = right(arguments.path,len(arguments.path)-1)>
 			</cfif>
 		</cfif>
