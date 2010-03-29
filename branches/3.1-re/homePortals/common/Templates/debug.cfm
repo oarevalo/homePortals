@@ -178,7 +178,12 @@
 					<td>
 						<cfset stProps = request.oPageRenderer.getPage().getProperties()>
 						<cfloop collection="#stProps#" item="key">
-							<strong>&bull; #key#:</strong> '#stProps[key]#'<br />
+							<strong>&bull; #key#:</strong> 
+							<cfif isSimpleValue(stProps[key])>
+								'#stProps[key]#'<br />
+							<cfelse>
+								<cfdump var="#stProps[key]#">
+							</cfif>
 						</cfloop>
 						<cfif structIsEmpty(stProps)>
 							<em>None</em>
