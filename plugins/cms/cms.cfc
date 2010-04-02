@@ -371,9 +371,9 @@
    				for(arg in arguments) {
    					if(left(arg,len(prefix)) eq prefix and listLast(arg,"_") neq "default") {
 						if(arguments[arg] eq "_NOVALUE_")
-	   						oModuleBean.setProperty(replace(arg,prefix,""),"");
+	   						oModuleBean.setProperty(replaceNoCase(arg,prefix,""),"");
 						else {
-	   						oModuleBean.setProperty(replace(arg,prefix,""),arguments[arg]);
+	   						oModuleBean.setProperty(replaceNoCase(arg,prefix,""),arguments[arg]);
 						}
 					}
    				}
@@ -796,7 +796,7 @@
 			var oUserRegistry = 0;
 			var stRet = structNew();
 			
-			oUserRegistry = createObject("Component","homePortals.Components.userRegistry").init();
+			oUserRegistry = createObject("Component","homePortals.components.userRegistry").init();
 			stRet = oUserRegistry.getUserInfo();	// information about the logged-in user	
 			stRet.isLoggedIn = ( stRet.username neq "" );
 		</cfscript>
