@@ -126,7 +126,7 @@
 				});			
 				jQuery(".cms-layoutRegion").disableSelection();
 				jQuery("##cms-btnEditPage").click(function(){ controlPanel.getView("PageProperties"); });
-				jQuery("##cms-btnSitemap").click(function(){ controlPanel.getView("SiteMap"); });
+				jQuery("##cms-btnSitemap").click(function(){ controlPanel.getView("Sitemap"); });
 				jQuery("##cms-btnSettings").click(function(){ controlPanel.getView("Settings"); });
 				jQuery("##cms-btnAddContent").click(function(){ controlPanel.getView("AddContent"); });
 				jQuery("##cms-btnLogout").click(function(){ navCmdLogout(); });

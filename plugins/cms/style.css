@@ -73,12 +73,14 @@
 	margin:5px 0 5px 0;
 	background-color:#f3f4ee;
 	color:#000;
+	text-align:left;
 }
 .cms-panelTitle {
 	font-size:14px;
 	font-weight:bold;
 	margin-bottom:10px;
 	border-bottom:1px solid #999;
+	text-align:left;
 }
 .cms-lightPanel {
 	color:#333;
@@ -88,6 +90,7 @@
 	line-height:20px;
 	font-size:12px;
 	font-family:Arial, Helvetica, sans-serif;
+	text-align:left;
 }
 #cms-navMenuContentPanel {
 	
@@ -127,6 +130,7 @@
 	color:#fff;
 	height:30px;
 	padding-top:5px;
+	text-align:left;
 	
 }
 #cms-adminSubBar a {
@@ -147,6 +151,7 @@
 	line-height:19px;
 	margin-bottom:5px;
 	font-size:12px;
+	text-align:left;
 }
 #cms-adminSubBar a {
 	font-size:11px;

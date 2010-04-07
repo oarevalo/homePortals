@@ -43,7 +43,7 @@
 	<div class="cms-lightPanel">
 		<cfif currentPath neq "/">
 			<img src="#variables.cmsRoot#/images/folder.png" align="absmiddle">
-			<a href="##" onclick="controlPanel.getView('SiteMap',{path:'#parentPath#'});">..</a>
+			<a href="##" onclick="controlPanel.getView('Sitemap',{path:'#parentPath#'});">..</a>
 		</cfif>
 		<cfloop query="qryPages">
 			<span style="white-space:nowrap;">
@@ -58,7 +58,7 @@
 					</cfif>
 				<cfelse>
 					<img src="#variables.cmsRoot#/images/folder.png" align="absmiddle">
-					<a href="##" onclick="controlPanel.getView('SiteMap',{path:'#currentPath#/#qryPages.name#'});">#qryPages.name#</a>
+					<a href="##" onclick="controlPanel.getView('Sitemap',{path:'#currentPath#/#qryPages.name#'});">#qryPages.name#</a>
 				</cfif>
 			</span>
 			&nbsp;&nbsp;&nbsp;
