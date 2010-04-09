@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<accountStorage created="Jan 1, 2005" host="localhost">
-	<account username="default" 
-			password="21232F297A57A5A743894A0E4A801FC3" 
-			userID="default" 
-			email="noemail@domain.com" 
-			createDate="1/1/2005" />
-</accountStorage>
