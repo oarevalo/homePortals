@@ -179,13 +179,11 @@
 											createdOn = now())>
 			
 			<cftry>
-				<!--- create directory structure --->
-				<cfset oSite = createObject("component","homePortals.plugins.accounts.components.site").create(Arguments.accountName, this)>
-				
 				<!--- create initial page --->
 				<cfif newPageTemplate neq "">
 					<cfset xmlDoc = processTemplate(arguments.accountName, newPageTemplate)>
 					<cfset oPage = createObject("component","homePortals.components.pageBean").init(xmlDoc)>
+					<cfset oSite = createObject("component","homePortals.plugins.accounts.components.site").init(Arguments.accountName, this)>
 					<cfset oSite.addPage( pageName = GetFileFromPath(newPageTemplate),
 										  pageBean = oPage )>
 				</cfif>
@@ -196,7 +194,9 @@
 			</cftry>
 			
 			<cfcatch type="any">
-				<cfset oDAO.delete(newAccountID)>
+				<cfif newAccountID gt 0>
+					<cfset oDAO.delete(newAccountID)>
+				</cfif>
 				<cfrethrow>			
 			</cfcatch>
 		</cftry>
@@ -457,6 +457,10 @@
 
 			// initialize dataProvider
 			variables.oDataProvider = createObject("component", pkgPath & storageType & "DataProvider").init(oConfigBean);
+			
+			// make sure tables exist if we are using the db
+			if(storageType eq "db")
+				ensureTablesExist(oConfigBean);
 		</cfscript>	
 	</cffunction>	
 
@@ -499,6 +503,32 @@
 	<cffunction name="getAccountsDAO" access="private" returntype="homePortals.plugins.accounts.components.lib.DAOFactory.DAO" hint="returns the accounts DAO">
 		<cfreturn getDAO("accounts")>
 	</cffunction>	
+	
+	<cffunction name="ensureTablesExist" access="private" returntype="void">
+		<cfset var table = "">
+		<cfset var tables = "accounts,friends,linkedPages,sites">
+		<cfloop list="#tables#" index="table">
+			<cfif not tableExists(table)>
+				<cfset getDAO(table).createTable()>
+			</cfif>
+		</cfloop>
+	</cffunction>
+	
+	<cffunction name="tableExists" access="private" returntype="boolean">
+		<cfargument name="tableName" type="string" required="true">
+		<cfset var bRet = false>
+		<cfset var qry = 0>
+		
+		<cfdbinfo datasource="#getConfig().getDatasource()#" 
+					username="#getConfig().getUsername()#" 
+					password="#getConfig().getPassword()#" 
+					type="tables" 
+					name="qry" 
+					pattern="#arguments.tableName#" />
+
+		<cfreturn bRet = (qry.recordCount gt 0)>
+	</cffunction>
+	
 	
 	
 	<cffunction name="dump" access="private" hint="facade for cfdump">

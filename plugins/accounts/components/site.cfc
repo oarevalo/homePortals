@@ -268,6 +268,9 @@
 			if(arguments.pageName eq "") 
 				throw("Please enter a name for the new page","homePortals.site.pageNameMissing");
 
+			// make sure directory structure exists
+			create( getOwner(), getAccountsService() );
+
 			// get the new page
 			if(arguments.pageHREF eq "") {
 				if(structKeyExists(arguments,"pageBean")) {
@@ -515,7 +518,7 @@
 	</cffunction>	
 	
 	<cffunction name="loadSite" access="private" returntype="void" hint="Populates the site information">
-		<cfset var qryPages = 0>
+		<cfset var qryPages = queryNew("name,type")>
 		<cfset var qrySite = 0>
 		<cfset var aPages = arrayNew(1)>
 		<cfset var st = "">
@@ -531,7 +534,9 @@
 		</cfif>
 
 		<!--- get list of pages --->
-		<cfset qryPages = oPageProvider.listFolder( getSiteHREF() )>
+		<cfif oPageProvider.folderExists( getSiteHREF() )>
+			<cfset qryPages = oPageProvider.listFolder( getSiteHREF() )>
+		</cfif>
 
 		<!--- check if there is a record for the site --->
 		<cfset qrySite = oDAO.search(accountID = qryAccountInfo.accountID)>

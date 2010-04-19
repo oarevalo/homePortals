@@ -54,5 +54,8 @@
 		<cfthrow message="method not defined">
 	</cffunction>
 	
-	
+	<cffunction name="getConfig" access="public" returntype="configBean">
+		<cfreturn variables.oConfigBean />
+	</cffunction>
+		
 </cfcomponent>
