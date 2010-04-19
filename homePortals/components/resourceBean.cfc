@@ -112,7 +112,7 @@
 	<cffunction name="getProperty" access="public" output="false" returntype="string">
 		<cfargument name="name" type="string" required="true" />
 		<cfif not structKeyExists(variables.instance.customProperties, arguments.name)>
-			<cfthrow message="Invalid property name" type="homePortals.resourceBean.invalidProperty">
+			<cfthrow message="Invalid property name [#arguments.name#]" type="homePortals.resourceBean.invalidProperty">
 		</cfif>
 		<cfreturn variables.instance.customProperties[arguments.name] />
 	</cffunction>
