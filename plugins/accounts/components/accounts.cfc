@@ -526,7 +526,7 @@
 					name="qry" 
 					pattern="#arguments.tableName#" />
 
-		<cfreturn bRet = (qry.recordCount gt 0)>
+		<cfreturn (qry.recordCount gt 0)>
 	</cffunction>
 	
 	
