@@ -16,8 +16,8 @@
 		
 		<cfhttp url="#tmpURL#" method="get" timeout="#variables.timeout#" result="info" throwonerror="true">
 		</cfhttp>
-		
-		<cfif info.status_code eq "200" and isXML(info.FileContent)>
+
+		<cfif info.responseHeader.status_code eq "200" and isXML(info.FileContent)>
 			<cfset xmlResponse = xmlParse(info.FileContent)>
 		<cfelse>
 			<cfthrow message="Invalid response">
@@ -42,7 +42,7 @@
 			<cfhttpparam type="url" name="max-results" value="#arguments.per_page#">
 		</cfhttp>
 
-		<cfif info.status_code eq "200" and isXML(info.FileContent)>
+		<cfif info.responseHeader.status_code eq "200" and isXML(info.FileContent)>
 			<cfset xmlResponse = xmlParse(info.FileContent)>
 		<cfelse>
 			<cfthrow message="Invalid response">
@@ -68,7 +68,7 @@
 			<cfhttpparam type="url" name="max-results" value="#arguments.per_page#">
 		</cfhttp>
 
-		<cfif info.status_code eq "200" and isXML(info.FileContent)>
+		<cfif info.responseHeader.status_code eq "200" and isXML(info.FileContent)>
 			<cfset xmlResponse = xmlParse(info.FileContent)>
 		<cfelse>
 			<cfthrow message="Invalid response">
@@ -94,7 +94,7 @@
 			<cfhttpparam type="url" name="max-results" value="#arguments.per_page#">
 		</cfhttp>
 		
-		<cfif info.status_code eq "200" and isXML(info.FileContent)>
+		<cfif info.responseHeader.status_code eq "200" and isXML(info.FileContent)>
 			<cfset xmlResponse = xmlParse(info.FileContent)>
 		<cfelse>
 			<cfthrow message="Invalid response">
@@ -124,7 +124,7 @@
 			<cfhttpparam type="url" name="max-results" value="#arguments.per_page#">
 		</cfhttp>
 		
-		<cfif info.status_code eq "200" and isXML(info.FileContent)>
+		<cfif info.responseHeader.status_code eq "200" and isXML(info.FileContent)>
 			<cfset xmlResponse = xmlParse(info.FileContent)>
 		<cfelse>
 			<cfthrow message="Invalid response">
