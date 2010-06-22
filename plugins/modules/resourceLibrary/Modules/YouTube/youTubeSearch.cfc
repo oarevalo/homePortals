@@ -14,7 +14,7 @@
 	<!---------------------------------------->		
 	<cffunction name="saveSettings" access="public" output="true">
 		<cfargument name="onClickGotoURL" type="boolean" default="false">
-		<cfargument name="mode" type="string" default="searchByTag">
+		<cfargument name="mode" type="string" default="">
 		<cfargument name="term" type="string" default="">
 		
 		<cfscript>

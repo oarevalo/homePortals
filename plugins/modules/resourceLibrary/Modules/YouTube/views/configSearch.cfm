@@ -4,7 +4,7 @@
 	
 	// get default settings
 	onClickGotoURL = cfg.getPageSetting("onClickGotoURL",true);
-	mode = cfg.getPageSetting("mode","searchByTag");
+	mode = cfg.getPageSetting("mode","listFeatured");
 	term = cfg.getPageSetting("term","");
 
 	// get current user info
@@ -25,6 +25,7 @@
 		
 		<b>Select mode:</b><br>
 		<select name="mode">
+			<option value="search" <cfif mode eq "search">selected</cfif>> General search</option>
 			<option value="searchByTag" <cfif mode eq "searchByTag">selected</cfif>> Search by tags</option>
 			<option value="searchByUser" <cfif mode eq "searchByUser">selected</cfif>> Search by user</option>
 			<option value="listFeatured" <cfif mode eq "listFeatured">selected</cfif>> List featured videos</option>

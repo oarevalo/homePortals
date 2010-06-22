@@ -7,6 +7,7 @@
 	moduleID = this.controller.getModuleID();
 	aVideos = ArrayNew(1);
 	errorMessage = "";
+	xmlResults = xmlNew();
 
 	// get module path
 	cfg = this.controller.getModuleConfigBean();
@@ -15,8 +16,9 @@
 
 	stUser = this.controller.getUserInfo();	
 	onClickGotoURL = cfg.getPageSetting("onClickGotoURL",true);
-	configMode = cfg.getPageSetting("mode","searchByTag");
+	configMode = cfg.getPageSetting("mode","listFeatured");
 	configTerm = cfg.getPageSetting("term","");
+	videosPerPage = cfg.getPageSetting("videosPerPage",5);
 	
 	if(term eq "") term = configTerm;	
 	if(mode eq "") mode = configMode;	
@@ -27,70 +29,110 @@
 	try {
 		switch(mode) {
 			
+			case "searchByTag":
+				xmlResults = obj.searchByTag(term,p,videosPerPage);
+				aVideos = xmlSearch(xmlResults,"//:entry");
+				break;
+
 			case "searchByUser":
-				xmlResults = obj.searchByUser(term,p,5);
+				xmlResults = obj.searchByUser(term,p,videosPerPage);
+				aVideos = xmlSearch(xmlResults,"//:entry");
 				break;
 	
 			case "listFeatured":
-				xmlResults = obj.listFeatured();
+				xmlResults = obj.list("recently_featured","",p,videosPerPage);
+				aVideos = xmlSearch(xmlResults,"//:entry");
 				break;
 	
 			case "listPopular":
-				xmlResults = obj.listPopular('all');
+				xmlResults = obj.list("most_popular","",p,videosPerPage);
+				aVideos = xmlSearch(xmlResults,"//:entry");
 				break;
 			
 			default:
-				xmlResults = obj.searchByTag(term,p,5);
+				mode = "search";
+				if(term neq "") {
+					xmlResults = obj.search(term,p,videosPerPage);
+					aVideos = xmlSearch(xmlResults,"//:entry");
+				}
 		}
-		aVideos = xmlSearch(xmlResults,"//video_list/video/");
 
 	} catch(any e) {
 		errorMessage = e.message;
 	}
-	
 </cfscript>
 
 <cfoutput>
-	<cfif mode eq "searchByUser">
-		<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;">
-			Search By User: <input type="text" name="term" value="#term#" id="yt_term">
-			<input type="button" value="Go" onclick="#moduleID#.search({term:$('yt_term').value,mode:'#mode#'})">
-		</div>
-	<cfelseif mode eq "searchByTag">
-		<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;">
-			Search By Tags: <input type="text" name="term" value="#term#" id="yt_term">
-			<input type="button" value="Go" onclick="#moduleID#.search({term:$('yt_term').value,mode:'#mode#'})">
-		</div>
-	<cfelseif mode eq "listPopular">
-		<b>Most Popular Videos</b>
-	<cfelseif mode eq "listFeatured">
-		<b>Featured Videos</b>
-	</cfif>
-	
+	<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;">
+		Search: <input type="text" name="term" value="#term#" id="yt_term">
+		<input type="button" value="Go" onclick="#moduleID#.search({term:$('yt_term').value,mode:'search'})">
+		<br />
+		<a href="##" onclick="#moduleID#.search({mode:'listFeatured'})" <cfif mode eq "listFeatured">style="font-weight:bold;"</cfif>>Featured Videos</a>
+		&nbsp;|&nbsp;
+		<a href="##" onclick="#moduleID#.search({mode:'listPopular'})" <cfif mode eq "listPopular">style="font-weight:bold;"</cfif>>Most Popular</a>
+	</div>
+
 	<div style="margin-top:10px;margin-bottom:10px;">
 		<cfloop from="1" to="#arrayLen(aVideos)#" index="i">
 			<cfset xmlNode = aVideos[i]>
-			<cfset tmpHREF = "##">
-			<cfset tmpTitle = jsstringFormat(HTMLSafe(xmlNode.title.xmlText))>
-			
-			<cfif onClickGotoURL>
-				<cfset tmpHREF = xmlNode.url.xmlText>
-			</cfif>
-			
+
+			<cfset entry.id = listLast(xmlNode.id.xmlText,"/") />
+			<cfset entry.title = HTMLSafe(xmlNode.title.xmlText) />
+			<cfset entry.description = HTMLSafe(xmlNode.content.xmlText)  />
+			<cfset entry.href = "##" />
+			<cfset entry.viewhref = "##" />
+			<cfset entry.tags = arrayNew(1) />
+			<cfset entry.author = xmlNode.author.name.xmlText />
+			<cfset entry.authorURL = xmlNode.author.uri.xmlText />
+			<cfset entry.thumbnail = "">
+	
+			<cfloop array="#xmlNode.xmlChildren#" index="tmp">
+				<cfswitch expression="#tmp.xmlName#">
+					<cfcase value="link">
+						<cfif onClickGotoURL and tmp.xmlAttributes.rel eq "alternate">
+							<cfset entry.viewhref = tmp.xmlAttributes.href />
+						</cfif>
+						<cfif tmp.xmlAttributes.rel eq "self">
+							<cfset entry.href = tmp.xmlAttributes.href />
+						</cfif>
+					</cfcase>
+					<cfcase value="category">
+						<cfif left(tmp.xmlAttributes.term,7) neq "http://">
+							<cfset arrayAppend(entry.tags,tmp.xmlAttributes.term) />
+						</cfif>
+					</cfcase>
+					<cfcase value="media:group">
+						<cfloop array="#tmp.xmlChildren#" index="tmp2">
+							<cfif tmp2.xmlName eq "media:thumbnail">
+								<cfset entry.thumbnail = tmp2.xmlAttributes.url />
+								<cfbreak>
+							</cfif>
+						</cfloop>
+					</cfcase>
+				</cfswitch>
+			</cfloop>
+
+			<cfset onclick = "#moduleID#.raiseEvent('onSelectVideo',{videoID:'#entry.id#',url:'#entry.href#',text:'#jsStringFormat(entry.title)#'})">
+
 			<div style="margin-bottom:2px;margin-top:2px;">
-				<a href="#tmpHREF#" onclick="#moduleID#.raiseEvent('onSelectVideo',{videoID:'#xmlNode.id.xmlText#',url:'#xmlNode.url.xmlText#',text:'#tmpTitle#'})">
-					<img src="#xmlNode.thumbnail_url.xmlText#" alt="#xmlNode.title.xmlText#" 
-						title="#xmlNode.title.xmlText#" 
+				<a href="#entry.viewhref#" onclick="#onclick#">
+					<img src="#entry.thumbnail#" 
+						alt="#entry.title#" 
+						title="#entry.title#"
 						border="0" 
-						style="float:left;border:1px solid black;"></a>
+						style="float:left;border:1px solid black;width:120px;"></a>
 				<div style="margin-left:140px;font-size:11px;">
-					<a style="color:##333;" href="#tmpHREF#"><b>#xmlNode.title.xmlText#</b></a><br>
-					#left(xmlNode.description.xmlText,100)#<br>
+					<a style="color:##333;" href="#entry.viewhref#" onclick="#onclick#"><b>#entry.title#</b></a><br>
+					#left(entry.description,100)#<br>
 					<div style="margin-top:3px;font-size:10px;color:##999;">
-						<strong>From:</strong> <a href="javascript:#moduleID#.search({term:'#xmlNode.author.xmlText#',mode:'searchByUser'})">#xmlNode.author.xmlText#</a><br>
+						<strong>From:</strong> <a href="javascript:#moduleID#.search({term:'#entry.author#',mode:'searchByUser'})"
+													alt="Search videos uploaded by '#entry.author#'"
+													title="Search videos uploaded by '#entry.author#'">#entry.author#</a><br>
 						<strong>Tags:</strong> 
-						<cfloop list="#xmlNode.tags.xmlText#" index="tag" delimiters=" ">
-							<a href="javascript:#moduleID#.search({term:'#tag#',mode:'searchByTag'})">#tag#</a>&nbsp;
+						<cfloop array="#entry.tags#" index="tmp">
+							<a href="javascript:#moduleID#.search({term:'#jsStringFormat(tmp)#',mode:'searchByTag'})"
+								alt="Search videos tagged '#htmlEditFormat(tmp)#'"
+								title="Search videos tagged '#htmlEditFormat(tmp)#'">#tmp#</a>&nbsp;
 						</cfloop>
 					</div>
 				</div>
@@ -104,18 +146,19 @@
 		</cfif>
 	</div>
 
-	<cfif listFind("searchByTag,searchByUser",mode)>
-		<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;">
-			<table width="100%">
-				<tr>
-					<cfif p gt 1>
-						<td><a href="##" onclick="#moduleID#.search({term:'#term#',mode:'#mode#',p:#p-1#})"><strong>Previous Page</strong></a></td>
-					</cfif>
-					<td align="right"><a href="##" onclick="#moduleID#.search({term:'#term#',mode:'#mode#',p:#p+1#})"><strong>Next Page</strong></a></td>
-				</tr>
-			</table>
-		</div><br>
-	</cfif>
+
+	<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;">
+		<table width="100%">
+			<tr>
+				<cfif p gt 1>
+					<td><a href="##" onclick="#moduleID#.search({term:'#jsStringFormat(term)#',mode:'#mode#',p:#p-1#})"><strong>Previous Page</strong></a></td>
+				</cfif>
+				<cfif arrayLen(aVideos) gt 0>
+					<td align="right"><a href="##" onclick="#moduleID#.search({term:'#jsStringFormat(term)#',mode:'#mode#',p:#p+1#})"><strong>Next Page</strong></a></td>
+				</cfif>
+			</tr>
+		</table>
+	</div><br>
 
 	<!--- set module icon --->
 	<script type="text/javascript">
@@ -142,7 +185,8 @@
 	<cfhtmlhead text="#tmpHead#">
 </cfoutput>
 	<cfcatch type="any">
-		<cfoutput>#cfcatch.Message#</cfoutput>
+		<cfoutput>#cfcatch.Message#
+		<cfdump var="#cfcatch#"></cfoutput>
 	</cfcatch>
 </cftry>
 
@@ -179,4 +223,3 @@ function HTMLSafe(string) {
 
 }
 </cfscript>
-

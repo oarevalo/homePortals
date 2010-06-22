@@ -34,9 +34,8 @@
 		if(videoID neq "") {
 			obj = getYouTubeService();
 			xmlResults = obj.getDetails(videoID);
-			if(xmlResults.xmlRoot.xmlAttributes.status eq "fail") throw(xmlResults.xmlRoot.error.description.xmlText);			
-			title = xmlResults.xmlRoot.video_details.title.xmlText;
-			description = xmlResults.xmlRoot.video_details.description.xmlText;
+			title = xmlResults.xmlRoot.title.xmlText;
+			description = xmlResults.xmlRoot.content.xmlText;
 		}
 	
 	} catch(any e) {
@@ -48,7 +47,7 @@
 	<div style="text-align:center;">
 		<cfif errorMsg eq "">
 			<cfif videoID neq "">
-				<cfset tmpVideoURL = "http://www.youtube.com/v/#videoID#">
+				<cfset tmpVideoURL = "http://www.youtube.com/v/#videoID#?fs=1">
 				<cfif autoplay>
 					<cfset tmpVideoURL = tmpVideoURL & "&autoplay=1">
 				</cfif>
@@ -61,7 +60,7 @@
 							wmode="transparent" width="#width#" height="#height#">
 					</embed>
 				</object>
-				<div style="text-align:left;">
+				<div style="text-align:left;margin-top:10px;">
 					#description#
 				</div>
 				
