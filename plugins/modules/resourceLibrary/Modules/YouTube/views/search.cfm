@@ -80,6 +80,7 @@
 			<cfset entry.title = HTMLSafe(xmlNode.title.xmlText) />
 			<cfset entry.description = HTMLSafe(xmlNode.content.xmlText)  />
 			<cfset entry.href = "##" />
+			<cfset entry.clickhref = "##">
 			<cfset entry.viewhref = "##" />
 			<cfset entry.tags = arrayNew(1) />
 			<cfset entry.author = xmlNode.author.name.xmlText />
@@ -89,7 +90,7 @@
 			<cfloop array="#xmlNode.xmlChildren#" index="tmp">
 				<cfswitch expression="#tmp.xmlName#">
 					<cfcase value="link">
-						<cfif onClickGotoURL and tmp.xmlAttributes.rel eq "alternate">
+						<cfif tmp.xmlAttributes.rel eq "alternate">
 							<cfset entry.viewhref = tmp.xmlAttributes.href />
 						</cfif>
 						<cfif tmp.xmlAttributes.rel eq "self">
@@ -112,17 +113,21 @@
 				</cfswitch>
 			</cfloop>
 
-			<cfset onclick = "#moduleID#.raiseEvent('onSelectVideo',{videoID:'#entry.id#',url:'#entry.href#',text:'#jsStringFormat(entry.title)#'})">
+			<cfif onClickGotoURL>
+				<cfset entry.clickhref = entry.viewhref />
+			</cfif>
+
+			<cfset onclick = "#moduleID#.raiseEvent('onSelectVideo',{videoID:'#entry.id#',url:'#entry.viewhref#',text:'#jsStringFormat(entry.title)#'})">
 
 			<div style="margin-bottom:2px;margin-top:2px;">
-				<a href="#entry.viewhref#" onclick="#onclick#">
+				<a href="#entry.clickhref#" onclick="#onclick#">
 					<img src="#entry.thumbnail#" 
 						alt="#entry.title#" 
 						title="#entry.title#"
 						border="0" 
 						style="float:left;border:1px solid black;width:120px;"></a>
 				<div style="margin-left:140px;font-size:11px;">
-					<a style="color:##333;" href="#entry.viewhref#" onclick="#onclick#"><b>#entry.title#</b></a><br>
+					<a style="color:##333;" href="#entry.clickhref#" onclick="#onclick#"><b>#entry.title#</b></a><br>
 					#left(entry.description,100)#<br>
 					<div style="margin-top:3px;font-size:10px;color:##999;">
 						<strong>From:</strong> <a href="javascript:#moduleID#.search({term:'#entry.author#',mode:'searchByUser'})"

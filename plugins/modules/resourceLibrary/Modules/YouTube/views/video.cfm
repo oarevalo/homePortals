@@ -20,9 +20,9 @@
 	try {
 		// check if a video has been passed as a url
 		if(structKeyExists(arguments,"url") and arguments.url neq "") {
-			tmp = replaceNoCase(arguments.url,"http://www.youtube.com/?v=","","ALL");
-			tmp = replaceNoCase(tmp,"http://youtube.com/?v=","","ALL");
-			if(tmp neq "") videoID = tmp;
+			tmp = reFindNoCase("[\?|&|/]v=([^&##]*)",arguments.url,1,true);
+			if(arrayLen(tmp.len) gt 1)
+				videoID = mid(arguments.url,tmp.pos[2],tmp.len[2]);
 		}
 		
 		// get settings
