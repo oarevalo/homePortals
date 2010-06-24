@@ -22,7 +22,7 @@
 												execMode = 'remote',
 												homePortals = arguments.homePortals);
 			} else {
-				throwSessionTimedOut();
+				throwAppTimedOut();
 			}
 			
 			return this;
@@ -92,9 +92,9 @@
 	</cffunction>	
 
 	<!---------------------------------------->
-	<!--- throwSessionTimedOut             --->
+	<!--- throwAppTimedOut	               --->
 	<!---------------------------------------->	
-	<cffunction name="throwSessionTimedOut" access="private">
-		<cfthrow message="The session has timed out." type="homePortals.sessionTimedOut">
+	<cffunction name="throwAppTimedOut" access="private">
+		<cfthrow message="The application has timed out." type="homePortals.modules.applicationTimedOut">
 	</cffunction>
 </cfcomponent>
