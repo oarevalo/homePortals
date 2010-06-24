@@ -238,15 +238,18 @@
 	<!--------------------------------------->
 	<cffunction name="loadPageBean" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page. This method accepts an instance of a pageBean component.">
 		<cfargument name="page" type="pageBean" required="true" hint="the page to load">
+		<cfargument name="pageHREF" type="string" required="false" default="" hint="A optional client-defined key or identifier for the page. If empty uses a unique identifier for the page bean instance">
 		<cfscript>
 			var oPageRenderer = 0;
-			var pageUUID = createUUID();
 			var start = getTickCount();
 
+			if(arguments.pageHREF eq "") 
+				arguments.pageHREF = createObject("java", "java.lang.System").identityHashCode(arguments.page);
+
 			// notify plugins
-			arguments.pageHREF = getPluginManager().notifyPlugins("beforePageLoad", pageUUID);
+			arguments.pageHREF = getPluginManager().notifyPlugins("beforePageLoad", arguments.pageHREF);
 			
-			oPageRenderer = createObject("component","pageRenderer").init(pageUUID, arguments.page, this);
+			oPageRenderer = createObject("component","pageRenderer").init(arguments.pageHREF, arguments.page, this);
 
 			// notify plugins
 			oPageRenderer = getPluginManager().notifyPlugins("afterPageLoad", oPageRenderer);
