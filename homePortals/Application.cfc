@@ -21,10 +21,8 @@
 	*/ 
 	---->
 	<cfset this.name = "hpEngine"> 
-	<cfset this.sessionManagement = true>
 		
-	<cffunction name="onRequestStart">
-		
+	<cffunction name="onRequestStart">	
 		<cfset var oSystem =  createObject("java","java.lang.System")>
 		<cfset var pathSeparator = oSystem.getProperty("file.separator")>
 		<cfset var currentPath = getDirectoryFromPath(getCurrentTemplatePath())>

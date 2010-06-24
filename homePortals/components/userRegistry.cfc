@@ -3,10 +3,16 @@
 	<cfset variables.registryVarName = "_hpUserInfo">
 	
 	<cffunction name="init" access="public" returntype="userRegistry">
-		<!--- if the registry doesnt exist, then reset it --->		
-		<cfif Not structKeyExists(session, variables.registryVarName)>
-			<cfset reinit()>
-		</cfif>
+		<cftry>
+			<!--- if the registry doesnt exist, then reset it --->		
+			<cfif Not structKeyExists(session, variables.registryVarName)>
+				<cfset reinit()>
+			</cfif>
+			<cfcatch type="any">
+				<!--- if there is no session scope enabled just return, so that everything doesnt fail
+					just because this cfc was instantiated --->
+			</cfcatch>
+		</cftry>
 		<cfreturn this>
 	</cffunction>
 
@@ -18,26 +24,33 @@
 		<cfargument name="userID" type="string" required="true">
 		<cfargument name="userName" type="string" required="true">
 		<cfargument name="userData" type="Any" required="false" hint="Any additional data about the user">
-		
-		<cfset session[variables.registryVarName] = structNew()>
-		<cfset session[variables.registryVarName].userID = arguments.userID>
-		<cfset session[variables.registryVarName].userName = arguments.userName>
-		<cfset session[variables.registryVarName].userData = arguments.userData>
-		<cfset session[variables.registryVarName].loginTime = Now()>
+		<cfset var tmp = {
+						userID = arguments.userID,
+						userName = arguments.userName,
+						userData = arguments.userData,
+						loginTime = Now()
+					}>
+		<cfset session[variables.registryVarName] = tmp>
 	</cffunction>
 
 	<cffunction name="getUserInfo" access="public" returntype="struct" 
 				hint="Retrieves information about the current logged-in user for this session">
 		<!--- return user information --->
-		<cfreturn duplicate(session[variables.registryVarName])>
+		<cftry>
+			<cfreturn duplicate(session[variables.registryVarName])>
+			<cfcatch type="any">
+				<cfreturn getEmptyUserStruct()>
+			</cfcatch>
+		</cftry>
 	</cffunction>
 
 	<cffunction name="getEmptyUserStruct" access="private" returntype="struct">
-		<cfset var st = structNew()>
-		<cfset st.userID = "">
-		<cfset st.userName = "">
-		<cfset st.userData = "">
-		<cfreturn st>
+		<cfset var st = {
+						userID = "",
+						userName = "",
+						userData = ""
+					}>
+		<cfreturn duplicate(st)>
 	</cffunction>
 
 </cfcomponent>
