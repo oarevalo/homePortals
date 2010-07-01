@@ -50,7 +50,7 @@
 								 accountName_friend = arguments.accountName_to_remove);
 			
 			if(qry.recordCount gt 0) {
-				dao.delete(friendID = qry.friendID);
+				dao.delete(qry.friendID);
 			}
 		</cfscript>
 	</cffunction>
@@ -139,7 +139,7 @@
 								 confirmed = false);
 								 
 			if(qry.recordCount gt 0) {
-				dao.delete(friendID = qry.friendID);
+				dao.delete(qry.friendID);
 			}		
 		</cfscript>
 	</cffunction>		
