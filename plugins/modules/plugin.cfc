@@ -9,10 +9,15 @@
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
 			var oRSSService = 0;
-			var configPath = "/homePortals/plugins/modules/config/homePortals-config.xml.cfm";
+			var configPath = getDirectoryFromPath(getcurrentTemplatePath()) & "plugin-config.xml.cfm";
 
 			// load plugin config settings
-			oConfig.load(expandPath(configPath));
+			oConfig.load(configPath);
+			
+			// add bundled resource library (if required)
+			if(getPluginSetting("loadBundledResourceLibrary")) {
+				oConfig.addResourceLibraryPath( getPluginSetting("bundledReosurceLibraryPath") );
+			}
 
 			// reinitialize environment to include new settings
 			getHomePortals().initEnv(false);
@@ -55,5 +60,17 @@
 	<cffunction name="getModuleProperties" access="public" returntype="homePortals.plugins.modules.components.moduleProperties">
 		<cfreturn variables.oModuleProperties>
 	</cffunction>		
-		
+
+	<cffunction name="getPluginSetting" access="public" returntype="string">
+		<cfargument name="settingName" type="string" required="true">
+		<cfset var propValue = "">
+		<cfset var stProps = getHomePortals().getConfig().getPageProperties()>
+		<cfif structKeyExists(stProps,"plugins.modules." & arguments.settingName)>
+			<cfset propValue = stProps["plugins.modules." & arguments.settingName]>
+		<cfelseif structKeyExists(stProps,"plugins.modules.defaults." & arguments.settingName)>
+			<cfset propValue = stProps["plugins.modules.defaults." & arguments.settingName]>
+		</cfif>
+		<cfreturn propValue>
+	</cffunction>
+					
 </cfcomponent>

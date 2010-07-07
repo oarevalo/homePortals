@@ -74,7 +74,8 @@
 			}
 
 			// build the path where the modules will store their data 
-			csStorePath = getHomePortalsConfigBean().getAppRoot() & "/accountsData";
+			csStorePath = variables.oHomePortals.getPluginManager().getPlugin("modules").getPluginSetting("accountsDataPath");
+			csStorePath = replace(csStorePath,"{appRoot}",variables.oHomePortals.getConfig().getAppRoot());
 			
 			// set the accounts root and the page owner on the content store
 			variables.oContentStoreConfigBean.setAccountsRoot( csStorePath );

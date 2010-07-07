@@ -24,9 +24,10 @@
 		</resourceType>
 	</resourceTypes>
 	
-	<!-- Directories where HomePortals will look for resources  -->
-	<resourceLibraryPaths>
-		<resourceLibraryPath>/homePortals/plugins/modules/resourceLibrary/</resourceLibraryPath>
-	</resourceLibraryPaths>
+	<pageProperties>
+		<property name="plugins.modules.defaults.bundledReosurceLibraryPath" value="/homePortals/plugins/modules/resourceLibrary/" />
+		<property name="plugins.modules.defaults.loadBundledResourceLibrary" value="true" />
+		<property name="plugins.modules.defaults.accountsDataPath" value="{appRoot}/accountsData" />
+	</pageProperties>
 	
 </homePortals>
