@@ -17,6 +17,8 @@
 
 	// get images path
 	imgRoot = tmpModulePath & "/images";
+	
+	showFeedDirectory = cfg.getProperty("showFeedDirectory",true);
 </cfscript>
 
 <cfoutput>
@@ -36,8 +38,11 @@
 				<div class="SectionToolbar">
 					<a href="javascript:#moduleID#.getView('config');"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
 					<a href="javascript:#moduleID#.getView('config');">Settings</a>
-					<a href="javascript:#moduleID#.getPopupView('directory');"><img src="#imgRoot#/page_white_text.png" border="0" align="absmiddle"></a>
-					<a href="javascript:#moduleID#.getPopupView('directory');">Feed Directory</a>&nbsp;&nbsp;
+					
+					<cfif showFeedDirectory>
+						<a href="javascript:#moduleID#.getPopupView('directory');"><img src="#imgRoot#/page_white_text.png" border="0" align="absmiddle"></a>
+						<a href="javascript:#moduleID#.getPopupView('directory');">Feed Directory</a>&nbsp;&nbsp;
+					</cfif>
 				</div>
 			</cfif>
 		</cfif>
