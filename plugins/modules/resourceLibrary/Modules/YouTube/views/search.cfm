@@ -63,9 +63,9 @@
 </cfscript>
 
 <cfoutput>
-	<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;">
+	<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;font-size:12px;">
 		Search: <input type="text" name="term" value="#term#" id="yt_term">
-		<input type="button" value="Go" onclick="#moduleID#.search({term:$('yt_term').value,mode:'search'})">
+		<input type="button" value="Go" onclick="#moduleID#.search({term:$('yt_term').value,mode:'search'})" style="padding:2px;">
 		<br />
 		<a href="##" onclick="#moduleID#.search({mode:'listFeatured'})" <cfif mode eq "listFeatured">style="font-weight:bold;"</cfif>>Featured Videos</a>
 		&nbsp;|&nbsp;
@@ -119,17 +119,17 @@
 
 			<cfset onclick = "#moduleID#.raiseEvent('onSelectVideo',{videoID:'#entry.id#',url:'#entry.viewhref#',text:'#jsStringFormat(entry.title)#'})">
 
-			<div style="margin-bottom:2px;margin-top:2px;">
+			<div style="margin-bottom:10px;margin-top:2px;">
 				<a href="#entry.clickhref#" onclick="#onclick#">
 					<img src="#entry.thumbnail#" 
 						alt="#entry.title#" 
 						title="#entry.title#"
 						border="0" 
 						style="float:left;border:1px solid black;width:120px;"></a>
-				<div style="margin-left:140px;font-size:11px;">
+				<div style="margin-left:140px;font-size:12px;line-height:18px;">
 					<a style="color:##333;" href="#entry.clickhref#" onclick="#onclick#"><b>#entry.title#</b></a><br>
 					#left(entry.description,100)#<br>
-					<div style="margin-top:3px;font-size:10px;color:##999;">
+					<div style="margin-top:3px;font-size:11px;color:##999;">
 						<strong>From:</strong> <a href="javascript:#moduleID#.search({term:'#entry.author#',mode:'searchByUser'})"
 													alt="Search videos uploaded by '#entry.author#'"
 													title="Search videos uploaded by '#entry.author#'">#entry.author#</a><br>
@@ -152,7 +152,7 @@
 	</div>
 
 
-	<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;">
+	<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;font-size:12px;">
 		<table width="100%">
 			<tr>
 				<cfif p gt 1>

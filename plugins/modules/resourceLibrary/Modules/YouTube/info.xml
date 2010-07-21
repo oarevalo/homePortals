@@ -34,7 +34,7 @@
             <attributes>
                 <attribute name="term" description="Search term" default="" />
                 <attribute name="onClickGotoURL" description="Determines whether to go to YouTube website when selecting a vide" default="true" type="list" values="Yes,No" />
-                <attribute name="mode" description="Type of search to perform" default="searchByTag" type="list" values="searchByTag,searchByUser,listFeatured,listPopular" />
+                <attribute name="mode" description="Type of search to perform" default="listFeatured" type="list" values="searchByTag,searchByUser,listFeatured,listPopular" />
             </attributes>
             <moduleInfo>
                 <authorName>Oscar Arevalo</authorName>
