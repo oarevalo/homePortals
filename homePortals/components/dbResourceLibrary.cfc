@@ -48,6 +48,7 @@
 				<cfset variables.dbtype = "mysql">
 			</cfif>
 		</cfif>
+					<cfdump var="#this#"><cfabort>
 
 		<cfreturn this>
 	</cffunction>
@@ -440,7 +441,6 @@
 
 	<cffunction name="resourceTableExists" access="private" returntype="boolean">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfset var bRet = false>
 		<cfset var qry = 0>
 		<cfset var tblName = getResourceTableName(arguments.resourceType)>
 		
@@ -451,7 +451,7 @@
 					name="qry" 
 					pattern="#tblName#" />
 
-		<cfreturn bRet = (qry.recordCount gt 0)>
+		<cfreturn (qry.recordCount gt 0)>
 	</cffunction>
 
 	<cffunction name="getPackagesFromResourceTable" access="private" returntype="array">
