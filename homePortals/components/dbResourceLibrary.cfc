@@ -48,7 +48,6 @@
 				<cfset variables.dbtype = "mysql">
 			</cfif>
 		</cfif>
-					<cfdump var="#this#"><cfabort>
 
 		<cfreturn this>
 	</cffunction>
