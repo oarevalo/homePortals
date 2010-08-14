@@ -377,21 +377,29 @@
 		
 			// scripts
 			for(i=1;i lte ArrayLen(aScriptResources);i=i+1) {
-				ArrayAppend(variables.stPage.page.scripts, aScriptResources[i]);
+				if(not variables.stPage.page.scripts.contains( aScriptResources[i] )) {
+					ArrayAppend(variables.stPage.page.scripts, aScriptResources[i]);
+				}
 			}
 			tmp = getPage().getScripts();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				ArrayAppend(variables.stPage.page.scripts, tmp[i]);
+				if(not variables.stPage.page.scripts.contains( tmp[i] )) {
+					ArrayAppend(variables.stPage.page.scripts, tmp[i]);
+				}
 			}
 			
 			
 			// styles
 			for(i=1;i lte ArrayLen(aStyleResources);i=i+1) {
-				ArrayAppend(variables.stPage.page.stylesheets, aStyleResources[i]);
+				if(not variables.stPage.page.stylesheets.contains( aStyleResources[i] )) {
+					ArrayAppend(variables.stPage.page.stylesheets, aStyleResources[i]);
+				}
 			}
 			tmp = getPage().getStylesheets();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
+				if(not variables.stPage.page.stylesheets.contains( tmp[i] )) {
+					ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
+				}
 			}
 
 
