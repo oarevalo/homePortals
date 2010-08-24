@@ -72,6 +72,10 @@
 			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
 				if(fileExists(expandPath(variables.appRoot & variables.configFilePath))) {
 					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
+				} else if(fileExists(expandPath(variables.appRoot & this.CONFIG_FILE_NAME))) {
+					// we also handle the case in which the config is found at the app root level
+					variables.configFilePath = this.CONFIG_FILE_NAME;
+					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
 				}
 			} else {
 				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
