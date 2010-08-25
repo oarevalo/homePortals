@@ -51,7 +51,10 @@
 
 	<cffunction name="registerPlugin" access="public" returntype="void" hint="registers a plugin">
 		<cfargument name="pluginName" type="string" required="true">
-		<cfargument name="pluginPath" type="string" required="true">
+		<cfargument name="pluginPath" type="string" required="false" default="">
+		<cfif arguments.pluginPath eq "">
+			<cfset arguments.pluginPath = "homePortals.plugins.#arguments.pluginName#.plugin" />
+		</cfif>
 		<cfif left(arguments.pluginPath,1) eq ".">
 			<cfset arguments.pluginPath = variables.homePortals.getConfig().getAppRoot() & arguments.pluginPath>
 			<cfset arguments.pluginPath = replace(arguments.pluginPath,"/",".","ALL")>
