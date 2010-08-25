@@ -338,6 +338,13 @@
 	<cffunction name="getTimers" access="public" returntype="any" hint="Returns the timers for this object">
 		<cfreturn variables.stTimers>
 	</cffunction>	
+
+	<!---------------------------------------->
+	<!--- getParsedPageData				   --->
+	<!---------------------------------------->	
+	<cffunction name="getParsedPageData" access="public" returntype="struct" hint="This function a reference to the page contents after the page bean has been parsed. This allows to do low level modifications to the page structure without affecting the original bean">
+		<cfreturn variables.stPage.page>
+	</cffunction>	
 	
 	
 	<!----------  P R I V A T E    M E T H O D S    ----------------->
