@@ -176,7 +176,8 @@
 										<cfloop query="qryResources">
 											<option value="#qryResources.id#"
 													<cfif tmpValue eq qryResources.id>selected</cfif>	
-														>[#qryResources.package#] #qryResources.id#</option>
+														><cfif qryResources.package neq qryResources.id
+															>[#qryResources.package#] </cfif>#qryResources.id#</option>
 										</cfloop>
 									</select>
 									<cfif propsConfig[key].required><span style="color:red;">&nbsp; * required</span></cfif>
