@@ -921,7 +921,7 @@
 		<cfargument name="pagePath" type="string" required="true">
 		<cfscript>
 			var appRoot = variables.homePortals.getConfig().getAppRoot();
-			var configPath = appRoot & "/" & variables.homePortals.CONFIG_FILE_DIR & "/" & variables.homePortals.CONFIG_FILE_NAME;
+			var configPath = appRoot & "/" & variables.homePortals.getConfigFilePath();
 			var oConfig = createObject("component","homePortals.components.homePortalsConfigBean").init(expandPath(configPath));
 			oConfig.setDefaultPage(trim(arguments.pagePath));
 			fileWrite(expandPath(configPath),toString(oConfig.toXML()),"utf-8");
@@ -937,7 +937,7 @@
 		<cfargument name="value" type="string" required="true">
 		<cfscript>
 			var appRoot = variables.homePortals.getConfig().getAppRoot();
-			var configPath = appRoot & "/" & variables.homePortals.CONFIG_FILE_DIR & "/" & variables.homePortals.CONFIG_FILE_NAME;
+			var configPath = appRoot & "/" & variables.homePortals.getConfigFilePath();
 			var oConfig = createObject("component","homePortals.components.homePortalsConfigBean").init(expandPath(configPath));
 			oConfig.setPageProperty(arguments.name, arguments.value);
 			fileWrite(expandPath(configPath),toString(oConfig.toXML()),"utf-8");
