@@ -1,5 +1,5 @@
 <cfcomponent extends="homePortals.components.plugin" hint="This plugin provides a way of 'skinning' site pages. Skins are created as regular Resources and stored on the resource library. Skins are used on a per-page basis.">
-	<cfproperty name="skinID" type="string" required="false" hint="Use this property to define a default skin to be used for all pages. Can be overridden at page level.">
+	<cfproperty name="skinID" type="resource:skin" required="false" hint="Use this property to define a default skin to be used for all pages. Can be overridden at page level.">
 
 	<cffunction name="onAppInit" access="public" returntype="void">
 		<cfscript>
