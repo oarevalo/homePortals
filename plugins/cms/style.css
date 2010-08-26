@@ -74,6 +74,9 @@
 	background-color:#f3f4ee;
 	color:#000;
 	text-align:left;
+	width:800px;
+	margin:0 auto;
+	margin-bottom:20px;
 }
 .cms-panelTitle {
 	font-size:14px;
