@@ -31,7 +31,8 @@
 		<cfset variables.oHomePortals = arguments.homePortals>
 		
 		<cfset resetPageContentBuffer()>
-		<cfset loadPage()>
+		<cfset initPageStruct()>
+		<cfset loadPage(arguments.pageHREF, arguments.page)>
 		<cfset injectGlobalPageProperties()>
 		
 		<cfset variables.stTimers.init = getTickCount()-start>
@@ -53,7 +54,7 @@
 			var arg2 = "";
 			var rendered = "";
 			var start = getTickCount();
-			var pageTemplate = getPage().getPageTemplate();
+			var pageTemplate = variables.stPage.page.pageTemplate;
 
 			// store the context object
 			if(not structIsEmpty(arguments.context)) 
@@ -66,7 +67,7 @@
 			renderTemplateBody = getHomePortals().getTemplateManager().getTemplateBody("page", pageTemplate);
 
 			// replace simple values
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", getPage().getTitle(), "ALL");
+			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", variables.stPage.page.title, "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_ONLOAD$", getBodyOnLoad(), "ALL");
 
@@ -348,11 +349,35 @@
 	
 	
 	<!----------  P R I V A T E    M E T H O D S    ----------------->
+
+	<!--------------------------------------->
+	<!----  initPageStruct				----->
+	<!--------------------------------------->
+	<cffunction name="initPageStruct" access="private" returntype="void" hint="initializes the struct where we will collect the page data">
+		<cfscript>
+			variables.stPage = StructNew();
+			variables.stPage.page = StructNew();
+			variables.stPage.page.href = "";			// address of the page
+			variables.stPage.page.title = "";		// page title
+			variables.stPage.page.pageTemplate = "";		// page title
+			variables.stPage.page.eventListeners = arrayNew(1);
+			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
+
+			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
+			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
+			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
+			variables.stPage.page.modules = StructNew();		// holds modules
+			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
+		</cfscript>
+	</cffunction>
 	
 	<!--------------------------------------->
 	<!----  loadPage					----->
 	<!--------------------------------------->
 	<cffunction name="loadPage" access="private" returntype="void" hint="loads and parses a homeportals page">
+		<cfargument name="pageHREF" type="string" required="true" hint="The identifier for the page">
+		<cfargument name="page" type="pageBean" required="true" hint="The page to render">
+		<cfargument name="isParent" type="boolean" required="false" default="false">
 		<cfscript>
 			var i = 0;
 			var tmrStart = getTickCount();
@@ -363,32 +388,38 @@
 			var aStyleResources = oHPConfig.getBaseResourcesByType("style");
 			
 			var oResourceBean = 0;
+			var parentPageHREF = "";
 		
 		
 			// ****** Parse homePortals page contents ******
 
-			// Structure to hold the page info
-			variables.stPage = StructNew();
-			variables.stPage.page = StructNew();
-			variables.stPage.page.href = variables.pageHREF;			// address of the page
-			variables.stPage.page.title = getPage().getTitle();		// page title
-			variables.stPage.page.eventListeners = getPage().getEventListeners();
-			variables.stPage.page.meta = getPage().getMetaTags();			// holds html meta tags
+			// if this page extends another, then parse the parent first
+			if(arguments.page.hasProperty("extends")) {
+				parentPageHREF = arguments.page.getProperty("extends");
+				if(parentPageHREF neq "" and parentPageHREF neq arguments.pageHREF) {
+					loadPage(parentPageHREF,
+							getHomePortals().getPageLoader().load(parentPageHREF),
+							true);
+				}
+			} 
 
-			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
-			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
-			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
-			variables.stPage.page.modules = StructNew();		// holds modules
-			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
-		
-		
+			// Structure to hold the page info
+			variables.stPage.page.href = arguments.pageHREF;			// address of the page
+			if(arguments.page.getTitle() neq "")
+				variables.stPage.page.title = arguments.page.getTitle();		// page title
+			if(arguments.page.getPageTemplate() neq "")
+				variables.stPage.page.pageTemplate = arguments.page.getPageTemplate();		// page template
+
+			variables.stPage.page.eventListeners.addAll(arguments.page.getEventListeners());
+			variables.stPage.page.meta.addAll(arguments.page.getMetaTags());			// holds html meta tags
+
 			// scripts
 			for(i=1;i lte ArrayLen(aScriptResources);i=i+1) {
 				if(not variables.stPage.page.scripts.contains( aScriptResources[i] )) {
 					ArrayAppend(variables.stPage.page.scripts, aScriptResources[i]);
 				}
 			}
-			tmp = getPage().getScripts();
+			tmp = arguments.page.getScripts();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				if(not variables.stPage.page.scripts.contains( tmp[i] )) {
 					ArrayAppend(variables.stPage.page.scripts, tmp[i]);
@@ -402,7 +433,7 @@
 					ArrayAppend(variables.stPage.page.stylesheets, aStyleResources[i]);
 				}
 			}
-			tmp = getPage().getStylesheets();
+			tmp = arguments.page.getStylesheets();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				if(not variables.stPage.page.stylesheets.contains( tmp[i] )) {
 					ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
@@ -411,7 +442,7 @@
 
 
 			// layout sections
-			tmp = getPage().getLayoutRegions();
+			tmp = arguments.page.getLayoutRegions();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				if(not structKeyExists(variables.stPage.page.layout, tmp[i].type))
 					variables.stPage.page.layout[tmp[i].type] = ArrayNew(1);
@@ -420,25 +451,25 @@
 
 			
 			// skin
-			if(getPage().getSkinID() neq "" and getHomePortals().getResourceLibraryManager().hasResourceType("skin")) {
-				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", getPage().getSkinID());
+			if(arguments.page.getSkinID() neq "" and getHomePortals().getResourceLibraryManager().hasResourceType("skin")) {
+				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", arguments.page.getSkinID());
 				variables.stPage.page.skinHREF = oResourceBean.getFullHref();
 			}
 
 						
 			// modules and content
-			tmp = getPage().getModules();
+			tmp = arguments.page.getModules();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				// create structure for modules that belong to the same location
 				tmpLoc = tmp[i].getLocation();
 				
 				// if location is empty, default to first available
 				if(tmpLoc eq "") {
-					tmp2 = getPage().getLayoutRegions();
+					tmp2 = arguments.page.getLayoutRegions();
 					if(arrayLen(tmp2) gt 0)
 						tmpLoc = tmp2[1].name;
 					else {
-						tmp2 = getHomePortals().getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+						tmp2 = getHomePortals().getTemplateManager().getLayoutSections( arguments.page.getPageTemplate() );
 						tmpLoc = listFirst(tmp2);
 					}
 				}
@@ -451,8 +482,8 @@
 			
 			
 			// if no explicit layout is given, then create a layout based on the page template
-			if(arrayLen(getPage().getLayoutRegions()) eq 0) {
-				tmp = getHomePortals().getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+			if(!arguments.isParent and arrayLen(arguments.page.getLayoutRegions()) eq 0) {
+				tmp = getHomePortals().getTemplateManager().getLayoutSections( arguments.page.getPageTemplate() );
 				tmp = listToArray(tmp);
 				for(i=1;i lte ArrayLen(tmp);i=i+1) {
 					st = {
