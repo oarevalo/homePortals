@@ -212,14 +212,20 @@
 					aModules = listToArray(lstModules);
 				
 					for(j=1;j lte arrayLen(aModules);j=j+1) {
-						// find module node in original page
-						oModule = oPage.getModule(aModules[j]);
-						
-						// update location in module
-						oModule.setLocation(thisLocation);
-						
-						// add module to new modules array
-						arrayAppend(aNewModules, oModule);
+						try {
+							// find module node in original page
+							oModule = oPage.getModule(aModules[j]);
+							
+							// update location in module
+							oModule.setLocation(thisLocation);
+							
+							// add module to new modules array
+							arrayAppend(aNewModules, oModule);
+
+						} catch(homePortals.pageBean.moduleNotFound e) {
+							// the layout string contains a module ID that is not on the page
+							// we can assume that it is due to a parent page
+						}
 					}
 				}
 			}
