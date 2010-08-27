@@ -127,6 +127,7 @@
 		<cfargument name="pageName" default="" type="string">
 		<cfargument name="parent" default="" type="string">
 		<cfargument name="pageTemplate" default="" type="string">
+		<cfargument name="createDefaultLayout" default="false" type="boolean">
 		<cfset var newPageURL = "">
 		<cfset var hp = variables.homePortals>
 		<Cfset var bFound = true>
@@ -138,19 +139,23 @@
 				oPage = createObject("component","homePortals.components.pageBean").init();
 				
 				// create a default layout based on the default page template
-				tm = hp.getTemplateManager();
-				if(arguments.pageTemplate eq "") 
-					pt = tm.getDefaultTemplate("page");
-				else
-					pt = tm.getTemplate("page",arguments.pageTemplate);
-				lstLayoutSections = tm.getLayoutSections( pt.name );
-				for(i=1;i lte listLen(lstLayoutSections);i++) {
-					oPage.addLayoutRegion(lcase(listGetAt(lstLayoutSections,i)), lcase(listGetAt(lstLayoutSections,i)));
+				if(arguments.createDefaultLayout) {
+					tm = hp.getTemplateManager();
+					if(arguments.pageTemplate eq "") 
+						pt = tm.getDefaultTemplate("page");
+					else
+						pt = tm.getTemplate("page",arguments.pageTemplate);
+					lstLayoutSections = tm.getLayoutSections( pt.name );
+					for(i=1;i lte listLen(lstLayoutSections);i++) {
+						oPage.addLayoutRegion(lcase(listGetAt(lstLayoutSections,i)), lcase(listGetAt(lstLayoutSections,i)));
+					}
 				}
 				
 				if(right(arguments.parent,1) neq "/") arguments.parent = arguments.parent & "/";
 				
 				// make sure the page has a unique name within the account
+				newPath = arguments.parent & arguments.pageName;
+				bFound = hp.getPageProvider().pageExists(newPath);
 				while(bFound) {
 					newPath = arguments.parent & arguments.pageName & currIndex;
 					bFound = hp.getPageProvider().pageExists(newPath);
@@ -291,6 +296,7 @@
    		<cfargument name="template" type="string" required="yes">
   		<cfargument name="description" type="string" required="yes">
   		<cfargument name="keywords" type="string" required="yes">
+  		<cfargument name="extends" type="string" required="yes">
    		<cftry>
    			<cfscript>
    				validateOwner();
@@ -299,8 +305,12 @@
    						.setPageTemplate(arguments.template)
    						.removeMetaTag("description")
    						.removeMetaTag("keywords")
-   						.addMetaTag("description",arguments.description)
-   						.addMetaTag("keywords",arguments.keywords);
+   						.removeProperty("extends");
+						
+				if(arguments.description neq "") variables.oPage.addMetaTag("description",arguments.description);
+				if(arguments.keywords neq "") variables.oPage.addMetaTag("keywords",arguments.keywords);
+				if(arguments.extends neq "") variables.oPage.setProperty("extends",arguments.extends);
+						
    				savePage();
    				
    				if(arguments.name neq "" and arguments.name neq getFileFromPath(variables.pageHREF)) {

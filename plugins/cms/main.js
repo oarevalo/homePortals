@@ -159,7 +159,8 @@ function controlPanelClient() {
 							title:frm.title.value, 
 							template:frm.template.value,
 							description:frm.description.value,
-							keywords:frm.keywords.value
+							keywords:frm.keywords.value,
+							extends:frm.extends.value
 						}
 					);
 	}

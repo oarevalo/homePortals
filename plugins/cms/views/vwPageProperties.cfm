@@ -16,6 +16,11 @@
 	</cfif>
 </cfloop>
 
+<cfset parentPage = "">
+<cfif p.hasProperty("extends")>
+	<cfset parentPage = p.getProperty("extends")>
+</cfif>
+
 <cfoutput>
 	<form name="frm" method="post" action="##">
 		<div class="cms-panelTitle">
@@ -32,13 +37,13 @@
 			<tr valign="top">
 				<td><strong>Name:</strong></td>
 				<td><input type="text" name="name" value="#pageName#" class="cms-formField"></td>
-				<td style="width:20px;" rowspan="3">&nbsp;</td>
-				<td rowspan="3">
+				<td style="width:20px;" rowspan="2">&nbsp;</td>
+				<td rowspan="2">
 					<strong>Description:</strong><br />
 					<textarea name="description" rows="2" class="cms-formField" style="width:180px;">#trim(metadescription)#</textarea>
 				</td>
-				<td style="width:20px;" rowspan="3">&nbsp;</td>
-				<td rowspan="3">
+				<td style="width:20px;" rowspan="2">&nbsp;</td>
+				<td rowspan="2">
 					<strong>Keywords:</strong><br />
 					<textarea name="keywords" rows="2" class="cms-formField" style="width:180px;">#trim(metakeywords)#</textarea>
 				</td>
@@ -57,6 +62,15 @@
 									<cfif stTemplates[key].name eq p.getPageTemplate()>selected</cfif>>#stTemplates[key].name# <cfif stTemplates[key].isdefault eq true>*</cfif></option>
 						</cfloop>
 					</select>
+				</td>
+				<td>&nbsp;</td>
+				<td colspan="3">
+					<strong>Extends:</strong>
+					<input type="text" name="extends" value="#trim(parentPage)#" class="cms-formField">
+					<span class="cms-formFieldTip">
+						Enter the name or path of the parent page. This page will inherit all properties, layout and content
+						of the parent page.
+					</span>
 				</td>
 			</tr>
 		</table>
