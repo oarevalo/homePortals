@@ -38,19 +38,28 @@
 		aLayoutRegions = getPage().getLayoutRegions();
 		usingImplicitLayout = 0;
 		if(arrayLen(aLayoutRegions) eq 0) {
-			tmp = oHP.getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
-			tmp = listToArray(tmp);
-			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				st = {
-					type = tmp[i],
-					id = tmp[i],
-					class = "",
-					style = "",
-					name = tmp[i]
-				};
-				ArrayAppend(aLayoutRegions, st );
+			// if this page doesnt have any layout, it could be that we are inheriting the layout from a parent page
+			if(getPage().hasProperty("extends") and getPage().getProperty("extends") neq "") {
+				p = getParsedPageData();
+				for(tmp in p.layout) {
+					aLayoutRegions.addAll(p.layout[tmp]);
+				}
+				usingImplicitLayout = 1;
+			} else {
+				tmp = oHP.getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+				tmp = listToArray(tmp);
+				for(i=1;i lte ArrayLen(tmp);i=i+1) {
+					st = {
+						type = tmp[i],
+						id = tmp[i],
+						class = "",
+						style = "",
+						name = tmp[i]
+					};
+					ArrayAppend(aLayoutRegions, st );
+				}
+				usingImplicitLayout = 1;
 			}
-			usingImplicitLayout = 1;
 		}
 		
 		// make a js struct with page locations
