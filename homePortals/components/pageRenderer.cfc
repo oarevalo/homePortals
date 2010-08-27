@@ -469,7 +469,7 @@
 					if(arrayLen(tmp2) gt 0)
 						tmpLoc = tmp2[1].name;
 					else {
-						tmp2 = getHomePortals().getTemplateManager().getLayoutSections( arguments.page.getPageTemplate() );
+						tmp2 = getHomePortals().getTemplateManager().getLayoutSections( variables.stPage.page.pageTemplate );
 						tmpLoc = listFirst(tmp2);
 					}
 				}
@@ -482,8 +482,8 @@
 			
 			
 			// if no explicit layout is given, then create a layout based on the page template
-			if(!arguments.isParent and arrayLen(arguments.page.getLayoutRegions()) eq 0) {
-				tmp = getHomePortals().getTemplateManager().getLayoutSections( arguments.page.getPageTemplate() );
+			if(!arguments.isParent and structIsEmpty(variables.stPage.page.layout)) {
+				tmp = getHomePortals().getTemplateManager().getLayoutSections( variables.stPage.page.pageTemplate );
 				tmp = listToArray(tmp);
 				for(i=1;i lte ArrayLen(tmp);i=i+1) {
 					st = {
