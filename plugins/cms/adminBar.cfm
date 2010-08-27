@@ -136,6 +136,7 @@
 				jQuery(".cms-layoutRegion").disableSelection();
 				jQuery("##cms-btnEditPage").click(function(){ controlPanel.getView("PageProperties"); });
 				jQuery("##cms-btnSitemap").click(function(){ controlPanel.getView("Sitemap"); });
+				jQuery("##cms-btnResources").click(function(){ controlPanel.getView("Resources"); });
 				jQuery("##cms-btnSettings").click(function(){ controlPanel.getView("Settings"); });
 				jQuery("##cms-btnAddContent").click(function(){ controlPanel.getView("AddContent"); });
 				jQuery("##cms-btnLogout").click(function(){ navCmdLogout(); });
@@ -179,6 +180,8 @@
 			<a href="##" id="cms-btnEditPage">Page Settings</a>
 			&nbsp;&nbsp;
 			<a href="##" id="cms-btnSitemap">Site Pages</a>
+			&nbsp;&nbsp;
+			<a href="##" id="cms-btnResources">Site Resources</a>
 		</cfif>
 	</div>
 	<div id="cms-navMenuContentPanel" class="cms-panel" style="display:none;">

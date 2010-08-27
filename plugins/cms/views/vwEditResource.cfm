@@ -79,6 +79,9 @@
 				</tr>
 				<input type="hidden" name="#arguments.prefix#__isnew" value="1">
 			<cfelse>
+				<tr>
+					<td colspan="2"><div class="cms-panelTitle">#arguments.resourceID#</div></td>
+				</tr>
 				<input type="hidden" name="#arguments.prefix#__id" value="#arguments.resourceID#">
 				<input type="hidden" name="#arguments.prefix#__isnew" value="0">
 			</cfif>
