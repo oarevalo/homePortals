@@ -80,7 +80,18 @@
 				<input type="hidden" name="#arguments.prefix#__isnew" value="1">
 			<cfelse>
 				<tr>
-					<td colspan="2"><div class="cms-panelTitle">#arguments.resourceID#</div></td>
+					<td colspan="2">
+						<div class="cms-panelTitle">
+							<div style="float:right;">
+								<a href='##' onclick="navCmdDeleteResource('#jsStringFormat(arguments.resourceType)#','#jsStringFormat(arguments.resourceID)#')"
+									style="color:red;text-decoration:none;font-size:11px;"><img 
+									src='#variables.cmsRoot#/images/omit-page-orange.gif' 
+									border='0' align='absmiddle' alt='Click to delete resource' 
+									title='click to delete resource'> Delete Resource</a>
+							</div>
+							#arguments.resourceID#
+						</div>
+					</td>
 				</tr>
 				<input type="hidden" name="#arguments.prefix#__id" value="#arguments.resourceID#">
 				<input type="hidden" name="#arguments.prefix#__isnew" value="0">

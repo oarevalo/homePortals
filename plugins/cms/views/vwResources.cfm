@@ -39,7 +39,7 @@
 			<cfoutput>
 				<p>	
 					&raquo;
-					<a href="javascript:controlPanel.getPartialView('EditResource',{resourceType:'#resourceType#',resourceID:'_NOVALUE_',prefix:'res'},'cms-resourceEditPanel')" 
+					<a href="javascript:controlPanel.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'_NOVALUE_',prefix:'res'},'cms-resourceEditPanel')" 
 						class="cpListLink" 
 						style="font-weight:bold;" 
 						>Create New...</a>
@@ -59,7 +59,7 @@
 							<cfloop array="#aPkgResources#" index="resID">
 								<div style="border-bottom:1px solid ##ebebeb;">
 									<div style="width:150px;overflow:hidden;">
-										<a href="javascript:controlPanel.getPartialView('EditResource',{resourceType:'#resourceType#',resourceID:'#jsstringformat(resID)#',prefix:'res'},'cms-resourceEditPanel')" 
+										<a href="javascript:controlPanel.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(resID)#',prefix:'res'},'cms-resourceEditPanel')" 
 											class="cpListLink" 
 											style="font-weight:normal;" 
 											>#resID#</a>
@@ -70,7 +70,7 @@
 					<cfelse>
 						<div style="border-bottom:1px solid ##ebebeb;">
 							<div style="width:150px;overflow:hidden;">
-								<a href="javascript:controlPanel.getPartialView('EditResource',{resourceType:'#resourceType#',resourceID:'#jsstringformat(qryResources.id)#',prefix:'res'},'cms-resourceEditPanel')" 
+								<a href="javascript:controlPanel.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(qryResources.id)#',prefix:'res'},'cms-resourceEditPanel')" 
 									class="cpListLink" 
 									style="font-weight:normal;" 
 									>#qryResources.id#</a>

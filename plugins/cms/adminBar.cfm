@@ -181,7 +181,7 @@
 			&nbsp;&nbsp;
 			<a href="##" id="cms-btnSitemap">Site Pages</a>
 			&nbsp;&nbsp;
-			<a href="##" id="cms-btnResources">Site Resources</a>
+			<a href="##" id="cms-btnResources">Resources</a>
 		</cfif>
 	</div>
 	<div id="cms-navMenuContentPanel" class="cms-panel" style="display:none;">

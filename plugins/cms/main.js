@@ -175,6 +175,51 @@ function controlPanelClient() {
 						}
 					);
 	}
+	
+	function updateResource(frm,prefix) {
+		var hasFileToUpload = false;
+		var params = {
+			resourceType:frm.resourceType.value,
+			prefix: prefix
+		};
+		
+		for(var i=0;i<frm.elements.length;i++) {
+			var fieldName = frm.elements[i].name;
+			var fieldType = frm.elements[i].type
+			var fieldValue = frm.elements[i].value
+			var fieldChecked = frm.elements[i].checked
+
+			if(fieldName.substr(0,prefix.length)==prefix) {
+				if(fieldType == "file" && fieldValue!="") {
+					hasFileToUpload = true;
+				}
+				if(fieldName == prefix+"__filebody" ) {
+					jQuery("#"+prefix+"__filebody").htmlarea("updateTextArea");
+				}
+				if(fieldType=="radio")  {
+					 if(fieldChecked) {
+						params[fieldName] = fieldValue;
+					 }
+				} else {
+					params[fieldName] = fieldValue;
+				}
+			}
+		}
+		
+		if(hasFileToUpload)
+			submitFormToServer(frm,"updateResource");
+		else
+			h_callServer("updateResource",
+							this.panelDivID,
+							params		
+						);
+	}
+	
+	function deleteResource(resourceType,resourceID) {
+		if(confirm("Delete resource from site?")) {
+			h_callServer("deleteResource","cms-statusMessage",{resourceID:resourceID,resourceType:resourceType});
+		}
+	}
 
 
 	// *****   Misc   ****** //
@@ -319,6 +364,8 @@ function controlPanelClient() {
 	controlPanelClient.prototype.updateSettings = updateSettings;
 	controlPanelClient.prototype.setGlobalPageProperties = setGlobalPageProperties;
 	controlPanelClient.prototype.addContentTag = addContentTag;
+	controlPanelClient.prototype.updateResource = updateResource;
+	controlPanelClient.prototype.deleteResource = deleteResource;
 }
 
 
@@ -339,7 +386,9 @@ function navCmdLogout() {
 function navCmdLogin(frm) {
 	controlPanel.login(frm);
 }
-
+function navCmdDeleteResource(resourceType,resourceID) {
+	controlPanel.deleteResource(resourceType,resourceID);
+}
 
 
 function h_callServer(method,sec,params,rcv) {

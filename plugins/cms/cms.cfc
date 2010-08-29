@@ -792,6 +792,125 @@
 		</cftry>
 	</cffunction>
 
+   	<!---------------------------------------->
+   	<!--- updateResource                   --->
+   	<!---------------------------------------->
+	<cffunction name="updateResource" access="public" output="true">
+		<cfargument name="resourceType" type="string" required="true" />
+		<cfargument name="prefix" type="string" required="true" />
+   		<cftry>
+   			<cfscript>
+   			validateOwner();
+			resourceID = "";
+			resType = arguments.resourceType;
+			resPrefix = arguments.prefix & "_";
+			
+			// get resource ID
+			if(structKeyExists(arguments,resPrefix & "_id")) {
+				resourceID = arguments[resPrefix & "_id"]; 
+				if(listLen(resourceID,"/") gt 1) {
+					resPackage = listFirst(resourceID);
+					resourceID = listRest(resourceID);
+				} else {
+					resPackage = "default";
+				}
+			}
+			
+			if(resourceID neq "") {
+				if(arguments[resPrefix & "_isnew"]) {
+					resLib = getDefaultResourceLibrary();
+					oResourceBean = resLib.getNewResource(resType);
+					oResourceBean.setID(resourceID);
+					//oResourceBean.setDescription(description); 
+					oResourceBean.setPackage(resPackage); 
+				} else {
+					oResourceBean = variables.homePortals
+												.getCatalog()
+												.getResourceNode(resType, resourceID, true);
+				}
+
+				for(arg in arguments) {
+					// update resource properties
+					if(left(arg,len(resPrefix)) eq resPrefix
+						and listLast(arg,"_") neq "default"
+						and arg neq resPrefix & "_id"
+						and arg neq resPrefix & "_isnew"
+						and arg neq resPrefix & "_file"
+						and arg neq resPrefix & "_filebody"
+						and arg neq resPrefix & "_filename"
+						and arg neq resPrefix & "_filecontenttype") {
+						
+						if(arguments[arg] eq "_NOVALUE_")
+	   						oResourceBean.setProperty(replace(arg,resPrefix,""),"");
+						else
+	   						oResourceBean.setProperty(replace(arg,resPrefix,""),arguments[arg]);
+					}
+				}
+				oResourceBean.getResourceLibrary().saveResource(oResourceBean);
+
+				// update body
+				if(structKeyExists(arguments, resPrefix & "_filebody")) {
+					oResourceBean.getResourceLibrary().saveResourceFile(oResourceBean, 
+																		arguments[resPrefix & "_filebody"], 
+																		arguments[resPrefix & "_filename"], 
+																		arguments[resPrefix & "_filecontenttype"]);
+				}
+				
+				// upload file
+				if(structKeyExists(arguments, resPrefix & "_file") and arguments[resPrefix & "_file"] neq "") {
+					pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
+					path = getTempFile(getTempDirectory(),"cmsPluginFileUpload");
+					stFileInfo = fileUpload(arguments[resPrefix & "_file"], path);
+					if(not stFileInfo.fileWasSaved)	throw("File upload failed");
+					path = stFileInfo.serverDirectory & pathSeparator & stFileInfo.serverFile;
+	
+					oResourceBean.getResourceLibrary().addResourceFile(oResourceBean, 
+																		path, 
+																		stFileInfo.clientFile, 
+																		stFileInfo.contentType & "/" & stFileInfo.contentSubType);
+				}
+
+				// reload package
+				variables.homePortals.getCatalog().reloadPackage(resType,oResourceBean.getPackage());
+			}
+   			</cfscript>
+   			<script>
+  				window.location.replace("#variables.reloadPageHREF#");
+              	controlPanel.closePanel();
+   			</script>
+   			<cfcatch type="any">
+   				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+   			</cfcatch>
+   		</cftry>
+	</cffunction>
+
+   	<!---------------------------------------->
+   	<!--- deleteResource                   --->
+   	<!---------------------------------------->
+	<cffunction name="deleteResource" access="public" output="true">
+		<cfargument name="resourceType" type="string" required="true" />
+		<cfargument name="resourceID" type="string" required="true" />
+   		<cftry>
+			<cfscript>
+	   			validateOwner();
+				oCatalog = variables.homePortals.getCatalog();
+				oResourceBean = oCatalog.getResourceNode(arguments.resourceType, arguments.resourceID, true);
+
+				// delete resource
+				oResourceBean.getResourceLibrary().deleteResource(resourceID, resourceType, oResourceBean.getPackage());
+
+				// remove from catalog
+				oCatalog.deleteResourceNode(resourceType, resourceID);
+   			</cfscript>
+   			<script>
+  				window.location.replace("#variables.reloadPageHREF#");
+              	controlPanel.closePanel();
+   			</script>
+   			<cfcatch type="any">
+   				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+   			</cfcatch>
+   		</cftry>
+	</cffunction>
 
 
 	<!---****************************************************************--->
