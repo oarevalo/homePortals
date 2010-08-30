@@ -57,8 +57,13 @@
 			var pageTemplate = variables.stPage.page.pageTemplate;
 
 			// store the context object
-			if(not structIsEmpty(arguments.context)) 
+			if(not structIsEmpty(arguments.context)) {
+				// make sure we cleanup the context for html sneakyness!!
+				for(arg1 in arguments.context) {
+					arguments.context[arg1] = reReplace(arguments.context[arg1],"<[^>]*>","","ALL");
+				}
 				variables.context = arguments.context;
+			}
 
 			// pre-render output of all content tags on page		
 			processContentTags();
@@ -560,6 +565,21 @@
 										} else if(props[prop] eq token) {
 											oModBean.removeProperty(prop);
 										}
+									}
+								}
+
+								// apply context to title
+								prop = oModBean.getTitle();
+								stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",prop,1,true);
+								if(stResult.len[1] gt 0) {
+									token = mid(prop,stResult.pos[1],stResult.len[1]);
+									arg1 = mid(prop,stResult.pos[2],stResult.len[2]);
+									if(left(token,1) neq "$" and structKeyExists(variables.context,arg1)) {
+										oModBean.setTitle( replace(prop, token, variables.context[arg1], "ALL") );
+									} else if(getPage().hasProperty(arg1)) {
+										oModBean.setTitle( replace(prop, token, getPage().getProperty(arg1), "ALL") );
+									} else if(prop eq token) {
+										oModBean.setTitle("");
 									}
 								}
 								 
