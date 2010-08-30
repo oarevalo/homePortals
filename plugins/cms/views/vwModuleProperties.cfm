@@ -24,12 +24,17 @@
 				</cfif>
 				<cfset lstModuleAttribs = listAppend(lstModuleAttribs, "prop_" & prop.name)>
 				<cfset lstModuleAttribs = listAppend(lstModuleAttribs, "prop_" & prop.name & "_default")>
+
+				<cfset isContextVar = (left(tmpAttrValue,1) eq "{" and right(tmpAttrValue,1) eq "}")>
+				<cfif isContextVar>
+					<cfset tmpType = "text">
+				</cfif>
 				
-				<cfif tmpType eq "resource">
+				<cfif tmpType eq "resource" and not isContextVar>
 					<cfset lstResPrefixes = listAppend(lstResPrefixes, "#thisAttr#:#resourceType#:res#i#")>
 					<cfset lstResPrefixesJs = listAppend(lstResPrefixesJs, "res#i#")>
-				</cfif>				
-										
+				</cfif>	
+				
 				<tr valign="top">
 					<td nowrap="nowrap" style="width:80px;"><strong>#prop.displayName#:</strong></td>
 					<td>
