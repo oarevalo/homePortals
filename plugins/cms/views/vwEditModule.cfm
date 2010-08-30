@@ -2,7 +2,7 @@
 <cfset modID = arguments.moduleID>
 <cfset oModuleBean = variables.oPage.getModule(modID)>
 <cfset stTemplates = hp.getTemplateManager().getTemplates("module")>
-<cfset aLayoutRegions = variables.oPage.getLayoutRegions()>
+<cfset >
 <cfscript>
 	objPath = hp.getConfig().getContentRenderer(oModuleBean.getModuleType());
 	obj = createObject("component",objPath);
@@ -17,18 +17,28 @@
 	modTitle = oModuleBean.getTitle();
 	modStyle = oModuleBean.getStyle();
 	
+	aLayoutRegions = variables.oPage.getLayoutRegions();
 	if(arrayLen(aLayoutRegions) eq 0) {
-		tmp = variables.homePortals.getTemplateManager().getLayoutSections( variables.oPage.getPageTemplate() );
-		tmp = listToArray(tmp);
-		for(i=1;i lte ArrayLen(tmp);i=i+1) {
-			st = {
-				type = tmp[i],
-				id = tmp[i],
-				class = "",
-				style = "",
-				name = tmp[i]
-			};
-			ArrayAppend(aLayoutRegions, st );
+		// if this page doesnt have any layout, it could be that we are inheriting the layout from a parent page
+		if(variables.oPage.hasProperty("extends") and variables.oPage.getProperty("extends") neq "") {
+			oPageRenderer = createObject("component","homePortals.components.pageRenderer").init(variables.pageHREF, variables.oPage, hp);
+			p = oPageRenderer.getParsedPageData();
+			for(tmp in p.layout) {
+				aLayoutRegions.addAll(p.layout[tmp]);
+			}
+		} else {
+			tmp = hp.getTemplateManager().getLayoutSections( variables.oPage.getPageTemplate() );
+			tmp = listToArray(tmp);
+			for(i=1;i lte ArrayLen(tmp);i=i+1) {
+				st = {
+					type = tmp[i],
+					id = tmp[i],
+					class = "",
+					style = "",
+					name = tmp[i]
+				};
+				ArrayAppend(aLayoutRegions, st );
+			}
 		}
 	}
 </cfscript>	
