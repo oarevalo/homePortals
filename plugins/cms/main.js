@@ -180,7 +180,6 @@ function controlPanelClient() {
 		var hasFileToUpload = false;
 		var params = {
 			resourceType:frm.resourceType.value,
-			prefix: prefix
 		};
 		
 		for(var i=0;i<frm.elements.length;i++) {
