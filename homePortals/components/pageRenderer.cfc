@@ -72,7 +72,7 @@
 			renderTemplateBody = getHomePortals().getTemplateManager().getTemplateBody("page", pageTemplate);
 
 			// replace simple values
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", variables.stPage.page.title, "ALL");
+			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", htmlEditFormat(variables.stPage.page.title), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_ONLOAD$", getBodyOnLoad(), "ALL");
 
@@ -251,7 +251,7 @@
 					<cfset tmpHTML = tmpHTML & "<link rel=""alternate"" type=""application/rss+xml"" href=""#aMeta[i].content#"" />">
 				</cfif>
 			<cfelse>
-				<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#aMeta[i].content#"" />">
+				<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#htmlEditFormat(aMeta[i].content)#"" />">
 			</cfif>
 		</cfloop>
 			
