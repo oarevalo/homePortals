@@ -71,10 +71,31 @@
 			// get the render template for the full page
 			renderTemplateBody = getHomePortals().getTemplateManager().getTemplateBody("page", pageTemplate);
 
+			// replace page title
+			tmp = htmlEditFormat(variables.stPage.page.title);
+			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", resolveContextTokens(tmp), "ALL");
+
 			// replace simple values
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", htmlEditFormat(variables.stPage.page.title), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_ONLOAD$", getBodyOnLoad(), "ALL");
+
+			// search and replace "Page Properties"
+			index = 1;
+			finished = false;
+			while(Not finished) {
+				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				if(stResult.len[1] gt 0) {
+					// match found
+					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
+					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
+					rendered = resolveContextTokens("{" & arg1 & "}");;
+					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					
+					index = stResult.pos[1] + len(rendered);
+				} else {
+					finished = true;
+				}
+			}
 
 			// search and replace "Custom Sections"
 			index = 1;
@@ -115,31 +136,6 @@
 				}
 			}
 			
-			// search and replace "Page Properties"
-			index = 1;
-			finished = false;
-			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
-				if(stResult.len[1] gt 0) {
-					// match found
-					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
-					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
-					rendered = "";
-					
-					if(getPage().hasProperty(arg1)) {
-						rendered = getPage().getProperty(arg1);
-					}
-						
-					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
-					
-					index = stResult.pos[1] + len(rendered);
-				} else {
-					finished = true;
-				}
-			}
-			
-			
-
 			variables.stTimers.renderPage = getTickCount()-start;
 			
 			return renderTemplateBody;	
@@ -553,35 +549,15 @@
 								// do dynamic replacement of properties from the context object
 								props = oModBean.getProperties();
 								for(prop in props) {
-									stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",props[prop],1,true);
-									if(stResult.len[1] gt 0) {
-										token = mid(props[prop],stResult.pos[1],stResult.len[1]);
-										arg1 = mid(props[prop],stResult.pos[2],stResult.len[2]);
-
-										if(left(token,1) neq "$" and structKeyExists(variables.context,arg1)) {
-											oModBean.setProperty(prop, replace(props[prop], token, variables.context[arg1], "ALL") );
-										} else if(getPage().hasProperty(arg1)) {
-											oModBean.setProperty(prop, replace(props[prop], token, getPage().getProperty(arg1), "ALL") );
-										} else if(props[prop] eq token) {
-											oModBean.removeProperty(prop);
-										}
-									}
+									tmp = resolveContextTokens( props[prop] );
+									if(tmp eq "")
+										oModBean.removeProperty(prop);
+									else
+										oModBean.setProperty(prop, tmp);
 								}
 
 								// apply context to title
-								prop = oModBean.getTitle();
-								stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",prop,1,true);
-								if(stResult.len[1] gt 0) {
-									token = mid(prop,stResult.pos[1],stResult.len[1]);
-									arg1 = mid(prop,stResult.pos[2],stResult.len[2]);
-									if(left(token,1) neq "$" and structKeyExists(variables.context,arg1)) {
-										oModBean.setTitle( replace(prop, token, variables.context[arg1], "ALL") );
-									} else if(getPage().hasProperty(arg1)) {
-										oModBean.setTitle( replace(prop, token, getPage().getProperty(arg1), "ALL") );
-									} else if(prop eq token) {
-										oModBean.setTitle("");
-									}
-								}
+								oModBean.setTitle( resolveContextTokens( oModBean.getTitle() ) );
 								 
 								// process module content
 								oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, oModBean);
@@ -748,6 +724,46 @@
 		</cfscript>
 	</cffunction>
 	
+	<!---------------------------------------->
+	<!--- resolveContextTokens		       --->
+	<!---------------------------------------->		
+	<cffunction name="resolveContextTokens" access="private" returntype="string">
+		<cfargument name="text" type="string" required="true">
+		<cfscript>
+			var token = "";
+			var arg1 = "";
+			var stResult = {};
+			var rtn = arguments.text;
+			var index = 1;
+			var finished = false;
+			var rendered = "";
+
+			while(Not finished) {
+				stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",rtn,index,true);
+	
+				if(stResult.len[1] gt 0) {
+					token = mid(rtn,stResult.pos[1],stResult.len[1]);
+					arg1 = mid(rtn,stResult.pos[2],stResult.len[2]);
+					rendered = "";
+
+					if(left(token,1) neq "$" and structKeyExists(variables.context,arg1)) {
+						rendered = variables.context[arg1];
+					} else if(getPage().hasProperty(arg1)) {
+						rendered = getPage().getProperty(arg1);
+					}
+
+					rtn = replace(rtn, token, rendered, "ALL");
+					
+					index = stResult.pos[1] + len(rendered);
+				} else {
+					finished = true;
+				}
+			}
+
+			return rtn;
+		</cfscript>
+	</cffunction>
+
 
 	<!--------------------------------------->
 	<!----  Facades for cf tags			----->
