@@ -176,10 +176,11 @@ function controlPanelClient() {
 					);
 	}
 	
-	function updateResource(frm,prefix) {
+	function updateResource(frm) {
 		var hasFileToUpload = false;
 		var params = {
 			resourceType:frm.resourceType.value,
+			prefix:frm.prefix.value
 		};
 		
 		for(var i=0;i<frm.elements.length;i++) {
@@ -188,12 +189,12 @@ function controlPanelClient() {
 			var fieldValue = frm.elements[i].value
 			var fieldChecked = frm.elements[i].checked
 
-			if(fieldName.substr(0,prefix.length)==prefix) {
+			if(fieldName.substr(0,params.prefix.length)==params.prefix) {
 				if(fieldType == "file" && fieldValue!="") {
 					hasFileToUpload = true;
 				}
-				if(fieldName == prefix+"__filebody" ) {
-					jQuery("#"+prefix+"__filebody").htmlarea("updateTextArea");
+				if(fieldName == params.prefix+"__filebody" ) {
+					jQuery("#"+params.prefix+"__filebody").htmlarea("updateTextArea");
 				}
 				if(fieldType=="radio")  {
 					 if(fieldChecked) {
@@ -396,6 +397,8 @@ function h_callServer(method,sec,params,rcv) {
 	params.method = method;
 	params._pageHREF = _pageHREF;
 
+	if(jQuery("#"+sec).html() == "")
+		jQuery("#"+sec).html("loading...");
 	jQuery("#"+sec).load(controlPanel.server,
 						 params,
 						 function(responseText, textStatus, XMLHttpRequest) {

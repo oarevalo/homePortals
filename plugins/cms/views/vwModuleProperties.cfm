@@ -26,11 +26,8 @@
 				<cfset lstModuleAttribs = listAppend(lstModuleAttribs, "prop_" & prop.name & "_default")>
 
 				<cfset isContextVar = (left(tmpAttrValue,1) eq "{" and right(tmpAttrValue,1) eq "}")>
-				<cfif isContextVar>
-					<cfset tmpType = "text">
-				</cfif>
 				
-				<cfif tmpType eq "resource" and not isContextVar>
+				<cfif tmpType eq "resource">
 					<cfset lstResPrefixes = listAppend(lstResPrefixes, "#thisAttr#:#resourceType#:res#i#")>
 					<cfset lstResPrefixesJs = listAppend(lstResPrefixesJs, "res#i#")>
 				</cfif>	
@@ -62,13 +59,18 @@
 										ORDER BY upackage, uid, id
 								</cfquery>
 								<select name="prop_#thisAttr#" class="cms-formField" 
-										onchange="controlPanel.getPartialView('EditResource',{resourceType:'#resourceType#',resourceID:this.value,prefix:'res#i#'},'cms-resourceEditPanel')">
+										onchange="controlPanel.getPartialView('EditResourceField',{resourceType:'#resourceType#',resourceID:this.value,prefix:'res#i#'},'cms-resourceEditPanel')">
 									<cfif not prop.required><option value="_NOVALUE_">Create New...</option></cfif>
 									<cfloop query="qryResources">
 										<option value="#qryResources.id#"
 												<cfif tmpAttrValue eq qryResources.id>selected</cfif>	
 													><cfif qryResources.package neq defaultPackage>#qryResources.package# :: </cfif>#qryResources.id#</option>
 									</cfloop>
+									<cfif isContextVar>
+										<option value="#tmpAttrValue#" selected>Custom...</option>
+									<cfelse>
+										<option value="_CUSTOM_">Custom...</option>
+									</cfif>
 								</select>
 							</cfcase>
 							
@@ -111,7 +113,7 @@
 						<td>&nbsp;</td>
 						<td colspan="2">
 							<div id="cms-resourceEditPanel" class="cms-lightPanel"></div>
-							<script>controlPanel.getPartialView("EditResource",{resourceType:'#resourceType#',resourceID:'#tmpAttrValue#',prefix:'res#i#'},"cms-resourceEditPanel")</script>
+							<script>controlPanel.getPartialView("EditResourceField",{resourceType:'#resourceType#',resourceID:'#tmpAttrValue#',prefix:'res#i#'},"cms-resourceEditPanel")</script>
 						</td>
 					</tr>
 				</cfif>

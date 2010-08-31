@@ -83,8 +83,20 @@
 		<cfargument name="location" type="string" required="no" default="">
 		<cftry>
 			<cfscript>
+				usedModuleIDList = "";
 				oPageHelper = createObject("component","homePortals.components.pageHelper").init(variables.oPage);
-				newModuleID = oPageHelper.addContentTag(arguments.tag, arguments.location);
+
+				if(variables.oPage.hasProperty("extends") and variables.oPage.getProperty("extends") neq "") {
+					oPageRenderer = createObject("component","homePortals.components.pageRenderer").init(variables.pageHREF, variables.oPage, variables.homePortals);
+					p = oPageRenderer.getParsedPageData();
+					for(key in p.modules) {
+						for(i=1;i lte arrayLen(p.modules[key]);i++) {
+							usedModuleIDList = listappend(usedModuleIDList,p.modules[key][i].getID());
+						}
+					}
+				}
+
+				newModuleID = oPageHelper.addContentTag(arguments.tag, arguments.location, structNew(), usedModuleIDList);
 				savePage();
 			</cfscript>
 			
@@ -407,68 +419,73 @@
 	   						} else {
 	   							resPackage = "default";
 	   						}
-   						}
-   						
-   						if(resourceID neq "") {
-	   						if(arguments[resPrefix & "_isnew"]) {
+
+	   						if(arguments[resPrefix & "_iscustom"]) {
+								oModuleBean.setProperty(propName,resourceID);
+								doUpdateResource = false;
+
+	   						} else if(arguments[resPrefix & "_isnew"]) {
 	   							resLib = getDefaultResourceLibrary();
 	   							oResourceBean = resLib.getNewResource(resType);
 								oResourceBean.setID(resourceID);
 								//oResourceBean.setDescription(description); 
 								oResourceBean.setPackage(resPackage); 
+								doUpdateResource = true;
 	   						} else {
 	   							oResourceBean = variables.homePortals
 	   														.getCatalog()
 	   														.getResourceNode(resType, resourceID, true);
+								doUpdateResource = true;
 	   						}
 
-			   				for(arg in arguments) {
-			   					// update resource properties
-			   					if(left(arg,len(resPrefix)) eq resPrefix
-			   						and listLast(arg,"_") neq "default"
-			   						and arg neq resPrefix & "_id"
-			   						and arg neq resPrefix & "_isnew"
-			   						and arg neq resPrefix & "_file"
-			   						and arg neq resPrefix & "_filebody"
-			   						and arg neq resPrefix & "_filename"
-			   						and arg neq resPrefix & "_filecontenttype") {
-										
-									if(arguments[arg] eq "_NOVALUE_")
-				   						oResourceBean.setProperty(replace(arg,resPrefix,""),"");
-									else
-				   						oResourceBean.setProperty(replace(arg,resPrefix,""),arguments[arg]);
+							if(doUpdateResource) {
+				   				for(arg in arguments) {
+				   					// update resource properties
+				   					if(left(arg,len(resPrefix)) eq resPrefix
+				   						and listLast(arg,"_") neq "default"
+				   						and arg neq resPrefix & "_id"
+				   						and arg neq resPrefix & "_isnew"
+				   						and arg neq resPrefix & "_file"
+				   						and arg neq resPrefix & "_filebody"
+				   						and arg neq resPrefix & "_filename"
+				   						and arg neq resPrefix & "_filecontenttype") {
+											
+										if(arguments[arg] eq "_NOVALUE_")
+					   						oResourceBean.setProperty(replace(arg,resPrefix,""),"");
+										else
+					   						oResourceBean.setProperty(replace(arg,resPrefix,""),arguments[arg]);
+									}
+				   				}
+				   				oResourceBean.getResourceLibrary().saveResource(oResourceBean);
+	
+								// update body
+								if(structKeyExists(arguments, resPrefix & "_filebody")) {
+									oResourceBean.getResourceLibrary().saveResourceFile(oResourceBean, 
+																						arguments[resPrefix & "_filebody"], 
+																						arguments[resPrefix & "_filename"], 
+																						arguments[resPrefix & "_filecontenttype"]);
 								}
-			   				}
-			   				oResourceBean.getResourceLibrary().saveResource(oResourceBean);
+								
+								// upload file
+								if(structKeyExists(arguments, resPrefix & "_file") and arguments[resPrefix & "_file"] neq "") {
+									pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
+									path = getTempFile(getTempDirectory(),"cmsPluginFileUpload");
+									stFileInfo = fileUpload(arguments[resPrefix & "_file"], path);
+									if(not stFileInfo.fileWasSaved)	throw("File upload failed");
+									path = stFileInfo.serverDirectory & pathSeparator & stFileInfo.serverFile;
+					
+									oResourceBean.getResourceLibrary().addResourceFile(oResourceBean, 
+																						path, 
+																						stFileInfo.clientFile, 
+																						stFileInfo.contentType & "/" & stFileInfo.contentSubType);
+								}
 
-							// update body
-							if(structKeyExists(arguments, resPrefix & "_filebody")) {
-								oResourceBean.getResourceLibrary().saveResourceFile(oResourceBean, 
-																					arguments[resPrefix & "_filebody"], 
-																					arguments[resPrefix & "_filename"], 
-																					arguments[resPrefix & "_filecontenttype"]);
-							}
-							
-							// upload file
-							if(structKeyExists(arguments, resPrefix & "_file") and arguments[resPrefix & "_file"] neq "") {
-								pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
-								path = getTempFile(getTempDirectory(),"cmsPluginFileUpload");
-								stFileInfo = fileUpload(arguments[resPrefix & "_file"], path);
-								if(not stFileInfo.fileWasSaved)	throw("File upload failed");
-								path = stFileInfo.serverDirectory & pathSeparator & stFileInfo.serverFile;
-				
-								oResourceBean.getResourceLibrary().addResourceFile(oResourceBean, 
-																					path, 
-																					stFileInfo.clientFile, 
-																					stFileInfo.contentType & "/" & stFileInfo.contentSubType);
+								// reload package
+				   				variables.homePortals.getCatalog().reloadPackage(resType,oResourceBean.getPackage());
 							}
 
 							// update module in page
 			   				oModuleBean.setProperty(propName,resourceID);
-
-							// reload package
-			   				variables.homePortals.getCatalog().reloadPackage(resType,oResourceBean.getPackage());
-			   				
    						}
    						
    					}
