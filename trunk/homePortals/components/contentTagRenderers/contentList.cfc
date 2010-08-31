@@ -1,13 +1,17 @@
-<cfcomponent extends="homePortals.components.contentTagRenderer">
-	<cfproperty name="orderBy" type="list" values="A to Z,Z to A,Older first,Newer first" />
-	<cfproperty name="maxItems" type="numeric" default="10" required="false" />
-	<cfproperty name="showIntro" type="boolean" default="false" />
-	<cfproperty name="itemHREF" type="string" />
+<cfcomponent extends="homePortals.components.contentTagRenderer"
+			hint="Displays a list of available Content resources with a customizable URL.">
+	<cfproperty name="orderBy" type="list" values="A to Z,Z to A,Older first,Newer first" hint="Indicates the sorting order for content entries. By default entries are displayed in alphabetical order (A to Z)" />
+	<cfproperty name="maxItems" type="numeric" default="10" required="false" hint="The maximum number of entries to display on the list" />
+	<cfproperty name="showIntro" type="boolean" default="false" hint="Toggles whether to display a small intro paragraph for each entry" />
+	<cfproperty name="itemHREF" type="string" hint="Use this field to provide an optional URL to trigger when selecting an item from the list. To indicate the ID of the selected entry, use the token %id" />
 	
 	<cfset variables.MAX_ITEMS_TO_DISPLAY = 1000>
 	<cfset variables.DEFAULT_ITEMS_TO_DISPLAY = 10>
+	<cfset variables.DEFAULT_ORDER_BY_STR = "A to Z">
 	<cfset variables.DEFAULT_ORDER_BY = "id">
 	<cfset variables.CONTENT_RES_TYPE = "content">
+	<cfset variables.READ_MORE_TEXT = "more">
+	<cfset variables.DATE_FORMAT_MASK = "long">
 
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
 		<cfargument name="headContentBuffer" type="homePortals.components.singleContentBuffer" required="true">	
@@ -18,8 +22,8 @@
 			var resourceType = getContentTag().getAttribute("resourceType",variables.CONTENT_RES_TYPE );
 			var oCatalog = getPageRenderer().getHomePortals().getCatalog();
 			var qryRes = oCatalog.getResourcesByType(resourceType);
-			var orderBy = getContentTag().getAttribute("orderBy","A to Z");
-			var maxItems = getContentTag().getAttribute("maxItems",10);
+			var orderBy = getContentTag().getAttribute("orderBy",variables.DEFAULT_ORDER_BY_STR);
+			var maxItems = getContentTag().getAttribute("maxItems",variables.DEFAULT_ITEMS_TO_DISPLAY);
 			
 			if(val(maxItems) eq 0) maxItems = variables.DEFAULT_ITEMS_TO_DISPLAY;
 		</cfscript>
@@ -67,8 +71,8 @@
 		<cfsavecontent variable="tmpHTML">
 			<cfoutput query="arguments.qryData">
 				<cfif itemHREF neq "">
-					<cfset href = replaceNoCase(itemHREF,"{id}",arguments.qrydata.id,"ALL")>
-					<cfset href = replaceNoCase(href,"{package}",arguments.qrydata.package,"ALL")>
+					<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
+					<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 				</cfif>
 				<cfif showIntro>
 					<p>
@@ -94,13 +98,13 @@
 							</cfif>
 						</cfif>
 						<span style="border-bottom:1px dotted black;">
-							#lsDateFormat(arguments.qryData.createdOn, "long")#
+							#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#
 						</span><br /><br />
 						#tmpBody#
-						<cfif hasMore>
+						<cfif hasMore and len(tmpBody) gt 0>
 							...
 							<cfif href neq "">
-								<a href="#href#">(more)</a>
+								<a href="#href#">#variables.READ_MORE_TEXT#</a>
 							</cfif>
 						</cfif>
 					</p>
