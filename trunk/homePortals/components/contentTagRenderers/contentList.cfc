@@ -43,7 +43,7 @@
 		</cfswitch>
 
 		<cfquery name="qryRes" dbtype="query" maxrows="#min(maxItems,variables.MAX_ITEMS_TO_DISPLAY)#">
-			SELECT id,description,createdOn,package
+			SELECT id,description,createdOn,package,type
 				FROM qryRes
 				ORDER BY #sqlOrderBy#
 		</cfquery>
@@ -57,8 +57,12 @@
 		<cfargument name="qryData" type="query" required="true">
 		<cfset var tmpHTML = "">
 		<cfset var href = "">
+		<cfset var tmpBody = "">
 		<cfset var showIntro = getContentTag().getAttribute("showIntro",false)>
 		<cfset var itemHREF = getContentTag().getAttribute("itemHREF")>
+		<cfset var oCatalog = getPageRenderer().getHomePortals().getCatalog()>
+		<cfset var resource = 0>
+		<cfset var hasMore = false>
 
 		<cfsavecontent variable="tmpHTML">
 			<cfoutput query="arguments.qryData">
@@ -66,14 +70,40 @@
 					<cfset href = replaceNoCase(itemHREF,"{id}",arguments.qrydata.id,"ALL")>
 					<cfset href = replaceNoCase(href,"{package}",arguments.qrydata.package,"ALL")>
 				</cfif>
-				<p>
 				<cfif showIntro>
-					<cfif href neq "">
-						<a href="#href#"><b>#arguments.qrydata.id#</b></a> <br/>
-					<cfelse>
-						<b>#arguments.qrydata.id#</b> <br/>
-					</cfif>
-					#arguments.qryData.description#
+					<p>
+						<cfif href neq "">
+							<a href="#href#" style="font-size:14px;font-weight:bold">#arguments.qrydata.id#</a> <br/>
+						<cfelse>
+							<b>#arguments.qrydata.id#</b> <br/>
+						</cfif>
+						<cfif arguments.qryData.description neq "">
+							<cfset tmpBody = arguments.qryData.description>
+						<cfelse>
+							<cfset resource = oCatalog.getResourceNode(arguments.qrydata.type, arguments.qrydata.id)>
+							<cfif resource.targetFileExists()>
+								<cfset tmpBody = resource.readFile()>
+								<cfset tmpBody = reReplace(tmpBody, "</?\w+(\s*[\w:]+\s*=\s*(""[^""]*""|'[^']*'))*\s*/?>", " ", "all") />
+								<cfset tmpBody = reReplace(trim( tmpBody ),"\s+"," ","all") />
+								<cfset tmpBody = reMatch("([^\s]+\s?){1,50}", tmpBody ) />
+								<cfif !arrayLen( tmpBody )>
+									<cfset tmpBody = [ "" ] />
+								</cfif>
+								<cfset tmpBody = tmpBody[1] />
+								<cfset hasMore = len(tmpBody) lt len(resource.readFile())>
+							</cfif>
+						</cfif>
+						<span style="border-bottom:1px dotted black;">
+							#lsDateFormat(arguments.qryData.createdOn, "long")#
+						</span><br /><br />
+						#tmpBody#
+						<cfif hasMore>
+							...
+							<cfif href neq "">
+								<a href="#href#">(more)</a>
+							</cfif>
+						</cfif>
+					</p>
 				<cfelse>
 					<cfif href neq "">
 						<a href="#href#">#arguments.qryData.id#</a> <br/>
@@ -81,7 +111,6 @@
 						#arguments.qryData.id# <br/>
 					</cfif>
 				</cfif>
-				</p>
 			</cfoutput>
 		</cfsavecontent>
 		<cfreturn tmpHTML>
