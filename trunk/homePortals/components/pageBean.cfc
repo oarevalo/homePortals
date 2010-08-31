@@ -207,14 +207,14 @@
 			st = getProperties();
 			for(i in st) {
 				if(not st[i].transient) {
-					xmlDoc.xmlRoot.xmlAttributes[st[i].name] = xmlFormat(st[i].value);
+					xmlDoc.xmlRoot.xmlAttributes[st[i].name] = st[i].value;
 				}
 			}
 
 			// add title
 			if(getTitle() neq "") {
 				xmlNode = xmlElemNew(xmlDoc,"title");
-				xmlNode.xmlText = xmlFormat(getTitle());
+				xmlNode.xmlText = getTitle();
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 
@@ -222,8 +222,8 @@
 			aTemp = getMetaTags();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
 				xmlNode = xmlElemNew(xmlDoc,"meta");
-				xmlNode.xmlAttributes["name"] = xmlFormat(aTemp[i].name);
-				xmlNode.xmlAttributes["content"] = xmlFormat(aTemp[i].content);
+				xmlNode.xmlAttributes["name"] = aTemp[i].name;
+				xmlNode.xmlAttributes["content"] = aTemp[i].content;
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 
@@ -232,7 +232,7 @@
 			aTemp = getStylesheets();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
 				xmlNode = xmlElemNew(xmlDoc,"stylesheet");
-				xmlNode.xmlAttributes["href"] = xmlFormat(aTemp[i]);
+				xmlNode.xmlAttributes["href"] = aTemp[i];
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 
@@ -240,7 +240,7 @@
 			aTemp = getScripts();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
 				xmlNode = xmlElemNew(xmlDoc,"script");
-				xmlNode.xmlAttributes["src"] = xmlFormat(aTemp[i]);
+				xmlNode.xmlAttributes["src"] = aTemp[i];
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 			
@@ -250,11 +250,11 @@
 				xmlNode = xmlElemNew(xmlDoc,"layout");
 				for(i=1;i lte arrayLen(aTemp);i=i+1) {
 					xmlNode2 = xmlElemNew(xmlDoc,"location");
-					xmlNode2.xmlAttributes["name"] = xmlFormat(aTemp[i].name);
-					xmlNode2.xmlAttributes["type"] = xmlFormat(aTemp[i].type);
-					if(aTemp[i].id neq "") xmlNode2.xmlAttributes["id"] = xmlFormat(aTemp[i].id);
-					if(aTemp[i].class neq "") xmlNode2.xmlAttributes["class"] = xmlFormat(aTemp[i].class);
-					if(aTemp[i].style neq "") xmlNode2.xmlAttributes["style"] = xmlFormat(aTemp[i].style);
+					xmlNode2.xmlAttributes["name"] = aTemp[i].name;
+					xmlNode2.xmlAttributes["type"] = aTemp[i].type;
+					if(aTemp[i].id neq "") xmlNode2.xmlAttributes["id"] = aTemp[i].id;
+					if(aTemp[i].class neq "") xmlNode2.xmlAttributes["class"] = aTemp[i].class;
+					if(aTemp[i].style neq "") xmlNode2.xmlAttributes["style"] = aTemp[i].style;
 					arrayAppend(xmlNode.xmlChildren, xmlNode2);
 				}
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
@@ -266,9 +266,9 @@
 				xmlNode = xmlElemNew(xmlDoc,"eventListeners");
 				for(i=1;i lte arrayLen(aTemp);i=i+1) {
 					xmlNode2 = xmlElemNew(xmlDoc,"event");
-					xmlNode2.xmlAttributes["objectName"] = xmlFormat(aTemp[i].objectName);
-					xmlNode2.xmlAttributes["eventName"] = xmlFormat(aTemp[i].eventName);
-					xmlNode2.xmlAttributes["eventHandler"] = xmlFormat(aTemp[i].eventHandler);
+					xmlNode2.xmlAttributes["objectName"] = aTemp[i].objectName;
+					xmlNode2.xmlAttributes["eventName"] = aTemp[i].eventName;
+					xmlNode2.xmlAttributes["eventHandler"] = aTemp[i].eventHandler;
 					arrayAppend(xmlNode.xmlChildren, xmlNode2);
 				}
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
@@ -329,7 +329,7 @@
 								bWriteAttribute = true;		// write down all other attributes
 						}
 						
-						if(bWriteAttribute) xmlNode2.xmlAttributes[attr] = xmlFormat(st[attr]);
+						if(bWriteAttribute) xmlNode2.xmlAttributes[attr] = st[attr];
 					}
 					arrayAppend(xmlNode.xmlChildren, xmlNode2);
 				}
