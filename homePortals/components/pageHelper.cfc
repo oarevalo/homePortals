@@ -124,6 +124,7 @@
 		<cfargument name="tag" type="string" required="true">
 		<cfargument name="locationID" type="string" required="yes">
 		<cfargument name="customAttributes" type="struct" required="no" default="#structNew()#">
+		<cfargument name="invalidModuleIDList" type="string" required="no" default="" hint="provides a list of moduleIDs that should be used for the new tag">
 
 		<cfscript>
 			var stModule = structNew();
@@ -142,7 +143,9 @@
 			while(keepLooping) {
 				try {
 					moduleID = tag & moduleIndex;
-					st = oPage.getModule(moduleID);
+					if(!listFindNoCase(arguments.invalidModuleIDList,moduleID)) {
+						st = oPage.getModule(moduleID);
+					}
 					moduleIndex = moduleIndex + 1;
 					keepLooping = true;
 				
