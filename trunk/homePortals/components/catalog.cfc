@@ -1,7 +1,8 @@
 <cfcomponent hint="This component implements a catalog to access the resource library using lazy loading of resources">
 
 	<cfscript>
-		variables.qryResources = QueryNew("libpath,type,id,href,package,description");
+		variables.FIELD_LIST = "libpath,type,id,href,package,description,createdOn";
+		variables.qryResources = QueryNew(variables.FIELD_LIST);
 		variables.mapResources = structNew();
 		variables.oResourceLibraryManager = 0;
 		variables.cacheServiceName = "catalogCacheService";
@@ -145,7 +146,7 @@
 
 			// clear the catalog
 			variables.mapResources = structNew();
-			variables.qryResources = QueryNew("type,id,href,package,description,libPath");
+			variables.qryResources = QueryNew(variables.FIELD_LIST);
 
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
@@ -205,6 +206,7 @@
 				st.Package = stResourceBean.Package;
 				st.Description = stResourceBean.Description;
 				st.libpath = stResourceBean.resourceLibrary.getPath();
+				st.createdOn = stResourceBean.createdOn;
 
 				// add resource to map
 				variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
@@ -231,7 +233,7 @@
 			var resType = "";
 			var resID = "";
 			
-			variables.qryResources = QueryNew("type,id,href,package,description,libpath");
+			variables.qryResources = QueryNew(variables.FIELD_LIST);
 			
 			for(resType in variables.mapResources) {
 			
@@ -246,6 +248,7 @@
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);
 					querySetCell(variables.qryResources, "libpath", stResourceBean.libpath);			
+					querySetCell(variables.qryResources, "createdOn", stResourceBean.createdOn);			
 				}
 	
 			}
@@ -293,6 +296,7 @@
 					querySetCell(variables.qryResources, "package", stResourceBean.Package);
 					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
 					querySetCell(variables.qryResources, "libpath", stResourceBean.resourceLibrary.getPath());					
+					querySetCell(variables.qryResources, "createdOn", stResourceBean.createdOn);
 					
 					// create resource map entry
 					st = structNew();
@@ -302,6 +306,7 @@
 					st.Package = stResourceBean.Package;
 					st.Description = stResourceBean.Description;
 					st.libpath = stResourceBean.resourceLibrary.getPath();
+					st.createdOn = stResourceBean.createdOn;
 
 					// create node for resource type group if doesnt exist
 					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
