@@ -2,7 +2,7 @@
 <cfset modID = arguments.moduleID>
 <cfset oModuleBean = variables.oPage.getModule(modID)>
 <cfset stTemplates = hp.getTemplateManager().getTemplates("module")>
-<cfset >
+
 <cfscript>
 	objPath = hp.getConfig().getContentRenderer(oModuleBean.getModuleType());
 	obj = createObject("component",objPath);
