@@ -100,9 +100,9 @@
 		<cfset lstResPrefixesJs = listQualify(lstResPrefixesJs,"'")>
 		<input type="hidden" name="moduleID" value="#modID#">
 		<input type="hidden" name="resPrefixes" value="#lstResPrefixes#">
-		<input type="button" value="Apply Changes" onclick="controlPanel.updateModule(this.form,[#lstModuleAttribs#],'#lstResPrefixes#',[#lstResPrefixesJs#])">
+		<input type="button" value="Apply Changes" onclick="cms.updateModule(this.form,[#lstModuleAttribs#],'#lstResPrefixes#',[#lstResPrefixesJs#])">
 		&nbsp;&nbsp;
-		<input type="button" value="Close" onclick="controlPanel.closePanel()">
+		<input type="button" value="Close" onclick="cms.closePanel()">
 	</form>
 	
 </cfoutput>

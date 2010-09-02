@@ -18,7 +18,7 @@
 			<strong>Username:</strong> <input type="text" name="username" value="" class="cms-formField"><br />
 			<strong>Password:</strong> <input type="password" name="password" value="" class="cms-formField"><br />
 			<strong>Confirm password:</strong> <input type="password" name="password2" value="" class="cms-formField"><br /><br />
-			<input type="button" value="Create User" onclick="controlPanel.createUser(this.form)">
+			<input type="button" value="Create User" onclick="cms.createUser(this.form)">
 		</form>
 	</div>
 </cfoutput>

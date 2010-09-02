@@ -92,25 +92,25 @@
 			_pageHREF = "#jsStringFormat(currentPage)#";
 			_pageFileName = "#jsStringFormat(getFileFromPath(currentPage))#";
 			
-			var controlPanel = new controlPanelClient();
-			controlPanel.init("#gatewayPath#", "#cmsRoot#", stLocations);
+			var cms = new cmsClient();
+			cms.init("#gatewayPath#", "#cmsRoot#", stLocations);
 		</script>
 
 	<cfif bUserLoggedIn>
 		<script type="text/javascript">
 			// setup UI
 			jQuery(function() {
-				controlPanel.setStatusMessage("attaching module icons...",700);
+				cms.setStatusMessage("attaching module icons...",700);
 				for(var i=0;i<stModules.length;i++) {
 					jQuery("##"+stModules[i])
-						.prepend("<div class='cms-moduleHandleBar'>" + stModules[i] + controlPanel.getModuleIconsHTML(stModules[i]) + "</div>");
+						.prepend("<div class='cms-moduleHandleBar'>" + stModules[i] + cms.getModuleIconsHTML(stModules[i]) + "</div>");
 				}
 			
-				controlPanel.setStatusMessage("enabling drag and drop...",700);
-				for(loc in controlPanel.locations) {
-					jQuery("##"+controlPanel.locations[loc].id)
+				cms.setStatusMessage("enabling drag and drop...",700);
+				for(loc in cms.locations) {
+					jQuery("##"+cms.locations[loc].id)
 						.addClass("cms-layoutRegion")
-						.prepend("<div class='cms-layoutRegionHandleBar'>" + controlPanel.locations[loc].name + controlPanel.getLocationIconsHTML(controlPanel.locations[loc].name,controlPanel.locations[loc].usingImplicitLayout) + "</div>");
+						.prepend("<div class='cms-layoutRegionHandleBar'>" + cms.locations[loc].name + cms.getLocationIconsHTML(cms.locations[loc].name,cms.locations[loc].usingImplicitLayout) + "</div>");
 				}
 				jQuery(".cms-layoutRegion").sortable({
 					connectWith: '.cms-layoutRegion',
@@ -129,16 +129,16 @@
 				    stop: function(event,ui) {
 						jQuery(".cms-layoutRegion")
 							.removeClass("cms-layoutRegionHighlighted");
-						controlPanel.updateLayout();
+						cms.updateLayout();
 					}
 				
 				});			
 				jQuery(".cms-layoutRegion").disableSelection();
-				jQuery("##cms-btnEditPage").click(function(){ controlPanel.getView("PageProperties"); });
-				jQuery("##cms-btnSitemap").click(function(){ controlPanel.getView("Sitemap"); });
-				jQuery("##cms-btnResources").click(function(){ controlPanel.getView("Resources"); });
-				jQuery("##cms-btnSettings").click(function(){ controlPanel.getView("Settings"); });
-				jQuery("##cms-btnAddContent").click(function(){ controlPanel.getView("AddContent"); });
+				jQuery("##cms-btnEditPage").click(function(){ cms.getView("PageProperties"); });
+				jQuery("##cms-btnSitemap").click(function(){ cms.getView("Sitemap"); });
+				jQuery("##cms-btnResources").click(function(){ cms.getView("Resources"); });
+				jQuery("##cms-btnSettings").click(function(){ cms.getView("Settings"); });
+				jQuery("##cms-btnAddContent").click(function(){ cms.getView("AddContent"); });
 				jQuery("##cms-btnLogout").click(function(){ navCmdLogout(); });
 			});
 		</script>
@@ -157,10 +157,10 @@
 	<div id="cms-adminBar">
 		<div id="cms-adminBarActions">
 			<cfif bUserLoggedIn>
-				<a href="##" onclick="navCmdAddPage('#jsStringFormat(currentPath)#')"><img src="#cmsRoot#/images/btnAddPage.gif" align="absmiddle" alt="Add Page" title="Add Page"></a>
-				<a href="##" id="cms-btnAddContent"><img src="#cmsRoot#/images/btnAddContent.gif" align="absmiddle" alt="Add Content" title="Add Content"></a>
-				<a href="##" id="cms-btnLogout"><img src="#cmsRoot#/images/btnLogOff.gif" align="absmiddle" alt="Log Off" title="Log Off"></a>
-				<a href="##" id="cms-btnSettings"><img src="#cmsRoot#/images/cog.png" align="absmiddle" alt="Settings" title="Settings"></a>
+				<a href="javascript:void(0);" onclick="navCmdAddPage('#jsStringFormat(currentPath)#')"><img src="#cmsRoot#/images/btnAddPage.gif" align="absmiddle" alt="Add Page" title="Add Page"></a>
+				<a href="javascript:void(0);" id="cms-btnAddContent"><img src="#cmsRoot#/images/btnAddContent.gif" align="absmiddle" alt="Add Content" title="Add Content"></a>
+				<a href="javascript:void(0);" id="cms-btnLogout"><img src="#cmsRoot#/images/btnLogOff.gif" align="absmiddle" alt="Log Off" title="Log Off"></a>
+				<a href="javascript:void(0);" id="cms-btnSettings"><img src="#cmsRoot#/images/cog.png" align="absmiddle" alt="Settings" title="Settings"></a>
 				<a href="#cgi.script_name#?noadmin"><img src="#cmsRoot#/images/closePanel.gif" align="absmiddle" alt="Hide admin controls" title="Hide admin controls"></a>
 			<cfelse>
 				<form name="frmLogin" id="cms-frmLogin" action="##" method="post">
@@ -177,11 +177,11 @@
 		Current Page: <span class="cms-subTitle">#currentPage#</span>
 		<cfif bUserLoggedIn>
 			&nbsp;|&nbsp;
-			<a href="##" id="cms-btnEditPage">Page Settings</a>
+			<a href="javascript:void(0);" id="cms-btnEditPage">Page Settings</a>
 			&nbsp;&nbsp;
-			<a href="##" id="cms-btnSitemap">Site Pages</a>
+			<a href="javascript:void(0);" id="cms-btnSitemap">Site Pages</a>
 			&nbsp;&nbsp;
-			<a href="##" id="cms-btnResources">Resources</a>
+			<a href="javascript:void(0);" id="cms-btnResources">Resources</a>
 		</cfif>
 	</div>
 	<div id="cms-navMenuContentPanel" class="cms-panel" style="display:none;">
@@ -189,7 +189,7 @@
 	
 	<cfif url._statusMessage neq "">
 		<script>
-			controlPanel.setStatusMessage("#jsstringformat(url._statusMessage)#");
+			cms.setStatusMessage("#jsstringformat(url._statusMessage)#");
 		</script>
 	</cfif>
 	

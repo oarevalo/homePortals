@@ -31,13 +31,13 @@ This file acts as a front controller for the CMS functionality
 		if(not structKeyExists(stRequest, "_pageHREF")) stRequest._pageHREF = "";
 		if(not structKeyExists(stRequest, "method")) stRequest.method = "";
 		
-		oControlPanel = createObject("component","cms").init(HOMEPORTALS_INSTANCE, stRequest._pageHREF);
+		cms = createObject("component","cms").init(HOMEPORTALS_INSTANCE, stRequest._pageHREF);
 	</cfscript>
 	
 	<!--- create and execute call --->
 	<cfif stRequest.method neq "">
 		<cfsavecontent variable="tmp">
-			<cfinvoke component="#oControlPanel#" 
+			<cfinvoke component="#cms#" 
 					  returnvariable="obj" 
 					  method="#stRequest.method#" 
 					  argumentcollection="#stRequest#" />

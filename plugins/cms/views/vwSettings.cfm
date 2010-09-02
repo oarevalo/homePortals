@@ -22,10 +22,10 @@
 			</tr>
 		</table>
 		<br />
-		<input type="button" value="Apply Changes" onclick="controlPanel.updateSettings(this.form)">
-		<input type="button" value="Reload Site" onclick="controlPanel.resetApp()">
+		<input type="button" value="Apply Changes" onclick="cms.updateSettings(this.form)">
+		<input type="button" value="Reload Site" onclick="cms.resetApp()">
 		&nbsp;&nbsp;
-		<input type="button" value="Close" onclick="controlPanel.closePanel()">
+		<input type="button" value="Close" onclick="cms.closePanel()">
 	</form>
 
 	<br /><br />

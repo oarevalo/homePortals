@@ -59,7 +59,7 @@
 										ORDER BY upackage, uid, id
 								</cfquery>
 								<select name="prop_#thisAttr#" class="cms-formField" 
-										onchange="controlPanel.getPartialView('EditResourceField',{resourceType:'#resourceType#',resourceID:this.value,prefix:'res#i#'},'cms-resourceEditPanel')">
+										onchange="cms.getPartialView('EditResourceField',{resourceType:'#resourceType#',resourceID:this.value,prefix:'res#i#'},'cms-resourceEditPanel')">
 									<cfif not prop.required><option value="_NOVALUE_">Create New...</option></cfif>
 									<cfloop query="qryResources">
 										<option value="#qryResources.id#"
@@ -113,7 +113,7 @@
 						<td>&nbsp;</td>
 						<td colspan="2">
 							<div id="cms-resourceEditPanel" class="cms-lightPanel"></div>
-							<script>controlPanel.getPartialView("EditResourceField",{resourceType:'#resourceType#',resourceID:'#tmpAttrValue#',prefix:'res#i#'},"cms-resourceEditPanel")</script>
+							<script>cms.getPartialView("EditResourceField",{resourceType:'#resourceType#',resourceID:'#tmpAttrValue#',prefix:'res#i#'},"cms-resourceEditPanel")</script>
 						</td>
 					</tr>
 				</cfif>

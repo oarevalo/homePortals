@@ -33,7 +33,7 @@
 		<div style="font-size:12px;float:right;width:300px;text-align:right;">
 			<b>Create Folder:</b>
 			<input type="text" name="folder" value="" class="cms-formField" id="cms-folderName">
-			<input type="button" name="btnGo" value="Go" onclick="controlPanel.createFolder('#currentPath#',jQuery('##cms-folderName').attr('value'))">
+			<input type="button" name="btnGo" value="Go" onclick="cms.createFolder('#currentPath#',jQuery('##cms-folderName').attr('value'))">
 		</div>
 		Site Pages
 		<div style="clear:both;"></div>
@@ -43,7 +43,7 @@
 	<div class="cms-lightPanel">
 		<cfif currentPath neq "/">
 			<img src="#variables.cmsRoot#/images/folder.png" align="absmiddle">
-			<a href="##" onclick="controlPanel.getView('Sitemap',{path:'#parentPath#'});">..</a>
+			<a href="##" onclick="cms.getView('Sitemap',{path:'#parentPath#'});">..</a>
 		</cfif>
 		<cfloop query="qryPages">
 			<span style="white-space:nowrap;">
@@ -58,7 +58,7 @@
 					</cfif>
 				<cfelse>
 					<img src="#variables.cmsRoot#/images/folder.png" align="absmiddle">
-					<a href="##" onclick="controlPanel.getView('Sitemap',{path:'#currentPath#/#qryPages.name#'});">#qryPages.name#</a>
+					<a href="##" onclick="cms.getView('Sitemap',{path:'#currentPath#/#qryPages.name#'});">#qryPages.name#</a>
 				</cfif>
 			</span>
 			&nbsp;&nbsp;&nbsp;
@@ -69,9 +69,9 @@
 	<p>
 		<input type="button" name="btnAdd" value="Add Page" onclick="navCmdAddPage('#currentPath#')">
 		<input type="button" name="btnDelPage" value="Delete Page" onclick="navCmdDeletePage()">
-		<input type="button" name="btnDelFolder" value="Delete Folder" onclick="controlPanel.deleteFolder('#currentPath#')"
+		<input type="button" name="btnDelFolder" value="Delete Folder" onclick="cms.deleteFolder('#currentPath#')"
 				<cfif currentPath eq "/">disabled="true"</cfif>>
 		&nbsp;&nbsp;
-		<input type="button" value="Close" onclick="controlPanel.closePanel()">
+		<input type="button" value="Close" onclick="cms.closePanel()">
 	</p>
 </cfoutput>

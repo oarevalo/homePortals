@@ -8,8 +8,11 @@
 		<cfinclude template="vwEditResource.cfm">
 		
 		<br />
-		<input type="button" value="Apply Changes" onclick="controlPanel.updateResource(this.form)">
-		&nbsp;&nbsp;
-		<input type="button" value="Close" onclick="controlPanel.closePanel()">
+		
+		<cfif isEditable>
+			<input type="button" value="Apply Changes" onclick="cms.updateResource(this.form)">
+			&nbsp;&nbsp;
+		</cfif>
+		<input type="button" value="Close" onclick="cms.closePanel()">
 	</form>
 </cfoutput>

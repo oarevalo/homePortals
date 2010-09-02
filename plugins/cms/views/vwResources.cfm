@@ -25,7 +25,7 @@
 	<tr valign="top">
 		<td style="width:160px;">
 			<strong>Resource Type: </strong>
-			<select name="resType" onchange="controlPanel.getPartialView('Resources',{resourceType:this.value},'cms-navMenuContentPanel')"
+			<select name="resType" onchange="cms.getPartialView('Resources',{resourceType:this.value},'cms-navMenuContentPanel')"
 					style="width:150px;">
 				<cfoutput>
 					<cfloop from="1" to="#arrayLen(aResTypes)#" index="i">
@@ -39,7 +39,7 @@
 			<cfoutput>
 				<p>	
 					&raquo;
-					<a href="javascript:controlPanel.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'_NOVALUE_',prefix:'res'},'cms-resourceEditPanel')" 
+					<a href="javascript:cms.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'_NOVALUE_',prefix:'res'},'cms-resourceEditPanel')" 
 						class="cpListLink" 
 						style="font-weight:bold;" 
 						>Create New...</a>
@@ -59,7 +59,7 @@
 							<cfloop array="#aPkgResources#" index="resID">
 								<div style="border-bottom:1px solid ##ebebeb;">
 									<div style="width:150px;overflow:hidden;">
-										<a href="javascript:controlPanel.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(resID)#',prefix:'res'},'cms-resourceEditPanel')" 
+										<a href="javascript:cms.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(resID)#',prefix:'res'},'cms-resourceEditPanel')" 
 											class="cpListLink" 
 											style="font-weight:normal;" 
 											>#resID#</a>
@@ -70,7 +70,7 @@
 					<cfelse>
 						<div style="border-bottom:1px solid ##ebebeb;">
 							<div style="width:150px;overflow:hidden;">
-								<a href="javascript:controlPanel.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(qryResources.id)#',prefix:'res'},'cms-resourceEditPanel')" 
+								<a href="javascript:cms.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(qryResources.id)#',prefix:'res'},'cms-resourceEditPanel')" 
 									class="cpListLink" 
 									style="font-weight:normal;" 
 									>#qryResources.id#</a>
@@ -85,7 +85,7 @@
 			</cfif>
 			<!---
 			<select name="prop_#thisAttr#" class="cms-formField" 
-					onchange="controlPanel.getPartialView('EditResource',{resourceType:'#resourceType#',resourceID:this.value,prefix:'res#i#'},'cms-resourceEditPanel')">
+					onchange="cms.getPartialView('EditResource',{resourceType:'#resourceType#',resourceID:this.value,prefix:'res#i#'},'cms-resourceEditPanel')">
 				<cfif not prop.required><option value="_NOVALUE_">Create New...</option></cfif>
 				<cfloop query="qryResources">
 					<option value="#qryResources.id#"

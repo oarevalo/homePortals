@@ -101,12 +101,12 @@
 			</cfscript>
 			
             <script>
-                controlPanel.closePanel();
+                cms.closePanel();
  				window.location.replace("#variables.reloadPageHREF#");
             </script>
 
             <cfcatch type="any">
-                <script>controlPanel.setStatusMessage("#jsstringformat( cfcatch.Message)#");</script>
+                <script>cms.setStatusMessage("#jsstringformat( cfcatch.Message)#");</script>
             </cfcatch>   	
 		</cftry>
 	</cffunction>	
@@ -123,11 +123,11 @@
 				savePage();
 			</cfscript>
 			<script>
-				controlPanel.removeModuleFromLayout('#arguments.moduleID#');
-				controlPanel.setStatusMessage("Module has been removed.");
+				cms.removeModuleFromLayout('#arguments.moduleID#');
+				cms.setStatusMessage("Module has been removed.");
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -183,11 +183,11 @@
 			</cfscript>
 			
 			<script>
-				controlPanel.closePanel();
+				cms.closePanel();
 				window.location.replace('#newPagePath#');
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>			
 	</cffunction>
@@ -210,12 +210,12 @@
 				redirHREF = "index.cfm";
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Page deleted...");
+				cms.setStatusMessage("Page deleted...");
 				window.location.replace('#redirHREF#');
 			</script>
 
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -232,12 +232,12 @@
 				redirHREF = "index.cfm";
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Folder deleted...");
+				cms.setStatusMessage("Folder deleted...");
 				window.location.replace('#redirHREF#');
 			</script>
 
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -254,10 +254,10 @@
 				savePage();
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Title changed.");
+				cms.setStatusMessage("Title changed.");
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -289,12 +289,12 @@
 			</cfscript>
 			
 			<script>
-				controlPanel.closePanel();
+				cms.closePanel();
 				window.location.replace("#variables.reloadPageHREF#");
 			</script>
 
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -338,11 +338,11 @@
    				}
    			</cfscript>
    			<script>
-              	controlPanel.closePanel();
+              	cms.closePanel();
   				window.location.replace("#variables.reloadPageHREF#");
    			</script>
    			<cfcatch type="any">
-   				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+   				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
    			</cfcatch>
    		</cftry>
    	</cffunction>
@@ -361,10 +361,10 @@
 				savePage();
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Layout changed.");
+				cms.setStatusMessage("Layout changed.");
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -496,10 +496,10 @@
    			</cfscript>
    			<script>
   				window.location.replace("#variables.reloadPageHREF#");
-              	controlPanel.closePanel();
+              	cms.closePanel();
    			</script>
    			<cfcatch type="any">
-   				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+   				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
    			</cfcatch>
    		</cftry>
    	</cffunction>
@@ -534,7 +534,7 @@
   				window.location.replace("#link#");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>		
 	</cffunction>
@@ -553,7 +553,7 @@
   				window.location.replace("#appRoot#");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -642,7 +642,7 @@
   				window.location.replace("#variables.reloadPageHREF#");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -685,7 +685,7 @@
   				window.location.replace("#variables.reloadPageHREF#");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -709,11 +709,11 @@
 				pp.createFolder(parent,name);
    			</cfscript>			
    			<script>
-				controlPanel.setStatusMessage("Folder created");
-  				controlPanel.getPartialView("SiteMap",{path:'#parent#/#name#'},"cms-navMenuContentPanel");
+				cms.setStatusMessage("Folder created");
+  				cms.getPartialView("SiteMap",{path:'#parent#/#name#'},"cms-navMenuContentPanel");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -729,11 +729,11 @@
    				appRoot = variables.homePortals.getConfig().getAppRoot();
    			</cfscript>			
    			<script>
-				controlPanel.setStatusMessage("Application reloaded");
+				cms.setStatusMessage("Application reloaded");
   				window.location.replace("#appRoot#?admin");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -773,11 +773,11 @@
    				appRoot = variables.homePortals.getConfig().getAppRoot();
    			</cfscript>			
    			<script>
-				controlPanel.setStatusMessage("Settings updated");
+				cms.setStatusMessage("Settings updated");
   				window.location.replace("#appRoot#?admin");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#",10000);</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#",10000);</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -800,11 +800,11 @@
    				appRoot = variables.homePortals.getConfig().getAppRoot();
    			</cfscript>			
    			<script>
-				controlPanel.setStatusMessage("Settings updated");
+				cms.setStatusMessage("Settings updated");
   				window.location.replace("#appRoot#?admin");
    			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -893,10 +893,10 @@
    			</cfscript>
    			<script>
   				window.location.replace("#variables.reloadPageHREF#");
-              	controlPanel.closePanel();
+              	cms.closePanel();
    			</script>
    			<cfcatch type="any">
-   				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+   				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
    			</cfcatch>
    		</cftry>
 	</cffunction>
@@ -921,10 +921,10 @@
    			</cfscript>
    			<script>
   				window.location.replace("#variables.reloadPageHREF#");
-              	controlPanel.closePanel();
+              	cms.closePanel();
    			</script>
    			<cfcatch type="any">
-   				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+   				<script>cms.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
    			</cfcatch>
    		</cftry>
 	</cffunction>

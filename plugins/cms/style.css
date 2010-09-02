@@ -78,6 +78,9 @@
 	margin:0 auto;
 	margin-bottom:20px;
 }
+.cms-panel img {
+	border:0px;
+}
 .cms-panelTitle {
 	font-size:14px;
 	font-weight:bold;
@@ -201,3 +204,10 @@
 	border-bottom:1px solid silver;
 }
 
+.cms-icon {
+	margin-top:3px;
+	margin-right:3px;
+	border:0px;
+	float:right;
+	vertical-align:top;
+}

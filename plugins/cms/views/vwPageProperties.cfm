@@ -75,8 +75,8 @@
 			</tr>
 		</table>
 		<br />
-		<input type="button" value="Apply Changes" onclick="controlPanel.updatePage(this.form)">
+		<input type="button" value="Apply Changes" onclick="cms.updatePage(this.form)">
 		&nbsp;&nbsp;
-		<input type="button" value="Close" onclick="controlPanel.closePanel()">
+		<input type="button" value="Close" onclick="cms.closePanel()">
 	</form>
 </cfoutput>

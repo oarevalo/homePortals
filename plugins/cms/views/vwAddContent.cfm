@@ -24,11 +24,11 @@
 	<script>
 		jQuery(function() {
 			jQuery("##cms-contentTagName").change(function() {
-				controlPanel.getPartialView('ContentTagInfo',{tagName:this.value},'cms-contentTagInfoPanel');
+				cms.getPartialView('ContentTagInfo',{tagName:this.value},'cms-contentTagInfoPanel');
 			});
 			<cfif arrayLen(structKeyArray(tags)) gt 0>
 				<cfset tmp = structKeyArray(tags)>
-				controlPanel.getPartialView('ContentTagInfo',{tagName:'#tmp[1]#'},'cms-contentTagInfoPanel');
+				cms.getPartialView('ContentTagInfo',{tagName:'#tmp[1]#'},'cms-contentTagInfoPanel');
 			</cfif>
 		});
 	</script>
@@ -69,8 +69,8 @@
 			</cfif>
 		</table>
 		<br />
-		<input type="button" value="Add To Page" onclick="controlPanel.addContentTag(this.form)">
+		<input type="button" value="Add To Page" onclick="cms.addContentTag(this.form)">
 		&nbsp;&nbsp;
-		<input type="button" value="Close" onclick="controlPanel.closePanel()">
+		<input type="button" value="Close" onclick="cms.closePanel()">
 	</form>	
 </cfoutput>

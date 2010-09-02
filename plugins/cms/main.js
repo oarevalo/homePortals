@@ -14,7 +14,7 @@ var editHTML = "";
 var _pageHREF = "";
 var _pageFileName = "";
 
-function controlPanelClient() {
+function cmsClient() {
 
 	// pseudo-constructor
 	function init(gateway, cmsRoot, lstLocations) {
@@ -65,7 +65,7 @@ function controlPanelClient() {
 	
 	function removeModuleFromLayout(modID) {
 		jQuery("#"+modID).remove();
-		controlPanel.currentModuleID = "";
+		cms.currentModuleID = "";
 	}
 	
 	function addPage(pageName,parent) {
@@ -228,7 +228,7 @@ function controlPanelClient() {
 		jQuery("#cms-statusMessage").html(msg);
 	
 		if(!timeout || timeout==null) timeout=4000;
-		setTimeout('controlPanel.clearStatusMessage()',timeout);
+		setTimeout('cms.clearStatusMessage()',timeout);
 	}
 
 	function clearStatusMessage() {
@@ -250,7 +250,7 @@ function controlPanelClient() {
 			newLayout = newLayout.replace(tmpNameOriginal, tmpNameTarget);
 		}
 
-		controlPanel.setStatusMessage("Updating workspace layout...");
+		cms.setStatusMessage("Updating workspace layout...");
 		h_callServer("updateModuleOrder","cms-statusMessage",{layout:newLayout});
     }
 
@@ -272,18 +272,18 @@ function controlPanelClient() {
 	}
 
 	function getModuleIconsHTML(modID) {
-		var tmpHTML = "<a href=\"javascript:controlPanel.deleteModule('" + modID + "');\"><img src='" + this.cmsRoot + "/images/omit-page-orange.gif' alt='Remove from page' title='Remove from page' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
-		tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.getView('EditModule',{moduleID:'" + modID + "'});\"><img src='" + this.cmsRoot + "/images/cog.png' alt='Edit Module' title='Edit Module' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
+		var tmpHTML = "<a href=\"javascript:void(0);\" onclick=\"cms.deleteModule('" + modID + "');\"><img src='" + this.cmsRoot + "/images/omit-page-orange.gif' alt='Remove from page' title='Remove from page' class='cms-icon'></a>";
+		tmpHTML  = tmpHTML + "<a href=\"javascript:void(0);\" onclick=\"cms.getView('EditModule',{moduleID:'" + modID + "'});\"><img src='" + this.cmsRoot + "/images/cog.png' alt='Edit Module' title='Edit Module' class='cms-icon'></a>";
 		return tmpHTML;	
 	}
 
 	function getLocationIconsHTML(id,implicitLayout) {
 		var tmpHTML = "";
 		if(implicitLayout==0) {
-			tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.deleteLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/omit-page-orange.gif' alt='Remove from page' title='Remove from page' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
-			tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.addLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/page_copy.png' alt='Add container on this region' title='Add container on this region' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
+			tmpHTML  = tmpHTML + "<a href=\"javascript:void(0);\" onclick=\"cms.deleteLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/omit-page-orange.gif' alt='Remove from page' title='Remove from page' class='cms-icon'></a>";
+			tmpHTML  = tmpHTML + "<a href=\"javascript:void(0);\" onclick=\"cms.addLocation('" + id + "');\"><img src='" + this.cmsRoot + "/images/page_copy.png' alt='Add container on this region' title='Add container on this region' class='cms-icon'></a>";
 		}
-		tmpHTML  = tmpHTML + "<a href=\"javascript:controlPanel.getView('AddContent',{locationName:'" + id + "'});\"><img src='" + this.cmsRoot + "/images/brick_add.png' alt='Add element on this region' title='Add element on this region' border='0' style='margin-top:3px;margin-right:3px;' align='right'></a>";
+		tmpHTML  = tmpHTML + "<a href=\"javascript:void(0);\" onclick=\"cms.getView('AddContent',{locationName:'" + id + "'});\"><img src='" + this.cmsRoot + "/images/brick_add.png' alt='Add element on this region' title='Add element on this region' class='cms-icon'></a>";
 		return tmpHTML;	
 	}
 	
@@ -301,7 +301,7 @@ function controlPanelClient() {
 	}
 
 	function createUser(frm) {
-		frm.action = controlPanel.server;
+		frm.action = cms.server;
 		frm.submit();
 	}
 	
@@ -334,86 +334,86 @@ function controlPanelClient() {
 	
 	// Attach functions to the prototype of this object
 	// (this is what creates the actual "methods" of the object)
-	controlPanelClient.prototype.init = init;
+	cmsClient.prototype.init = init;
 
-	controlPanelClient.prototype.closePanel = closePanel; 
-	controlPanelClient.prototype.getView = getView;
-	controlPanelClient.prototype.getPartialView = getPartialView;
+	cmsClient.prototype.closePanel = closePanel; 
+	cmsClient.prototype.getView = getView;
+	cmsClient.prototype.getPartialView = getPartialView;
 
-	controlPanelClient.prototype.deleteModule = deleteModule;
-	controlPanelClient.prototype.addPage = addPage;
-	controlPanelClient.prototype.deletePage = deletePage;
-	controlPanelClient.prototype.changeTitle = changeTitle;
-	controlPanelClient.prototype.renamePage = renamePage;
-	controlPanelClient.prototype.updateLayout = updateLayout;
-	controlPanelClient.prototype.setStatusMessage = setStatusMessage;
-	controlPanelClient.prototype.clearStatusMessage = clearStatusMessage;
-	controlPanelClient.prototype.removeModuleFromLayout = removeModuleFromLayout;
-	controlPanelClient.prototype.updateModule = updateModule;
-	controlPanelClient.prototype.login = login;
-	controlPanelClient.prototype.logout = logout;
-	controlPanelClient.prototype.getModuleIconsHTML = getModuleIconsHTML;
-	controlPanelClient.prototype.getLocationIconsHTML = getLocationIconsHTML;
-	controlPanelClient.prototype.deleteLocation = deleteLocation;
-	controlPanelClient.prototype.addLocation = addLocation;
-	controlPanelClient.prototype.createUser = createUser;
-	controlPanelClient.prototype.updatePage = updatePage;
-	controlPanelClient.prototype.createFolder = createFolder;
-	controlPanelClient.prototype.deleteFolder = deleteFolder;
-	controlPanelClient.prototype.resetApp = resetApp;
-	controlPanelClient.prototype.updateSettings = updateSettings;
-	controlPanelClient.prototype.setGlobalPageProperties = setGlobalPageProperties;
-	controlPanelClient.prototype.addContentTag = addContentTag;
-	controlPanelClient.prototype.updateResource = updateResource;
-	controlPanelClient.prototype.deleteResource = deleteResource;
+	cmsClient.prototype.deleteModule = deleteModule;
+	cmsClient.prototype.addPage = addPage;
+	cmsClient.prototype.deletePage = deletePage;
+	cmsClient.prototype.changeTitle = changeTitle;
+	cmsClient.prototype.renamePage = renamePage;
+	cmsClient.prototype.updateLayout = updateLayout;
+	cmsClient.prototype.setStatusMessage = setStatusMessage;
+	cmsClient.prototype.clearStatusMessage = clearStatusMessage;
+	cmsClient.prototype.removeModuleFromLayout = removeModuleFromLayout;
+	cmsClient.prototype.updateModule = updateModule;
+	cmsClient.prototype.login = login;
+	cmsClient.prototype.logout = logout;
+	cmsClient.prototype.getModuleIconsHTML = getModuleIconsHTML;
+	cmsClient.prototype.getLocationIconsHTML = getLocationIconsHTML;
+	cmsClient.prototype.deleteLocation = deleteLocation;
+	cmsClient.prototype.addLocation = addLocation;
+	cmsClient.prototype.createUser = createUser;
+	cmsClient.prototype.updatePage = updatePage;
+	cmsClient.prototype.createFolder = createFolder;
+	cmsClient.prototype.deleteFolder = deleteFolder;
+	cmsClient.prototype.resetApp = resetApp;
+	cmsClient.prototype.updateSettings = updateSettings;
+	cmsClient.prototype.setGlobalPageProperties = setGlobalPageProperties;
+	cmsClient.prototype.addContentTag = addContentTag;
+	cmsClient.prototype.updateResource = updateResource;
+	cmsClient.prototype.deleteResource = deleteResource;
 }
 
 
 
 
 function navCmdAddPage(path) {
-	controlPanel.addPage('New Page',path);
+	cms.addPage('New Page',path);
 }
 function navCmdAddContent() {
-	controlPanel.getView('AddContent')
+	cms.getView('AddContent')
 }
 function navCmdDeletePage() {
-	controlPanel.deletePage(_pageFileName);
+	cms.deletePage(_pageFileName);
 }
 function navCmdLogout() {
-	controlPanel.logout();
+	cms.logout();
 }
 function navCmdLogin(frm) {
-	controlPanel.login(frm);
+	cms.login(frm);
 }
 function navCmdDeleteResource(resourceType,resourceID) {
-	controlPanel.deleteResource(resourceType,resourceID);
+	cms.deleteResource(resourceType,resourceID);
 }
 
 
 function h_callServer(method,sec,params,rcv) {
-	controlPanel.setStatusMessage("Loading...");
+	cms.setStatusMessage("Loading...");
 	
 	params.method = method;
 	params._pageHREF = _pageHREF;
 
 	if(jQuery("#"+sec).html() == "")
 		jQuery("#"+sec).html("loading...");
-	jQuery("#"+sec).load(controlPanel.server,
+	jQuery("#"+sec).load(cms.server,
 						 params,
 						 function(responseText, textStatus, XMLHttpRequest) {
 						    if(textStatus!='success') {alert('An error ocurred while contacting the server');}
 						    if(rcv!=null) 
 						    	eval(rcv);
 						    else
-						    	setTimeout('controlPanel.clearStatusMessage()',2000);
+						    	setTimeout('cms.clearStatusMessage()',2000);
 						 }
 	);
 
 }
 
 function submitFormToServer(frm,method) {
-	frm.action = controlPanel.server;
+	frm.action = cms.server;
 	frm.method.value = method;
 	frm._pageHREF.value = _pageHREF;
 	frm.submit();

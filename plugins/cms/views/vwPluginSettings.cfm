@@ -109,7 +109,7 @@
 						</cfloop>
 					</table>
 					<cfset propList = listQualify(propList,"'")>
-					<input type="button" value="Apply Changes" onclick="controlPanel.setGlobalPageProperties(this.form,[#propList#])">
+					<input type="button" value="Apply Changes" onclick="cms.setGlobalPageProperties(this.form,[#propList#])">
 				</form>
 			</div>
 		</cfif>

@@ -9,6 +9,8 @@
 		</cfif>
 		<input type="text" name="#prefix#__id" value="#tmp#" class="cms-formField">
 		<input type="hidden" name="#prefix#__iscustom" value="1">
+		&nbsp;&nbsp;
+		<span class="cms-formFieldTip">Enter a custom value for this property.</td>
 	<cfelse>
 		<cfinclude template="vwEditResource.cfm">
 		<input type="hidden" name="#prefix#__iscustom" value="0">

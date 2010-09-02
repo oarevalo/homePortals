@@ -62,10 +62,19 @@
 		<cfif not isEditable>
 			<cfif arguments.resourceID eq "">
 				This resource type has no editable properties and cannot be created manually.
-				<script>jQuery("##cms-resourceEditPanel").show()</script>
 			<cfelse>
-				<script>jQuery("##cms-resourceEditPanel").hide()</script>
+				<div class="cms-panelTitle">
+					#arguments.resourceID#
+				</div>
+				<em>This resource has no editable properties.</em><br />
+				<cfif oResourceBean.getDescription() neq "">
+					<div style="margin-top:10px;">
+						<img src="#cmsRoot#/images/information.png" align="absmiddle">
+						#oResourceBean.getDescription()#
+					</div>
+				</cfif>
 			</cfif>
+			<script>jQuery("##cms-resourceEditPanel").show()</script>
 			<cfexit method="exittemplate">
 		<cfelse>
 			<script>jQuery("##cms-resourceEditPanel").show()</script>
@@ -123,7 +132,7 @@
 						            });
 								</script>
 								<input type="hidden" name="#arguments.prefix#__filecontenttype" value="text/html">
-								<a href="##" id="#arguments.prefix#_btnEnableHtmlArea" style="font-weight:bold;color:green;">&raquo; Click to enable rich text editor</a>
+								<a href="javascript:void(0);" id="#arguments.prefix#_btnEnableHtmlArea" style="font-weight:bold;color:green;">&raquo; Click to enable rich text editor</a>
 							<cfelse>
 								<input type="hidden" name="#arguments.prefix#__filecontenttype" value="text/plain">
 							</cfif>
