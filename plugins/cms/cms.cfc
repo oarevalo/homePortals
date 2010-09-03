@@ -451,9 +451,9 @@
 				   						and arg neq resPrefix & "_filecontenttype") {
 											
 										if(arguments[arg] eq "_NOVALUE_")
-					   						oResourceBean.setProperty(replace(arg,resPrefix,""),"");
+					   						oResourceBean.setProperty(replaceNoCase(arg,resPrefix,""),"");
 										else
-					   						oResourceBean.setProperty(replace(arg,resPrefix,""),arguments[arg]);
+					   						oResourceBean.setProperty(replaceNoCase(arg,resPrefix,""),arguments[arg]);
 									}
 				   				}
 				   				oResourceBean.getResourceLibrary().saveResource(oResourceBean);
@@ -793,7 +793,7 @@
    				
    				for(arg in arguments) {
    					if(left(arg,len(prefix)) eq prefix) {
-   						setGlobalPageProperty(replace(arg,prefix,""),arguments[arg]);
+   						setGlobalPageProperty(replaceNoCase(arg,prefix,""),arguments[arg]);
    					}
    				}
    				variables.homePortals.reinit();
@@ -858,9 +858,9 @@
 						and arg neq resPrefix & "_filecontenttype") {
 						
 						if(arguments[arg] eq "_NOVALUE_")
-	   						oResourceBean.setProperty(replace(arg,resPrefix,""),"");
+	   						oResourceBean.setProperty(replaceNoCase(arg,resPrefix,""),"");
 						else
-	   						oResourceBean.setProperty(replace(arg,resPrefix,""),arguments[arg]);
+	   						oResourceBean.setProperty(replaceNoCase(arg,resPrefix,""),arguments[arg]);
 					}
 				}
 				oResourceBean.getResourceLibrary().saveResource(oResourceBean);
@@ -1117,8 +1117,8 @@
 		<cfargument name="makeUnique" type="boolean" required="false" default="true">
 		<cfargument name="admin" type="boolean" required="false" default="false">
 		<cfset var link = variables.homePortals.getPluginManager().getPlugin("cms").getCMSLinkFormat()>
-		<cfset link = replace(link,"{appRoot}",variables.homePortals.getConfig().getAppRoot())>
-		<cfset link = replace(link,"{page}",arguments.page)>
+		<cfset link = replaceNoCase(link,"{appRoot}",variables.homePortals.getConfig().getAppRoot())>
+		<cfset link = replaceNoCase(link,"{page}",arguments.page)>
 		<cfif arguments.makeUnique>
 			<cfif find("?",link)>
 				<cfset link = link & "&" & getTickCount()>
