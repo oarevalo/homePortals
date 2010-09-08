@@ -38,7 +38,7 @@ function cmsClient() {
 		args["useLayout"] = true;
 
 		var p = jQuery("#"+this.panelDivID);
-		p.empty();
+		//p.empty();
 		h_callServer("getView", this.panelDivID, args);
 		p.show();
 	}
