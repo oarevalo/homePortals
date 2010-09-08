@@ -129,9 +129,8 @@ function cmsClient() {
 						hasFileToUpload = true;
 					}
 					if(fieldName == resPrefixesJs[j]+"__filebody" ) {
-						jQuery("#"+resPrefixesJs[j]+"__filebody").htmlarea("updateTextArea");
-					}
-					if(fieldType=="radio")  {
+						params[fieldName] = jQuery("#"+resPrefixesJs[j]+"__filebody").htmlarea("toHtmlString");
+					} else if(fieldType=="radio")  {
 						 if(fieldChecked) {
 							params[fieldName] = fieldValue;
 						 }
@@ -194,9 +193,8 @@ function cmsClient() {
 					hasFileToUpload = true;
 				}
 				if(fieldName == params.prefix+"__filebody" ) {
-					jQuery("#"+params.prefix+"__filebody").htmlarea("updateTextArea");
-				}
-				if(fieldType=="radio")  {
+					params[fieldName] = jQuery("#"+params.prefix+"__filebody").htmlarea("toHtmlString");
+				} else if(fieldType=="radio")  {
 					 if(fieldChecked) {
 						params[fieldName] = fieldValue;
 					 }
