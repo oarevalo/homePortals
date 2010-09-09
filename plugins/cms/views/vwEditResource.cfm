@@ -59,20 +59,44 @@
 </cfscript>
 	
 	<cfoutput>
+		<div class="cms-panelTitle">
+			<cfif arguments.resourceID neq "">
+				<cfif isEditable>
+					<div style="float:right;">
+						<a href='javascript:void(0);' onclick="navCmdDeleteResource('#jsStringFormat(arguments.resourceType)#','#jsStringFormat(arguments.resourceID)#')"
+							style="color:red;text-decoration:none;font-size:11px;"><img 
+							src='#variables.cmsRoot#/images/omit-page-orange.gif' 
+							border='0' align='absmiddle' alt='Click to delete resource' 
+							title='click to delete resource'> Delete Resource</a>
+					</div>
+				</cfif>
+				#arguments.resourceID#
+			<cfelse>
+				New #arguments.resourceType#
+			</cfif>
+		</div>
+
+		<cfif arguments.resourceID neq "">
+			<cfset tmpDesc = oResourceBean.getDescription()>
+			<cfif tmpDesc eq "">
+				<cfset tmpDesc = resourceTypeConfig.getDescription()>
+			</cfif>
+		<cfelse>
+			<cfset tmpDesc = resourceTypeConfig.getDescription()>
+		</cfif>
+		<cfif tmpDesc neq "">
+			<div style="margin-top:10px;margin-bottom:10px;">
+				<img src="#cmsRoot#/images/information.png" align="absmiddle">
+				#tmpDesc#
+			</div>
+		</cfif>
+
+		
 		<cfif not isEditable>
 			<cfif arguments.resourceID eq "">
 				This resource type has no editable properties and cannot be created manually.
 			<cfelse>
-				<div class="cms-panelTitle">
-					#arguments.resourceID#
-				</div>
 				<em>This resource has no editable properties.</em><br />
-				<cfif oResourceBean.getDescription() neq "">
-					<div style="margin-top:10px;">
-						<img src="#cmsRoot#/images/information.png" align="absmiddle">
-						#oResourceBean.getDescription()#
-					</div>
-				</cfif>
 			</cfif>
 			<script>jQuery("##cms-resourceEditPanel").show()</script>
 			<cfexit method="exittemplate">
@@ -88,20 +112,6 @@
 				</tr>
 				<input type="hidden" name="#arguments.prefix#__isnew" value="1">
 			<cfelse>
-				<tr>
-					<td colspan="2">
-						<div class="cms-panelTitle">
-							<div style="float:right;">
-								<a href='##' onclick="navCmdDeleteResource('#jsStringFormat(arguments.resourceType)#','#jsStringFormat(arguments.resourceID)#')"
-									style="color:red;text-decoration:none;font-size:11px;"><img 
-									src='#variables.cmsRoot#/images/omit-page-orange.gif' 
-									border='0' align='absmiddle' alt='Click to delete resource' 
-									title='click to delete resource'> Delete Resource</a>
-							</div>
-							#arguments.resourceID#
-						</div>
-					</td>
-				</tr>
 				<input type="hidden" name="#arguments.prefix#__id" value="#arguments.resourceID#">
 				<input type="hidden" name="#arguments.prefix#__isnew" value="0">
 			</cfif>
@@ -128,7 +138,7 @@
 								              jQuery(this).hide();
 										 });
 										 
-										 setTimeout("jQuery('###arguments.prefix#_btnEnableHtmlArea').click()",500);
+										 setTimeout("jQuery('###arguments.prefix#_btnEnableHtmlArea').click()",100);
 						            });
 								</script>
 								<input type="hidden" name="#arguments.prefix#__filecontenttype" value="text/html">
