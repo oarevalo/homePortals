@@ -47,6 +47,7 @@
 	<!--------------------------------------->
 	<cffunction name="init" access="public" returntype="homePortals" hint="Constructor">
 		<cfargument name="appRoot" type="string" required="false" default="" hint="Root directory of the application as a relative URL">
+		<cfargument name="config" type="any" required="false" hint="Provides an explicit configuration to load. This can be a an instance of homePortalsConfigBean, an XML object or a string containing the configuration. If this parameter is missing, HomePortals will try to locate a config file in the app directory" />
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
@@ -68,8 +69,15 @@
 
 			// load configuration settings for the application (overrides specific settings)
 			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
-				if(fileExists(expandPath(variables.appRoot & variables.configFilePath))) {
+				if(structKeyExists(arguments,"config")) {
+					if(isXML(arguments.config) or isXMLDoc(arguments.config))
+						variables.oHomePortalsConfigBean.loadXML(arguments.config);
+					else if(not isSimpleValue(arguments.config))
+						variables.oHomePortalsConfigBean.loadXML(arguments.config.toXML());
+
+				} else if(fileExists(expandPath(variables.appRoot & variables.configFilePath))) {
 					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
+
 				} else if(fileExists(expandPath(variables.appRoot & this.CONFIG_FILE_NAME))) {
 					// we also handle the case in which the config is found at the app root level
 					variables.configFilePath = this.CONFIG_FILE_NAME;
