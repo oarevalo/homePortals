@@ -255,12 +255,7 @@
 		<cfloop from="1" to="#ArrayLen(aStylesheets)#" index="i">
 			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#normalizePath(aStylesheets[i])#""/>">
 		</cfloop>
-		
-		<!--- Add page skin --->
-		<cfif variables.stPage.page.skinHREF neq "">
-			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#variables.stPage.page.skinHREF#""/>">
-		</cfif>
-		
+				
 		<!--- Include required and user-defined Javascript files --->
 		<cfloop from="1" to="#ArrayLen(aScripts)#" index="i">
 			<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
@@ -368,7 +363,6 @@
 			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
 			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
 			variables.stPage.page.modules = StructNew();		// holds modules
-			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
 		</cfscript>
 	</cffunction>
 	
@@ -448,13 +442,6 @@
 				if(not structKeyExists(variables.stPage.page.layout, tmp[i].type))
 					variables.stPage.page.layout[tmp[i].type] = ArrayNew(1);
 				ArrayAppend(variables.stPage.page.layout[tmp[i].type], tmp[i] );
-			}
-
-			
-			// skin
-			if(arguments.page.getSkinID() neq "" and getHomePortals().getResourceLibraryManager().hasResourceType("skin")) {
-				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", arguments.page.getSkinID());
-				variables.stPage.page.skinHREF = oResourceBean.getFullHref();
 			}
 
 						
