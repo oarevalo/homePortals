@@ -2,8 +2,8 @@
 
 	<cfscript>
 		variables.FIELD_LIST = "libpath,type,id,href,package,description,createdOn";
-		variables.qryResources = QueryNew(variables.FIELD_LIST);
 		variables.mapResources = structNew();
+		variables.mapIndexes = structNew();
 		variables.oResourceLibraryManager = 0;
 		variables.cacheServiceName = "catalogCacheService";
 	</cfscript>
@@ -43,20 +43,22 @@
 
 		<cfset var qry = queryNew("")>
 		
-		<cfif not StructKeyExists(variables.mapResources, arguments.resourceType)>
+		<cfif not StructKeyExists(variables.mapResources, arguments.resourceType)
+				or not StructKeyExists(variables.mapIndexes, arguments.resourceType)>
 			<cfset loadResourcesByType(arguments.resourceType)>
 		</cfif>
 		
-		<cfquery name="qry" dbtype="query">
-			SELECT *
-				FROM variables.qryResources
-				WHERE type = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resourceType#">
-					<cfif resLibPath neq "">
-						AND libpath = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resLibPath#"> 
-					</cfif>
-		</cfquery>
+		<cfset qry = variables.mapIndexes[arguments.resourceType] />
 		
-		<cfreturn qry>
+		<cfif arguments.resLibPath neq "">
+			<cfquery name="qry" dbtype="query">
+				SELECT *
+					FROM qry
+					WHERE libpath = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resLibPath#"> 
+			</cfquery>
+		</cfif>
+		
+		<cfreturn qry />
 	</cffunction>
 		
 	<!---------------------------------------->
@@ -128,9 +130,8 @@
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
 		<cfargument name="resourceID" type="string" required="true" hint="ID of the resource">
 
-		<cfif StructKeyExists(variables.mapResources, arguments.resourceType) and
-				StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)>
-			<cfset structDelete(variables.mapResources[arguments.resourceType], arguments.resourceID)>
+		<cfif StructKeyExists(variables.mapResources, arguments.resourceType)>
+			<cfset structDelete(variables.mapResources[arguments.resourceType], arguments.resourceID, false)>
 			<cfset populateResourcesQuery()>
 		</cfif>
 	</cffunction>		
@@ -146,7 +147,7 @@
 
 			// clear the catalog
 			variables.mapResources = structNew();
-			variables.qryResources = QueryNew(variables.FIELD_LIST);
+			variables.mapIndexes = structNew();
 
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
@@ -156,7 +157,6 @@
 			for(i=1;i lte arrayLen(aTypes);i=i+1) {
 				loadResourcesByType(aTypes[i]);
 			}	
-			
 		</cfscript>
 	</cffunction>
 
@@ -164,7 +164,29 @@
 	<!--- getResources				         --->
 	<!---------------------------------------->	
 	<cffunction name="getResources" access="public" returntype="query" output="False" hint="Returns all resources currently indexed. To obtain a complete list of all resources in the library you must first call the index() method in this component or use the methods in the ResourceLibrary component">
-		<cfreturn variables.qryResources>
+		<cfscript>
+			var	qry = queryNew(variables.FIELD_LIST);
+			var stResourceBean = structNew();
+			var resType = "";
+			var resID = "";
+			
+			for(resType in variables.mapResources) {
+				for(resID in variables.mapResources[resType]) {
+					
+					stResourceBean = variables.mapResources[resType][resID];
+					
+					queryAddRow(qry);
+
+					for(fld in stResourceBean) {
+						if(listFindNoCase(variables.FIELD_LIST,fld)) {
+							querySetCell(qry, fld, stResourceBean[fld]);
+						}
+					}
+				}
+			}
+			
+			return qry;
+		</cfscript>
 	</cffunction>
 		
 	<!---------------------------------------->
@@ -173,49 +195,7 @@
 	<cffunction name="reloadPackage" access="public" returntype="void" hint="Reloads all resources of the given type in the given package">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="packageName" type="string" required="true">
-		
-		<cfscript>
-			var aResources = arrayNew(1);
-			var j = 0;
-			var stResourceBean = structNew();
-			var resTypeGroup = "";
-			var oResourceLibrary = 0;
-			var st = structNew();
-
-			// create an instance of the resourceLibrary object
-			oResourceLibrary = getResourceLibraryManager();
-
-			// get all resources on the current package
-			aResources = oResourceLibrary.getResourcesInPackage(arguments.resourceType, arguments.packageName);
-			
-			// update resource map
-			for(j=1;j lte arrayLen(aResources);j=j+1) {
-				stResourceBean = aResources[j].getMemento();
-				resTypeGroup = stResourceBean.type;
-
-				// create node for resource type group if doesnt exist
-				if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
-					variables.mapResources[resTypeGroup] = structNew();
-				}
-
-				// create resource map entry
-				st = structNew();
-				st.type = stResourceBean.type;
-				st.id = stResourceBean.id;
-				st.HREF = stResourceBean.HREF;
-				st.Package = stResourceBean.Package;
-				st.Description = stResourceBean.Description;
-				st.libpath = stResourceBean.resourceLibrary.getPath();
-				st.createdOn = stResourceBean.createdOn;
-
-				// add resource to map
-				variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
-			}
-
-			// recreate query of resources
-			populateResourcesQuery();		
-		</cfscript>
-		
+		<cfset loadResourcesByType(arguments.resourceType, arguments.packageName) />
 	</cffunction>
 
 
@@ -226,31 +206,42 @@
 	<!---------------------------------------->	
 	<cffunction name="populateResourcesQuery" access="private" returntype="void" hint="Puts all resources into a query to improve performance while searching and listing">
 		<cfscript>
-			var i=0; 
-			var j=0;
+			var rt=0; 
+			var fldList="";
 			var start = getTickCount();
 			var stResourceBean = structNew();
 			var resType = "";
 			var resID = "";
-			
-			variables.qryResources = QueryNew(variables.FIELD_LIST);
+			var qry = 0;
+			var fld = "";
+			var prop = "";
 			
 			for(resType in variables.mapResources) {
-			
+				rt = getResourceLibraryManager().getResourceTypeRegistry().getResourceType(resType);
+				fldList = listAppend(variables.FIELD_LIST, structKeyList( rt.getProperties() ));
+				
+				qry = queryNew(fldList);
+				
 				for(resID in variables.mapResources[resType]) {
-					
 					stResourceBean = variables.mapResources[resType][resID];
 					
-					queryAddRow(variables.qryResources);
-					querySetCell(variables.qryResources, "type", resType);
-					querySetCell(variables.qryResources, "id", resID);
-					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
-					querySetCell(variables.qryResources, "package", stResourceBean.Package);
-					querySetCell(variables.qryResources, "description", stResourceBean.Description);
-					querySetCell(variables.qryResources, "libpath", stResourceBean.libpath);			
-					querySetCell(variables.qryResources, "createdOn", stResourceBean.createdOn);			
+					queryAddRow(qry);
+
+					for(fld in stResourceBean) {
+						if(fld neq "customProperties") {
+							if(listFindNoCase(fldList,fld)) {
+								querySetCell(qry, fld, stResourceBean[fld]);
+							}
+						} else {
+							for(prop in stResourceBean.customProperties) {
+								if(listFindNoCase(fldList,prop)) {
+									querySetCell(qry, prop, stResourceBean.customProperties[prop]);
+								}
+							}
+						}
+					}
 				}
-	
+				variables.mapIndexes[resType] = qry;
 			}
 			variables.stTimers.populateResourcesQuery = getTickCount()-start;
 		</cfscript>
@@ -260,7 +251,8 @@
 	<!--- loadResourcesByType			   --->
 	<!---------------------------------------->	
 	<cffunction name="loadResourcesByType" access="private" returntype="void" hint="loads into memory all resources of the given type">
-		<cfargument name="resourceType" type="string" required="false" default="">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfargument name="packageName" type="string" required="false" default="">
 		<cfscript>
 			var qry = QueryNew("");
 			var i = 1; var j = 0;
@@ -268,53 +260,43 @@
 			var aResources = arrayNew(1);
 			var stResourceBean = structNew();
 			var st = structNew();
-
+	
 			// create an instance of the resourceLibrary object
 			oResourceLibrary = getResourceLibraryManager();
 
 			// clear existing map for this resource type
-			variables.mapResources[arguments.resourceType] = structNew();
+			if(arguments.packageName eq "") {
+				variables.mapResources[arguments.resourceType] = structNew();
+			}
 			
 			// get list of resource packages
 			qry = oResourceLibrary.getResourcePackagesList(arguments.resourceType);
 
 			// add resources to the catalog
 			for(i=1;i lte qry.recordCount;i=i+1) {
-				// get all resources on the current package
-				aResources = oResourceLibrary.getResourcesInPackage(qry.resType[i], qry.name[i]);
+				if(arguments.packageName eq "" or arguments.packageName eq qry.name[i]) {
 
-				// store the resources in a map
-				for(j=1;j lte arrayLen(aResources);j=j+1) {
-					stResourceBean = aResources[j].getMemento();
-					resTypeGroup = stResourceBean.type;
+					// get all resources on the current package
+					aResources = oResourceLibrary.getResourcesInPackage(arguments.resourceType, qry.name[i]);
 
-					// add resource to resources query
-					queryAddRow(variables.qryResources);
-					querySetCell(variables.qryResources, "type", stResourceBean.type);
-					querySetCell(variables.qryResources, "id", stResourceBean.id);
-					querySetCell(variables.qryResources, "href", stResourceBean.HREF);
-					querySetCell(variables.qryResources, "package", stResourceBean.Package);
-					querySetCell(variables.qryResources, "description", stResourceBean.Description);					
-					querySetCell(variables.qryResources, "libpath", stResourceBean.resourceLibrary.getPath());					
-					querySetCell(variables.qryResources, "createdOn", stResourceBean.createdOn);
-					
-					// create resource map entry
-					st = structNew();
-					st.type = stResourceBean.type;
-					st.id = stResourceBean.id;
-					st.HREF = stResourceBean.HREF;
-					st.Package = stResourceBean.Package;
-					st.Description = stResourceBean.Description;
-					st.libpath = stResourceBean.resourceLibrary.getPath();
-					st.createdOn = stResourceBean.createdOn;
-
-					// create node for resource type group if doesnt exist
-					if(Not StructKeyExists(variables.mapResources, resTypeGroup)) {
-						variables.mapResources[resTypeGroup] = structNew();
+					// store the resources in a map
+					for(j=1;j lte arrayLen(aResources);j=j+1) {
+						stResourceBean = aResources[j].getMemento();
+	
+						// create resource map entry
+						st = structNew();
+						st.type = stResourceBean.type;
+						st.id = stResourceBean.id;
+						st.HREF = stResourceBean.HREF;
+						st.Package = stResourceBean.Package;
+						st.Description = stResourceBean.Description;
+						st.libpath = stResourceBean.resourceLibrary.getPath();
+						st.createdOn = stResourceBean.createdOn;
+						st.customProperties = stResourceBean.customProperties;
+	
+						// add resource to map
+						variables.mapResources[stResourceBean.type][stResourceBean.id] = duplicate(st);
 					}
-
-					// add resource to map
-					variables.mapResources[resTypeGroup][stResourceBean.id] = duplicate(st);
 				}
 			}
 
