@@ -32,6 +32,15 @@
 			variables.stConfig.resourceTypes = structNew();
 			variables.stConfig.pageProperties = structNew();
 			variables.stConfig.resourceLibraryTypes = structNew();
+
+			variables.stConfig.overwrite.resourceLibraryPaths = false;
+			variables.stConfig.overwrite.renderTemplates = false;
+			variables.stConfig.overwrite.resources = false;
+			variables.stConfig.overwrite.contentRenderers = false;
+			variables.stConfig.overwrite.plugins = false;
+			variables.stConfig.overwrite.resourceTypes = false;
+			variables.stConfig.overwrite.pageProperties = false;
+			variables.stConfig.overwrite.resourceLibraryTypes = false;
 			
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
@@ -87,6 +96,11 @@
 				xmlNode = xmlConfigDoc.xmlRoot.xmlChildren[i];
 				
 				if(xmlNode.xmlName eq "baseResources") {
+
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.resources = true;
+						variables.stConfig.resources = structNew();
+					}
 				
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						xmlThisNode = xmlNode.xmlChildren[j];
@@ -109,6 +123,11 @@
 
 				} else if(xmlNode.xmlName eq "renderTemplates") {
 		
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.renderTemplates = true;
+						variables.stConfig.renderTemplates = structNew();
+					}
+				
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"name"))
@@ -138,6 +157,11 @@
 
 				} else if(xmlNode.xmlName eq "contentRenderers") {
 		
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.contentRenderers = true;
+						variables.stConfig.contentRenderers = structNew();
+					}
+				
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"moduleType"))
@@ -150,6 +174,11 @@
 
 				} else if(xmlNode.xmlName eq "plugins") {
 		
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.plugins = true;
+						variables.stConfig.plugins = arrayNew(1);
+					}
+				
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 
 						stTemp = structNew();
@@ -169,6 +198,11 @@
 
 				} else if(xmlNode.xmlName eq "resourceTypes") {
 		
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.resourceTypes = true;
+						variables.stConfig.resourceTypes = structNew();
+					}
+				
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						xmlThisNode = xmlNode.xmlChildren[j];
 						
@@ -197,13 +231,23 @@
 					arrayAppend( variables.stConfig.resourceLibraryPaths, trim(xmlNode.xmlText) ); 
 
 				} else if(xmlNode.xmlName eq "resourceLibraryPaths") {
+
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.resourceLibraryPaths = true;
+						variables.stConfig.resourceLibraryPaths = arrayNew(1);
+					}
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						arrayAppend( variables.stConfig.resourceLibraryPaths , trim(xmlNode.xmlChildren[j].xmlText) );
 					}
 
 				} else if(xmlNode.xmlName eq "pageProperties") {
-		
+	
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.pageProperties = true;
+						variables.stConfig.pageProperties = structNew();
+					}
+	
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						xmlThisNode = xmlNode.xmlChildren[j];
 						if(xmlThisNode.xmlName eq "property" 
@@ -215,6 +259,11 @@
 
 				} else if(xmlNode.xmlName eq "resourceLibraryTypes") {
 		
+					if(structKeyExists(xmlNode.xmlAttributes,"overwrite") and isBoolean(xmlNode.xmlAttributes.overwrite) and xmlNode.xmlAttributes.overwrite) {
+						variables.stConfig.overwrite.resourceLibraryTypes = true;
+						variables.stConfig.resourceLibraryTypes = structNew();
+					}
+	
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 						xmlThisNode = xmlNode.xmlChildren[j];
 						
@@ -300,9 +349,12 @@
 			
 			
 			// ****** [baseResources] *****
-			if(getBaseResourceTypes() neq "" or variables.stConfig.lstResourceTypes neq "") {
+			if(getBaseResourceTypes() neq "" or variables.stConfig.lstResourceTypes neq "" or variables.stConfig.overwrite.resources) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"baseResources") );
 				
+				if(variables.stConfig.overwrite.resources)
+					xmlConfigDoc.xmlRoot.baseResources.xmlAttributes["overwrite"] = true;
+
 				if(getBaseResourceTypes() neq "") {
 					lstResourceTypes = getBaseResourceTypes();
 				} else {
@@ -324,8 +376,11 @@
 			}
 
 			// ****** [renderTemplates] *****
-			if(not structIsEmpty(variables.stConfig.renderTemplates)) {
+			if(not structIsEmpty(variables.stConfig.renderTemplates) or variables.stConfig.overwrite.renderTemplates) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"renderTemplates") );
+
+				if(variables.stConfig.overwrite.renderTemplates)
+					xmlConfigDoc.xmlRoot.renderTemplates.xmlAttributes["overwrite"] = true;
 				
 				for(key in variables.stConfig.renderTemplates) {
 					for(thisKey in variables.stConfig.renderTemplates[key]) {
@@ -342,8 +397,11 @@
 			}
 			
 			// ****** [contentRenderers] *****
-			if(not structIsEmpty(variables.stConfig.contentRenderers)) {
+			if(not structIsEmpty(variables.stConfig.contentRenderers) or variables.stConfig.overwrite.contentRenderers) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"contentRenderers") );
+				
+				if(variables.stConfig.overwrite.contentRenderers)
+					xmlConfigDoc.xmlRoot.contentRenderers.xmlAttributes["overwrite"] = true;
 				
 				for(thisKey in variables.stConfig.contentRenderers) {
 					tmpXmlNode = xmlElemNew(xmlConfigDoc,"contentRenderer");
@@ -354,8 +412,11 @@
 			}
 
 			// ****** [plugins] *****
-			if(ArrayLen(variables.stConfig.plugins) gt 0) {
+			if(ArrayLen(variables.stConfig.plugins) gt 0 or variables.stConfig.overwrite.plugins) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"plugins") );
+				
+				if(variables.stConfig.overwrite.plugins)
+					xmlConfigDoc.xmlRoot.plugins.xmlAttributes["overwrite"] = true;
 				
 				for(i=1;i lte arrayLen(variables.stConfig.plugins);i=i+1) {
 					tmpXmlNode = xmlElemNew(xmlConfigDoc,"plugin");
@@ -367,8 +428,11 @@
 			}
 
 			// ****** [resourceTypes] *****
-			if(not structIsEmpty(variables.stConfig.resourceTypes)) {
+			if(not structIsEmpty(variables.stConfig.resourceTypes) or variables.stConfig.overwrite.resourceTypes) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceTypes") );
+				
+				if(variables.stConfig.overwrite.resourceTypes)
+					xmlConfigDoc.xmlRoot.resourceTypes.xmlAttributes["overwrite"] = true;
 				
 				for(thisKey in variables.stConfig.resourceTypes) {
 					st = variables.stConfig.resourceTypes[thisKey];
@@ -410,8 +474,12 @@
 			}
 
 			// ****** [resourceLibrary] *****	
-			if(arrayLen(variables.stConfig.resourceLibraryPaths) gt 0) {
+			if(arrayLen(variables.stConfig.resourceLibraryPaths) gt 0 or variables.stConfig.overwrite.resourceLibraryPaths) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceLibraryPaths") );
+
+				if(variables.stConfig.overwrite.resourceLibraryPaths)
+					xmlConfigDoc.xmlRoot.resourceLibraryPaths.xmlAttributes["overwrite"] = true;
+				
 				for(i=1;i lte arrayLen(variables.stConfig.resourceLibraryPaths);i=i+1) {
 					tmpXmlNode = xmlElemNew(xmlConfigDoc,"resourceLibraryPath");
 					tmpXmlNode.xmlText = variables.stConfig.resourceLibraryPaths[i];
@@ -420,8 +488,11 @@
 			}
 			
 			// ***** [pageProperties] ******
-			if(not structIsEmpty(variables.stConfig.pageProperties)) {
+			if(not structIsEmpty(variables.stConfig.pageProperties) or variables.stConfig.overwrite.pageProperties) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"pageProperties") );
+				
+				if(variables.stConfig.overwrite.pageProperties)
+					xmlConfigDoc.xmlRoot.pageProperties.xmlAttributes["overwrite"] = true;
 				
 				for(thisKey in variables.stConfig.pageProperties) {
 					tmpXmlNode = xmlElemNew(xmlConfigDoc,"property");
@@ -432,8 +503,11 @@
 			}
 
 			// ****** [resourceLibraryTypes] *****
-			if(not structIsEmpty(variables.stConfig.resourceLibraryTypes)) {
+			if(not structIsEmpty(variables.stConfig.resourceLibraryTypes) or variables.stConfig.overwrite.resourceLibraryTypes) {
 				ArrayAppend(xmlConfigDoc.xmlRoot.xmlChildren, XMLElemNew(xmlConfigDoc,"resourceLibraryTypes") );
+				
+				if(variables.stConfig.overwrite.resourceLibraryTypes)
+					xmlConfigDoc.xmlRoot.resourceLibraryTypes.xmlAttributes["overwrite"] = true;
 				
 				for(thisKey in variables.stConfig.resourceLibraryTypes) {
 					st = variables.stConfig.resourceLibraryTypes[thisKey];
@@ -606,6 +680,38 @@
 
 	<cffunction name="getDefaultResourceLibraryClass" access="public" returntype="string" hint="Returns the path in dot notation for the class to use as the default resource library implementation">
 		<cfreturn variables.stConfig.defaultResourceLibraryClass>
+	</cffunction>	
+
+	<cffunction name="getResourceLibraryPathsOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.resourceLibraryPaths>
+	</cffunction>	
+
+	<cffunction name="getRenderTemplatesOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.renderTemplates>
+	</cffunction>	
+
+	<cffunction name="getBaseResourcesOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.resources>
+	</cffunction>	
+
+	<cffunction name="getContentRenderersOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.contentRenderers>
+	</cffunction>	
+
+	<cffunction name="getPluginsOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.plugins>
+	</cffunction>	
+
+	<cffunction name="getResourceTypesOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.resourceTypes>
+	</cffunction>	
+
+	<cffunction name="getPagePropertiesOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.pageProperties>
+	</cffunction>	
+
+	<cffunction name="getResourceLibraryTypesOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
+		<cfreturn variables.stConfig.overwrite.resourceLibraryTypes>
 	</cffunction>	
 		
 	<cffunction name="getMemento" access="public" returntype="struct" hint="returns a struct with a copy of all settings">
@@ -952,6 +1058,54 @@
 	<cffunction name="setDefaultResourceLibraryClass" access="public" returntype="string" hint="Sets the path in dot notation for the class to use as the default resource library implementation">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.defaultResourceLibraryClass = trim(arguments.data)>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setResourceLibraryPathsOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.resourceLibraryPaths = arguments.data>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setRenderTemplatesOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.renderTemplates = arguments.data>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setBaseResourcesOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.resources = arguments.data>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setContentRenderersOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.contentRenderers = arguments.data>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setPluginsOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.plugins = arguments.data>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setResourceTypesOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.resourceTypes = arguments.data>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setPagePropertiesOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.pageProperties = arguments.data>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setResourceLibraryTypesOverwrite" access="public" returntype="boolean" hint="Sets whether to overwrite any inherited values on this section with the current settings">
+		<cfargument name="data" type="boolean" required="true">
+		<cfset variables.stConfig.overwrite.resourceLibraryTypes = arguments.data>
 		<cfreturn this>
 	</cffunction>	
 
