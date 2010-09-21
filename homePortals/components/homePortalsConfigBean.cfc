@@ -765,22 +765,20 @@
 
 	<cffunction name="setPlugin" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
-		<cfargument name="path" type="string" required="true">
+		<cfargument name="path" type="string" required="false" default="">
 		<cfset var i = 0>
 		<cfset var found = false>
 		<cfset var st = structNew()>
-		<cfif arguments.path neq "">
-			<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
-				<cfif variables.stConfig.plugins[i].name eq arguments.name>
-					<cfset variables.stConfig.plugins[i].path = arguments.path>
-					<cfset found = true>
-				</cfif>
-			</cfloop>
-			<cfif not found>
-				<cfset st.name = arguments.name>
-				<cfset st.path = arguments.path>
-				<cfset arrayAppend(variables.stConfig.plugins, st)>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+			<cfif variables.stConfig.plugins[i].name eq arguments.name>
+				<cfset variables.stConfig.plugins[i].path = arguments.path>
+				<cfset found = true>
 			</cfif>
+		</cfloop>
+		<cfif not found>
+			<cfset st.name = arguments.name>
+			<cfset st.path = arguments.path>
+			<cfset arrayAppend(variables.stConfig.plugins, st)>
 		</cfif>
 		<cfreturn this>
 	</cffunction>
