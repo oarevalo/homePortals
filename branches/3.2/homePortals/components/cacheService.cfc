@@ -229,5 +229,11 @@
 		</cfif>
 	</cffunction>	
 		
+	<!-------------------------------------->
+	<!--- clear                        	  --->
+	<!-------------------------------------->	
+	<cffunction name="clear" access="public" returntype="void" hint="Removes all items from the cache">
+		<cfset init()>
+	</cffunction>	
 	
 </cfcomponent>
