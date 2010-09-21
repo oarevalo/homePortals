@@ -23,6 +23,7 @@
 			variables.stConfig.pageProviderClass = "";
 			variables.stConfig.lstResourceTypes = "";
 			variables.stConfig.defaultResourceLibraryClass = "";
+			variables.stConfig.errorHandlerClass = "";
 
 			variables.stConfig.resourceLibraryPaths = arrayNew(1);
 			variables.stConfig.renderTemplates = structNew();
@@ -340,6 +341,7 @@
 					case "baseResourceTypes": tmpXmlNode = xmlElemNew(xmlConfigDoc,"baseResourceTypes"); break;
 					case "pageProviderClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageProviderClass"); break;
 					case "defaultResourceLibraryClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"defaultResourceLibraryClass"); break;
+					case "errorHandlerClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"errorHandlerClass"); break;
 				}
 				if(isXMLNode(tmpXmlNode) and variables.stConfig[thisKey] neq "") {
 					tmpXmlNode.xmlText = variables.stConfig[thisKey];
@@ -680,6 +682,10 @@
 
 	<cffunction name="getDefaultResourceLibraryClass" access="public" returntype="string" hint="Returns the path in dot notation for the class to use as the default resource library implementation">
 		<cfreturn variables.stConfig.defaultResourceLibraryClass>
+	</cffunction>	
+
+	<cffunction name="getErrorHandlerClass" access="public" returntype="string" hint="Returns the path in dot notation for the class to use for handling errors">
+		<cfreturn variables.stConfig.errorHandlerClass>
 	</cffunction>	
 
 	<cffunction name="getResourceLibraryPathsOverwrite" access="public" returntype="boolean" hint="returns whether to overwrite any inherited values on this section with the current settings">
@@ -1058,6 +1064,12 @@
 	<cffunction name="setDefaultResourceLibraryClass" access="public" returntype="string" hint="Sets the path in dot notation for the class to use as the default resource library implementation">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.defaultResourceLibraryClass = trim(arguments.data)>
+		<cfreturn this>
+	</cffunction>	
+
+	<cffunction name="setErrorHandlerClass" access="public" returntype="string" hint="Sets the path in dot notation for the class to use for handling errors">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.errorHandlerClass = trim(arguments.data)>
 		<cfreturn this>
 	</cffunction>	
 

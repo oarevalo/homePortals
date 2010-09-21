@@ -523,6 +523,8 @@
 			var prop = "";
 			var token = "";
 			var stResult = "";
+			var errorContentBuffer = 0;
+			var errorHandlerClass = getHomePortals().getConfig().getErrorHandlerClass();
 			
 			// reset the content output buffer
 			resetPageContentBuffer();
@@ -565,10 +567,13 @@
 																	createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body)
 																);
 							} catch(any e) {
-								// show error
-								createObject("component","singleContentBuffer")
-									.init(stTagNode.id, variables.contentBuffer.body)
-									.set(e.message & e.detail);
+								// handle error
+								errorContentBuffer = createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body);
+								
+								if(errorHandlerClass neq "")
+									createObject("component",errorHandlerClass).onContentRendererError(getHomePortals(), this, oModBean, errorContentBuffer, e);
+								else
+									errorContentBuffer.set(e.message & e.detail);
 							}
 
 							// keep an ordered list with all content tags rendered

@@ -115,5 +115,8 @@
 	
 	<!-- Path in dot notation for the class used for the default Resource Library implementation -->
 	<defaultResourceLibraryClass>homePortals.components.defaultResourceLibrary</defaultResourceLibraryClass>
+
+	<!-- use this setting to provide a class that will be invoked whenever an error occurs while rendering a page -->
+	<errorHandlerClass></errorHandlerClass>
 	
 </homePortals>
