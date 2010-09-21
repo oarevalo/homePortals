@@ -4,7 +4,7 @@
 		variables.stPage = StructNew();
 		variables.lstRenderedContent = ""; 		// list with the order in which the content tags are rendered
 		variables.homePortalsEngineDir = "/homePortals/";		// path to location of HomePortals engine
-		variables.errorTemplate = variables.homePortalsEngineDir & "/common/Templates/error.cfm";	// template to display when errors occur while rendering page components
+		variables.errorTemplate = variables.homePortalsEngineDir & "/includes/error.cfm";	// template to display when errors occur while rendering page components
 		variables.pageHREF = "";		// path to the current page
 		variables.oHomePortals = 0;		// homeportals instance
 		variables.oPage = 0;			// the page to render
