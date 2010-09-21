@@ -1,4 +1,4 @@
-@<cfcomponent hint="This manages and controls access to multiple resource libraries on an application">
+<cfcomponent hint="This manages and controls access to multiple resource libraries on an application">
 
 	<cfscript>
 		variables.resourceTypeRegistry = 0;
