@@ -15,7 +15,7 @@
 		<content id="version" href="/homePortals/contentRoot/_res/content/version.html" title="HomePortals Version" location="right"
 				container="false"  />
 		<content id="license" href="/homePortals/contentRoot/_res/content/license.html" container="false" location="right"
-				style="margin-top:30px;text-align:center;" />
+				style="margin-top:10px;text-align:center;" />
 		<content id="footer" href="/homePortals/contentRoot/_res/content/footer.html" container="false" location="footer" />
 	</modules>
 </Page>
