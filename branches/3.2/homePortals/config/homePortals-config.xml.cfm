@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<homePortals version="3.1.544">
+<homePortals version="3.1.609">
 
 	<!-- base path for the HomePortals installation -->
 	<homePortalsPath>/homePortals/</homePortalsPath>
@@ -54,6 +54,7 @@
 		<contentRenderer moduleType="navMenu" path="homePortals.components.contentTagRenderers.navMenu" />
 		<contentRenderer moduleType="rss" path="homePortals.components.contentTagRenderers.rss" />
 		<contentRenderer moduleType="text" path="homePortals.components.contentTagRenderers.text" />
+		<contentRenderer moduleType="contentList" path="homePortals.components.contentTagRenderers.contentList" />
 	</contentRenderers>
 	
 	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
