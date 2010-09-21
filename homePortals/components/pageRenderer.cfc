@@ -31,7 +31,8 @@
 		<cfset variables.oHomePortals = arguments.homePortals>
 		
 		<cfset resetPageContentBuffer()>
-		<cfset loadPage()>
+		<cfset initPageStruct()>
+		<cfset loadPage(arguments.pageHREF, arguments.page)>
 		<cfset injectGlobalPageProperties()>
 		
 		<cfset variables.stTimers.init = getTickCount()-start>
@@ -53,11 +54,16 @@
 			var arg2 = "";
 			var rendered = "";
 			var start = getTickCount();
-			var pageTemplate = getPage().getPageTemplate();
+			var pageTemplate = variables.stPage.page.pageTemplate;
 
 			// store the context object
-			if(not structIsEmpty(arguments.context)) 
+			if(not structIsEmpty(arguments.context)) {
+				// make sure we cleanup the context for html sneakyness!!
+				for(arg1 in arguments.context) {
+					arguments.context[arg1] = reReplace(arguments.context[arg1],"<[^>]*>","","ALL");
+				}
 				variables.context = arguments.context;
+			}
 
 			// pre-render output of all content tags on page		
 			processContentTags();
@@ -65,10 +71,31 @@
 			// get the render template for the full page
 			renderTemplateBody = getHomePortals().getTemplateManager().getTemplateBody("page", pageTemplate);
 
+			// replace page title
+			tmp = htmlEditFormat(variables.stPage.page.title);
+			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", resolveContextTokens(tmp), "ALL");
+
 			// replace simple values
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", getPage().getTitle(), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_ONLOAD$", getBodyOnLoad(), "ALL");
+
+			// search and replace "Page Properties"
+			index = 1;
+			finished = false;
+			while(Not finished) {
+				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				if(stResult.len[1] gt 0) {
+					// match found
+					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
+					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
+					rendered = resolveContextTokens("{" & arg1 & "}");;
+					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					
+					index = stResult.pos[1] + len(rendered);
+				} else {
+					finished = true;
+				}
+			}
 
 			// search and replace "Custom Sections"
 			index = 1;
@@ -109,31 +136,6 @@
 				}
 			}
 			
-			// search and replace "Page Properties"
-			index = 1;
-			finished = false;
-			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
-				if(stResult.len[1] gt 0) {
-					// match found
-					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
-					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
-					rendered = "";
-					
-					if(getPage().hasProperty(arg1)) {
-						rendered = getPage().getProperty(arg1);
-					}
-						
-					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
-					
-					index = stResult.pos[1] + len(rendered);
-				} else {
-					finished = true;
-				}
-			}
-			
-			
-
 			variables.stTimers.renderPage = getTickCount()-start;
 			
 			return renderTemplateBody;	
@@ -245,7 +247,7 @@
 					<cfset tmpHTML = tmpHTML & "<link rel=""alternate"" type=""application/rss+xml"" href=""#aMeta[i].content#"" />">
 				</cfif>
 			<cfelse>
-				<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#aMeta[i].content#"" />">
+				<cfset tmpHTML = tmpHTML & "<meta name=""#aMeta[i].name#"" content=""#htmlEditFormat(aMeta[i].content)#"" />">
 			</cfif>
 		</cfloop>
 			
@@ -338,14 +340,45 @@
 	<cffunction name="getTimers" access="public" returntype="any" hint="Returns the timers for this object">
 		<cfreturn variables.stTimers>
 	</cffunction>	
+
+	<!---------------------------------------->
+	<!--- getParsedPageData				   --->
+	<!---------------------------------------->	
+	<cffunction name="getParsedPageData" access="public" returntype="struct" hint="This function a reference to the page contents after the page bean has been parsed. This allows to do low level modifications to the page structure without affecting the original bean">
+		<cfreturn variables.stPage.page>
+	</cffunction>	
 	
 	
 	<!----------  P R I V A T E    M E T H O D S    ----------------->
+
+	<!--------------------------------------->
+	<!----  initPageStruct				----->
+	<!--------------------------------------->
+	<cffunction name="initPageStruct" access="private" returntype="void" hint="initializes the struct where we will collect the page data">
+		<cfscript>
+			variables.stPage = StructNew();
+			variables.stPage.page = StructNew();
+			variables.stPage.page.href = "";			// address of the page
+			variables.stPage.page.title = "";		// page title
+			variables.stPage.page.pageTemplate = "";		// page title
+			variables.stPage.page.eventListeners = arrayNew(1);
+			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
+
+			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
+			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
+			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
+			variables.stPage.page.modules = StructNew();		// holds modules
+			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
+		</cfscript>
+	</cffunction>
 	
 	<!--------------------------------------->
 	<!----  loadPage					----->
 	<!--------------------------------------->
 	<cffunction name="loadPage" access="private" returntype="void" hint="loads and parses a homeportals page">
+		<cfargument name="pageHREF" type="string" required="true" hint="The identifier for the page">
+		<cfargument name="page" type="pageBean" required="true" hint="The page to render">
+		<cfargument name="isParent" type="boolean" required="false" default="false">
 		<cfscript>
 			var i = 0;
 			var tmrStart = getTickCount();
@@ -356,47 +389,61 @@
 			var aStyleResources = oHPConfig.getBaseResourcesByType("style");
 			
 			var oResourceBean = 0;
+			var parentPageHREF = "";
 		
 		
 			// ****** Parse homePortals page contents ******
 
-			// Structure to hold the page info
-			variables.stPage = StructNew();
-			variables.stPage.page = StructNew();
-			variables.stPage.page.href = variables.pageHREF;			// address of the page
-			variables.stPage.page.title = getPage().getTitle();		// page title
-			variables.stPage.page.eventListeners = getPage().getEventListeners();
-			variables.stPage.page.meta = getPage().getMetaTags();			// holds html meta tags
+			// if this page extends another, then parse the parent first
+			if(arguments.page.hasProperty("extends")) {
+				parentPageHREF = arguments.page.getProperty("extends");
+				if(parentPageHREF neq "" and parentPageHREF neq arguments.pageHREF) {
+					loadPage(parentPageHREF,
+							getHomePortals().getPageLoader().load(parentPageHREF),
+							true);
+				}
+			} 
 
-			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
-			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
-			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
-			variables.stPage.page.modules = StructNew();		// holds modules
-			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
-		
-		
+			// Structure to hold the page info
+			variables.stPage.page.href = arguments.pageHREF;			// address of the page
+			if(arguments.page.getTitle() neq "")
+				variables.stPage.page.title = arguments.page.getTitle();		// page title
+			if(arguments.page.getPageTemplate() neq "")
+				variables.stPage.page.pageTemplate = arguments.page.getPageTemplate();		// page template
+
+			variables.stPage.page.eventListeners.addAll(arguments.page.getEventListeners());
+			variables.stPage.page.meta.addAll(arguments.page.getMetaTags());			// holds html meta tags
+
 			// scripts
 			for(i=1;i lte ArrayLen(aScriptResources);i=i+1) {
-				ArrayAppend(variables.stPage.page.scripts, aScriptResources[i]);
+				if(not variables.stPage.page.scripts.contains( aScriptResources[i] )) {
+					ArrayAppend(variables.stPage.page.scripts, aScriptResources[i]);
+				}
 			}
-			tmp = getPage().getScripts();
+			tmp = arguments.page.getScripts();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				ArrayAppend(variables.stPage.page.scripts, tmp[i]);
+				if(not variables.stPage.page.scripts.contains( tmp[i] )) {
+					ArrayAppend(variables.stPage.page.scripts, tmp[i]);
+				}
 			}
 			
 			
 			// styles
 			for(i=1;i lte ArrayLen(aStyleResources);i=i+1) {
-				ArrayAppend(variables.stPage.page.stylesheets, aStyleResources[i]);
+				if(not variables.stPage.page.stylesheets.contains( aStyleResources[i] )) {
+					ArrayAppend(variables.stPage.page.stylesheets, aStyleResources[i]);
+				}
 			}
-			tmp = getPage().getStylesheets();
+			tmp = arguments.page.getStylesheets();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
+				if(not variables.stPage.page.stylesheets.contains( tmp[i] )) {
+					ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
+				}
 			}
 
 
 			// layout sections
-			tmp = getPage().getLayoutRegions();
+			tmp = arguments.page.getLayoutRegions();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				if(not structKeyExists(variables.stPage.page.layout, tmp[i].type))
 					variables.stPage.page.layout[tmp[i].type] = ArrayNew(1);
@@ -405,25 +452,25 @@
 
 			
 			// skin
-			if(getPage().getSkinID() neq "" and getHomePortals().getResourceLibraryManager().hasResourceType("skin")) {
-				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", getPage().getSkinID());
+			if(arguments.page.getSkinID() neq "" and getHomePortals().getResourceLibraryManager().hasResourceType("skin")) {
+				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", arguments.page.getSkinID());
 				variables.stPage.page.skinHREF = oResourceBean.getFullHref();
 			}
 
 						
 			// modules and content
-			tmp = getPage().getModules();
+			tmp = arguments.page.getModules();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
 				// create structure for modules that belong to the same location
 				tmpLoc = tmp[i].getLocation();
 				
 				// if location is empty, default to first available
 				if(tmpLoc eq "") {
-					tmp2 = getPage().getLayoutRegions();
+					tmp2 = arguments.page.getLayoutRegions();
 					if(arrayLen(tmp2) gt 0)
 						tmpLoc = tmp2[1].name;
 					else {
-						tmp2 = getHomePortals().getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+						tmp2 = getHomePortals().getTemplateManager().getLayoutSections( variables.stPage.page.pageTemplate );
 						tmpLoc = listFirst(tmp2);
 					}
 				}
@@ -436,8 +483,8 @@
 			
 			
 			// if no explicit layout is given, then create a layout based on the page template
-			if(arrayLen(getPage().getLayoutRegions()) eq 0) {
-				tmp = getHomePortals().getTemplateManager().getLayoutSections( getPage().getPageTemplate() );
+			if(!arguments.isParent and structIsEmpty(variables.stPage.page.layout)) {
+				tmp = getHomePortals().getTemplateManager().getLayoutSections( variables.stPage.page.pageTemplate );
 				tmp = listToArray(tmp);
 				for(i=1;i lte ArrayLen(tmp);i=i+1) {
 					st = {
@@ -502,20 +549,15 @@
 								// do dynamic replacement of properties from the context object
 								props = oModBean.getProperties();
 								for(prop in props) {
-									stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",props[prop],1,true);
-									if(stResult.len[1] gt 0) {
-										token = mid(props[prop],stResult.pos[1],stResult.len[1]);
-										arg1 = mid(props[prop],stResult.pos[2],stResult.len[2]);
-
-										if(left(token,1) neq "$" and structKeyExists(variables.context,arg1)) {
-											oModBean.setProperty(prop, replace(props[prop], token, variables.context[arg1], "ALL") );
-										} else if(getPage().hasProperty(arg1)) {
-											oModBean.setProperty(prop, replace(props[prop], token, getPage().getProperty(arg1), "ALL") );
-										} else if(props[prop] eq token) {
-											oModBean.removeProperty(prop);
-										}
-									}
+									tmp = resolveContextTokens( props[prop] );
+									if(tmp eq "")
+										oModBean.removeProperty(prop);
+									else
+										oModBean.setProperty(prop, tmp);
 								}
+
+								// apply context to title
+								oModBean.setTitle( resolveContextTokens( oModBean.getTitle() ) );
 								 
 								// process module content
 								oContentTagRenderer = getContentTagRenderer(stTagNode.moduleType, oModBean);
@@ -682,6 +724,46 @@
 		</cfscript>
 	</cffunction>
 	
+	<!---------------------------------------->
+	<!--- resolveContextTokens		       --->
+	<!---------------------------------------->		
+	<cffunction name="resolveContextTokens" access="private" returntype="string">
+		<cfargument name="text" type="string" required="true">
+		<cfscript>
+			var token = "";
+			var arg1 = "";
+			var stResult = {};
+			var rtn = arguments.text;
+			var index = 1;
+			var finished = false;
+			var rendered = "";
+
+			while(Not finished) {
+				stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",rtn,index,true);
+	
+				if(stResult.len[1] gt 0) {
+					token = mid(rtn,stResult.pos[1],stResult.len[1]);
+					arg1 = mid(rtn,stResult.pos[2],stResult.len[2]);
+					rendered = "";
+
+					if(left(token,1) neq "$" and structKeyExists(variables.context,arg1)) {
+						rendered = variables.context[arg1];
+					} else if(getPage().hasProperty(arg1)) {
+						rendered = getPage().getProperty(arg1);
+					}
+
+					rtn = replace(rtn, token, rendered, "ALL");
+					
+					index = stResult.pos[1] + len(rendered);
+				} else {
+					finished = true;
+				}
+			}
+
+			return rtn;
+		</cfscript>
+	</cffunction>
+
 
 	<!--------------------------------------->
 	<!----  Facades for cf tags			----->

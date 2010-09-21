@@ -151,14 +151,18 @@
 		
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 
+						stTemp = structNew();
+
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"name"))
 							throw("HomePortals config file is malformed. Missing 'name' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
-						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"path"))
-							throw("HomePortals config file is malformed. Missing 'path' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
+						else
+							stTemp.name = xmlNode.xmlChildren[j].xmlAttributes.name;
 
-						stTemp = structNew();
-						stTemp.name = xmlNode.xmlChildren[j].xmlAttributes.name;
-						stTemp.path = xmlNode.xmlChildren[j].xmlAttributes.path;
+						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"path"))
+							stTemp.path = "";
+						else
+							stTemp.path = xmlNode.xmlChildren[j].xmlAttributes.path;
+
 						arrayAppend(variables.stConfig.plugins, stTemp);
 					}
 
@@ -354,7 +358,8 @@
 				for(i=1;i lte arrayLen(variables.stConfig.plugins);i=i+1) {
 					tmpXmlNode = xmlElemNew(xmlConfigDoc,"plugin");
 					tmpXmlNode.xmlAttributes["name"] = variables.stConfig.plugins[i].name;
-					tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[i].path;
+					if(variables.stConfig.plugins[i].path neq "")
+						tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[i].path;
 					ArrayAppend(xmlConfigDoc.xmlRoot.plugins.xmlChildren, tmpXmlNode );
 				}
 			}
@@ -776,8 +781,6 @@
 				<cfset st.path = arguments.path>
 				<cfset arrayAppend(variables.stConfig.plugins, st)>
 			</cfif>
-		<cfelse>
-			<cfset removePlugin(arguments.name)>
 		</cfif>
 		<cfreturn this>
 	</cffunction>

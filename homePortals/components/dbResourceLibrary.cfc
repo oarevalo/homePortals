@@ -243,11 +243,14 @@
 								<cfcase value="description">
 									description = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getDescription()#">
 								</cfcase>
+								<cfcase value="createdOn">
+									<!--- ignore this one --->
+								</cfcase>
 								<cfdefaultcase>
 									#fld# = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getProperty(fld)#">
 								</cfdefaultcase>
 							</cfswitch>
-							<cfif fld neq listlast(lstFields)>,</cfif>
+							<cfif fld neq listlast(lstFields) and fld neq "createdOn">,</cfif>
 						</cfloop>
 					WHERE package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getPackage()#">
 						AND id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getID()#"> 
@@ -357,11 +360,17 @@
 										& defaultExtension;
 			}	
 			
-			href = rt.getFolderName() 
-					& "_" 
-					& rb.getPackage() 
-					& "_" 
-					& arguments.fileName;	
+			if(listLen(arguments.fileName,"_") gte 3 
+					and listFirst(arguments.fileName,"_") eq rt.getFolderName()
+					and listGetAt(arguments.fileName,2,"_") eq rb.getPackage()) {
+				href = arguments.fileName;
+			} else {
+				href = rt.getFolderName() 
+						& "_" 
+						& rb.getPackage() 
+						& "_" 
+						& arguments.fileName;	
+			}
 					
 			rb.setHREF(href);
 		</cfscript>
@@ -431,7 +440,6 @@
 
 	<cffunction name="resourceTableExists" access="private" returntype="boolean">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfset var bRet = false>
 		<cfset var qry = 0>
 		<cfset var tblName = getResourceTableName(arguments.resourceType)>
 		
@@ -442,7 +450,7 @@
 					name="qry" 
 					pattern="#tblName#" />
 
-		<cfreturn bRet = (qry.recordCount gt 0)>
+		<cfreturn (qry.recordCount gt 0)>
 	</cffunction>
 
 	<cffunction name="getPackagesFromResourceTable" access="private" returntype="array">
@@ -466,7 +474,7 @@
 		<cfset var tableName = getResourceTableName(rt)>
 		<cfset var lstFields = getResourceTableColumnList(rt)>
 
-		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#" maxrows="1">
+		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
 			SELECT #lstFields#
 				FROM #tableName#
 				<cfif arguments.packageName neq "">
@@ -519,13 +527,13 @@
 									`href` VARCHAR(1000) default NULL,
 								</cfcase>
 								<cfcase value="description">
-									`description` VARCHAR(8000) default NULL,
+									`description` VARCHAR(1000) default NULL,
 								</cfcase>
 								<cfcase value="createdOn">
 									`createdOn` DATETIME default NULL,
 								</cfcase>
 								<cfdefaultcase>
-									`#fld#` VARCHAR(8000) default NULL,
+									`#fld#` VARCHAR(1000) default NULL,
 								</cfdefaultcase>
 							</cfswitch>
 						</cfloop>
@@ -548,13 +556,13 @@
 									[href] VARCHAR(1000) NULL,
 								</cfcase>
 								<cfcase value="description">
-									[description] VARCHAR(8000) NULL,
+									[description] VARCHAR(1000) NULL,
 								</cfcase>
 								<cfcase value="createdOn">
 									[createdOn] DATETIME NULL,
 								</cfcase>
 								<cfdefaultcase>
-									[#fld#] VARCHAR(8000) NULL,
+									[#fld#] VARCHAR(1000) NULL,
 								</cfdefaultcase>
 							</cfswitch>
 						</cfloop>
