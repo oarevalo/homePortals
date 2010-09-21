@@ -113,4 +113,7 @@
 		</resourceLibraryType>
 	</resourceLibraryTypes>
 	
+	<!-- Path in dot notation for the class used for the default Resource Library implementation -->
+	<defaultResourceLibraryClass>homePortals.components.defaultResourceLibrary</defaultResourceLibraryClass>
+	
 </homePortals>

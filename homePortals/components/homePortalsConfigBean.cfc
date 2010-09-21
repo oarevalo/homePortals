@@ -22,6 +22,7 @@
 			variables.stConfig.baseResourceTypes = "";
 			variables.stConfig.pageProviderClass = "";
 			variables.stConfig.lstResourceTypes = "";
+			variables.stConfig.defaultResourceLibraryClass = "";
 
 			variables.stConfig.resourceLibraryPaths = arrayNew(1);
 			variables.stConfig.renderTemplates = structNew();
@@ -289,6 +290,7 @@
 					case "catalogCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"catalogCacheTTL"); break;
 					case "baseResourceTypes": tmpXmlNode = xmlElemNew(xmlConfigDoc,"baseResourceTypes"); break;
 					case "pageProviderClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageProviderClass"); break;
+					case "defaultResourceLibraryClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"defaultResourceLibraryClass"); break;
 				}
 				if(isXMLNode(tmpXmlNode) and variables.stConfig[thisKey] neq "") {
 					tmpXmlNode.xmlText = variables.stConfig[thisKey];
@@ -601,6 +603,10 @@
 	<cffunction name="getResourceLibraryTypes" access="public" returntype="struct" hint="returns a key-value map with all custom resourcelibrary types">
 		<cfreturn duplicate(variables.stConfig.resourceLibraryTypes)>
 	</cffunction>		
+
+	<cffunction name="getDefaultResourceLibraryClass" access="public" returntype="string" hint="Returns the path in dot notation for the class to use as the default resource library implementation">
+		<cfreturn variables.stConfig.defaultResourceLibraryClass>
+	</cffunction>	
 		
 	<cffunction name="getMemento" access="public" returntype="struct" hint="returns a struct with a copy of all settings">
 		<cfreturn duplicate(variables.stConfig)>
@@ -943,7 +949,12 @@
 		<cfreturn this>
 	</cffunction>
 
-	
+	<cffunction name="setDefaultResourceLibraryClass" access="public" returntype="string" hint="Sets the path in dot notation for the class to use as the default resource library implementation">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.defaultResourceLibraryClass = trim(arguments.data)>
+		<cfreturn this>
+	</cffunction>	
+
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 
