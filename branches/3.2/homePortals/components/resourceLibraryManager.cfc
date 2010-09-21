@@ -6,7 +6,7 @@
 										.synchronizedList( 
 											createObject("java","java.util.ArrayList").init() 
 										);
-		variables.defaultResourceLibraryClass = "defaultResourceLibrary";
+		variables.defaultResourceLibraryClass = "";
 		variables.customResLibTypes = structNew();
 		variables.appRoot = "";
 	</cfscript>
@@ -23,6 +23,9 @@
 			var aResLibs = arguments.config.getResourceLibraryPaths();
 			
 			variables.appRoot = arguments.config.getAppRoot();
+
+			// default reslib implementation
+			variables.defaultResourceLibraryClass = arguments.config.getDefaultResourceLibraryClass();
 
 			// create and populate the resourceTypeRegistry
 			variables.resourceTypeRegistry = createObject("component","resourceTypeRegistry").init( arguments.config );
