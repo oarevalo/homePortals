@@ -12,6 +12,10 @@
 	<cffunction name="onAppInit" access="public" returntype="void" hint="this method is executed when the HomePortals application is initialized.">
 		<!--- perform any plugin initialization tasks here --->
 	</cffunction>
+
+	<cffunction name="onConfigLoad" access="public" returntype="void" hint="this method is executed when the HomePortals configuration is being loaded and before the engine is fully initialized. This method should only be used to modify the current configBean.">
+		<cfargument name="eventArg" type="homePortalsConfigBean" required="true" hint="the application-provided config bean">	
+	</cffunction>
 		
 	<cffunction name="onBeforePageLoad" access="public" returntype="string" hint="this method is executed before a call to loadPage(). The argument is the path to the requested page, and its return value is also a page path">
 		<cfargument name="eventArg" type="string" required="true" hint="the page to load">	
