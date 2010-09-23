@@ -2,7 +2,7 @@
 
 	<cfset variables.pluginsMap = structNew()>
 	<cfset variables.homePortals = 0>
-	<cfset variables.ALLOWED_EVENTS = "appInit,beforePageLoad,afterPageLoad">
+	<cfset variables.ALLOWED_EVENTS = "appInit,configLoad,beforePageLoad,afterPageLoad">
 
 	<cffunction name="init" access="public" returntype="pluginManager" hint="constructor">
 		<cfargument name="homePortals" type="homePortals" required="true">

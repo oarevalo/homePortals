@@ -53,6 +53,7 @@
 			var defaultConfigFilePath = "";
 			var start = getTickCount();
 			var hpContentRoot = "";
+			var aPlugins = []; pluginLoader = 0; i = 0;
 
 			// check that appRoot has the right format
 			if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";
@@ -69,20 +70,43 @@
 
 			// load configuration settings for the application (overrides specific settings)
 			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
+
+				// create a config bean with the app configuration
+				userConfigBean = createObject("component", "homePortalsConfigBean").init();
 				if(structKeyExists(arguments,"config")) {
 					if(isXML(arguments.config) or isXMLDoc(arguments.config))
-						variables.oHomePortalsConfigBean.loadXML(arguments.config);
+						userConfigBean.loadXML(arguments.config);
 					else if(not isSimpleValue(arguments.config))
-						variables.oHomePortalsConfigBean.loadXML(arguments.config.toXML());
+						userConfigBean.loadXML(arguments.config.toXML());
 
 				} else if(fileExists(expandPath(variables.appRoot & variables.configFilePath))) {
-					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
+					userConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
 
 				} else if(fileExists(expandPath(variables.appRoot & this.CONFIG_FILE_NAME))) {
 					// we also handle the case in which the config is found at the app root level
 					variables.configFilePath = this.CONFIG_FILE_NAME;
-					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
+					userConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
 				}
+
+				// allow plugins to do any config changes they want
+				userPlugins = userConfigBean.getPlugins();
+				hpPlugins = oHomePortalsConfigBean.getPlugins();
+				if(arrayLen(userPlugins) gt 0 or arrayLen(hpPlugins) gt 0) {
+					pluginLoader = createObject("component","pluginManager").init(this);
+
+					for(i=1;i lte arrayLen(userPlugins);i++) {
+						pluginLoader.registerPlugin(userPlugins[i].name, userPlugins[i].path);
+					}
+					for(i=1;i lte arrayLen(hpPlugins);i++) {
+						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path);
+					}
+
+					pluginLoader.notifyPlugins("configLoad", userConfigBean);
+				}
+
+				// now apply app configuration on top of the global config
+				variables.oHomePortalsConfigBean.loadXML(userConfigBean.toXML());
+
 			} else {
 				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
 				if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";	//normalize approot if obtained from config
