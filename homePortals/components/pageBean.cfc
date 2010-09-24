@@ -24,6 +24,8 @@
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
 		variables.instance.stProperties = structNew();
+		
+		variables.instance.stCustomElements = structNew();	// holds custom sections and elements 
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
@@ -185,6 +187,22 @@
 						setPageTemplate(trim(xmlNode.xmlText));
 						break;
 						
+					// everything else is a custom section
+					default:
+						setCustomElement(xmlNode.xmlName, trim(xmlNode.xmlText));
+						for(i in xmlNode.xmlAttributes) {
+							setCustomElementProperty(xmlNode.xmlName, i, xmlNode.xmlAttributes[i]);
+						}
+
+						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
+							xmlThisNode = xmlNode.xmlChildren[j];
+
+							setCustomElementChild(xmlNode.xmlName, xmlThisNode.xmlName, trim(xmlThisNode.xmlText));
+
+							for(i in xmlThisNode.xmlAttributes) {
+								setCustomElementChildProperty(xmlNode.xmlName, xmlThisNode.xmlName, i, xmlThisNode.xmlAttributes[i]);
+							}
+						break;
 				}
 			}		
 		</cfscript>
@@ -766,7 +784,41 @@
 		<cfset structDelete(variables.instance.stProperties, arguments.name,false)>
 		<cfreturn this>
 	</cffunction>	
-	
+
+
+	<!---------------------------------------->
+	<!--- Custom Elements		           --->
+	<!---------------------------------------->	
+	<cffunction name="setCustomElement" access="public" returnType="pageBean" hint="sets the value of a custom element">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfset variables.instance.stCustomElements[arguments.name] = structNew()>
+		<cfset variables.instance.stCustomElements[arguments.name].name = arguments.name>
+		<cfset variables.instance.stCustomElements[arguments.name].value = arguments.value>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="setCustomElementProperty" access="public" returnType="pageBean" hint="sets the value of a custom element">
+		<cfargument name="elementName" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="setCustomElementChild" access="public" returnType="pageBean" hint="sets the value of a custom element">
+		<cfargument name="elementName" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="setCustomElementChildProperty" access="public" returnType="pageBean" hint="sets the value of a custom element">
+		<cfargument name="elementName" type="string" required="true">
+		<cfargument name="childName" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfreturn this>
+	</cffunction>
 
 
 	<!---------------------------------------->
