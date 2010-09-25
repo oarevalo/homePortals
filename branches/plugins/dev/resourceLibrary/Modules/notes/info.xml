@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resLib type="module">
+
+
+
+	
+	<!-- ********   Notes  ************ -->
+	<resource access="general" id="Notes" name="notes/notes">
+		<attributes>
+			<attribute description="The ID of the content entry to display by default. If empty, displays an index of all entries." name="contentID" required="true"/>
+		</attributes>		
+		<description>
+			Use this module to take quick notes on your page.
+		</description>
+		<moduleInfo>
+			<authorName>Oscar Arevalo</authorName>
+			<authorEmail>oarevalo@gmail.com</authorEmail>
+			<authorURL>http://www.homeportals.com</authorURL>
+			<screenshot/>
+		</moduleInfo>
+	</resource>		
+	
+
+</resLib>
