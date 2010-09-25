@@ -23,9 +23,7 @@
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
-		variables.instance.stProperties = structNew();
-		
-		variables.instance.stCustomElements = structNew();	// holds custom sections and elements 
+		variables.instance.stCustomElements = structNew(); // holds all custom element nodes
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
@@ -189,19 +187,7 @@
 						
 					// everything else is a custom section
 					default:
-						setCustomElement(xmlNode.xmlName, trim(xmlNode.xmlText));
-						for(i in xmlNode.xmlAttributes) {
-							setCustomElementProperty(xmlNode.xmlName, i, xmlNode.xmlAttributes[i]);
-						}
-
-						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
-							xmlThisNode = xmlNode.xmlChildren[j];
-
-							setCustomElementChild(xmlNode.xmlName, xmlThisNode.xmlName, trim(xmlThisNode.xmlText));
-
-							for(i in xmlThisNode.xmlAttributes) {
-								setCustomElementChildProperty(xmlNode.xmlName, xmlThisNode.xmlName, i, xmlThisNode.xmlAttributes[i]);
-							}
+						setCustomElement( createCustomElementFromXML(xmlNode) );
 						break;
 				}
 			}		
@@ -367,9 +353,18 @@
 				xmlNode.xmlText = variables.instance.pageTemplate;
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
+
+			// add custom elements
+			st = variables.instance.stCustomElements;
+			for(i in st) {
+				xmlNode = createXMLFromCustomElement(xmlDoc, st[i]);
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			}
+
 		</cfscript>
 		<cfreturn xmlDoc>
 	</cffunction>
+
 
 
 
@@ -789,36 +784,39 @@
 	<!---------------------------------------->
 	<!--- Custom Elements		           --->
 	<!---------------------------------------->	
+	<cffunction name="newCustomElement" access="public" returnType="pageBean" hint="creates a simple new custom element and adds it to the page">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfset var elm = createObject("component","customElement").init(arguments.name, arguments.value)>
+		<cfset variables.instance.stCustomElements[arguments.name] = elm>
+		<cfreturn this>
+	</cffunction>
+
 	<cffunction name="setCustomElement" access="public" returnType="pageBean" hint="sets the value of a custom element">
-		<cfargument name="name" type="string" required="true">
-		<cfargument name="value" type="string" required="true">
-		<cfset variables.instance.stCustomElements[arguments.name] = structNew()>
-		<cfset variables.instance.stCustomElements[arguments.name].name = arguments.name>
-		<cfset variables.instance.stCustomElements[arguments.name].value = arguments.value>
+		<cfargument name="element" type="customElement" required="true">
+		<cfset variables.instance.stCustomElements[arguments.element.getName()] = arguments.element>
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setCustomElementProperty" access="public" returnType="pageBean" hint="sets the value of a custom element">
-		<cfargument name="elementName" type="string" required="true">
+	<cffunction name="hasCustomElement" access="public" returnType="boolean" hint="Returns true if a custom element with the given name exists">
 		<cfargument name="name" type="string" required="true">
-		<cfargument name="value" type="string" required="true">
-		<cfreturn this>
+		<cfreturn structKeyExists(variables.instance.stCustomElements, arguments.name)>
 	</cffunction>
 
-	<cffunction name="setCustomElementChild" access="public" returnType="pageBean" hint="sets the value of a custom element">
-		<cfargument name="elementName" type="string" required="true">
+	<cffunction name="getCustomElement" access="public" returnType="customElement" hint="Returns the requested custom element">
 		<cfargument name="name" type="string" required="true">
-		<cfargument name="value" type="string" required="true">
-		<cfreturn this>
+		<cfif not hasCustomElement(arguments.name)>
+			<cfthrow message="Undefined element #arguments.name#" type="pageBean.undefinedCustomElement">
+		</cfif>
+		<cfreturn variables.instance.stCustomElements[arguments.name]>
 	</cffunction>
 
-	<cffunction name="setCustomElementChildProperty" access="public" returnType="pageBean" hint="sets the value of a custom element">
-		<cfargument name="elementName" type="string" required="true">
-		<cfargument name="childName" type="string" required="true">
+	<cffunction name="removeCustomElement" access="public" returnType="pageBean" hint="Deletes a custom element and all of its properties and children">
 		<cfargument name="name" type="string" required="true">
-		<cfargument name="value" type="string" required="true">
+		<cfset structDelete(variables.instance.stCustomElements, arguments.name, false)>
 		<cfreturn this>
 	</cffunction>
+	
 
 
 	<!---------------------------------------->
@@ -829,7 +827,7 @@
 	</cffunction>
 
 	<!---------------------------------------->
-	<!--- initPageProperties		       --->
+	<!--- Private Methods			       --->
 	<!---------------------------------------->	
 	<cffunction name="initPageProperties" access="private" returntype="void" hint="sets initial value for page properties">
 		<cfscript>
@@ -845,7 +843,55 @@
 			variables.instance.stModuleIndex = structNew();	// an index of modules	
 			variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
 			variables.instance.stProperties = structNew();
+			variables.instance.stCustomElements = structNew();
 		</cfscript>	
+	</cffunction>
+
+	<cffunction name="createCustomElementFromXML" access="private" returntype="customElement">
+		<cfargument name="xmlNode" type="any" required="true">
+		<cfscript>
+			var element = 0;
+			var i = 0;
+			var xmlThisNode = 0;
+	
+			element = createObject("component","customElement").init(arguments.xmlNode.xmlName, trim(arguments.xmlNode.xmlText));
+
+			for(i in arguments.xmlNode.xmlAttributes) {
+				element.setProperty(i, arguments.xmlNode.xmlAttributes[i]);
+			}
+	
+			for(i=1;i lte ArrayLen(arguments.xmlNode.xmlChildren); i=i+1) {
+				xmlThisNode = arguments.xmlNode.xmlChildren[i];
+				element.addChild(createCustomElementFromXML(xmlThisNode));
+			}
+	
+			return element;
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="createXMLFromCustomElement" access="private" returntype="any">
+		<cfargument name="xmlDoc" type="any" required="true">
+		<cfargument name="element" type="customElement" required="true">
+		<cfscript>
+			var xmlNode = xmlElemNew(arguments.xmlDoc, element.getName());
+			var i = 0;
+			var items = 0;
+			
+			if(element.getValue() neq "")
+				xmlNode.xmlText = element.getValue();
+
+			items = element.getProperties();
+			for(i in items) {
+				xmlNode.xmlAttributes[items[i].name] = items[i].value;
+			}
+	
+			items = element.getChildren();
+			for(i=1;i lte ArrayLen(items); i=i+1) {
+				arrayAppend(xmlNode.xmlChildren, createXMLFromCustomElement(xmlDoc,items[i]));
+			}
+	
+			return xmlNode;
+		</cfscript>
 	</cffunction>
 
 
