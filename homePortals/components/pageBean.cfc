@@ -2,7 +2,6 @@
 
 	<cfscript>
 		variables.DEFAULT_PAGE_TITLE = "";
-		variables.DEFAULT_PAGE_SKINID = "";
 		variables.DEFAULT_PAGE_TEMPLATE = "";
 		variables.DEFAULT_MODULE_TITLE = "";
 		variables.DEFAULT_MODULE_ICON = "";
@@ -14,7 +13,6 @@
 
 		variables.instance = structNew();
 		variables.instance.title = variables.DEFAULT_PAGE_TITLE;
-		variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
 		variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
@@ -174,12 +172,7 @@
 						
 						addMetaTag(argumentCollection = args);
 						break;	
-						
-					// skin	
-					case "skin":
-						setSkinID(xmlNode.xmlAttributes.id);
-						break;
-						
+												
 					// page template
 					case "pageTemplate":
 						setPageTemplate(trim(xmlNode.xmlText));
@@ -340,13 +333,6 @@
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 			
-			// add skin
-			if(variables.instance.skinID neq variables.DEFAULT_PAGE_SKINID) {
-				xmlNode = xmlElemNew(xmlDoc,"skin");
-				xmlNode.xmlAttributes["id"] = variables.instance.skinID;
-				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
-			}
-
 			// add pagetemplate
 			if(variables.instance.pageTemplate neq variables.DEFAULT_PAGE_TEMPLATE) {
 				xmlNode = xmlElemNew(xmlDoc,"pageTemplate");
@@ -729,20 +715,6 @@
 
 
 	<!---------------------------------------->
-	<!--- SkinID				           --->
-	<!---------------------------------------->		
-	<cffunction name="getSkinID" access="public" returntype="string" hint="retrieves the ID of the skin used on this page">
-		<cfreturn variables.instance.skinID>
-	</cffunction>
-	
-	<cffunction name="setSkinID" access="public" returnType="pageBean" hint="sets the page skin">
-		<cfargument name="skinID" type="string" required="true">
-		<cfset variables.instance.skinID = arguments.skinID>
-		<cfreturn this>
-	</cffunction>
-
-
-	<!---------------------------------------->
 	<!--- Custom Properties		           --->
 	<!---------------------------------------->	
 	<cffunction name="getProperties" access="public" returntype="struct" hint="returns a struct with all custom properties">
@@ -833,7 +805,6 @@
 		<cfscript>
 			variables.instance = structNew();
 			variables.instance.title = variables.DEFAULT_PAGE_TITLE;
-			variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
 			variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 			variables.instance.aStyles = ArrayNew(1);
 			variables.instance.aScripts = ArrayNew(1);
