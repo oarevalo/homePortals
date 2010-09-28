@@ -4,8 +4,8 @@
 /* This javascript contains all js functions for the  */
 /* client side of HomePortals modules.       		  */
 /*												   	  */
-/* (c) 2006 - CFEmpire   							  */
-/*	by Oscar Arevalo - oarevalo@cfempire.com		  */
+/* (c) 2006-2010 - Oscar Arevalo					  */
+/*	by Oscar Arevalo - oarevalo@gmail.com			  */
 /*												      */
 /******************************************************/
 
@@ -58,7 +58,7 @@ function moduleClient() {
 		var actionOutputID = this.moduleID + "ActionOutput_BodyRegion";
 		if(!$(actionOutputID)) {
 			var tmpHTML = "<div id='" + actionOutputID + "' class='h_actionOutputMessage'></div>";
-			new Insertion.Before(this.moduleID+"_BodyRegion",tmpHTML);
+			$("#"+this.moduleID+"_BodyRegion").prepend(tmpHTML);
 		}
 
 		// call server-side method
@@ -82,8 +82,7 @@ function moduleClient() {
 	}
 
 	function clearActionOutput() {
-		if($(this.moduleID + "ActionOutput_BodyRegion")) 
-			new Element.remove(this.moduleID + "ActionOutput_BodyRegion");
+		$("#"+this.moduleID+"ActionOutput_BodyRegion").remove();
 	}
 
 
@@ -92,13 +91,13 @@ function moduleClient() {
 		var b = document.getElementsByTagName("body")[0];
 		if(!d) {
 			var tmpHTML = "<div id='h_moduleWindow'><div id='h_moduleWindow_BodyRegion'></div></div>";
-			new Insertion.Top(b,tmpHTML);
+			$("body").append(tmpHTML);
 
 			tmpHTML = "<a href='javascript:" + this.moduleID + ".closeWindow();'>" +
 							"<img id='h_moduleWindowClose' " +
 									"src='/homePortals/plugins/modules/common/Images/cp_header_close.gif'"+ 
 									"alt='Close' title='Close' border='0'></a>";
-			new Insertion.Top("h_moduleWindow",tmpHTML);
+			$("#h_moduleWindow").append(tmpHTML);						
 
 			if(window.innerWidth)  clientWidth = window.innerWidth;
 			else if (document.body) clientWidth = document.body.clientWidth;
@@ -117,15 +116,11 @@ function moduleClient() {
 	}
 	
 	function closeWindow() {
-		new Element.remove("h_moduleWindow");
+		$("#h_moduleWindow").remove();
 	}
 
 	function setMessage(msg) {
-		var actionOutputID = this.moduleID + "ActionOutput_BodyRegion";
-		var divMsg = $(actionOutputID);
-		if(divMsg) {
-			if(msg!="") divMsg.innerHTML = msg;
-		}
+		$("#" + this.moduleID + "ActionOutput_BodyRegion").html(msg);
 	}
 
 	function raiseEvent(eventName, args) {
@@ -133,11 +128,7 @@ function moduleClient() {
 	}
 
 	function attachIcon(imgSrc, onclickStr, alt) {
-		h = $(this.moduleID + "_Head");
-		if(h) {
-			aElem = h.getElementsByTagName("h2");
-			new Insertion.Top(aElem[0],  "<a href='#' onclick=\"" + onclickStr + "\"><img src=\"" + imgSrc + "\" border='0' style='margin-top:3px;margin-right:3px;' align='right' alt='" + alt + "' title='" + alt + "'></a>");
-		}
+		$("#" + this.moduleID + "_Head h2").prepend("<a href='#' onclick=\"" + onclickStr + "\"><img src=\"" + imgSrc + "\" border='0' style='margin-top:3px;margin-right:3px;' align='right' alt='" + alt + "' title='" + alt + "'></a>");
 	}
 	
 	function setIcon(imgSrc) {
