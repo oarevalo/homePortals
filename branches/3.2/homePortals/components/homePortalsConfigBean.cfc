@@ -9,8 +9,6 @@
 		<cfscript>
 			variables.stConfig = structNew();
 			variables.stConfig.version = variables.hpEngineBaseVersion;
-			variables.stConfig.initialEvent = "";
-			variables.stConfig.bodyOnLoad = "";
 			variables.stConfig.homePortalsPath = "";
 			variables.stConfig.defaultPage = "";
 			variables.stConfig.appRoot = "";
@@ -294,10 +292,6 @@
 					variables.stConfig[xmlNode.xmlName] = trim(xmlNode.xmlText);
 				
 			}
-		
-			// set initial javascript event
-			if(ListLen(variables.stConfig.initialEvent,".") eq 2)
-				variables.stConfig.bodyOnLoad = "h_raiseEvent('#ListFirst(variables.stConfig.initialEvent,".")#', '#ListLast(variables.stConfig.initialEvent,".")#')";
 		</cfscript>
 	</cffunction>
 
@@ -328,8 +322,6 @@
 				thisKey = ListGetAt(lstKeys,i);
 				tmpXmlNode = 0;
 				switch(thisKey) {
-					case "initialEvent": tmpXmlNode = xmlElemNew(xmlConfigDoc,"initialEvent"); break;
-					case "bodyOnLoad": tmpXmlNode = xmlElemNew(xmlConfigDoc,"bodyOnLoad"); break;
 					case "homePortalsPath": tmpXmlNode = xmlElemNew(xmlConfigDoc,"homePortalsPath"); break;
 					case "defaultPage": tmpXmlNode = xmlElemNew(xmlConfigDoc,"defaultPage"); break;
 					case "appRoot": tmpXmlNode = xmlElemNew(xmlConfigDoc,"appRoot"); break;
@@ -539,14 +531,6 @@
 		<cfreturn variables.stConfig.version>
 	</cffunction>
 
-	<cffunction name="getInitialEvent" access="public" returntype="string">
-		<cfreturn variables.stConfig.initialEvent>
-	</cffunction>
-					
-	<cffunction name="getBodyOnLoad" access="public" returntype="string">
-		<cfreturn variables.stConfig.bodyOnLoad>
-	</cffunction>
-
 	<cffunction name="getHomePortalsPath" access="public" returntype="string" hint="The path to the HomePortals engine">
 		<cfreturn variables.stConfig.homePortalsPath>
 	</cffunction>
@@ -729,12 +713,6 @@
 	<cffunction name="setVersion" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.version = arguments.data>
-		<cfreturn this>
-	</cffunction>
-
-	<cffunction name="setInitialEvent" access="public" returntype="homePortalsConfigBean">
-		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.initialEvent = arguments.data>
 		<cfreturn this>
 	</cffunction>
 
