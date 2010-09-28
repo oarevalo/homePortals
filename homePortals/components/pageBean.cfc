@@ -16,7 +16,6 @@
 		variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
-		variables.instance.aEventListeners = ArrayNew(1);
 		variables.instance.aLayouts = ArrayNew(1);			// holds properties for layout sections
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
@@ -140,27 +139,7 @@
 						}
 						
 						break;
-							
-					// event handlers
-					case "eventListeners":
-						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
-							if(xmlNode.xmlChildren[j].xmlName eq "event") {
-								xmlThisNode = xmlNode.xmlChildren[j];
-
-								args = structNew();
-								args.objectName = "";
-								args.eventName = "";
-								args.eventHandler = "";
-
-								if(StructKeyExists(xmlThisNode.xmlAttributes,"objectName")) args.objectName = xmlThisNode.xmlAttributes.objectName; 
-								if(StructKeyExists(xmlThisNode.xmlAttributes,"eventName")) args.eventName = xmlThisNode.xmlAttributes.eventName; 
-								if(StructKeyExists(xmlThisNode.xmlAttributes,"eventHandler")) args.eventHandler= xmlThisNode.xmlAttributes.eventHandler; 
-								
-								addEventListener(argumentCollection = args);
-							}
-						}
-						break;	
-						
+													
 					// meta tags
 					case "meta":
 						args = structNew();
@@ -252,20 +231,6 @@
 					if(aTemp[i].id neq "") xmlNode2.xmlAttributes["id"] = aTemp[i].id;
 					if(aTemp[i].class neq "") xmlNode2.xmlAttributes["class"] = aTemp[i].class;
 					if(aTemp[i].style neq "") xmlNode2.xmlAttributes["style"] = aTemp[i].style;
-					arrayAppend(xmlNode.xmlChildren, xmlNode2);
-				}
-				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
-			}
-			
-			// add event listeners
-			aTemp = getEventListeners();
-			if(arrayLen(aTemp) gt 0) {
-				xmlNode = xmlElemNew(xmlDoc,"eventListeners");
-				for(i=1;i lte arrayLen(aTemp);i=i+1) {
-					xmlNode2 = xmlElemNew(xmlDoc,"event");
-					xmlNode2.xmlAttributes["objectName"] = aTemp[i].objectName;
-					xmlNode2.xmlAttributes["eventName"] = aTemp[i].eventName;
-					xmlNode2.xmlAttributes["eventHandler"] = aTemp[i].eventHandler;
 					arrayAppend(xmlNode.xmlChildren, xmlNode2);
 				}
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
@@ -465,52 +430,6 @@
 		<cfset variables.instance.aScripts = ArrayNew(1)>
 		<cfreturn this>
 	</cffunction>
-
-
-	<!---------------------------------------->
-	<!--- Event Listeners		           --->
-	<!---------------------------------------->	
-	<cffunction name="getEventListeners" access="public" returntype="array" hint="Returns an array with all event listeners on the page">
-		<cfreturn duplicate(variables.instance.aEventListeners)>
-	</cffunction>
-
-	<cffunction name="addEventListener" access="public" returnType="pageBean" hint="Adds an event listener to the page">
-		<cfargument name="objectName" type="string" required="true">
-		<cfargument name="eventName" type="string" required="true">
-		<cfargument name="eventHandler" type="string" required="true">
-		<cfset var st = structNew()>
-		<cfif arguments.objectName eq "" or arguments.eventName eq "" or arguments.eventHandler eq "">
-			<cfthrow message="An event listener must include object, event and event handler" type="homePortals.pageBean.invalidEventListener">
-		</cfif>
-		<cfset st.objectName = arguments.objectName>
-		<cfset st.eventName = arguments.eventName>
-		<cfset st.eventHandler = arguments.eventHandler>
-		<cfset ArrayAppend(variables.instance.aEventListeners, st)>
-		<cfreturn this>
-	</cffunction>
-
-	<cffunction name="removeEventListener" access="public" returnType="pageBean" hint="Removes the given event listener">
-		<cfargument name="objectName" type="string" required="true">
-		<cfargument name="eventName" type="string" required="true">
-		<cfargument name="eventHandler" type="string" required="true">
-		<cfset var i = 0>
-		<cfset var st = structNew()>
-
-		<cfloop from="1" to="#arrayLen(variables.instance.aEventListeners)#" index="i">
-			<cfset st = variables.instance.aEventListeners[i]>
-			<cfif st.objectName eq arguments.objectName and st.eventName eq arguments.eventName and st.eventHandler eq arguments.eventHandler>
-				<cfset arrayDeleteAt(variables.instance.aEventListeners, i)>
-				<cfreturn this>
-			</cfif>
-		</cfloop>
-		<cfreturn this>
-	</cffunction>	
-	
-	<cffunction name="removeAllEventListeners" access="public" returnType="pageBean" hint="removes all event listeners">
-		<cfset variables.instance.aEventListeners = arrayNew(1)>
-		<cfreturn this>
-	</cffunction>
-
 
 
 	<!---------------------------------------->
@@ -808,7 +727,6 @@
 			variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 			variables.instance.aStyles = ArrayNew(1);
 			variables.instance.aScripts = ArrayNew(1);
-			variables.instance.aEventListeners = ArrayNew(1);
 			variables.instance.aLayouts = ArrayNew(1);			// holds properties for layout sections
 			variables.instance.aModules = ArrayNew(1);		// holds modules		
 			variables.instance.stModuleIndex = structNew();	// an index of modules	

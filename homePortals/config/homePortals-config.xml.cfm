@@ -13,9 +13,6 @@
 	<!-- HomePortals page to load when no page has been provided -->
 	<defaultPage>default</defaultPage>
 
-	<!-- Event raised when a HomePortals page finishes loading -->
-	<initialEvent>Framework.onPageLoaded</initialEvent>
-
 	<!-- The maximum number of homeportals pages to cache at any given time -->
 	<pageCacheSize>50</pageCacheSize>
 

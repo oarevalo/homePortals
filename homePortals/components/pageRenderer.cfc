@@ -77,7 +77,6 @@
 
 			// replace simple values
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_ONLOAD$", getBodyOnLoad(), "ALL");
 
 			// search and replace "Page Properties"
 			index = 1;
@@ -231,12 +230,9 @@
 		<cfset var i = 0>
 		<cfset var aStylesheets = variables.stPage.page.stylesheets>
 		<cfset var aScripts = variables.stPage.page.scripts>
-		<cfset var aEventListeners = variables.stPage.page.eventListeners>
 		<cfset var aMeta = variables.stPage.page.meta>
 		<cfset var moduleID = "">
 		<cfset var tmpHTML = "">
-		<cfset var tmpHTML2 = "">
-		<cfset var appRoot = getHomePortals().getConfig().getAppRoot()>
 		
 		<!--- Add user-defined meta tags --->
 		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
@@ -261,27 +257,6 @@
 			<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
 		</cfloop>
 		
-		<!--- Process event listeners --->
-		<cfsavecontent variable="tmpHTML2">
-			<cfoutput>
-			<script type="text/javascript">
-				/*********** Set app root **********/
-				h_appRoot = "#jsStringFormat(appRoot)#";
-				h_pageHREF = "#jsStringFormat(variables.pageHREF)#";
-				
-				/*********** Raise events by modules *************/
-				function h_raiseEvent(objectName, eventName, args) {
-					<cfloop from="1" to="#ArrayLen(aEventListeners)#" index="i">
-						if(objectName=="#aEventListeners[i].objectName#" && eventName=="#aEventListeners[i].eventName#") {
-							try {#aEventListeners[i].eventHandler#(args);} catch(e) {alert(e);}
-						}
-					</cfloop>
-				}
-			</script>
-			</cfoutput>
-		</cfsavecontent>
-		<cfset tmpHTML = tmpHTML & tmpHTML2>
-		
 		<!--- Add html head code rendered by content tags --->
 		<cfloop list="#variables.lstRenderedContent#" index="moduleID">
 			<cfif variables.contentBuffer.head.containsID(moduleID)>
@@ -300,14 +275,7 @@
 		 
 		<cfreturn tmpHTML>
 	</cffunction>
-	
-	<!--------------------------------------->
-	<!----  getBodyOnLoad				----->
-	<!--------------------------------------->
-	<cffunction name="getBodyOnLoad" access="public" returntype="string" output="false" hint="Returns the javascript statement to run on the onLoad attribute of the body tag">
-		<cfreturn getHomePortals().getConfig().getBodyOnLoad()>
-	</cffunction>	
-	
+		
 	<!--------------------------------------->
 	<!----  getPageHREF					----->
 	<!--------------------------------------->
@@ -356,7 +324,6 @@
 			variables.stPage.page.href = "";			// address of the page
 			variables.stPage.page.title = "";		// page title
 			variables.stPage.page.pageTemplate = "";		// page title
-			variables.stPage.page.eventListeners = arrayNew(1);
 			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
 
 			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
@@ -405,7 +372,6 @@
 			if(arguments.page.getPageTemplate() neq "")
 				variables.stPage.page.pageTemplate = arguments.page.getPageTemplate();		// page template
 
-			variables.stPage.page.eventListeners.addAll(arguments.page.getEventListeners());
 			variables.stPage.page.meta.addAll(arguments.page.getMetaTags());			// holds html meta tags
 
 			// scripts
