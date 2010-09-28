@@ -149,7 +149,13 @@
 
 	</cffunction>
 	
-
+	<!-------------------------------------->
+	<!--- hasItem                 	  --->
+	<!-------------------------------------->	
+	<cffunction name="hasItem" access="public" returntype="any" hint="Returns whether the item exists on the cache or not">
+		<cfargument name="key" type="string" required="true">
+		<cfreturn structKeyExists(variables.stData, arguments.key)>
+	</cffunction>
 	
 	<!-------------------------------------->
 	<!--- store                         	  --->

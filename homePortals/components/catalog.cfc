@@ -2,121 +2,92 @@
 
 	<cfscript>
 		variables.FIELD_LIST = "libpath,type,id,href,package,description,createdOn";
-		variables.mapResources = structNew();
-		variables.mapIndexes = structNew();
 		variables.oResourceLibraryManager = 0;
-		variables.cacheServiceName = "catalogCacheService";
+		variables.contentCacheServiceName = "catalogContentCacheService";
+		variables.indexCacheServiceName = "catalogIndexesCacheService";
 	</cfscript>
 	
 	<!---------------------------------------->
 	<!--- init					           --->
 	<!---------------------------------------->	
 	<cffunction name="init" access="public" returntype="catalog" hint="This is the constructor">
-		<cfargument name="resourceLibraryManager" type="resourceLibraryManager" required="true" hint="An instance of the resource library manager">
-		<cfargument name="indexLibrary" type="boolean" required="false" default="false" hint="Flag to indicate whether or not to perform a full index of the entire resource library. Depending on the amount of resources on the library this operation may take some time to complete. The default is False">
+		<cfargument name="config" type="homePortalsConfigBean" hint="main configuration bean for the application">
+		<cfscript>
+			var oCacheService = 0;
+			var oCacheRegistry = createObject("component","cacheRegistry").init();
 
-		<cfset variables.oResourceLibraryManager = arguments.resourceLibraryManager>
+			// create and register the cache for catalog contents (this caches resource beans)
+			oCacheService = createObject("component","cacheService").init(arguments.config.getCatalogCacheSize(), 
+																			arguments.config.getCatalogCacheTTL());
+			oCacheRegistry.register(variables.contentCacheServiceName, oCacheService);
 
-		<cfif arguments.indexLibrary>
-			<cfset index()>
-		</cfif>
-		
-		<cfreturn this>
+			// create and register the cache for the catalog indexes 
+			oCacheService = createObject("component","cacheService").init(arguments.config.getCatalogCacheSize(), 
+																			arguments.config.getCatalogCacheTTL());
+			oCacheRegistry.register(variables.indexCacheServiceName, oCacheService);
+
+			return this;
+		</cfscript>		
 	</cffunction>
 
+
 	<!---------------------------------------->
-	<!--- getResourceLibraryManager		   --->
+	<!--- ResourceLibraryManager		   --->
 	<!---------------------------------------->	
 	<cffunction name="getResourceLibraryManager" access="public" returntype="resourceLibraryManager">
 		<cfreturn variables.oResourceLibraryManager>
 	</cffunction> 
+	<cffunction name="setResourceLibraryManager" access="public" returntype="void">
+		<cfargument name="obj" type="resourceLibraryManager" required="true">
+		<cfset variables.oResourceLibraryManager = arguments.obj />
+	</cffunction> 
 
-
-
-
-	<!---------------------------------------->
-	<!--- getResourcesByType         --->
-	<!---------------------------------------->	
-	<cffunction name="getResourcesByType" access="public" returntype="query" output="False" hint="Returns all resources of a given type">
-		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
-		<cfargument name="resLibPath" type="string" required="false" default="" hint="Restricts the resources to a single resource library">
-
-		<cfset var qry = queryNew("")>
-		
-		<cfif not StructKeyExists(variables.mapResources, arguments.resourceType)
-				or not StructKeyExists(variables.mapIndexes, arguments.resourceType)>
-			<cfset loadResourcesByType(arguments.resourceType)>
-		</cfif>
-		
-		<cfset qry = variables.mapIndexes[arguments.resourceType] />
-		
-		<cfif arguments.resLibPath neq "">
-			<cfquery name="qry" dbtype="query">
-				SELECT *
-					FROM qry
-					WHERE libpath = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resLibPath#"> 
-			</cfquery>
-		</cfif>
-		
-		<cfreturn qry />
-	</cffunction>
 		
 	<!---------------------------------------->
-	<!--- getResourceNode				   --->
+	<!--- getResource					   --->
 	<!---------------------------------------->	
-	<cffunction name="getResourceNode" access="public" returntype="any" hint="Returns the tree node for a given resource on this catalog">
-		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
-		<cfargument name="resourceID" type="string" required="true" hint="Path to the resource.">
+	<cffunction name="getResource" access="public" returntype="resourceBean" hint="Returns the requested resource bean from the catalog">
+		<cfargument name="type" type="string" required="true" hint="Type of resource">
+		<cfargument name="id" type="string" required="true" hint="Identifies the resource. This can be either the resourceID of the resource, or can be of the form 'packageName.resourceID' or 'packageName/resourceID'. Using the latter improves resource lookup performance for non cached resources.">
 		<cfargument name="forceReload" type="boolean" required="false" default="false" hint="forces a reload of the resource, ignoring any cached instance">
 		
 		<cfscript>
-			var stResourceInfo = structNew();
 			var oResBean = 0;
 			var cacheKey = "";
+			var package = "";
+			var resourceID = arguments.id;
+			var loadFromSource = arguments.forceReload;
+			var delimChar = "/";
 			
-			// Make sure the resourceID does not have any XML escaped characters
-			arguments.resourceID = XMLUnformat(arguments.resourceID);
-
-			// check if the resource type has been loaded and that the requested resource is in memory,
-			// if not, then load the resource type to memory
-			if(not StructKeyExists(variables.mapResources, arguments.resourceType)
-				or not StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)) {
-				loadResourcesByType(arguments.resourceType);
+			// allow resources to be identified by "packageName/resourceID" notation.
+			if(listLen(arguments.id,delimChar) eq 2) {
+				package = listFirst(arguments.id, delimChar);
+				resourceID = listLast(arguments.id, delimChar);
 			}
 
-			// check again if the resource has been loaded to memory
-			if(StructKeyExists(variables.mapResources, arguments.resourceType)
-				and StructKeyExists(variables.mapResources[arguments.resourceType], arguments.resourceID)) {
-				stResourceInfo = variables.mapResources[arguments.resourceType][arguments.resourceID];
-			} else {
-				// reload package from file system
-				throw("Resource [#arguments.resourceID#] of type [#arguments.resourceType#] does not exist", "homePortals.catalog.resourceNotFound");
+			// check the index to see if we know the package for that resource (if we know the package, the lookup is faster)
+			if(package eq "" and getIndexCacheService().hasItem(arguments.type)) {
+				qry = getIndexCacheService().retrieve(arguments.type);
+				qry = filterQuery(qry,"id",resourceID);
+				package = qry.package;
 			}
-			
-			// if the cache for the catalog has been enabled, then first check if the resource is already cached
-			if(hasCacheService()) {
 
-				// generate a key for the cache entry
-				cacheKey = "//" & arguments.resourceType & "/" & stResourceInfo.package & "/" & arguments.resourceID;
-				
+			// build the key used for storing item in cache
+			cacheKey = "//" & arguments.type & "/" & package & "/" & resourceID;
+			
+			// try to read item from cache
+			if(not loadFromSource) {
 				try {
-					// if we are forcing a reload, then we make it look like it wasnt in the cache
-					if(forceReload) throw("","homePortals.cacheService.itemNotFound");
-					
-					// read from cache
-					oResBean = getCacheService().retrieve(cacheKey);
-				
+					oResBean = getContentCacheService().retrieve(cacheKey);
 				} catch(homePortals.cacheService.itemNotFound e) {
-					// read from source
-					oResBean = getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID);
-					
-					// update cache
-					getCacheService().store(cacheKey, oResBean);
+					loadFromSource = true;
 				}
-			
-			} else {
-				// not using catalog cache, so just read the resource from the library
-				oResBean = getResourceLibraryManager().getResource(arguments.resourceType, stResourceInfo.package, arguments.resourceID);
+			}
+
+			// load item from resource library and store in cache
+			if(loadFromSource) {
+				oResBean = getResourceLibraryManager().getResource(arguments.type, package, resourceID);
+				getContentCacheService().store(cacheKey, oResBean);
 			}
 			
 			return oResBean;
@@ -124,201 +95,170 @@
 	</cffunction>	
 
 	<!---------------------------------------->
-	<!--- deleteResourceNode			   --->
-	<!---------------------------------------->	
-	<cffunction name="deleteResourceNode" access="public" returntype="any" hint="Deletes the given resource node on this catalog">
-		<cfargument name="resourceType" type="string" required="true" hint="Type of resource">
-		<cfargument name="resourceID" type="string" required="true" hint="ID of the resource">
-
-		<cfif StructKeyExists(variables.mapResources, arguments.resourceType)>
-			<cfset structDelete(variables.mapResources[arguments.resourceType], arguments.resourceID, false)>
-			<cfset populateResourcesQuery()>
-		</cfif>
-	</cffunction>		
-
-	<!---------------------------------------->
 	<!--- index							   --->
 	<!---------------------------------------->	
-	<cffunction name="index" access="public" returntype="void" hint="Crawls the resource library indexing all available resources. Depending on the amount of resources this operation may take some time to complete">
+	<cffunction name="index" access="public" returntype="void" hint="Crawls the available resource libraries indexing available resources. Indexing can be restricted to a specific resource type and package. Depending on the amount of resources this operation may take some time to complete">
+		<cfargument name="resourceType" type="string" required="false" default="">
+		<cfargument name="packageName" type="string" required="false" default="">
 		<cfscript>
 			var i = 1;
-			var oResourceLibrary = 0;
-			var aResources = arrayNew(1);
+			var aTypes = arrayNew(1);
 
-			// clear the catalog
-			variables.mapResources = structNew();
-			variables.mapIndexes = structNew();
+			if(arguments.resourceType eq "") {
+				// clears the catalog index
+				getIndexCacheService().clear();
 
-			// create an instance of the resourceLibrary object
-			oResourceLibrary = getResourceLibraryManager();
-			
-			aTypes = oResourceLibrary.getResourceTypes();
-			
-			for(i=1;i lte arrayLen(aTypes);i=i+1) {
-				loadResourcesByType(aTypes[i]);
-			}	
+				aTypes = getResourceLibraryManager().getResourceTypes();
+				for(i=1;i lte arrayLen(aTypes);i=i+1) {
+					loadResources(aTypes[i]);
+				}	
+			} else {
+				loadResources(arguments.resourceType, arguments.packageName);
+			}
 		</cfscript>
 	</cffunction>
 
 	<!---------------------------------------->
-	<!--- getResources				         --->
+	<!--- getIndex						   --->
 	<!---------------------------------------->	
-	<cffunction name="getResources" access="public" returntype="query" output="False" hint="Returns all resources currently indexed. To obtain a complete list of all resources in the library you must first call the index() method in this component or use the methods in the ResourceLibrary component">
+	<cffunction name="getIndex" access="public" returntype="query" output="False" hint="Returns a recordset with an index of the available resources. The index can be restricted to a specific resource type. Be aware that if the resourceType argument is not given, then this method calls index() internally so if there are too many resources it can take a while to complete.">
+		<cfargument name="resourceType" type="string" required="false" default="">
+		<cfargument name="packageName" type="string" required="false" default="">
 		<cfscript>
 			var	qry = queryNew(variables.FIELD_LIST);
 			var stResourceBean = structNew();
 			var resType = "";
 			var resID = "";
+			var indexCache = getIndexCacheService();
 			
-			for(resType in variables.mapResources) {
-				for(resID in variables.mapResources[resType]) {
-					
-					stResourceBean = variables.mapResources[resType][resID];
-					
-					queryAddRow(qry);
-
-					for(fld in stResourceBean) {
-						if(listFindNoCase(variables.FIELD_LIST,fld)) {
-							querySetCell(qry, fld, stResourceBean[fld]);
+			if(arguments.resourceType eq "") {
+				index();	// index all libraries
+			
+				resourceTypes = indexCache.list();
+				for(i=1;i lte arrayLen(resourceTypes);i++) {
+					resType = resourceTypes[i];
+					qryType = indexCache.retrieve(resType);
+					for(j=1;j lte qryType.recordCount;j++) {
+						queryAddRow(qry);
+						for(k=1;k lte listLen(qryType.columnList);k++) {
+							fld = listGetAt(qryType.columnList,k);
+							if(listFindNoCase(variables.FIELD_LIST,fld)) {
+								querySetCell(qry, fld, qryType[fld][k]);
+							}
 						}
 					}
 				}
+
+			} else if(arguments.packageName eq "") {
+				if(not indexCache.hasItem(arguments.resourceType))
+					index(arguments.resourceType);
+				qry = indexCache.retrieve(arguments.resourceType);
+
+			} else {
+				if(not indexCache.hasItem(arguments.resourceType))
+					index(arguments.resourceType, arguments.packageName);
+				qry = indexCache.retrieve(arguments.resourceType);
+				qry = filterQuery(qry,"package",arguments.packageName);
 			}
 			
 			return qry;
 		</cfscript>
 	</cffunction>
 		
+
 	<!---------------------------------------->
-	<!--- reloadPackage				       --->
+	<!--- cacheServices					   --->
 	<!---------------------------------------->	
-	<cffunction name="reloadPackage" access="public" returntype="void" hint="Reloads all resources of the given type in the given package">
-		<cfargument name="resourceType" type="string" required="true">
-		<cfargument name="packageName" type="string" required="true">
-		<cfset loadResourcesByType(arguments.resourceType, arguments.packageName) />
-	</cffunction>
+	<cffunction name="getContentCacheService" access="public" returntype="cacheService">
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
+		<cfreturn oCacheRegistry.getCache(variables.contentCacheServiceName)>
+	</cffunction> 
+	<cffunction name="getIndexCacheService" access="public" returntype="cacheService">
+		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
+		<cfreturn oCacheRegistry.getCache(variables.indexCacheServiceName)>
+	</cffunction> 
+
 
 
 	<!--- * * * *     P R I V A T E     M E T H O D S   * * * * 	   --->
 
-	<!---------------------------------------->
-	<!--- populateResourcesQuery		   --->
-	<!---------------------------------------->	
-	<cffunction name="populateResourcesQuery" access="private" returntype="void" hint="Puts all resources into a query to improve performance while searching and listing">
-		<cfscript>
-			var rt=0; 
-			var fldList="";
-			var start = getTickCount();
-			var stResourceBean = structNew();
-			var resType = "";
-			var resID = "";
-			var qry = 0;
-			var fld = "";
-			var prop = "";
-			
-			for(resType in variables.mapResources) {
-				rt = getResourceLibraryManager().getResourceTypeRegistry().getResourceType(resType);
-				fldList = listAppend(variables.FIELD_LIST, structKeyList( rt.getProperties() ));
-				
-				qry = queryNew(fldList);
-				
-				for(resID in variables.mapResources[resType]) {
-					stResourceBean = variables.mapResources[resType][resID];
-					
-					queryAddRow(qry);
-
-					for(fld in stResourceBean) {
-						if(fld neq "customProperties") {
-							if(listFindNoCase(fldList,fld)) {
-								querySetCell(qry, fld, stResourceBean[fld]);
-							}
-						} else {
-							for(prop in stResourceBean.customProperties) {
-								if(listFindNoCase(fldList,prop)) {
-									querySetCell(qry, prop, stResourceBean.customProperties[prop]);
-								}
-							}
-						}
-					}
-				}
-				variables.mapIndexes[resType] = qry;
-			}
-			variables.stTimers.populateResourcesQuery = getTickCount()-start;
-		</cfscript>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- loadResourcesByType			   --->
-	<!---------------------------------------->	
-	<cffunction name="loadResourcesByType" access="private" returntype="void" hint="loads into memory all resources of the given type">
+	<cffunction name="loadResources" access="private" returntype="void" hint="loads into memory all resources of the given type and package">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="packageName" type="string" required="false" default="">
 		<cfscript>
-			var qry = QueryNew("");
-			var i = 1; var j = 0;
-			var oResourceLibrary = 0;
+			var qryIndex = 0; var qryNewIndex = 0;
+			var i = 1; var rt = 0; 
+			var fldList = ""; var qryPackages = 0;
+			var resourceLibraryManager = getResourceLibraryManager();
+			var indexCache = getIndexCacheService();
+	
+			// if we are loading all packages, then clear any existing cache
+			if(arguments.packageName eq "") {
+				indexCache.flush(arguments.resourceType);
+			}
+
+			if(not indexCache.hasItem(arguments.resourceType)) {
+				rt = resourceLibraryManager.getResourceTypeRegistry().getResourceType(arguments.resourceType);
+				fldList = listAppend(variables.FIELD_LIST, structKeyList( rt.getProperties()) );
+				qryIndex = queryNew(fldList);
+			} else {
+				qryIndex = indexCache.retrieve(arguments.resourceType);
+			}
+				
+			if(arguments.packageName eq "") {
+				qryPackages = resourceLibraryManager.getResourcePackagesList(arguments.resourceType);
+				for(i=1;i lte qryPackages.recordCount;i=i+1) {
+					qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, qryPackages.name[i]);
+				}
+			} else {
+				qryIndex = filterQuery(qryIndex,"package",arguments.packageName,"cf_sql_varchar","!=");
+				qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, arguments.packageName);
+			}
+
+			indexCache.store(arguments.resourceType, qryIndex);
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="addResourcesFromPackage" access="private" returntype="query">
+		<cfargument name="qryIndex" type="query" required="true">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfargument name="packageName" type="string" required="true">
+		<cfscript>
+			var resourceLibraryManager = getResourceLibraryManager();
 			var aResources = arrayNew(1);
 			var stResourceBean = structNew();
-			var st = structNew();
-	
-			// create an instance of the resourceLibrary object
-			oResourceLibrary = getResourceLibraryManager();
+			var rt = ""; var customFldList = ""; var i=0;
+			var prop = "";
 
-			// clear existing map for this resource type
-			if(arguments.packageName eq "") {
-				variables.mapResources[arguments.resourceType] = structNew();
-			}
+			// get all resources on the given package
+			aResources = resourceLibraryManager.getResourcesInPackage(arguments.resourceType, arguments.packageName);
+
+			// create empty query
+			rt = resourceLibraryManager.getResourceTypeRegistry().getResourceType(arguments.resourceType);
+			customFldList = structKeyList( rt.getProperties() );
+
+			// store the resources
+			for(i=1;i lte arrayLen(aResources);i=i+1) {
+				stResourceBean = aResources[i].getMemento();
 			
-			// get list of resource packages
-			qry = oResourceLibrary.getResourcePackagesList(arguments.resourceType);
+				queryAddRow(qryIndex);
+				querySetCell(qryIndex, "type", stResourceBean.type);
+				querySetCell(qryIndex, "id", stResourceBean.id);
+				querySetCell(qryIndex, "HREF", stResourceBean.HREF);
+				querySetCell(qryIndex, "Package", stResourceBean.Package);
+				querySetCell(qryIndex, "Description", stResourceBean.Description);
+				querySetCell(qryIndex, "libpath", stResourceBean.resourceLibrary.getPath());
+				querySetCell(qryIndex, "createdOn", stResourceBean.createdOn);
 
-			// add resources to the catalog
-			for(i=1;i lte qry.recordCount;i=i+1) {
-				if(arguments.packageName eq "" or arguments.packageName eq qry.name[i]) {
-
-					// get all resources on the current package
-					aResources = oResourceLibrary.getResourcesInPackage(arguments.resourceType, qry.name[i]);
-
-					// store the resources in a map
-					for(j=1;j lte arrayLen(aResources);j=j+1) {
-						stResourceBean = aResources[j].getMemento();
-	
-						// create resource map entry
-						st = structNew();
-						st.type = stResourceBean.type;
-						st.id = stResourceBean.id;
-						st.HREF = stResourceBean.HREF;
-						st.Package = stResourceBean.Package;
-						st.Description = stResourceBean.Description;
-						st.libpath = stResourceBean.resourceLibrary.getPath();
-						st.createdOn = stResourceBean.createdOn;
-						st.customProperties = stResourceBean.customProperties;
-	
-						// add resource to map
-						variables.mapResources[stResourceBean.type][stResourceBean.id] = duplicate(st);
+				for(prop in stResourceBean.customProperties) {
+					if(listFindNoCase(customFldList,prop)) {
+						querySetCell(qryIndex, prop, stResourceBean.customProperties[prop]);
 					}
 				}
 			}
 
-			// recreate query of resources
-			populateResourcesQuery();		
+			return qryIndex;
 		</cfscript>
-	</cffunction>
-
-	<!---------------------------------------->
-	<!--- hasCacheService				   --->
-	<!---------------------------------------->	
-	<cffunction name="hasCacheService" access="private" returntype="boolean" hint="Checks whether the cache for the catalog has been registered">
-		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
-		<cfreturn oCacheRegistry.isRegistered(variables.cacheServiceName)>
-	</cffunction>
-	
-	<!---------------------------------------->
-	<!--- getCacheService				   --->
-	<!---------------------------------------->	
-	<cffunction name="getCacheService" access="private" returntype="cacheService" hint="Retrieves a cacheService instance used for caching resources in the catalog">
-		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
-		<cfreturn oCacheRegistry.getCache(variables.cacheServiceName)>
 	</cffunction>
 
 
@@ -343,17 +283,20 @@
 		<cfargument name="data" type="any">
 		<cfdump var="#arguments.data#" output="console">
 	</cffunction>
-
-	<cffunction name="XMLUnformat" access="private" returntype="string">
-		<cfargument name="string" type="string" default="">
-		<cfscript>
-			var resultString=arguments.string;
-			resultString=ReplaceNoCase(resultString,"&apos;","'","ALL");
-			resultString=ReplaceNoCase(resultString,"&quot;","""","ALL");
-			resultString=ReplaceNoCase(resultString,"&lt;","<","ALL");
-			resultString=ReplaceNoCase(resultString,"&gt;",">","ALL");
-			resultString=ReplaceNoCase(resultString,"&amp;","&","ALL");
-		</cfscript>
-		<cfreturn resultString>
-	</cffunction>				
+	
+	<cffunction name="filterQuery" access="private" returntype="query">
+		<cfargument name="query" type="query" required="true">
+		<cfargument name="fieldName" type="string" required="true">
+		<cfargument name="fieldValue" type="string" required="true">
+		<cfargument name="fieldType" type="string" required="false" default="cf_sql_varchar">
+		<cfargument name="condition" type="string" required="false" default="=">
+		<cfset var qry = 0 />
+		<cfquery name="qry" dbtype="query">
+			SELECT *
+				FROM arguments.query
+				WHERE #arguments.fieldName# = <cfqueryparam cfsqltype="#arguments.fieldType#" value="#arguments.fieldValue#">
+		</cfquery>
+		<cfreturn qry />
+	</cffunction>
+	
 </cfcomponent>

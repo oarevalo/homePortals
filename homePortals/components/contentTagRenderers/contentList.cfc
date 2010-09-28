@@ -21,7 +21,7 @@
 			var moduleID = getContentTag().getAttribute("id");
 			var resourceType = getContentTag().getAttribute("resourceType",variables.CONTENT_RES_TYPE );
 			var oCatalog = getPageRenderer().getHomePortals().getCatalog();
-			var qryRes = oCatalog.getResourcesByType(resourceType);
+			var qryRes = oCatalog.getIndex(resourceType);
 			var orderBy = getContentTag().getAttribute("orderBy",variables.DEFAULT_ORDER_BY_STR);
 			var maxItems = getContentTag().getAttribute("maxItems",variables.DEFAULT_ITEMS_TO_DISPLAY);
 			
@@ -84,7 +84,7 @@
 						<cfif arguments.qryData.description neq "">
 							<cfset tmpBody = arguments.qryData.description>
 						<cfelse>
-							<cfset resource = oCatalog.getResourceNode(arguments.qrydata.type, arguments.qrydata.id)>
+							<cfset resource = oCatalog.getResource(arguments.qrydata.type, arguments.qrydata.package & "/" & arguments.qrydata.id)>
 							<cfif resource.targetFileExists()>
 								<cfset tmpBody = resource.readFile()>
 								<cfset tmpBody = reReplace(tmpBody, "</?\w+(\s*[\w:]+\s*=\s*(""[^""]*""|'[^']*'))*\s*/?>", " ", "all") />

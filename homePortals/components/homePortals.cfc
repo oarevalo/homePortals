@@ -166,11 +166,18 @@
 			var oCacheService = 0;
 			var ppClass = "";
 
+			// initialize cache registry
+			oCacheRegistry = createObject("component","cacheRegistry").init();
+			if(arguments.initPlugins) {
+				oCacheRegistry.flush();		// clear registry
+			}
+
 			// initialize resource library manager
 			variables.oResourceLibraryManager = CreateObject("Component","resourceLibraryManager").init(variables.oHomePortalsConfigBean);
 			
 			// initialize resource catalog
-			variables.oCatalog = CreateObject("Component","catalog").init(variables.oResourceLibraryManager);
+			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean);
+			variables.oCatalog.setResourceLibraryManager(variables.oResourceLibraryManager);
 
 			// initialize page provider
 			variables.oPageProvider = createObject("component", variables.oHomePortalsConfigBean.getPageProviderClass() ).init(variables.oHomePortalsConfigBean);
@@ -178,27 +185,13 @@
 			// initialize page loader
 			variables.oPageLoader = createObject("component","pageLoader").init( variables.oPageProvider );
 
-			// initialize cache registry
-			oCacheRegistry = createObject("component","cacheRegistry").init();
-			if(arguments.initPlugins) {
-				oCacheRegistry.flush();		// clear registry
-			}
-
 			// crate page cache instance
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
 																			variables.oHomePortalsConfigBean.getPageCacheTTL());
 			oCacheRegistry.register("hpPageCache", oCacheService);
 
-
-			// crate catalog cache instance
-			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getCatalogCacheSize(), 
-																			variables.oHomePortalsConfigBean.getCatalogCacheTTL());
-			oCacheRegistry.register("catalogCacheService", oCacheService);
-
-
 			// initialize template manager
 			variables.oTemplateManager = createObject("component","templateManager").init(variables.oHomePortalsConfigBean);
-
 						
 			// register and initialize plugins (this flag is to allow plugins to reinit the environment without getting into an infinite loop)
 			if(arguments.initPlugins) {

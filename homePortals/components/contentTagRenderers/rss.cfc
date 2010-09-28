@@ -202,7 +202,7 @@
 		<cfset var oCatalog = getPageRenderer().getHomePortals().getCatalog()>
 
 		<cfif resourceID neq "">
-			<cfset oResourceBean = oCatalog.getResourceNode("feed", resourceID)>
+			<cfset oResourceBean = oCatalog.getResource("feed", resourceID)>
 			<cfif oResourceBean.isExternalTarget()>
 				<cfset rssURL = oResourceBean.getHREF()>
 			<cfelse>
