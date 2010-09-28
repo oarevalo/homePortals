@@ -35,7 +35,7 @@
 					oResBean = getPageRenderer()
 									.getHomePortals()
 									.getCatalog()
-									.getResourceNode(resourceType, resourceID);
+									.getResource(resourceType, resourceID);
 					
 					if(oResBean.targetFileExists()) {
 						tmpHTML = oResBean.readFile();
@@ -129,7 +129,7 @@
 			// define source of content (resource or external)
 			if(resourceID neq "") {
 				oCatalog = getPageRenderer().getHomePortals().getCatalog();
-				oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
+				oResourceBean = oCatalog.getResource(resourceType, resourceID);
 				if(oResourceBean.getHref() neq "") {
 					tmpHTML = oResourceBean.readFile();
 				}

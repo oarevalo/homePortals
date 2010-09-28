@@ -65,7 +65,7 @@
 			var resourceType = getContentTag().getAttribute("resourceType","image");
 			
 			// define source of content (resource or external)
-			var oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
+			var oResourceBean = oCatalog.getResource(resourceType, resourceID);
 			
 			return oResourceBean;
 		</cfscript>
