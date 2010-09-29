@@ -51,8 +51,10 @@
 		<cfscript>
 			var defaultConfigFilePath = "";
 			var start = getTickCount();
-			var aPlugins = []; 
+			var userPlugins = []; 
+			var hpPlugins = []; 
 			var pluginLoader = 0; 
+			var userConfigBean = 0;
 			var i = 0;
 
 			// check that appRoot has the right format
