@@ -49,31 +49,32 @@
 		<cfargument name="appRoot" type="string" required="false" default="" hint="Root directory of the application as a relative URL">
 		<cfargument name="config" type="any" required="false" hint="Provides an explicit configuration to load. This can be a an instance of homePortalsConfigBean, an XML object or a string containing the configuration. If this parameter is missing, HomePortals will try to locate a config file in the app directory" />
 		<cfscript>
-			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
 			var start = getTickCount();
-			var hpContentRoot = "";
-			var aPlugins = []; pluginLoader = 0; i = 0;
-			var addDefaultLibPath = false;
+			var aPlugins = []; 
+			var pluginLoader = 0; 
+			var i = 0;
 
 			// check that appRoot has the right format
 			if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";
-
 			variables.appRoot = arguments.appRoot;
 
 			// create object to store configuration settings
 			variables.oHomePortalsConfigBean = createObject("component", "homePortalsConfigBean").init();
 
 			// load default configuration settings
-			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & ".." & pathSeparator & this.CONFIG_FILE_DIR & pathSeparator & this.CONFIG_FILE_NAME;
-			variables.oHomePortalsConfigBean.load(defaultConfigFilePath);
-			hpContentRoot = variables.oHomePortalsConfigBean.getContentRoot();
+			defaultConfigFilePath = variables.hpEngineRoot & variables.configFilePath;
+			variables.oHomePortalsConfigBean.load(expandPath(defaultConfigFilePath));
+
+			// set the appRoot on the config bean so that it is globally accessible
+			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
 
 			// load configuration settings for the application (overrides specific settings)
-			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
+			if(arguments.appRoot neq variables.hpEngineRoot) {
 
 				// create a config bean with the app configuration
 				userConfigBean = createObject("component", "homePortalsConfigBean").init();
+
 				if(structKeyExists(arguments,"config")) {
 					if(isXML(arguments.config) or isXMLDoc(arguments.config))
 						userConfigBean.loadXML(arguments.config);
@@ -89,9 +90,13 @@
 					userConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
 				}
 
-				// check if we will need to add the default res lib path later
+				// set a default content root and for the app
+				if(userConfigBean.getContentRoot() eq "")
+					userConfigBean.setContentRoot(arguments.appRoot);
+	
+				// make sure we always have a resource library, defaulting to the application root
 				if(userConfigBean.getResourceLibraryPath() eq "")
-					addDefaultLibPath = true;
+					userConfigBean.setResourceLibraryPath(arguments.appRoot);
 
 				// allow plugins to do any config changes they want
 				userPlugins = userConfigBean.getPlugins();
@@ -99,13 +104,12 @@
 				if(arrayLen(userPlugins) gt 0 or arrayLen(hpPlugins) gt 0) {
 					pluginLoader = createObject("component","pluginManager").init(this);
 
-					for(i=1;i lte arrayLen(userPlugins);i++) {
-						pluginLoader.registerPlugin(userPlugins[i].name, userPlugins[i].path);
-					}
 					for(i=1;i lte arrayLen(hpPlugins);i++) {
 						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path);
 					}
-
+					for(i=1;i lte arrayLen(userPlugins);i++) {
+						pluginLoader.registerPlugin(userPlugins[i].name, userPlugins[i].path);
+					}
 					pluginLoader.notifyPlugins("configLoad", userConfigBean);
 				}
 
@@ -113,22 +117,24 @@
 				variables.oHomePortalsConfigBean.loadXML(userConfigBean.toXML());
 
 			} else {
-				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
-				if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";	//normalize approot if obtained from config
+				// set a default content root and for the app
+				if(variables.oHomePortalsConfigBean.getContentRoot() eq "")
+					variables.oHomePortalsConfigBean.setContentRoot(arguments.appRoot);
+	
+				// make sure we always have a resource library, defaulting to the application root
+				if(variables.oHomePortalsConfigBean.getResourceLibraryPath() eq "")
+					variables.oHomePortalsConfigBean.setResourceLibraryPath(arguments.appRoot);
+
+				// allow plugins to do any config changes they want
+				hpPlugins = variables.oHomePortalsConfigBean.getPlugins();
+				if(arrayLen(userPlugins) gt 0 or arrayLen(hpPlugins) gt 0) {
+					pluginLoader = createObject("component","pluginManager").init(this);
+					for(i=1;i lte arrayLen(hpPlugins);i++) {
+						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path);
+					}
+					pluginLoader.notifyPlugins("configLoad", userConfigBean);
+				}
 			}
-
-			// set the appRoot to the given parameter, this way, we can get away without having a local config 
-			// and only pass the appRoot on the constructor
-			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
-
-			// if the application has not overriden the default contentRoot in the config, 
-			// use the application root as content root
-			if(variables.oHomePortalsConfigBean.getContentRoot() eq hpContentRoot and arguments.appRoot neq variables.hpEngineRoot)
-				variables.oHomePortalsConfigBean.setContentRoot(arguments.appRoot);
-
-			// make sure we always have a resource library, defaulting to the application root
-			if(addDefaultLibPath or variables.oHomePortalsConfigBean.getResourceLibraryPath() eq "")
-				variables.oHomePortalsConfigBean.setResourceLibraryPath(arguments.appRoot);
 
 			// initialize environment with current config
 			initEnv();
