@@ -146,7 +146,7 @@
 
 
 	<!--- check if there are users created --->
-	<cfset qryUserCheck = getHomePortals().getCatalog().getResourcesByType("cmsUser")>
+	<cfset qryUserCheck = getHomePortals().getCatalog().getIndex("cmsUser")>
 	<cfif qryUserCheck.recordCount eq 0>
 		<cfinclude template="views/vwCreateUser.cfm">
 		<cfexit method="exittemplate">

@@ -10,7 +10,7 @@
 	if(arguments.resourceID eq "_NOVALUE_") arguments.resourceID = "";
 	
 	if(arguments.resourceID neq "")
-		oResourceBean = oCatalog.getResourceNode(arguments.resourceType, arguments.resourceID, true);
+		oResourceBean = oCatalog.getResource(arguments.resourceType, arguments.resourceID, true);
 	else
 		oResourceBean = resLib.getNewResource(arguments.resourceType);
 	
@@ -198,7 +198,7 @@
 								</cfcase>
 								
 								<cfcase value="resource">
-									<cfset qryResources = oCatalog.getResourcesByType(resourceType)>
+									<cfset qryResources = oCatalog.getIndex(resourceType)>
 									<cfquery name="qryResources" dbtype="query">
 										SELECT *, upper(package) as upackage, upper(id) as uid
 											FROM qryResources

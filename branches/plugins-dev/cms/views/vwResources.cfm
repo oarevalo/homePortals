@@ -12,7 +12,7 @@
 </cfscript>
 
 <cfif resourceType neq "">
-	<cfset qryResources = oCatalog.getResourcesByType(resourceType)>
+	<cfset qryResources = oCatalog.getIndex(resourceType)>
 	<cfquery name="qryResources" dbtype="query">
 		SELECT *, upper(package) as upackage, upper(id) as uid
 			FROM qryResources
