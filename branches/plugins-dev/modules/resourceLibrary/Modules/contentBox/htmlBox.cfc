@@ -78,7 +78,7 @@
 			oResourceLibrary.saveResource(oResourceBean);
 		
 			// update catalog
-			oHP.getCatalog().reloadPackage(resourceType,siteOwner);
+			oHP.getCatalog().index(resourceType,siteOwner);
 					
 			setResourceID(resID);
 		</cfscript>
@@ -112,7 +112,7 @@
 			oResourceLibrary.deleteResource(arguments.resourceID, resourceType, siteOwner);
 
 			// remove from catalog
-			oHP.getCatalog().deleteResourceNode(resourceType, arguments.resourceID);
+			oHP.getCatalog().index(resourceType, arguments.resourceID);
 			
 			setResourceID("");
         </cfscript>
@@ -131,7 +131,7 @@
 			var j = 1;
 			var oHP = this.controller.getHomePortals();
 			var resourceType = getResourceType();			
-			var qryResources = oHP.getCatalog().getResourcesByType(resourceType);
+			var qryResources = oHP.getCatalog().getIndex(resourceType);
 		</cfscript>
 		
 		<cfquery name="qryResources" dbtype="query">
