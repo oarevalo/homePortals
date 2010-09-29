@@ -54,6 +54,7 @@
 			var start = getTickCount();
 			var hpContentRoot = "";
 			var aPlugins = []; pluginLoader = 0; i = 0;
+			var addDefaultLibPath = false;
 
 			// check that appRoot has the right format
 			if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";
@@ -87,6 +88,10 @@
 					variables.configFilePath = this.CONFIG_FILE_NAME;
 					userConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
 				}
+
+				// check if we will need to add the default res lib path later
+				if(userConfigBean.getResourceLibraryPath() eq "")
+					addDefaultLibPath = true;
 
 				// allow plugins to do any config changes they want
 				userPlugins = userConfigBean.getPlugins();
@@ -122,7 +127,7 @@
 				variables.oHomePortalsConfigBean.setContentRoot(arguments.appRoot);
 
 			// make sure we always have a resource library, defaulting to the application root
-			if(variables.oHomePortalsConfigBean.getResourceLibraryPath() eq "")
+			if(addDefaultLibPath or variables.oHomePortalsConfigBean.getResourceLibraryPath() eq "")
 				variables.oHomePortalsConfigBean.setResourceLibraryPath(arguments.appRoot);
 
 			// initialize environment with current config
