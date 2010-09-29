@@ -1,16 +1,15 @@
 <cfcomponent extends="homePortals.components.plugin" hint="This plugin provides a way of 'skinning' site pages. Skins are created as regular Resources and stored on the resource library. Skins are used on a per-page basis.">
 	<cfproperty name="skinID" type="resource:skin" required="false" hint="Use this property to define a default skin to be used for all pages. Can be overridden at page level.">
 
-	<cffunction name="onAppInit" access="public" returntype="void">
+	<cffunction name="onConfigLoad" access="public" returntype="homePortalsConfigBean" hint="this method is executed when the HomePortals configuration is being loaded and before the engine is fully initialized. This method should only be used to modify the current configBean.">
+		<cfargument name="eventArg" type="homePortalsConfigBean" required="true" hint="the application-provided config bean">	
 		<cfscript>
-			var oConfig = getHomePortals().getConfig();
-			var configPath = "/homePortals/plugins/skins/config/homePortals-config.xml.cfm";
+			var configPath = getDirectoryFromPath(getcurrentTemplatePath()) & "plugin-config.xml.cfm";
 
 			// load plugin config settings
-			oConfig.load(expandPath(configPath));
+			getHomePortals().getConfig().load(configPath);
 
-			// reinitialize environment to include new settings
-			getHomePortals().initEnv(false);
+			return arguments.eventArg;
 		</cfscript>
 	</cffunction>
 
@@ -24,7 +23,7 @@
 
 			if(pb.hasProperty("skinID") and pb.getProperty("skinID") neq "") {
 				try {
-					oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", pb.getProperty("skinID"));
+					oResourceBean = getHomePortals().getCatalog().getResource("skin", pb.getProperty("skinID"));
 					href = oResourceBean.getFullHref();
 
 					if(not page.stylesheets.contains( href )) {
