@@ -28,7 +28,8 @@
 		variables.hpEngineRoot = "/homePortals/";		// root directory for the homeportals engine
 		variables.appRoot = "";					// Root directory of the application as a relative URL
 		variables.oHomePortalsConfigBean = 0;	// bean to store config settings
-		variables.configFilePath = "#this.CONFIG_FILE_DIR#/#this.CONFIG_FILE_NAME#";  
+		variables.hpConfigFilePath = "#this.CONFIG_FILE_DIR#/#this.CONFIG_FILE_NAME#";
+		variables.configFilePath = variables.hpConfigFilePath;  
 												// path of the config file relative to the root of the application
 		
 		variables.oCatalog = 0;					// a handle to the resources catalog 
@@ -65,7 +66,7 @@
 			variables.oHomePortalsConfigBean = createObject("component", "homePortalsConfigBean").init();
 
 			// load default configuration settings
-			defaultConfigFilePath = variables.hpEngineRoot & variables.configFilePath;
+			defaultConfigFilePath = variables.hpEngineRoot & variables.hpConfigFilePath;
 			variables.oHomePortalsConfigBean.load(expandPath(defaultConfigFilePath));
 
 			// set the appRoot on the config bean so that it is globally accessible
