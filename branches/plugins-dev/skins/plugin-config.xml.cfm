@@ -11,7 +11,7 @@
 	
 	<!-- Directories where HomePortals will look for resources  -->
 	<resourceLibraryPaths>
-		<resourceLibraryPath>/homePortals/plugins/skins/resourceLibrary/</resourceLibraryPath>
+		<resourceLibraryPath>{pluginPath}/resourceLibrary/</resourceLibraryPath>
 	</resourceLibraryPaths>
 	
 </homePortals>
