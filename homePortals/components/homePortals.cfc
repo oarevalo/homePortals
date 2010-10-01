@@ -107,10 +107,10 @@
 					pluginLoader = createObject("component","pluginManager").init(this);
 
 					for(i=1;i lte arrayLen(hpPlugins);i++) {
-						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path);
+						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path, hpPlugins[i].properties);
 					}
 					for(i=1;i lte arrayLen(userPlugins);i++) {
-						pluginLoader.registerPlugin(userPlugins[i].name, userPlugins[i].path);
+						pluginLoader.registerPlugin(userPlugins[i].name, userPlugins[i].path, userPlugins[i].properties);
 					}
 					pluginLoader.notifyPlugins("configLoad", userConfigBean);
 				}
@@ -132,7 +132,7 @@
 				if(arrayLen(userPlugins) gt 0 or arrayLen(hpPlugins) gt 0) {
 					pluginLoader = createObject("component","pluginManager").init(this);
 					for(i=1;i lte arrayLen(hpPlugins);i++) {
-						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path);
+						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path, hpPlugins[i].properties);
 					}
 					pluginLoader.notifyPlugins("configLoad", userConfigBean);
 				}

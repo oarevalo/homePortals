@@ -179,18 +179,28 @@
 					}
 				
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
+						xmlThisNode = xmlNode.xmlChildren[j];
 
 						stTemp = structNew();
+						stTemp.name = "";
+						stTemp.path = "";
+						stTemp.properties = structNew();
 
-						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"name"))
+						if(Not structKeyExists(xmlThisNode.xmlAttributes,"name"))
 							throw("HomePortals config file is malformed. Missing 'name' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
 						else
-							stTemp.name = xmlNode.xmlChildren[j].xmlAttributes.name;
+							stTemp.name = xmlThisNode.xmlAttributes.name;
 
-						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"path"))
-							stTemp.path = "";
-						else
-							stTemp.path = xmlNode.xmlChildren[j].xmlAttributes.path;
+						if(structKeyExists(xmlThisNode.xmlAttributes,"path"))
+							stTemp.path = xmlThisNode.xmlAttributes.path;
+
+						for(k=1;k lte arrayLen(xmlThisNode.xmlChildren);k=k+1) {
+							if(xmlThisNode.xmlChildren[k].xmlName eq "property") {
+								stTemp.properties[xmlThisNode.xmlChildren[k].xmlAttributes.name] = structNew();
+								stTemp.properties[xmlThisNode.xmlChildren[k].xmlAttributes.name].name = xmlThisNode.xmlChildren[k].xmlAttributes.name;
+								stTemp.properties[xmlThisNode.xmlChildren[k].xmlAttributes.name].value = xmlThisNode.xmlChildren[k].xmlAttributes.value;
+							}
+						}
 
 						arrayAppend(variables.stConfig.plugins, stTemp);
 					}
@@ -413,10 +423,20 @@
 					xmlConfigDoc.xmlRoot.plugins.xmlAttributes["overwrite"] = true;
 				
 				for(i=1;i lte arrayLen(variables.stConfig.plugins);i=i+1) {
+					st = variables.stConfig.plugins[i];
+
 					tmpXmlNode = xmlElemNew(xmlConfigDoc,"plugin");
-					tmpXmlNode.xmlAttributes["name"] = variables.stConfig.plugins[i].name;
-					if(variables.stConfig.plugins[i].path neq "")
-						tmpXmlNode.xmlAttributes["path"] = variables.stConfig.plugins[i].path;
+					tmpXmlNode.xmlAttributes["name"] = st.name;
+					if(st.path neq "")
+						tmpXmlNode.xmlAttributes["path"] = st.path;
+
+					for(k in st.properties) {
+						tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"property");
+						tmpXmlNode2.xmlAttributes["name"] = st.properties[k].name;
+						tmpXmlNode2.xmlAttributes["value"] = st.properties[k].value;
+						ArrayAppend(tmpXmlNode.xmlChildren, tmpXmlNode2 );
+					}
+
 					ArrayAppend(xmlConfigDoc.xmlRoot.plugins.xmlChildren, tmpXmlNode );
 				}
 			}
@@ -621,6 +641,29 @@
 		</cfloop>
 		<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
 	</cffunction>	
+
+	<cffunction name="getPluginProperty" access="public" returntype="string" hint="Returns a property from a plugin">
+		<cfargument name="plugin" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfset var i = 0>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+			<cfif variables.stConfig.plugins[i].name eq arguments.plugin>
+				<cfreturn variables.stConfig.plugins[i].properties[arguments.name]>
+			</cfif>
+		</cfloop>
+		<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
+	</cffunction>
+
+	<cffunction name="getPluginProperties" access="public" returntype="string" hint="Returns all properties from a plugin">
+		<cfargument name="plugin" type="string" required="true">
+		<cfset var i = 0>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+			<cfif variables.stConfig.plugins[i].name eq arguments.plugin>
+				<cfreturn duplicate(variables.stConfig.plugins[i].properties)>
+			</cfif>
+		</cfloop>
+		<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
+	</cffunction>
 
 	<cffunction name="getPlugins" access="public" returntype="array" hint="returns an array of key-value entries with all declared plugins and their paths">
 		<cfreturn duplicate(variables.stConfig.plugins)>
@@ -874,6 +917,7 @@
 		<cfif not found>
 			<cfset st.name = arguments.name>
 			<cfset st.path = arguments.path>
+			<cfset st.properties = structNew()>
 			<cfset arrayAppend(variables.stConfig.plugins, st)>
 		</cfif>
 		<cfreturn this>
@@ -889,6 +933,35 @@
 			</cfif>
 		</cfloop>
 		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="setPluginProperty" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="plugin" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfset var i = 0>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+			<cfif variables.stConfig.plugins[i].name eq arguments.plugin>
+				<cfset variables.stConfig.plugins[i].properties[arguments.name] = structNew()>
+				<cfset variables.stConfig.plugins[i].properties[arguments.name].name = arguments.name>
+				<cfset variables.stConfig.plugins[i].properties[arguments.name].value = arguments.value>
+				<cfreturn this>
+			</cfif>
+		</cfloop>
+		<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
+	</cffunction>
+
+	<cffunction name="removePluginProperty" access="public" returntype="homePortalsConfigBean">
+		<cfargument name="plugin" type="string" required="true">
+		<cfargument name="name" type="string" required="true">
+		<cfset var i = 0>
+		<cfloop from="1" to="#arrayLen(variables.stConfig.plugins)#" index="i">
+			<cfif variables.stConfig.plugins[i].name eq arguments.plugin>
+				<cfset structDelete(variables.stConfig.plugins[i].properties, arguments.name, false)>
+				<cfreturn this>
+			</cfif>
+		</cfloop>
+		<cfthrow message="Unknown plugin" type="homePortals.config.invalidPluginName">
 	</cffunction>
 
 	<cffunction name="setResourceType" access="public" returntype="homePortalsConfigBean">
