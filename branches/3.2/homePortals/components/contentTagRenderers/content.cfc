@@ -1,8 +1,8 @@
 <cfcomponent extends="homePortals.components.contentTagRenderer"
 			 hint="Inserts a block of HTML-formatted content into the page. Content can be located on the same server or retrieved from an external URL. Content can also be obtained from the resource library.">
 
-	<cfproperty name="resourceID" type="resource:content" required="false"  displayname="ID of a resource of type 'content' to display." />
-	<cfproperty name="href" type="string" required="false" displayname="Indicates the location of an external document. Can be either a full URL starting with http:// or a relative url for a resource located in the same server." />
+	<cfproperty name="resourceID" type="resource:content" required="false" displayName="Resource ID" hint="ID of a resource of type 'content' to display." />
+	<cfproperty name="href" type="string" required="false" displayName="HREF" hint="Indicates the location of an external document. Can be either a full URL starting with http:// or a relative url for a resource located in the same server." />
 	
 	<!---
 		Optional attributes:
