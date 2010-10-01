@@ -3,6 +3,7 @@
 	<cfset variables.homePortals = 0>
 	<cfset variables._properties = structNew()>
 	<cfset variables._pluginName = "">
+	<cfset variables._pluginPath = "">
 	<cfset variables._pluginID = createUUID()>
 
 	<cffunction name="init" access="public" returntype="plugin" hint="constructor">
@@ -60,7 +61,7 @@
 		<cfscript>
 			var configXMLDoc = "";
 			var prop = "";
-			var defaultPath = getProperty("pluginPath", "/homePortals/plugins/" & getPluginName());
+			var defaultPath = "/" & replace(getDirectoryFromPath(replaceNoCase(getcurrentTemplatePath(), expandPath("/"), "")),"\","/","ALL");
 			var defaultCFCPath = getProperty("pluginCFCPath", "homePortals.plugins." & getPluginName());
 
 			// load config file
