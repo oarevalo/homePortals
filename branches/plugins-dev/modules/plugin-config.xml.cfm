@@ -3,10 +3,10 @@
 
 	<!-- The following resources are included in every page rendered. -->
 	<baseResources>
-		<resource href="/homePortals/plugins/modules/common/CSS/modules.css" type="style"/>	
-		<resource href="/homePortals/plugins/modules/common/JavaScript/Main.js" type="script"/>	
-		<resource href="/homePortals/plugins/modules/common/JavaScript/moduleClient.js" type="script"/>	
-		<resource href="/homePortals/plugins/modules/common/htmlhead.cfm" type="HTMLHEAD"/>
+		<resource href="{pluginPath}/common/CSS/modules.css" type="style"/>	
+		<resource href="{pluginPath}/common/JavaScript/Main.js" type="script"/>	
+		<resource href="{pluginPath}/common/JavaScript/moduleClient.js" type="script"/>	
+		<resource href="{pluginPath}/common/htmlhead.cfm" type="HTMLHEAD"/>
 	</baseResources>
 
 	<!-- The following are the different types of modules or content renderers that will be supported on a page -->
@@ -25,7 +25,7 @@
 	
 	<pageProperties>
 		<property name="plugins.modules.defaults.modulesGateway" value="gateway.cfm"/>
-		<property name="plugins.modules.defaults.bundledReosurceLibraryPath" value="/homePortals/plugins/modules/resourceLibrary/" />
+		<property name="plugins.modules.defaults.bundledReosurceLibraryPath" value="{pluginPath}/resourceLibrary/" />
 		<property name="plugins.modules.defaults.loadBundledResourceLibrary" value="true" />
 		<property name="plugins.modules.defaults.accountsDataPath" value="{appRoot}/accountsData" />
 		<property name="plugins.modules.initialEvent" value="Framework.onPageLoaded" />
