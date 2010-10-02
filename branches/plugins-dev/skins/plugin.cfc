@@ -1,8 +1,8 @@
 <cfcomponent extends="homePortals.components.plugin" hint="This plugin provides a way of 'skinning' site pages. Skins are created as regular Resources and stored on the resource library. Skins are used on a per-page basis.">
 	<cfproperty name="skinID" type="resource:skin" required="false" hint="Use this property to define a default skin to be used for all pages. Can be overridden at page level.">
 
-	<cffunction name="onConfigLoad" access="public" returntype="homePortalsConfigBean" hint="this method is executed when the HomePortals configuration is being loaded and before the engine is fully initialized. This method should only be used to modify the current configBean.">
-		<cfargument name="eventArg" type="homePortalsConfigBean" required="true" hint="the application-provided config bean">	
+	<cffunction name="onConfigLoad" access="public" returntype="homePortals.components.homePortalsConfigBean" hint="this method is executed when the HomePortals configuration is being loaded and before the engine is fully initialized. This method should only be used to modify the current configBean.">
+		<cfargument name="eventArg" type="homePortals.components.homePortalsConfigBean" required="true" hint="the application-provided config bean">	
 		<!--- apply plugin configuration from the provided config file --->
 		<cfset loadConfigFile( getDirectoryFromPath(getcurrentTemplatePath()) & "plugin-config.xml.cfm" ) />
 		<cfreturn arguments.eventArg />
