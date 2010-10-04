@@ -21,6 +21,8 @@
 			<cfset tgtHREF = oResBean.getFullHref()>
 		</cfif>	
 		
+		<cfset props = oResBean.getProperties()>
+		
 		<cfsavecontent variable="tmpHTML">
 			<cfoutput>
 			<table border="1">
@@ -36,16 +38,24 @@
 					<td><b>Package:</b></td>
 					<td>#oResBean.getPackage()#</td>
 				</tr>
-				<tr>
-					<td><b>Description:</b></td>
-					<td>#oResBean.getDescription()#</td>
-				</tr>
+				<cfif oResBean.getDescription() neq "">
+					<tr>
+						<td><b>Description:</b></td>
+						<td>#oResBean.getDescription()#</td>
+					</tr>
+				</cfif>
 				<cfif tgtHREF neq "">
 					<tr>
 						<td><b>HREF:</b></td>
 						<td><a href="#tgtHREF#">#tgtHREF#</a></td>
 					</tr>
 				</cfif>
+				<cfloop collection="#props#" item="prop">
+					<tr>
+						<td><b>#prop#</b></td>
+						<td>#props[prop]#</td>
+					</tr>
+				</cfloop>
 			</table>
 			<cfif isBoolean(displayContent) and displayContent>
 				<hr />
