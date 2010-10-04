@@ -1,9 +1,12 @@
 <cfcomponent extends="homePortals.components.contentTagRenderer" hint="Displays a list of available resources.">
 	<cfproperty name="resourceType" type="string" required="true" displayname="Resource Type">
 	<cfproperty name="orderBy" type="list" values="A to Z,Z to A,Older first,Newer first" hint="Indicates the sorting order for content entries. By default entries are displayed in alphabetical order (A to Z)" />
-	<cfproperty name="maxItems" type="numeric" default="10" required="false" hint="The maximum number of entries to display on the list" />
+	<cfproperty name="pagingHREF" type="numeric" hint="URL format to use for paging. Use %pageNumber for the page number value" />
+	<cfproperty name="itemsPerPage" type="numeric" default="10" required="false" hint="The maximum number of entries to display on the list" />
 	<cfproperty name="itemHREF" type="string" hint="Use this field to provide an optional URL to trigger when selecting an item from the list. To indicate the ID of the selected entry, use the token %id" />
+	<cfproperty name="startRow" type="numeric" default="1" hint="URL format to use for paging. Use %pageNumber for the page number value" />
 
+	<!---
 	<cfproperty name="labelProperty" type="string" hint="Resource property to use as label" />
 	<cfproperty name="showDescription" type="boolean" hint="Display a description for each item?" />
 	<cfproperty name="showCreateDate" type="boolean" hint="Display the creation date for each item?" />
@@ -16,10 +19,10 @@
 	<cfproperty name="thumbnail_position" type="list" values="left,right,item" />
 
 	<cfproperty name="itemsPerPage" type="numeric" hint="Number of items to display at a time" />
-	<cfproperty name="pagingHREF" type="numeric" hint="URL format to use for paging. Use %pageNumber for the page number value" />
 	
 	<cfproperty name="displayType" type="list" values="list,grid,fluidgrid" default="list">
 	<cfproperty name="grid_items_per_row" type="numeric" default="4" hint="number of items to display on a row">
+	--->
 	
 	<cfset variables.MAX_ITEMS_TO_DISPLAY = 1000>
 	<cfset variables.DEFAULT_ITEMS_TO_DISPLAY = 10>
@@ -38,9 +41,8 @@
 			var oCatalog = getPageRenderer().getHomePortals().getCatalog();
 			var qryRes = oCatalog.getIndex(resourceType);
 			var orderBy = getContentTag().getAttribute("orderBy",variables.DEFAULT_ORDER_BY_STR);
-			var maxItems = getContentTag().getAttribute("maxItems",variables.DEFAULT_ITEMS_TO_DISPLAY);
 			
-			if(val(maxItems) eq 0) maxItems = variables.DEFAULT_ITEMS_TO_DISPLAY;
+			if(val(itemsPerPage) eq 0) itemsPerPage = variables.DEFAULT_ITEMS_TO_DISPLAY;
 		</cfscript>
 				
 		<cfswitch expression="#orderBy#">
@@ -61,7 +63,7 @@
 			</cfdefaultcase>
 		</cfswitch>
 
-		<cfquery name="qryRes" dbtype="query" maxrows="#min(maxItems,variables.MAX_ITEMS_TO_DISPLAY)#">
+		<cfquery name="qryRes" dbtype="query" maxrows="#variables.MAX_ITEMS_TO_DISPLAY#">
 			SELECT id,description,createdOn,package,type
 				FROM qryRes
 				ORDER BY #sqlOrderBy#
@@ -76,15 +78,18 @@
 		<cfargument name="qryData" type="query" required="true">
 		<cfset var tmpHTML = "">
 		<cfset var href = "">
-		<cfset var tmpBody = "">
 		<cfset var showIntro = getContentTag().getAttribute("showIntro",false)>
 		<cfset var itemHREF = getContentTag().getAttribute("itemHREF")>
+		<cfset var pagingHREF = getContentTag().getAttribute("pagingHREF")>
+		<cfset var itemsPerPage = getContentTag().getAttribute("itemsPerPage")>
+		<cfset var startRow = getContentTag().getAttribute("startRow")>
 		<cfset var oCatalog = getPageRenderer().getHomePortals().getCatalog()>
 		<cfset var resource = 0>
-		<cfset var hasMore = false>
+		<cfset var pageNumber = 0>
+		<cfset var totalPages = 0>
 
 		<cfsavecontent variable="tmpHTML">
-			<cfoutput query="arguments.qryData">
+			<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#">
 				<cfif itemHREF neq "">
 					<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
 					<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
@@ -96,32 +101,10 @@
 						<cfelse>
 							<b>#arguments.qrydata.id#</b> <br/>
 						</cfif>
-						<cfif arguments.qryData.description neq "">
-							<cfset tmpBody = arguments.qryData.description>
-						<cfelse>
-							<cfset resource = oCatalog.getResource(arguments.qrydata.type, arguments.qrydata.package & "/" & arguments.qrydata.id)>
-							<cfif resource.targetFileExists()>
-								<cfset tmpBody = resource.readFile()>
-								<cfset tmpBody = reReplace(tmpBody, "</?\w+(\s*[\w:]+\s*=\s*(""[^""]*""|'[^']*'))*\s*/?>", " ", "all") />
-								<cfset tmpBody = reReplace(trim( tmpBody ),"\s+"," ","all") />
-								<cfset tmpBody = reMatch("([^\s]+\s?){1,50}", tmpBody ) />
-								<cfif !arrayLen( tmpBody )>
-									<cfset tmpBody = [ "" ] />
-								</cfif>
-								<cfset tmpBody = tmpBody[1] />
-								<cfset hasMore = len(tmpBody) lt len(resource.readFile())>
-							</cfif>
-						</cfif>
 						<span style="border-bottom:1px dotted black;">
 							#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#
 						</span><br /><br />
-						#tmpBody#
-						<cfif hasMore and len(tmpBody) gt 0>
-							...
-							<cfif href neq "">
-								<a href="#href#">#variables.READ_MORE_TEXT#</a>
-							</cfif>
-						</cfif>
+						#arguments.qryData.description#
 					</p>
 				<cfelse>
 					<cfif href neq "">
@@ -131,6 +114,11 @@
 					</cfif>
 				</cfif>
 			</cfoutput>
+			<cfif pagingHREF neq "">
+				Page #pageNumber# of #totalPages# | 
+				<a href="">Prev #itemsPerPage#</a> 
+				<a href="">Next #itemsPerPage#</a>
+			</cfif>
 		</cfsavecontent>
 		<cfreturn tmpHTML>
 	</cffunction>
