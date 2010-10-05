@@ -25,7 +25,7 @@
 		
 		<cfsavecontent variable="tmpHTML">
 			<cfoutput>
-			<table border="1">
+			<table>
 				<tr>
 					<td><b>ID:</b></td>
 					<td>#oResBean.getID()#</td>
