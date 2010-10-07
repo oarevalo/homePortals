@@ -67,7 +67,7 @@
 				FROM qryRes
 				WHERE (1=1)
 					<cfif package neq "">
-						AND package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#package#">
+						AND package LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#package#">
 					</cfif>
 					<cfif searchTerm neq "">
 						AND (
