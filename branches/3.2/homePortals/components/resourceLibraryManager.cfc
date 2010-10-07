@@ -131,21 +131,14 @@
 		<cfset var aResFull = ArrayNew(1)>
 		<cfset var aRes = ArrayNew(1)>
 		<cfset var i = 0>
-		<cfset var j = 0>
-		<cfset qryPackages = 0>
 
 		<cfif not getResourceTypeRegistry().hasResourceType(arguments.resourceType)>
 			<cfthrow message="Unknown resource type [#arguments.resourceType#]" type="homePortals.resourceLibraryManager.resourceTypeNotFound">
 		</cfif>
 		
 		<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
-			<cfset qryPackages = aResLibs[i].getResourcePackagesList(arguments.resourceType)>
-			<cfif listFind(valueList(qryPackages.name), arguments.packageName)>
-				<cfset aRes = aResLibs[i].getResourcesInPackage(arguments.resourceType, arguments.packageName)>
-				<cfloop from="1" to="#arrayLen(aRes)#" index="j">
-					<cfset arrayAppend(aResFull,aRes[j])>
-				</cfloop>
-			</cfif>
+			<cfset aRes = aResLibs[i].getResourcesInPackage(arguments.resourceType, arguments.packageName)>
+			<cfset aResFull.addAll(aRes)>
 		</cfloop>
 
 		<cfreturn aResFull>
@@ -162,6 +155,7 @@
 		<cfset var aResLibs = getResourceLibraries()>
 		<cfset var resBean = 0>
 		<cfset var i = 0>
+		<cfset var qryPackages = 0>
 	
 		<cfif not getResourceTypeRegistry().hasResourceType(arguments.resourceType)>
 			<cfthrow message="Unknown resource type [#arguments.resourceType#]" type="homePortals.resourceLibraryManager.resourceTypeNotFound">
@@ -171,22 +165,15 @@
 			<cftry>
 				<cfif arguments.packageName eq "">
 					<cfset qryPackages = aResLibs[i].getResourcePackagesList(arguments.resourceType)>
-					<cfif qryPackages.recordCount eq 0>
-						<cfthrow type="homePortals.resourceLibrary.resourceNotFound" message="No packages for this resource type">
-					</cfif>
 					<cfloop query="qryPackages">
 						<cftry>
 							<cfset resBean = aResLibs[i].getResource(resourceType = arguments.resourceType,
 																	packageName = qryPackages.name,
 																	resourceID = arguments.resourceID)>
-							<cfbreak>
+							<cfreturn resBean>
+							
 							<cfcatch type="homePortals.resourceLibrary.resourceNotFound">
-								<cfif i eq qryPackages.recordCount>
-									<!--- we are at the end of the package list, so the resource is not in any of them --->
-									<cfrethrow>
-								<cfelse>
-									<!--- resource not here, keep looking --->
-								</cfif>
+								<!--- resource not here, keep looking --->
 							</cfcatch>
 						</cftry>
 					</cfloop>
@@ -194,22 +181,16 @@
 					<cfset resBean = aResLibs[i].getResource(resourceType = arguments.resourceType,
 															packageName = arguments.packageName,
 															resourceID = arguments.resourceID)>
+					<cfreturn resBean>
 				</cfif>
 				
-				<!--- if we didnt get an error, then it means that the resource was found,
-					so lets return that one --->
-				<cfreturn resBean>
-
 				<cfcatch type="homePortals.resourceLibrary.resourceNotFound">
-					<cfif i eq arrayLen(aResLibs)>
-						<!--- we are at the end of the libraries, so the resource is not in any of them --->
-						<cfrethrow>
-					<cfelse>
-						<!--- resource not here, keep looking --->
-					</cfif>
+					<!--- resource not here, keep looking --->
 				</cfcatch>
 			</cftry>
 		</cfloop>
+		
+		<cfthrow type="homePortals.resourceLibrary.resourceNotFound" message="Resource not found in any of the available libraries.">
 	</cffunction>
 
 	<!------------------------------------------------->
