@@ -60,8 +60,8 @@
 			var delimChar = "/";
 			
 			// allow resources to be identified by "packageName/resourceID" notation.
-			if(listLen(arguments.id,delimChar) eq 2) {
-				package = listFirst(arguments.id, delimChar);
+			if(listLen(arguments.id,delimChar) gt 1) {
+				package = listDeleteAt(arguments.id, listLen(arguments.id, delimChar), delimChar);
 				resourceID = listLast(arguments.id, delimChar);
 			}
 
