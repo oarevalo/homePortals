@@ -1,7 +1,7 @@
 <cfcomponent implements="resourceLibrary">
 
 	<cfscript>
-		variables.resourceDescriptorFile = "_index.xml";
+		variables.resourceDescriptorFile = "info.xml";
 		variables.resourcesRoot = "";
 		variables.resourcesRootOriginal = "";
 		variables.stTimers = structNew();
@@ -186,7 +186,7 @@
 							& "/"
 							& arguments.resourceID;
 				for(i=1;i lte listLen(fileTypes);i++) {
-					if(fileExists(variables.resourcesRootPath & pathSeparator & replace(tmpHREF,"/",pathSeparator) & "." & listGetAt(fileTypes,i))) {
+					if(fileExists(variables.resourcesRootPath & pathSeparator & replace(tmpHREF,"/",pathSeparator,"ALL") & "." & listGetAt(fileTypes,i))) {
 						oResourceBean = getNewResource(arguments.resourceType);
 						oResourceBean.setID( arguments.resourceID );
 						oResourceBean.setHREF( tmpHREF & "." & listGetAt(fileTypes,i) );
@@ -349,7 +349,7 @@
 			
 			// remove resource file
 			if(resHref neq "" and left(resHref,4) neq "http" and fileExists(variables.resourcesRootPath & pathSeparator & resHref)) {
-				removeFile(variables.resourcesRootPath & pathSeparator & resHref));			
+				removeFile(variables.resourcesRootPath & pathSeparator & resHref);			
 			}
 		</cfscript>	
 	</cffunction>	
