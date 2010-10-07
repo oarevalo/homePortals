@@ -50,14 +50,13 @@
 	<cffunction name="getResourcePackagesList" returntype="query" access="public" hint="returns a query with the names of all resource packages">
 		<cfargument name="resourceType" type="string" required="false" default="">
 		<cfscript>
+			var start = getTickCount();
 			var qry = QueryNew("ResType,Name");
 			var reg = getResourceTypeRegistry();
 			var tmpDir = "";
-			var start = getTickCount();
 			var res = "";
-			var aItems = arrayNew(1);
+			var fileObj = 0;
 			var i = 0;
-			var j = 0;
 			var aResTypes = arrayNew(1);
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			
@@ -71,17 +70,8 @@
 				tmpDir = variables.resourcesRootPath & pathSeparator & reg.getResourceType(res).getFolderName();
 				
 				if(directoryExists(tmpDir)) {
-					aItems = createObject("java","java.io.File").init(tmpDir).list();
-					
-					for (j=1;j lte arraylen(aItems); j=j+1){
-					   name = aItems[j];
-					   if(directoryexists(tmpDir & pathSeparator & name) 
-					   			and not listFindNoCase(variables.IGNORED_DIR_NAMES,name)) {
-					   		queryAddRow(qry);
-					   		querySetCell(qry,"resType",res);
-					   		querySetCell(qry,"name",name);
-					   }
-					}				
+					fileObj = createObject("java","java.io.File").init(tmpDir);
+					buildPackagesList(res, fileObj, qry);
 				}
 			}
 			
@@ -123,7 +113,7 @@
 							& pathSeparator 
 							& rt.getFolderName() 
 							& pathSeparator
-							& arguments.packageName;
+							& replace(arguments.packageName,"/",pathSeparator,"ALL");
 				if(directoryExists(tmpDir)) {
 					aItems = createObject("java","java.io.File").init(tmpDir).list();
 					for (j=1;j lte arraylen(aItems); j=j+1){
@@ -218,7 +208,7 @@
 		<cfscript>
 			var href = "";
 			var packageDir = "";
-			var resDir = "";
+			var resDir = variables.resourcesRootPath;
 			var reg = getResourceTypeRegistry();
 			var rb = arguments.resourceBean;
 			var resType = rb.getType();
@@ -242,13 +232,15 @@
 			// setup directories
 
 			// check if we need to create the res type directory
-			resDir = variables.resourcesRoot & pathSeparator & resTypeDir;
-			if(not directoryExists(resDir)) {
-				createDir( resDir );
+			if(resTypeDir neq "") {
+				resDir = resDir & pathSeparator & resTypeDir;
+				if( not directoryExists(resDir)) {
+					createDir( resDir );
+				}
 			}
 
 			// check if we need to create the package directory
-			packageDir = resDir & pathSeparator & rb.getPackage();
+			packageDir = resDir & pathSeparator & replace(rb.getPackage(),"/",pathSeparator,"ALL");
 			if(not directoryExists(packageDir)) {
 				createDir( packageDir );
 			}
@@ -301,37 +293,24 @@
 		<cfargument name="ID" type="string" required="true">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="package" type="string" required="true">
-
 		<cfscript>
-			var packageDir = "";
-			var resHref = "";
-			var resTypeDir = "";
-			var infoHREF = "";
-			var reg = getResourceTypeRegistry();
-			var resType = reg.getResourceType(arguments.resourceType);
-			var defaultExtension = listFirst(resType.getFileTypes());
-			var pathSeparator = createObject("java","java.lang.System").getProperty("file.separator");
+			var xmlDoc = 0;
+			var xmlNode = 0;
+			var i = 0;
+		
+			// get resource
+			var resBean = getResource(arguments.resourceType, arguments.package, arguments.id);
 			
-			if(arguments.id eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
-			if(arguments.package eq "") throw("No folder has been specified","homePortals.resourceLibrary.validation");
-			if(not reg.hasResourceType(arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
-
 			// get location of descriptor file
-			infoHREF = getResourceDescriptorFilePath( arguments.resourceType, arguments.package  );
+			var infoHREF = getResourceDescriptorFilePath( arguments.resourceType, arguments.package);
 			
-			resTypeDir = resType.getFolderName();
-
 			// remove from descriptor (if exists)
-			packageDir = resourcesRootPath & pathSeparator & resTypeDir & pathSeparator & arguments.package;
 			if(fileExists(infoHREF)) {
 				xmlDoc = xmlParse(infoHREF);
 
 				for(i=1;i lte arrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
 					xmlNode = xmlDoc.xmlRoot.xmlChildren[i];
 					if(xmlNode.xmlAttributes.id eq id) {
-						if(structKeyExists(xmlNode.xmlAttributes, "href"))
-							resHref = xmlNode.xmlAttributes.href;
-					
 						// remove node from document
 						arrayDeleteAt(xmlDoc.xmlRoot.xmlChildren, i);
 						
@@ -341,15 +320,11 @@
 						break;
 					}
 				}					
-			} else {
-			
-				resHref = packageDir & pathSeparator & arguments.package & "." & defaultExtension;
-
 			}				
 			
 			// remove resource file
-			if(resHref neq "" and left(resHref,4) neq "http" and fileExists(variables.resourcesRootPath & pathSeparator & resHref)) {
-				removeFile(variables.resourcesRootPath & pathSeparator & resHref);			
+			if(resourceFileExists(resBean)) {
+				removeFile(getResourceFilePath(resBean));			
 			}
 		</cfscript>	
 	</cffunction>	
@@ -364,8 +339,6 @@
 		<cfreturn oResBean>
 	</cffunction>
 
-
-
 	<!------------------------------------------------->
 	<!--- getPath			                	   ---->
 	<!------------------------------------------------->
@@ -373,22 +346,6 @@
 		<cfreturn variables.resourcesRootOriginal>
 	</cffunction>
 	
-	<!---------------------------------------->
-	<!--- getResourceDescriptorFilePath	   --->
-	<!---------------------------------------->	
-	<cffunction name="getResourceDescriptorFilePath" access="public" returntype="string" hint="Returns the relative path to the resource descriptor file for a given resource package">
-		<cfargument name="resourceType" type="string" required="true">
-		<cfargument name="packageName" type="string" required="true">
-		<cfset var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator")>
-		<cfreturn variables.resourcesRootPath 
-					& pathSeparator
-					& getResourceTypeRegistry().getResourceType(arguments.resourceType).getFolderName() 
-					& pathSeparator
-					& arguments.packageName 
-					& pathSeparator
-					& variables.resourceDescriptorFile>
-	</cffunction>
-						
 	<!---------------------------------------->
 	<!--- getTimers						   --->
 	<!---------------------------------------->	
@@ -538,6 +495,19 @@
 	<!---------------------------------------->
 	<!--- Private Methods				   --->
 	<!---------------------------------------->	
+	<cffunction name="getResourceDescriptorFilePath" access="private" returntype="string" hint="Returns the relative path to the resource descriptor file for a given resource package">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfargument name="packageName" type="string" required="true">
+		<cfset var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator")>
+		<cfreturn variables.resourcesRootPath 
+					& pathSeparator
+					& getResourceTypeRegistry().getResourceType(arguments.resourceType).getFolderName() 
+					& pathSeparator
+					& replace(arguments.packageName,"/",pathSeparator,"ALL") 
+					& pathSeparator
+					& variables.resourceDescriptorFile>
+	</cffunction>
+
 	<cffunction name="getResourcesInDescriptorFile"  returntype="array" access="private" hint="returns all resources on the given file descriptor, also if a resourceID is given, only returns that resource instead of all resources on the package">
 		<cfargument name="resourceType" type="string" required="true" hint="Type of resource to search">
 		<cfargument name="packageName" type="string" required="true" hint="Name of the package to search">
@@ -693,7 +663,35 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="buildPackagesList" access="private" returntype="void" hint="recursively traverses a directory tree">
+		<cfargument name="resType" type="string" required="true">
+		<cfargument name="fileObj" type="any" required="true">
+		<cfargument name="qryPackages" type="query" required="true">
+		<cfargument name="relpath" type="string" required="false" default="">
+		<cfscript>
+			var items = [];
+			var i = 0;
 
+			if(arguments.relPath neq "")
+				arguments.relPath = arguments.relPath & "/";
+
+			if(arguments.fileObj.isDirectory() and not listFindNoCase(variables.IGNORED_DIR_NAMES,arguments.fileObj.getName())) {
+
+				items = arguments.fileObj.listFiles();
+				for(i=1;i lte arrayLen(items);i++) {
+					if(items[i].isDirectory()) {
+				   		queryAddRow(qryPackages);
+				   		querySetCell(qryPackages,"resType",arguments.resType);
+				   		querySetCell(qryPackages,"name", arguments.relPath & items[i].getName());
+						buildPackagesList(arguments.resType, items[i], qryPackages, arguments.relPath & items[i].getName() );
+					}
+				}
+			}
+
+			return;
+		</cfscript>
+	</cffunction>
+	
 
 	<!---------------------------------------->
 	<!--- Utility Methods                  --->
