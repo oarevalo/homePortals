@@ -11,16 +11,15 @@
 		<cfset var resourceType = getContentTag().getAttribute("resourceType") >
 		<cfset var resourceID = getContentTag().getAttribute("resourceID")>
 		<cfset var displayContent = getContentTag().getAttribute("displayContent", false)>
+		<cfset var showPath = getContentTag().getAttribute("showPath", false)>
 
 		<cfset oResBean = getPageRenderer()
 							.getHomePortals()
 							.getCatalog()
 							.getResource(resourceType, resourceID)>
 						
-		<cfif oResBean.targetFileExists()>
-			<cfset tgtHREF = oResBean.getFullHref()>
-		</cfif>	
-		
+		<cfset tgtHREF = oResBean.getFullHref()>
+		<cfset tgtPath = oResBean.getFullPath()>
 		<cfset props = oResBean.getProperties()>
 		
 		<cfsavecontent variable="tmpHTML">
@@ -49,6 +48,11 @@
 						<td><b>HREF:</b></td>
 						<td><a href="#tgtHREF#">#tgtHREF#</a></td>
 					</tr>
+				<cfelseif tgtPath neq "" and showPath>
+					<tr>
+						<td><b>Path:</b></td>
+						<td>#tgtPath#</td>
+					</tr>
 				</cfif>
 				<cfloop collection="#props#" item="prop">
 					<tr>
@@ -59,10 +63,9 @@
 			</table>
 			<cfif isBoolean(displayContent) and displayContent>
 				<hr />
-				<cfset path = oResBean.getFullPath()>
-				<cfif path neq "" and isimageFile(path)>
+				<cfif tgtPath neq "" and tgtHREF neq "" and isimageFile(tgtPath)>
 					<img src="#tgtHREF#">
-				<cfelseif tgtHREF neq "">
+				<cfelseif tgtPath neq "">
 					<cfset txt = oResBean.readFile()>
 					#txt#
 				</cfif>
