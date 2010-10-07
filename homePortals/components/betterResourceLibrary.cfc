@@ -8,7 +8,7 @@
 		variables.resourceTypeRegistry = 0;
 		variables.isInternalPath = false;
 		
-		variables.IGNORED_DIR_NAMES = ".svn,.cvs";
+		variables.IGNORED_DIR_NAMES = ".svn,.cvs,.git";
 	</cfscript>
 
 	<!------------------------------------------------->
@@ -58,7 +58,6 @@
 			var fileObj = 0;
 			var i = 0;
 			var aResTypes = arrayNew(1);
-			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			
 			if(arguments.resourceType neq "")
 				aResTypes[1] = arguments.resourceType;
@@ -67,7 +66,7 @@
 			
 			for(i=1;i lte arrayLen(aResTypes);i=i+1) {
 				res = aResTypes[i];
-				tmpDir = variables.resourcesRootPath & pathSeparator & reg.getResourceType(res).getFolderName();
+				tmpDir = buildPackagePath(res,"");
 				
 				if(directoryExists(tmpDir)) {
 					fileObj = createObject("java","java.io.File").init(tmpDir);
@@ -76,7 +75,7 @@
 			}
 			
 			variables.stTimers.getResourcePackagesList = getTickCount()-start;
-			
+
 			return qry;
 		</cfscript>
 	</cffunction>
@@ -97,7 +96,6 @@
 			var j = 0;
 			var aItems = 0;
 			var tmpDir = "";
-			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			
 			// check if there is a resource descriptor for the package
 			tmpHREF = getResourceDescriptorFilePath(arguments.resourceType, arguments.packageName);
@@ -109,18 +107,14 @@
 			} else if(fileTypes neq "") {
 				// there is no resource descriptor, but we know the file types for these resource,
 				// so we will treat any files on the package dir with those extensions as resources
-				tmpDir = variables.resourcesRootPath
-							& pathSeparator 
-							& rt.getFolderName() 
-							& pathSeparator
-							& replace(arguments.packageName,"/",pathSeparator,"ALL");
+				tmpDir = buildPackagePath(arguments.resourceType, arguments.packageName);
 				if(directoryExists(tmpDir)) {
 					aItems = createObject("java","java.io.File").init(tmpDir).list();
 					for (j=1;j lte arraylen(aItems); j=j+1){
 						if(listLen(aItems[j],".") gt 1 and listFindNoCase(fileTypes,listLast(aItems[j],"."))) {
 							oResourceBean = getNewResource(arguments.resourceType);
 							oResourceBean.setID( listDeleteAt(aItems[j],listLen(aItems[j],"."),".") );
-							oResourceBean.setHREF( rt.getFolderName() & "/" & arguments.packageName & "/" & aItems[j] );
+							oResourceBean.setHREF( buildResourceHREFPath(arguments.resourceType, arguments.packageName, aItems[j]) );
 							oResourceBean.setPackage( arguments.packageName );
 							arrayAppend(aResources, oResourceBean);
 						}
@@ -148,20 +142,19 @@
 		<cfargument name="resourceID" type="string" required="true">
 		<cfscript>
 			var tmpHREF = "";
+			var tmpPath = "";
 			var oResourceBean = 0; var o = 0;
 			var start = getTickCount();
 			var aResources = arrayNew(1);
 			var infoHREF = "";
 			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
 			var fileTypes = rt.getFileTypes();
-			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			
 			// check that resourceID is not empty
 			if(arguments.resourceID eq "") throw("Resource ID cannot be blank","HomePortals.resourceLibrary.blankResourceID");
 			
 			// check if there is a resource descriptor for the package
 			infoHREF = getResourceDescriptorFilePath(arguments.resourceType, arguments.packageName);
-
 			if(fileExists(infoHREF)) {
 				// resource descriptor exists, so read the resource from the descriptor
 				aResources = getResourcesInDescriptorFile(arguments.resourceType, arguments.packageName, arguments.resourceID);
@@ -170,13 +163,11 @@
 				}
 	
 			} else if(fileTypes neq "") {
-				tmpHREF = rt.getFolderName() 
-							& "/" 
-							& arguments.packageName
-							& "/"
-							& arguments.resourceID;
+				tmpHREF = buildResourceHREFPath(arguments.resourceType, arguments.packageName, arguments.resourceID);
+
 				for(i=1;i lte listLen(fileTypes);i++) {
-					if(fileExists(variables.resourcesRootPath & pathSeparator & replace(tmpHREF,"/",pathSeparator,"ALL") & "." & listGetAt(fileTypes,i))) {
+					tmpPath =  buildPackagePath(arguments.resourceType, arguments.packageName) & arguments.resourceID & "." & listGetAt(fileTypes,i);
+					if( fileExists(tmpPath) ) {
 						oResourceBean = getNewResource(arguments.resourceType);
 						oResourceBean.setID( arguments.resourceID );
 						oResourceBean.setHREF( tmpHREF & "." & listGetAt(fileTypes,i) );
@@ -212,38 +203,25 @@
 			var reg = getResourceTypeRegistry();
 			var rb = arguments.resourceBean;
 			var resType = rb.getType();
-			var resTypeDir = reg.getResourceType(resType).getFolderName();
 			var xmlNode = 0;
 			var infoHREF = "";
 			var aRes = arrayNew(1);
 			var i = 0;
 			var isNew = true;
-			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 		
 			// validate bean			
 			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
 			if(rb.getType() eq "") throw("No resource type has been specified for the resource","homePortals.resourceLibrary.validation");
-			if(rb.getPackage() eq "") throw("No package has been specified for the resource","homePortals.resourceLibrary.validation");
 			if(not reg.hasResourceType(resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
 			
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( rb.getType(), rb.getPackage() );
 
-			// setup directories
-
-			// check if we need to create the res type directory
-			if(resTypeDir neq "") {
-				resDir = resDir & pathSeparator & resTypeDir;
-				if( not directoryExists(resDir)) {
-					createDir( resDir );
-				}
-			}
-
-			// check if we need to create the package directory
-			packageDir = resDir & pathSeparator & replace(rb.getPackage(),"/",pathSeparator,"ALL");
-			if(not directoryExists(packageDir)) {
-				createDir( packageDir );
-			}
+			// setup directories if needed
+			packageDir = buildPackagePath( rb.getType(), rb.getPackage() );
+			if( not directoryExists(packageDir)) {
+				createObject("java","java.io.File").init(packageDir).mkdirs();
+			}			
 
 			// check for file descriptor, if doesnt exist, then create one
 			if(fileExists(infoHREF)) {
@@ -429,12 +407,7 @@
 										& defaultExtension;
 			}	
 			
-			href = rt.getFolderName() 
-					& "/" 
-					& rb.getPackage() 
-					& "/" 
-					& arguments.fileName;	
-					
+			href = buildResourceHREFPath(rb.getType(), rb.getPackage(), arguments.fileName);
 			rb.setHREF(href);
 		</cfscript>
 
@@ -467,12 +440,7 @@
 										& defaultExtension;
 			}	
 			
-			href = rt.getFolderName() 
-					& "/" 
-					& rb.getPackage() 
-					& "/" 
-					& arguments.fileName;	
-					
+			href = buildResourceHREFPath(rb.getType(), rb.getPackage(), arguments.fileName);
 			rb.setHREF(href);
 		</cfscript>
 
@@ -498,14 +466,7 @@
 	<cffunction name="getResourceDescriptorFilePath" access="private" returntype="string" hint="Returns the relative path to the resource descriptor file for a given resource package">
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="packageName" type="string" required="true">
-		<cfset var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator")>
-		<cfreturn variables.resourcesRootPath 
-					& pathSeparator
-					& getResourceTypeRegistry().getResourceType(arguments.resourceType).getFolderName() 
-					& pathSeparator
-					& replace(arguments.packageName,"/",pathSeparator,"ALL") 
-					& pathSeparator
-					& variables.resourceDescriptorFile>
+		<cfreturn buildPackagePath(arguments.resourceType, arguments.packageName) & variables.resourceDescriptorFile />
 	</cffunction>
 
 	<cffunction name="getResourcesInDescriptorFile"  returntype="array" access="private" hint="returns all resources on the given file descriptor, also if a resourceID is given, only returns that resource instead of all resources on the package">
@@ -555,19 +516,16 @@
 			var oResourceBean = 0;
 			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
 			var defaultExtension = listFirst(rt.getFileTypes());
-			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
+
+			if(arguments.packageName eq "")
+				return oResourceBean;
 			
 			// build the default name of the resource to register
-			tmpHREF = rt.getFolderName() 
-						& "/" 
-						& arguments.packageName 
-						& "/" 
-						& arguments.packageName 
-						& "." 
-						& defaultExtension;
+			tmpHREF = buildResourceHREFPath(arguments.resourceType, arguments.packageName, arguments.packageName & "." & defaultExtension);
+			tmpPath = buildPackagePath(arguments.resourceType, arguments.packageName) & arguments.packageName & "." & defaultExtension;
 
 			// if the file exists, then register it
-			if(fileExists(variables.resourcesRootPath & pathSeparator & replace(tmpHREF,"/",pathSeparator,"ALL"))) {
+			if(fileExists(tmpPath)) {
 
 				// create resource bean
 				oResourceBean = getNewResource(arguments.resourceType);
@@ -675,16 +633,15 @@
 			if(arguments.relPath neq "")
 				arguments.relPath = arguments.relPath & "/";
 
-			if(arguments.fileObj.isDirectory() and not listFindNoCase(variables.IGNORED_DIR_NAMES,arguments.fileObj.getName())) {
+			if(!arguments.fileObj.isDirectory()) {return;}
 
-				items = arguments.fileObj.listFiles();
-				for(i=1;i lte arrayLen(items);i++) {
-					if(items[i].isDirectory()) {
-				   		queryAddRow(qryPackages);
-				   		querySetCell(qryPackages,"resType",arguments.resType);
-				   		querySetCell(qryPackages,"name", arguments.relPath & items[i].getName());
-						buildPackagesList(arguments.resType, items[i], qryPackages, arguments.relPath & items[i].getName() );
-					}
+			items = arguments.fileObj.listFiles();
+			for(i=1;i lte arrayLen(items);i++) {
+				if(items[i].isDirectory() and not listFindNoCase(variables.IGNORED_DIR_NAMES, items[i].getName())) {
+			   		queryAddRow(qryPackages);
+			   		querySetCell(qryPackages,"resType",arguments.resType);
+			   		querySetCell(qryPackages,"name", arguments.relPath & items[i].getName());
+					buildPackagesList(arguments.resType, items[i], qryPackages, arguments.relPath & items[i].getName() );
 				}
 			}
 
@@ -692,6 +649,46 @@
 		</cfscript>
 	</cffunction>
 	
+	<cffunction name="buildPackagePath" access="private" returntype="string" hint="Builds a filesystem path to the given package">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfargument name="packageName" type="string" required="true">
+		<cfscript>
+			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
+			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
+			var path = variables.resourcesRootPath;
+			
+			if(rt.getFolderName() neq "")
+				path = listAppend(path, rt.getFolderName(), pathSeparator);
+
+			if(arguments.packageName neq "")	
+				path = listAppend(path, replace(arguments.packageName,"/",pathSeparator,"ALL"), pathSeparator);
+
+			if(right(path,1) neq pathSeparator) 
+				path = path & pathSeparator;
+
+			return path;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="buildResourceHREFPath" access="private" returntype="string" hint="Builds a value to the HREF field for the given resource file">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfargument name="packageName" type="string" required="true">
+		<cfargument name="filename" type="string" required="true">
+		<cfscript>
+			var pathSeparator =  "/";
+			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
+			var path = rt.getFolderName();
+			
+			if(arguments.packageName neq "")	
+				path = listAppend(path, arguments.packageName, pathSeparator);
+
+			path = listAppend(path, arguments.filename, pathSeparator);
+			
+			return path;
+		</cfscript>
+	</cffunction>
+
+
 
 	<!---------------------------------------->
 	<!--- Utility Methods                  --->
