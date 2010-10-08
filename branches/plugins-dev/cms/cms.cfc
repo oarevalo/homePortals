@@ -518,7 +518,7 @@
 
 			<!--- check if user exists --->
 			<cftry>
-				<cfset resNode = oCatalog.getResource("cmsUser",arguments.username,true)>
+				<cfset resNode = oCatalog.getResource("cmsUser","users/" &  arguments.username,true)>
 				<cfif resNode.getProperty("password") eq hash(arguments.password,'SHA','utf-8')>
 					<cfset oUserRegistry.setUserInfo( arguments.username, arguments.username, resNode )>
 				<cfelse>
@@ -1051,6 +1051,9 @@
 				<cfset defLib = aLibs[i]>
 			</cfif>
 		</cfloop>
+		<cfif not defLibFound>
+			<cfthrow message="no default resource library found">
+		</cfif>
 		
 		<cfif not defLibFound and arrayLen(aLibs) gt 0>
 			<cfset defLib = aLibs[1]>

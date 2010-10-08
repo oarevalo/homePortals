@@ -70,7 +70,10 @@
 							title='click to delete resource'> Delete Resource</a>
 					</div>
 				</cfif>
-				#arguments.resourceID#
+				<cfif oResourceBean.getID() neq oResourceBean.getPackage() and oResourceBean.getPackage() neq "">
+					#oResourceBean.getPackage()# /
+				</cfif>
+				#oResourceBean.getID()#
 			<cfelse>
 				New #arguments.resourceType#
 			</cfif>

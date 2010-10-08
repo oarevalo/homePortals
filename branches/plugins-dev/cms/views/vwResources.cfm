@@ -53,13 +53,13 @@
 					<cfoutput>
 						<cfset arrayAppend(aPkgResources, qryResources.id)>
 					</cfoutput>
-					<cfif arrayLen(aPkgResources) gt 1>
+					<cfif arrayLen(aPkgResources) gt 1 or qryResources.id neq tmpPackage>
 						<div style="margin-top:5px;">
 							<b>#tmpPackage#</b><br>
 							<cfloop array="#aPkgResources#" index="resID">
 								<div style="border-bottom:1px solid ##ebebeb;">
 									<div style="width:150px;overflow:hidden;">
-										<a href="javascript:cms.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(resID)#',prefix:'res'},'cms-resourceEditPanel')" 
+										<a href="javascript:cms.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsStringFormat(tmpPackage)#/#jsstringformat(resID)#',prefix:'res'},'cms-resourceEditPanel')" 
 											class="cpListLink" 
 											style="font-weight:normal;" 
 											>#resID#</a>
@@ -70,7 +70,7 @@
 					<cfelse>
 						<div style="border-bottom:1px solid ##ebebeb;">
 							<div style="width:150px;overflow:hidden;">
-								<a href="javascript:cms.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsstringformat(qryResources.id)#',prefix:'res'},'cms-resourceEditPanel')" 
+								<a href="javascript:cms.getPartialView('EditResourceForm',{resourceType:'#resourceType#',resourceID:'#jsStringFormat(tmpPackage)#/#jsstringformat(qryResources.id)#',prefix:'res'},'cms-resourceEditPanel')" 
 									class="cpListLink" 
 									style="font-weight:normal;" 
 									>#qryResources.id#</a>

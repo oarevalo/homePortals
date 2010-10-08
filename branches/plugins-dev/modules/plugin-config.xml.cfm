@@ -24,7 +24,7 @@
 	
 	<pageProperties>
 		<property name="plugins.modules.defaults.modulesGateway" value="gateway.cfm"/>
-		<property name="plugins.modules.defaults.bundledReosurceLibraryPath" value="{pluginPath}/resourceLibrary/" />
+		<property name="plugins.modules.defaults.bundledReosurceLibraryPath" value="legacy://{pluginPath}/resourceLibrary/" />
 		<property name="plugins.modules.defaults.loadBundledResourceLibrary" value="true" />
 		<property name="plugins.modules.defaults.accountsDataPath" value="{appRoot}/accountsData" />
 		<property name="plugins.modules.initialEvent" value="Framework.onPageLoaded" />

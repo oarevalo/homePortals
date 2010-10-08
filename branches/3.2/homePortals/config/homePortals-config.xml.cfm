@@ -90,6 +90,9 @@
 	<resourceLibraryTypes>
 		<resourceLibraryType prefix="file" path="homePortals.components.defaultResourceLibrary">
 		</resourceLibraryType>
+
+		<resourceLibraryType prefix="legacy" path="homePortals.components.legacyResourceLibrary">
+		</resourceLibraryType>
 		
 		<resourceLibraryType prefix="db" path="homePortals.components.dbResourceLibrary">
 			<!--

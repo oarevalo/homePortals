@@ -10,7 +10,7 @@
 	
 	<!-- Directories where HomePortals will look for resources  -->
 	<resourceLibraryPaths>
-		<resourceLibraryPath>{pluginPath}/resourceLibrary/</resourceLibraryPath>
+		<resourceLibraryPath>legacy://{pluginPath}/resourceLibrary/</resourceLibraryPath>
 	</resourceLibraryPaths>
 	
 </homePortals>

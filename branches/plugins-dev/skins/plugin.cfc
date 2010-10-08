@@ -24,7 +24,7 @@
 					if(not page.stylesheets.contains( href )) {
 						ArrayAppend(page.stylesheets, href);
 					}
-				} catch(any e) {
+				} catch(lock e) {
 					// could not load resource!
 				}
 			}
