@@ -458,7 +458,6 @@
 						tmpXmlNode2 = 0;
 						switch(key) {
 							case "description":  tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"description"); break;
-							case "folderName": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"folderName"); break;
 							case "resBeanPath": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"resBeanPath"); break;
 							case "fileTypes": tmpXmlNode2 = xmlElemNew(xmlConfigDoc,"fileTypes"); break;
 						}
@@ -966,7 +965,6 @@
 
 	<cffunction name="setResourceType" access="public" returntype="homePortalsConfigBean">
 		<cfargument name="name" type="string" required="true">
-		<cfargument name="folderName" type="string" required="false" default="">
 		<cfargument name="description" type="string" required="false" default="">
 		<cfargument name="resBeanPath" type="string" required="false" default="">
 		<cfargument name="fileTypes" type="string" required="false" default="">
@@ -975,7 +973,6 @@
 			<cfset variables.stConfig.resourceTypes[arguments.name].properties = arrayNew(1)>
 		</cfif>
 		<cfset variables.stConfig.resourceTypes[arguments.name].name = arguments.name>
-		<cfset variables.stConfig.resourceTypes[arguments.name].folderName = arguments.folderName>
 		<cfset variables.stConfig.resourceTypes[arguments.name].description = arguments.description>
 		<cfset variables.stConfig.resourceTypes[arguments.name].resBeanPath = arguments.resBeanPath>
 		<cfset variables.stConfig.resourceTypes[arguments.name].fileTypes = arguments.fileTypes>
