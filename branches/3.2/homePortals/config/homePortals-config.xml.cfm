@@ -62,20 +62,17 @@
 	<!-- This section declares the available resource types -->
 	<resourceTypes>
 		<resourceType name="content">
-			<folderName>Contents</folderName>
 			<description>Content resources are blocks of formatted text that can be reused across a site</description>
 			<fileTypes>htm,html</fileTypes>
 		</resourceType>
 						
 		<resourceType name="feed">
-			<folderName>Feeds</folderName>
 			<description>Feeds are either RSS or Atom feeds from external sources that you can use with feed-enabled modules to display their contents on your site</description>
 			<property name="rssurl" type="string" hint="Location of the source of the feed" label="Feed URL" />
 			<property name="htmlurl" type="string" hint="Location of the website associated with this feed" label="Website URL" />
 		</resourceType>
 		
 		<resourceType name="image">
-			<folderName>Images</folderName>
 			<description>This resource type is used to represent an image document</description>
 			<property name="label" type="string" hint="Image title" />
 			<property name="url" type="string" hint="An URL address associated to this image" />

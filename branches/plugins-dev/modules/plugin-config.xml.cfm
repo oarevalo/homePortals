@@ -17,7 +17,6 @@
 	<!-- This section declares the available resource types -->
 	<resourceTypes>
 		<resourceType name="module">
-			<folderName>Modules</folderName>
 			<description>Modules are reusable components that allow you page to perform particular tasks. Modules act as mini applications that can do things like displaying calendars, blogs, rss feed contents, etc.</description>
 			<resBeanPath>homePortals.plugins.modules.components.moduleResourceBean</resBeanPath>
 		</resourceType>

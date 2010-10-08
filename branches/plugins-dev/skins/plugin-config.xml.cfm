@@ -3,7 +3,6 @@
 
 	<resourceTypes>
 		<resourceType name="skin">
-			<folderName>Skins</folderName>
 			<description>Skins are a way to customize the look and feel of a page. Skins dictate things like colors, fonts, margins and other visual attributes of the page</description>
 			<fileTypes>css</fileTypes>
 		</resourceType>

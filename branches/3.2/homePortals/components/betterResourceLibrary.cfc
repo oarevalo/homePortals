@@ -654,11 +654,9 @@
 		<cfargument name="packageName" type="string" required="true">
 		<cfscript>
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
-			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
 			var path = variables.resourcesRootPath;
 			
-			if(rt.getFolderName() neq "")
-				path = listAppend(path, rt.getFolderName(), pathSeparator);
+			path = listAppend(path, arguments.resourceType, pathSeparator);
 
 			if(arguments.packageName neq "")	
 				path = listAppend(path, replace(arguments.packageName,"/",pathSeparator,"ALL"), pathSeparator);
@@ -676,8 +674,7 @@
 		<cfargument name="filename" type="string" required="true">
 		<cfscript>
 			var pathSeparator =  "/";
-			var rt = getResourceTypeRegistry().getResourceType( arguments.resourceType );
-			var path = rt.getFolderName();
+			var path = arguments.resourceType;
 			
 			if(arguments.packageName neq "")	
 				path = listAppend(path, arguments.packageName, pathSeparator);

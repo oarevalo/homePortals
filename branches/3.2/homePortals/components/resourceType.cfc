@@ -5,7 +5,6 @@
 		variables.instance = structNew();
 		variables.instance.name = "";
 		variables.instance.description = "";
-		variables.instance.folderName = "";
 		variables.instance.properties = structNew();
 		variables.instance.resBeanPath = variables.DEFAULT_RES_BEAN_PATH;
 		variables.instance.fileTypes = "";
@@ -53,24 +52,7 @@
 		<cfset variables.instance.Description = arguments.data>
 		<cfreturn this>
 	</cffunction>
-	
-	<cffunction name="getFolderName" access="public" returntype="string">
-		<cfset ret = variables.instance.FolderName>
-		<cfif ret eq "">
-			<cfset ret = variables.instance.name>
-		</cfif>
-		<cfreturn ret>
-	</cffunction>
-
-	<cffunction name="setFolderName" access="public" returntype="resourceType">
-		<cfargument name="data" type="string" required="true">
-		<cfif arguments.data eq "">
-			<cfthrow message="Folder name cannot be empty" type="homePortals.resourceType.validation">
-		</cfif>
-		<cfset variables.instance.FolderName = arguments.data>
-		<cfreturn this>
-	</cffunction>
-	
+		
 	<cffunction name="getProperties" access="public" returntype="struct">
 		<cfreturn duplicate(variables.instance.Properties)>
 	</cffunction>
