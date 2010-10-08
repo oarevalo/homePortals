@@ -130,13 +130,15 @@
 			var resType = "";
 			var resID = "";
 			var indexCache = getIndexCacheService();
+			var resourceTypes = "";
+			var i = 0;
 			
 			if(arguments.resourceType eq "") {
 				index();	// index all libraries
 			
 				resourceTypes = indexCache.list();
 				for(i=1;i lte arrayLen(resourceTypes);i++) {
-					resType = resourceTypes[i];
+					resType = resourceTypes[i].key;
 					qryType = indexCache.retrieve(resType);
 					for(j=1;j lte qryType.recordCount;j++) {
 						queryAddRow(qry);
