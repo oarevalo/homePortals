@@ -21,7 +21,9 @@
 		<cfargument name="appRoot" type="string" required="false" default="">
 		<cfset variables.resourcesRootOriginal = arguments.resourceLibraryPath>
 		<cfset variables.resourceTypeRegistry = arguments.resourceTypeRegistry>
-		<cfif directoryExists(arguments.resourceLibraryPath)>
+
+		<cfif createObject("java","java.io.File").init(arguments.resourceLibraryPath).exists()>
+			<!--- had do to this hack because in railo, directoryExists would work on a url path, not only on an absolute path --->
 			<cfset variables.resourcesRoot = arguments.resourceLibraryPath>
 			<cfset variables.resourcesRootPath = arguments.resourceLibraryPath>
 			<cfset variables.isInternalPath = true>
@@ -34,6 +36,7 @@
 			<cfset variables.resourcesRootPath = expandPath(variables.resourcesRoot)>
 			<cfset variables.isInternalPath = false>
 		</cfif>
+
 		<cfreturn this>
 	</cffunction>
 
@@ -67,7 +70,6 @@
 			for(i=1;i lte arrayLen(aResTypes);i=i+1) {
 				res = aResTypes[i];
 				tmpDir = buildPackagePath(res,"");
-				
 				if(directoryExists(tmpDir)) {
 					fileObj = createObject("java","java.io.File").init(tmpDir);
 					buildPackagesList(res, fileObj, qry);
@@ -95,6 +97,7 @@
 			var fileTypes = rt.getFileTypes();
 			var j = 0;
 			var aItems = 0;
+			var objDir = 0;
 			var tmpDir = "";
 			
 			// check if there is a resource descriptor for the package
@@ -109,14 +112,17 @@
 				// so we will treat any files on the package dir with those extensions as resources
 				tmpDir = buildPackagePath(arguments.resourceType, arguments.packageName);
 				if(directoryExists(tmpDir)) {
-					aItems = createObject("java","java.io.File").init(tmpDir).list();
-					for (j=1;j lte arraylen(aItems); j=j+1){
-						if(listLen(aItems[j],".") gt 1 and listFindNoCase(fileTypes,listLast(aItems[j],"."))) {
-							oResourceBean = getNewResource(arguments.resourceType);
-							oResourceBean.setID( listDeleteAt(aItems[j],listLen(aItems[j],"."),".") );
-							oResourceBean.setHREF( buildResourceHREFPath(arguments.resourceType, arguments.packageName, aItems[j]) );
-							oResourceBean.setPackage( arguments.packageName );
-							arrayAppend(aResources, oResourceBean);
+					objDir = createObject("java","java.io.File").init(tmpDir);
+					if(objDir.exists()) {
+						aItems = objDir.list();
+						for (j=1;j lte arraylen(aItems); j=j+1){
+							if(listLen(aItems[j],".") gt 1 and listFindNoCase(fileTypes,listLast(aItems[j],"."))) {
+								oResourceBean = getNewResource(arguments.resourceType);
+								oResourceBean.setID( listDeleteAt(aItems[j],listLen(aItems[j],"."),".") );
+								oResourceBean.setHREF( buildResourceHREFPath(arguments.resourceType, arguments.packageName, aItems[j]) );
+								oResourceBean.setPackage( arguments.packageName );
+								arrayAppend(aResources, oResourceBean);
+							}
 						}
 					}
 				}
@@ -656,8 +662,6 @@
 			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var path = variables.resourcesRootPath;
 			
-			path = listAppend(path, arguments.resourceType, pathSeparator);
-
 			if(arguments.packageName neq "")	
 				path = listAppend(path, replace(arguments.packageName,"/",pathSeparator,"ALL"), pathSeparator);
 
@@ -674,7 +678,7 @@
 		<cfargument name="filename" type="string" required="true">
 		<cfscript>
 			var pathSeparator =  "/";
-			var path = arguments.resourceType;
+			var path = "";
 			
 			if(arguments.packageName neq "")	
 				path = listAppend(path, arguments.packageName, pathSeparator);
@@ -729,15 +733,6 @@
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 
 		<cfthrow message="#arguments.message#" type="#arguments.type#">
-	</cffunction>
-
-	<cffunction name="abort" access="private" returntype="void">
-		<cfabort>
-	</cffunction>
-	
-	<cffunction name="dump" access="private" returntype="void">
-		<cfargument name="data" type="any">
-		<cfdump var="#arguments.data#">
 	</cffunction>
 	
 </cfcomponent>

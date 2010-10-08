@@ -20,7 +20,7 @@
 			variables.stConfig.baseResourceTypes = "";
 			variables.stConfig.pageProviderClass = "";
 			variables.stConfig.lstResourceTypes = "";
-			variables.stConfig.defaultResourceLibraryClass = "";
+			variables.stConfig.defaultResourceLibraryType = "";
 			variables.stConfig.errorHandlerClass = "";
 
 			variables.stConfig.resourceLibraryPaths = arrayNew(1);
@@ -342,7 +342,7 @@
 					case "catalogCacheTTL": tmpXmlNode = xmlElemNew(xmlConfigDoc,"catalogCacheTTL"); break;
 					case "baseResourceTypes": tmpXmlNode = xmlElemNew(xmlConfigDoc,"baseResourceTypes"); break;
 					case "pageProviderClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"pageProviderClass"); break;
-					case "defaultResourceLibraryClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"defaultResourceLibraryClass"); break;
+					case "defaultResourceLibraryType": tmpXmlNode = xmlElemNew(xmlConfigDoc,"defaultResourceLibraryType"); break;
 					case "errorHandlerClass": tmpXmlNode = xmlElemNew(xmlConfigDoc,"errorHandlerClass"); break;
 				}
 				if(isXMLNode(tmpXmlNode) and variables.stConfig[thisKey] neq "") {
@@ -706,8 +706,8 @@
 		<cfreturn duplicate(variables.stConfig.resourceLibraryTypes)>
 	</cffunction>		
 
-	<cffunction name="getDefaultResourceLibraryClass" access="public" returntype="string" hint="Returns the path in dot notation for the class to use as the default resource library implementation">
-		<cfreturn variables.stConfig.defaultResourceLibraryClass>
+	<cffunction name="getDefaultResourceLibraryType" access="public" returntype="string" hint="Returns the type of the resource library to use when not explicitly given">
+		<cfreturn variables.stConfig.defaultResourceLibraryType>
 	</cffunction>	
 
 	<cffunction name="getErrorHandlerClass" access="public" returntype="string" hint="Returns the path in dot notation for the class to use for handling errors">
@@ -1109,9 +1109,9 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setDefaultResourceLibraryClass" access="public" returntype="string" hint="Sets the path in dot notation for the class to use as the default resource library implementation">
+	<cffunction name="setDefaultResourceLibraryType" access="public" returntype="string" hint="Sets the type of resource library to use when not explicitly indicated">
 		<cfargument name="data" type="string" required="true">
-		<cfset variables.stConfig.defaultResourceLibraryClass = trim(arguments.data)>
+		<cfset variables.stConfig.defaultResourceLibraryType = trim(arguments.data)>
 		<cfreturn this>
 	</cffunction>	
 

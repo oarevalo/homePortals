@@ -88,6 +88,9 @@
 	
 	<!-- Additional resource library types  -->
 	<resourceLibraryTypes>
+		<resourceLibraryType prefix="file" path="homePortals.components.defaultResourceLibrary">
+		</resourceLibraryType>
+		
 		<resourceLibraryType prefix="db" path="homePortals.components.dbResourceLibrary">
 			<!--
 			Optional properties:
@@ -107,8 +110,8 @@
 		</resourceLibraryType>
 	</resourceLibraryTypes>
 	
-	<!-- Path in dot notation for the class used for the default Resource Library implementation -->
-	<defaultResourceLibraryClass>homePortals.components.defaultResourceLibrary</defaultResourceLibraryClass>
+	<!-- this setting determines the default resourceLibraryType to use when not indicating explicitly via prefix -->
+	<defaultResourceLibraryType>file</defaultResourceLibraryType>
 
 	<!-- use this setting to provide a class that will be invoked whenever an error occurs while rendering a page -->
 	<errorHandlerClass></errorHandlerClass>

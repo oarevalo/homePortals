@@ -55,9 +55,13 @@
 			var oResBean = 0;
 			var cacheKey = "";
 			var package = "";
-			var resourceID = arguments.id;
+			var resourceID = "";
 			var loadFromSource = arguments.forceReload;
 			var delimChar = "/";
+
+			if(left(arguments.id,1) eq delimChar)
+				arguments.id = removeChars(arguments.id,1,1);
+			resourceID = arguments.id;
 			
 			// allow resources to be identified by "packageName/resourceID" notation.
 			if(listLen(arguments.id,delimChar) gt 1) {
@@ -65,15 +69,8 @@
 				resourceID = listLast(arguments.id, delimChar);
 			}
 
-			// check the index to see if we know the package for that resource (if we know the package, the lookup is faster)
-			if(package eq "" and getIndexCacheService().hasItem(arguments.type)) {
-				qry = getIndexCacheService().retrieve(arguments.type);
-				qry = filterQuery(qry,"id",resourceID);
-				package = qry.package;
-			}
-
 			// build the key used for storing item in cache
-			cacheKey = "//" & arguments.type & "/" & package & "/" & resourceID;
+			cacheKey = "//" & arguments.type & "/" & arguments.id;
 			
 			// try to read item from cache
 			if(not loadFromSource) {
@@ -132,6 +129,8 @@
 			var indexCache = getIndexCacheService();
 			var resourceTypes = "";
 			var i = 0;
+			var j = 0;
+			var k = 0;
 			
 			if(arguments.resourceType eq "") {
 				index();	// index all libraries
@@ -145,7 +144,7 @@
 						for(k=1;k lte listLen(qryType.columnList);k++) {
 							fld = listGetAt(qryType.columnList,k);
 							if(listFindNoCase(variables.FIELD_LIST,fld)) {
-								querySetCell(qry, fld, qryType[fld][k]);
+								querySetCell(qry, fld, qryType[fld][j]);
 							}
 						}
 					}
@@ -208,6 +207,7 @@
 			}
 				
 			if(arguments.packageName eq "") {
+				qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType);
 				qryPackages = resourceLibraryManager.getResourcePackagesList(arguments.resourceType);
 				for(i=1;i lte qryPackages.recordCount;i=i+1) {
 					qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, qryPackages.name[i]);
@@ -224,7 +224,7 @@
 	<cffunction name="addResourcesFromPackage" access="private" returntype="query">
 		<cfargument name="qryIndex" type="query" required="true">
 		<cfargument name="resourceType" type="string" required="true">
-		<cfargument name="packageName" type="string" required="true">
+		<cfargument name="packageName" type="string" required="false" default="">
 		<cfscript>
 			var resourceLibraryManager = getResourceLibraryManager();
 			var aResources = arrayNew(1);
