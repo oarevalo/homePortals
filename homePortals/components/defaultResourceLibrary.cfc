@@ -59,7 +59,7 @@
 			
 			for(i=1;i lte arrayLen(aResTypes);i=i+1) {
 				res = aResTypes[i];
-				tmpDir = ExpandPath(variables.resourcesRoot & "/" & reg.getResourceType(res).getFolderName());
+				tmpDir = ExpandPath(variables.resourcesRoot & "/" & getFolderName(res));
 				
 				if(directoryExists(tmpDir)) {
 					aItems = createObject("java","java.io.File").init(tmpDir).list();
@@ -111,7 +111,7 @@
 				// so we will treat any files on the package dir with those extensions as resources
 				tmpDir = variables.resourcesRoot
 							& "/" 
-							& rt.getFolderName() 
+							& getFolderName(arguments.resourceType) 
 							& "/" 
 							& arguments.packageName;
 				if(directoryExists(expandPath(tmpDir))) {
@@ -120,7 +120,7 @@
 						if(listLen(aItems[j],".") gt 1 and listFindNoCase(fileTypes,listLast(aItems[j],"."))) {
 							oResourceBean = getNewResource(arguments.resourceType);
 							oResourceBean.setID( listDeleteAt(aItems[j],listLen(aItems[j],"."),".") );
-							oResourceBean.setHREF( rt.getFolderName() & "/" & arguments.packageName & "/" & aItems[j] );
+							oResourceBean.setHREF( getFolderName(arguments.resourceType) & "/" & arguments.packageName & "/" & aItems[j] );
 							oResourceBean.setPackage( arguments.packageName );
 							arrayAppend(aResources, oResourceBean);
 						}
@@ -158,6 +158,21 @@
 			// check that resourceID is not empty
 			if(arguments.resourceID eq "") throw("Resource ID cannot be blank","HomePortals.resourceLibrary.blankResourceID");
 			
+			// if there is no package, then we need to look in all packages
+			if(arguments.packageName eq "") {
+				qry = getResourcePackagesList(arguments.resourceType);
+				for(i=1;i lte qry.recordCount;i++) {
+					try {
+						oResourceBean = getResource(arguments.resourceType, qry.name, arguments.resourceID);
+						return oResourceBean;
+					} catch(homePortals.resourceLibrary.resourceNotFound e) {
+						// nothing
+					}
+				}
+				throw("The requested resource [#arguments.packageName#][#arguments.resourceID#] was not found",
+						"homePortals.resourceLibrary.resourceNotFound");
+			}
+			
 			// check if there is a resource descriptor for the package
 			infoHREF = getResourceDescriptorFilePath(arguments.resourceType, arguments.packageName);
 
@@ -169,7 +184,7 @@
 				}
 	
 			} else if(fileTypes neq "") {
-				tmpHREF = rt.getFolderName() 
+				tmpHREF = getFolderName(arguments.resourceType)
 							& "/" 
 							& arguments.packageName
 							& "/"
@@ -211,7 +226,7 @@
 			var reg = getResourceTypeRegistry();
 			var rb = arguments.resourceBean;
 			var resType = rb.getType();
-			var resTypeDir = reg.getResourceType(resType).getFolderName();
+			var resTypeDir = getFolderName(resType);
 			var xmlNode = 0;
 			var infoHREF = "";
 			var aRes = arrayNew(1);
@@ -306,7 +321,7 @@
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( arguments.resourceType, arguments.package  );
 			
-			resTypeDir = resType.getFolderName();
+			resTypeDir = getFolderName(arguments.resourceType);
 
 			// remove from descriptor (if exists)
 			packageDir = resourcesRoot & "/" & resTypeDir & "/" & arguments.package;
@@ -368,7 +383,7 @@
 		<cfargument name="packageName" type="string" required="true">
 		<cfreturn variables.resourcesRoot 
 					& "/" 
-					& getResourceTypeRegistry().getResourceType(arguments.resourceType).getFolderName() 
+					& getFolderName(arguments.resourceType) 
 					& "/" 
 					& arguments.packageName 
 					& "/" 
@@ -451,7 +466,7 @@
 										& defaultExtension;
 			}	
 			
-			href = rt.getFolderName() 
+			href = getFolderName(rb.getType()) 
 					& "/" 
 					& rb.getPackage() 
 					& "/" 
@@ -489,7 +504,7 @@
 										& defaultExtension;
 			}	
 			
-			href = rt.getFolderName() 
+			href = getFolderName(rb.getType()) 
 					& "/" 
 					& rb.getPackage() 
 					& "/" 
@@ -568,7 +583,7 @@
 			var defaultExtension = listFirst(rt.getFileTypes());
 			
 			// build the default name of the resource to register
-			tmpHREF = rt.getFolderName() 
+			tmpHREF = getFolderName(arguments.resourceType) 
 						& "/" 
 						& arguments.packageName 
 						& "/" 
@@ -671,6 +686,32 @@
 						
 			return xmlNode;
 		</cfscript>
+	</cffunction>
+	
+	<cffunction name="getFolderName" access="private" returntype="string">
+		<cfargument name="resourceType" type="string" required="true">
+		<cfset var rtn = "" />
+		<cfswitch expression="#arguments.resourceType#">
+			<cfcase value="content">
+				<cfset rtn = "Contents">
+			</cfcase>
+			<cfcase value="image">
+				<cfset rtn = "Images">
+			</cfcase>
+			<cfcase value="skin">
+				<cfset rtn = "Skins">
+			</cfcase>
+			<cfcase value="feed">
+				<cfset rtn = "Feeds">
+			</cfcase>
+			<cfcase value="module">
+				<cfset rtn = "Modules">
+			</cfcase>
+			<cfdefaultcase>
+				<cfset rtn = arguments.resourceType>
+			</cfdefaultcase>
+		</cfswitch>
+		<cfreturn rtn/>
 	</cffunction>
 
 
