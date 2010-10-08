@@ -23,11 +23,15 @@
 		<cfscript>
 			variables.resourcesRoot = arguments.resourceLibraryPath;
 			variables.resourceTypeRegistry = arguments.resourceTypeRegistry;
-			variables.resLibID = mid(
-									arguments.resourceLibraryPath,
-									find("://",arguments.resourceLibraryPath)+3,
-									len(arguments.resourceLibraryPath)
-								);
+			variables.resLibID = arguments.resourceLibraryPath;
+
+			if(find("://",arguments.resourceLibraryPath)) {
+				variables.resLibID = mid(
+										arguments.resourceLibraryPath,
+										find("://",arguments.resourceLibraryPath)+3,
+										len(arguments.resourceLibraryPath)
+									);
+			}
 			
 			if(structKeyExists(arguments.configStruct,"dsn")) 
 				variables.dsn = arguments.configStruct.dsn;
