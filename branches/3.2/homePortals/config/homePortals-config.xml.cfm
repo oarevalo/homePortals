@@ -52,6 +52,10 @@
 		<contentRenderer moduleType="rss" path="homePortals.components.contentTagRenderers.rss" />
 		<contentRenderer moduleType="text" path="homePortals.components.contentTagRenderers.text" />
 		<contentRenderer moduleType="contentList" path="homePortals.components.contentTagRenderers.contentList" />
+		<contentRenderer moduleType="resourceList" path="homePortals.components.contentTagRenderers.resourceList" />
+		<contentRenderer moduleType="imageList" path="homePortals.components.contentTagRenderers.imageList" />
+		<contentRenderer moduleType="resourceView" path="homePortals.components.contentTagRenderers.resourceView" />
+		<contentRenderer moduleType="form" path="homePortals.components.contentTagRenderers.form" />
 	</contentRenderers>
 	
 	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
