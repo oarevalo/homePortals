@@ -1,14 +1,12 @@
-<cfcomponent extends="homePortals.components.contentTagRenderer" hint="Displays a list of available resources.">
-	<cfproperty name="resourceType" type="string" required="true" displayname="Resource Type">
+<cfcomponent extends="homePortals.components.contentTagRenderer" hint="Displays a list of available image resources.">
+
 	<cfproperty name="orderBy" type="string" hint="Indicates the sorting order for content entries. By default entries are displayed in alphabetical order by their ID property" />
 	<cfproperty name="itemHREF" type="string" hint="Use this field to provide an optional URL to trigger when selecting an item from the list. To indicate the ID of the selected entry, use the token %id" />
 	<cfproperty name="pagingHREF" type="numeric" hint="URL format to use for paging. Use %pageNumber for the page number value" />
 	<cfproperty name="itemsPerPage" type="numeric" default="10" required="false" hint="The number of resources to display at a time" />
 	<cfproperty name="startRow" type="numeric" default="1" />
 
-	<cfproperty name="itemTitle" type="string" hint="Resource property to use as label" />
-	<cfproperty name="showDescription" type="boolean" hint="Display a description for each item?" />
-	<cfproperty name="showCreateDate" type="boolean" hint="Display the creation date for each item?" />
+	<cfproperty name="showLabel" type="boolean" hint="Display a label for each image?" />
 	<cfproperty name="groupBy" type="string" />
 	<cfproperty name="pagingDelta" type="numeric" />
 	<cfproperty name="itemProperties" type="string" hint="List of resource properties to display for each item" />
@@ -17,28 +15,18 @@
 	<cfproperty name="searchTerm" type="string" hint="" />
 	<cfproperty name="searchFields" type="string" hint="" />
 	<cfproperty name="searchFilter" type="string" hint="" />
-
-	<!---
-	<cfproperty name="showFileAsThumbnail" type="boolean" hint="Display the resource file as a thumbnail?" />
-	<cfproperty name="thumbnail_width" type="numeric" />
-	<cfproperty name="thumbnail_height" type="numeric" />
-	<cfproperty name="thumbnail_path" type="string" />
-	<cfproperty name="thumbnail_position" type="list" values="left,right,item" />
-	<cfproperty name="displayType" type="list" values="list,grid,fluidgrid" default="list">
-	<cfproperty name="grid_items_per_row" type="numeric" default="4" hint="number of items to display on a row">
-	--->
 	
 	<cfset variables.MAX_ITEMS_TO_DISPLAY = 1000>
-	<cfset variables.DATE_FORMAT_MASK = "long">
+	<cfset variables.DEFAULT_RESOURCE_TYPE = "image">
 	<cfset variables.DEFAULT_ITEMS_TO_DISPLAY = 10>
 	<cfset variables.DEFAULT_ORDER_BY = "id">
 	<cfset variables.DEFAULT_GROUP_BY = "">
 	<cfset variables.DEFAULT_PAGING_DELTA = 3>
-	<cfset variables.DEFAULT_TITLE_PROPERTY = "id">
 	<cfset variables.DEFAULT_SEARCH_FIELDS = "id,package,description">
-	<cfset variables.DEFAULT_SHOW_CREATEDATE = true>
-	<cfset variables.DEFAULT_SHOW_DESCRIPTION = true>
+	<cfset variables.DEFAULT_SHOW_LABEL = true>
 	<cfset variables.DEFAULT_SHOW_RESULTSCOUNT = true>
+	<cfset variables.DEFAULT_WIDTH = "100">
+	<cfset variables.DEFAULT_HEIGHT = "">
 
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
 		<cfargument name="headContentBuffer" type="homePortals.components.singleContentBuffer" required="true">	
@@ -46,10 +34,9 @@
 		<cfscript>
 			var fld = "";
 
-			var resourceType = getContentTag().getAttribute("resourceType");
+			var resourceType = getContentTag().getAttribute("resourceType", variables.DEFAULT_RESOURCE_TYPE);
 			var orderBy = getContentTag().getAttribute("orderBy",variables.DEFAULT_ORDER_BY);
 			var groupBy = getContentTag().getAttribute("groupBy",variables.DEFAULT_GROUP_BY);
-			var itemTitle = getContentTag().getAttribute("itemTitle",variables.DEFAULT_TITLE_PROPERTY);
 			var itemProperties = getContentTag().getAttribute("itemProperties");
 			var package = getContentTag().getAttribute("package");
 			var searchTerm = getContentTag().getAttribute("searchTerm");
@@ -61,8 +48,9 @@
 
 			if(groupBy neq "") orderBy = listAppend(groupBy,orderBy);
 		</cfscript>
+	
 		<cfquery name="qryRes" dbtype="query" maxrows="#variables.MAX_ITEMS_TO_DISPLAY#">
-			SELECT id,description,createdOn,package,type, #itemTitle# as _title_prop_
+			SELECT id,description,createdOn,package,type,label,url,href,libpath
 					<cfif itemProperties neq "">,#itemProperties#</cfif>
 				FROM qryRes
 				WHERE (1=1)
@@ -97,14 +85,12 @@
 		<cfset var prevStart = 0>
 		<cfset var nextStart = 0>
 
-		<cfset var showIntro = getContentTag().getAttribute("showIntro",false)>
 		<cfset var itemHREF = getContentTag().getAttribute("itemHREF")>
 		<cfset var pagingHREF = getContentTag().getAttribute("pagingHREF")>
 		<cfset var startRow = getContentTag().getAttribute("startRow",1)>
 		<cfset var pagingDelta = getContentTag().getAttribute("pagingDelta", variables.DEFAULT_PAGING_DELTA)>
 		<cfset var itemsPerPage = getContentTag().getAttribute("itemsPerPage",variables.DEFAULT_ITEMS_TO_DISPLAY)>
-		<cfset var showCreateDate = getContentTag().getAttribute("showCreateDate", variables.DEFAULT_SHOW_CREATEDATE)>
-		<cfset var showDescription = getContentTag().getAttribute("showDescription", variables.DEFAULT_SHOW_DESCRIPTION)>
+		<cfset var showLabel = getContentTag().getAttribute("showLabel", variables.DEFAULT_SHOW_LABEL)>
 		<cfset var showResultsCount = getContentTag().getAttribute("showResultsCount", variables.DEFAULT_SHOW_RESULTSCOUNT)>
 		<cfset var groupBy = getContentTag().getAttribute("groupBy",variables.DEFAULT_GROUP_BY)>
 		<cfset var itemProperties = getContentTag().getAttribute("itemProperties")>
@@ -120,79 +106,88 @@
 		<cfset nextStart = startRow+itemsPerPage>
 
 		<cfsavecontent variable="tmpHTML">
+			<style type="text/css">
+				.rl_image {
+					margin-right:10px;
+					margin-bottom:10px;
+					float:left;
+					width:100px;
+					height:150px;
+				}
+			</style>
 			<cfif groupBy eq "">
 				<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#">
+					<cfset href = "" />
 					<cfif itemHREF neq "">
 						<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
 						<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 						<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
+					<cfelse>
+						<cfset href = arguments.qryData.url />
 					</cfif>
-					<p>
-						<div class="rl_itemTitle">
-							<cfif href neq "">
-								<a href="#href#">#arguments.qrydata._title_prop_#</a>
-							<cfelse>
-								#arguments.qrydata._title_prop_# 
-							</cfif>
-						</div>
-						<cfif showCreateDate and isDate(arguments.qryData.createdOn)>
-							<div class="rl_itemDate">
-								#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#
-							</div>
-						</cfif>
-						<cfif showDescription and arguments.qryData.description neq "">
-							<div class="rl_itemDescriptions">
-								#arguments.qryData.description#
-							</div>
-						</cfif>
+					<div class="rl_image" style="float:left;">
+						#renderImage(arguments.qryData.label,
+										"/miniblog/" & arguments.qryData.libpath & "/" & arguments.qryData.package& "/" & arguments.qryData.href,
+										href)#
 						<cfif itemProperties neq "">
-							<div class="rl_itemProperties">
-								<cfloop list="#itemProperties#" index="prop">
-									<label>#prop#:</label> #arguments.qryData[prop]#<br />
-								</cfloop>
-							</div>
+							<br />
+							<cfif showLabel and arguments.qryData.label neq "">
+								<b>#arguments.qryData.label#</b><br />
+							</cfif>
+							<cfloop list="#itemProperties#" index="prop">
+								<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
+							</cfloop>
+						<cfelseif arguments.qryData.label neq "" and showLabel>
+							<br />
+							<cfif href neq "">
+								<a href="#href#">#arguments.qryData.label#</a>
+							<cfelse>
+								#arguments.qryData.label#
+							</cfif>
+							<br />
 						</cfif>
-					</p>
+					</div>
 				</cfoutput>
 			<cfelse>
 				<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#" group="#groupBy#">
 					<b>#arguments.qrydata[groupBy]#</b><br />
 					<cfoutput>
-						<cfif itemHREF neq "">
-							<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
-							<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
-							<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
+					<cfset href = "" />
+					<cfif itemHREF neq "">
+						<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
+						<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
+						<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
+					<cfelse>
+						<cfset href = arguments.qryData.url />
+					</cfif>
+					<div class="rl_image">
+						#renderImage(arguments.qryData.label,
+										arguments.qryData.href,
+										href)#
+						<cfif itemProperties neq "">
+							<br />
+							<cfif showLabel and arguments.qryData.label neq "">
+								<b>#arguments.qryData.label#</b><br />
+							</cfif>
+							<cfloop list="#itemProperties#" index="prop">
+								<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
+							</cfloop>
+						<cfelseif arguments.qryData.label neq "" and showLabel>
+							<br />
+							<cfif href neq "">
+								<a href="#href#">#arguments.qryData.label#</a>
+							<cfelse>
+								#arguments.qryData.label#
+							</cfif>
+							<br />
 						</cfif>
-						<p>
-							<div class="rl_itemTitle">
-								<cfif href neq "">
-									<a href="#href#">#arguments.qrydata._title_prop_#</a>
-								<cfelse>
-									#arguments.qrydata._title_prop_# 
-								</cfif>
-							</div>
-							<cfif showCreateDate and isDate(arguments.qryData.createdOn)>
-								<div class="rl_itemDate">
-									#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#
-								</div>
-							</cfif>
-							<cfif showDescription and arguments.qryData.description neq "">
-								<div class="rl_itemDescriptions">
-									#arguments.qryData.description#
-								</div>
-							</cfif>
-							<cfif itemProperties neq "">
-								<cfloop list="#itemProperties#" index="prop">
-									<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
-								</cfloop>
-							</cfif>
-						</p>
+					</div>
 					</cfoutput>
-					<br />
+					<br style="clear:both;" />
 				</cfoutput>
 			</cfif>
 			<cfoutput>
-				<br />
+				<br style="clear:both;" />
 				<div class="rl_paging">
 					<cfif showResultsCount>
 						<b>
@@ -244,5 +239,30 @@
 		</cfsavecontent>
 		<cfreturn tmpHTML>
 	</cffunction>
+
+	<cffunction name="renderImage" access="public" returntype="string">
+		<cfargument name="label" type="string" required="true">
+		<cfargument name="imgHREF" type="string" required="true">
+		<cfargument name="linkHREF" type="string" required="true">
+		<cfscript>
+			var width = getContentTag().getAttribute("width", variables.DEFAULT_WIDTH);
+			var height = getContentTag().getAttribute("height", variables.DEFAULT_HEIGHT);
+			var tmpHTML = "";
+			var alt = arguments.label;
+			
+			if(alt eq "") alt = getFileFromPath(arguments.imgHREF);
+			
+			tmpHTML = "<img src=""#arguments.imgHREF#"" border=""0"" alt=""#htmlEditFormat(alt)#"" title=""#htmlEditFormat(alt)#""";
+			
+			if(width neq "") tmpHTML = tmpHTML & " width='#width#'";
+			if(height neq "") tmpHTML = tmpHTML & " height='#height#'";
+			tmpHTML = tmpHTML & ">";
+			
+			if(arguments.linkHREF neq "") tmpHTML = "<a href='#arguments.linkHREF#'>" & tmpHTML & "</a>";
+
+			return tmpHTML;				
+		</cfscript>
+	</cffunction>
+
 
 </cfcomponent>
