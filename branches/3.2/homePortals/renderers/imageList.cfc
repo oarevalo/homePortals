@@ -7,14 +7,18 @@
 	<cfproperty name="startRow" type="numeric" default="1" />
 
 	<cfproperty name="showLabel" type="boolean" hint="Display a label for each image?" />
-	<cfproperty name="groupBy" type="string" />
-	<cfproperty name="pagingDelta" type="numeric" />
+	<cfproperty name="groupBy" type="string" hint="Groups results by the given field" />
 	<cfproperty name="itemProperties" type="string" hint="List of resource properties to display for each item" />
 
-	<cfproperty name="package" type="string" hint="" />
+	<cfproperty name="package" type="string" hint="Use this field to limit the list to only a specific package" />
 	<cfproperty name="searchTerm" type="string" hint="" />
 	<cfproperty name="searchFields" type="string" hint="" />
 	<cfproperty name="searchFilter" type="string" hint="" />
+
+	<cfproperty name="width" type="numeric" hint="Width in pixels for the thumbnails. Can be empty." />
+	<cfproperty name="height" type="numeric" hint="Height in pixels for the thumbnails. Can be empty." />
+	<cfproperty name="thumbnails" type="boolean" hint="Indicates whether to automatically generate the thumbnails for the images. Defaults to True" />
+	<cfproperty name="thumbnailsPath" type="string" hint="When thumbnails are created automatically, this setting tells which folder within the app root will be used to store the generated images" />
 	
 	<cfset variables.MAX_ITEMS_TO_DISPLAY = 1000>
 	<cfset variables.DEFAULT_RESOURCE_TYPE = "image">
@@ -27,6 +31,8 @@
 	<cfset variables.DEFAULT_SHOW_RESULTSCOUNT = true>
 	<cfset variables.DEFAULT_WIDTH = "100">
 	<cfset variables.DEFAULT_HEIGHT = "">
+	<cfset variables.DEFAULT_CREATE_THUMBNAILS = true>
+	<cfset variables.DEFAULT_THUMBS_PATH = "thumbnails/">
 
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
 		<cfargument name="headContentBuffer" type="homePortals.components.singleContentBuffer" required="true">	
@@ -95,6 +101,8 @@
 		<cfset var groupBy = getContentTag().getAttribute("groupBy",variables.DEFAULT_GROUP_BY)>
 		<cfset var itemProperties = getContentTag().getAttribute("itemProperties")>
 		<cfset var searchTerm = getContentTag().getAttribute("searchTerm")>
+		<cfset var width = getContentTag().getAttribute("width", variables.DEFAULT_WIDTH)>
+		<cfset var height = getContentTag().getAttribute("height", variables.DEFAULT_HEIGHT)>
 
 		<cfif val(itemsPerPage) eq 0>
 			<cfset itemsPerPage = variables.DEFAULT_ITEMS_TO_DISPLAY>
@@ -110,84 +118,96 @@
 				.rl_image {
 					margin-right:10px;
 					margin-bottom:10px;
-					float:left;
-					width:100px;
-					height:150px;
+					<cfoutput>
+						<cfif width neq "">width:#width#px;</cfif>
+						<cfif height neq "">height:#height#px;</cfif>
+					</cfoutput>
+				}
+				.rl_groupLabel {
+					font-weight:bold;
+					margin-bottom:8px;
 				}
 			</style>
-			<cfif groupBy eq "">
-				<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#">
-					<cfset href = "" />
-					<cfif itemHREF neq "">
-						<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
-						<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
-						<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
-					<cfelse>
-						<cfset href = arguments.qryData.url />
-					</cfif>
-					<div class="rl_image" style="float:left;">
-						#renderImage(arguments.qryData.label,
-										"/miniblog/" & arguments.qryData.libpath & "/" & arguments.qryData.package& "/" & arguments.qryData.href,
-										href)#
-						<cfif itemProperties neq "">
-							<br />
-							<cfif showLabel and arguments.qryData.label neq "">
-								<b>#arguments.qryData.label#</b><br />
-							</cfif>
-							<cfloop list="#itemProperties#" index="prop">
-								<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
-							</cfloop>
-						<cfelseif arguments.qryData.label neq "" and showLabel>
-							<br />
-							<cfif href neq "">
-								<a href="#href#">#arguments.qryData.label#</a>
-							<cfelse>
-								#arguments.qryData.label#
-							</cfif>
-							<br />
+			<div class="rl_imageList" style="float:left;">
+				<cfif groupBy eq "">
+					<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#">
+						<cfset href = "" />
+						<cfif itemHREF neq "">
+							<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
+							<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
+							<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
+							<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
+						<cfelse>
+							<cfset href = arguments.qryData.url />
 						</cfif>
-					</div>
-				</cfoutput>
-			<cfelse>
-				<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#" group="#groupBy#">
-					<b>#arguments.qrydata[groupBy]#</b><br />
-					<cfoutput>
-					<cfset href = "" />
-					<cfif itemHREF neq "">
-						<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
-						<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
-						<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
-					<cfelse>
-						<cfset href = arguments.qryData.url />
-					</cfif>
-					<div class="rl_image">
-						#renderImage(arguments.qryData.label,
-										arguments.qryData.href,
-										href)#
-						<cfif itemProperties neq "">
-							<br />
-							<cfif showLabel and arguments.qryData.label neq "">
-								<b>#arguments.qryData.label#</b><br />
+						<div class="rl_image" style="float:left;">
+							#renderImage(arguments.qryData.id, arguments.qryData.package, arguments.qryData.label,
+											href,
+											arguments.qryData.libpath,
+											arguments.qryData.href)#
+							<cfif itemProperties neq "">
+								<br />
+								<cfif showLabel and arguments.qryData.label neq "">
+									<b>#arguments.qryData.label#</b><br />
+								</cfif>
+								<cfloop list="#itemProperties#" index="prop">
+									<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
+								</cfloop>
+							<cfelseif arguments.qryData.label neq "" and showLabel>
+								<br />
+								<cfif href neq "">
+									<a href="#href#">#arguments.qryData.label#</a>
+								<cfelse>
+									#arguments.qryData.label#
+								</cfif>
+								<br />
 							</cfif>
-							<cfloop list="#itemProperties#" index="prop">
-								<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
-							</cfloop>
-						<cfelseif arguments.qryData.label neq "" and showLabel>
-							<br />
-							<cfif href neq "">
-								<a href="#href#">#arguments.qryData.label#</a>
-							<cfelse>
-								#arguments.qryData.label#
-							</cfif>
-							<br />
-						</cfif>
-					</div>
+						</div>
 					</cfoutput>
-					<br style="clear:both;" />
-				</cfoutput>
-			</cfif>
+				<cfelse>
+					<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#" group="#groupBy#">
+						<div class="rl_groupLabel">
+							#arguments.qrydata[groupBy]#
+						</div>
+						<cfoutput>
+						<cfset href = "" />
+						<cfif itemHREF neq "">
+							<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
+							<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
+							<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
+							<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
+						<cfelse>
+							<cfset href = arguments.qryData.url />
+						</cfif>
+						<div class="rl_image" style="float:left;">
+							#renderImage(arguments.qryData.id, arguments.qryData.package, arguments.qryData.label,
+											href,
+											arguments.qryData.libpath,
+											arguments.qryData.href)#
+							<cfif itemProperties neq "">
+								<br />
+								<cfif showLabel and arguments.qryData.label neq "">
+									<b>#arguments.qryData.label#</b><br />
+								</cfif>
+								<cfloop list="#itemProperties#" index="prop">
+									<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
+								</cfloop>
+							<cfelseif arguments.qryData.label neq "" and showLabel>
+								<br />
+								<cfif href neq "">
+									<a href="#href#">#arguments.qryData.label#</a>
+								<cfelse>
+									#arguments.qryData.label#
+								</cfif>
+								<br />
+							</cfif>
+						</div>
+						</cfoutput>
+						<div style="clear:both;" />
+					</cfoutput>
+				</cfif>
+			</div>
 			<cfoutput>
-				<br style="clear:both;" />
 				<div class="rl_paging">
 					<cfif showResultsCount>
 						<b>
@@ -240,28 +260,58 @@
 		<cfreturn tmpHTML>
 	</cffunction>
 
-	<cffunction name="renderImage" access="public" returntype="string">
+	<cffunction name="renderImage" access="private" returntype="string">
+		<cfargument name="id" type="string" required="true">
+		<cfargument name="package" type="string" required="true">
 		<cfargument name="label" type="string" required="true">
-		<cfargument name="imgHREF" type="string" required="true">
 		<cfargument name="linkHREF" type="string" required="true">
+		<cfargument name="libPath" type="string" required="true">
+		<cfargument name="resPath" type="string" required="true">
 		<cfscript>
+			var tmpHTML = "";
 			var width = getContentTag().getAttribute("width", variables.DEFAULT_WIDTH);
 			var height = getContentTag().getAttribute("height", variables.DEFAULT_HEIGHT);
-			var tmpHTML = "";
-			var alt = arguments.label;
-			
-			if(alt eq "") alt = getFileFromPath(arguments.imgHREF);
-			
-			tmpHTML = "<img src=""#arguments.imgHREF#"" border=""0"" alt=""#htmlEditFormat(alt)#"" title=""#htmlEditFormat(alt)#""";
-			
-			if(width neq "") tmpHTML = tmpHTML & " width='#width#'";
-			if(height neq "") tmpHTML = tmpHTML & " height='#height#'";
-			tmpHTML = tmpHTML & ">";
-			
-			if(arguments.linkHREF neq "") tmpHTML = "<a href='#arguments.linkHREF#'>" & tmpHTML & "</a>";
-
-			return tmpHTML;				
+			var thumbnails = getContentTag().getAttribute("thumbnails", variables.DEFAULT_CREATE_THUMBNAILS);
+			var thumbnailsPath = getContentTag().getAttribute("thumbnailsPath", variables.DEFAULT_THUMBS_PATH);
+			var thmbPath = getHomePortals().getConfig().getAppRoot() & thumbnailsPath;
+			var srcPath = arguments.libPath & "/" & arguments.resPath;
+			var tgtPath = srcPath;
+			var tgtFileName = hash(srcPath & width & height);
+		//	uncomment the following line to have the thumbnails created with a more meaningful name if you want
+		//	var tgtFileName = reReplace(listDeleteAt(arguments.resPath,listLen(arguments.resPath,"."),"."),"[^a-zA-Z0-9]","_","ALL") & "_" & width & "_" & height;
 		</cfscript>
+		
+		<cfif thumbnails>
+			<cfset tgtPath = thmbPath
+							& tgtFileName
+							& "."
+							& listLast(arguments.resPath,".")>
+			<cfif not directoryExists(expandPath(thmbPath))>
+				<cfset createObject("java","java.io.File").init(expandPath(thmbPath)).mkdirs()>
+			</cfif>
+			<cfif !directoryExists(getDirectoryFromPath(srcPath))>
+				<cfset srcPath = expandPath(srcPath)>
+			</cfif>
+			<cfif not fileExists(expandPath(tgtPath))>
+				<cfimage action="resize"  
+						    source="#srcPath#"
+						    width="#width#" 
+						    height="#height#" 
+						    destination="#expandPath(tgtPath)#">
+			</cfif>		
+		</cfif>
+		
+		<cfif arguments.label eq "">
+			<cfset arguments.label = arguments.id>
+		</cfif>
+
+		<cfif linkHREF neq "">
+			<cfset tmpHTML = "<a href='#linkHREF#'><img src='#tgtPath#' alt='#htmlEditFormat(label)#' title='#htmlEditFormat(label)#' width='#width#' height='#height#'></a>">
+		<cfelse>
+			<cfset tmpHTML = "<img src='#tgtPath#' alt='#htmlEditFormat(label)#' title='#htmlEditFormat(label)#' width='#width#' height='#height#'>">
+		</cfif>
+
+		<cfreturn tmpHTML>
 	</cffunction>
 
 

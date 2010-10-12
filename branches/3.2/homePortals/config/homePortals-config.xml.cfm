@@ -45,17 +45,17 @@
 	
 	<!-- The following are the different types of modules or content renderers that will be supported on a page -->
 	<contentRenderers>
-		<contentRenderer moduleType="content" path="homePortals.components.contentTagRenderers.content" />
-		<contentRenderer moduleType="view" path="homePortals.components.contentTagRenderers.view" />
-		<contentRenderer moduleType="image" path="homePortals.components.contentTagRenderers.image" />
-		<contentRenderer moduleType="navMenu" path="homePortals.components.contentTagRenderers.navMenu" />
-		<contentRenderer moduleType="rss" path="homePortals.components.contentTagRenderers.rss" />
-		<contentRenderer moduleType="text" path="homePortals.components.contentTagRenderers.text" />
-		<contentRenderer moduleType="contentList" path="homePortals.components.contentTagRenderers.contentList" />
-		<contentRenderer moduleType="resourceList" path="homePortals.components.contentTagRenderers.resourceList" />
-		<contentRenderer moduleType="imageList" path="homePortals.components.contentTagRenderers.imageList" />
-		<contentRenderer moduleType="resourceView" path="homePortals.components.contentTagRenderers.resourceView" />
-		<contentRenderer moduleType="form" path="homePortals.components.contentTagRenderers.form" />
+		<contentRenderer moduleType="content" path="homePortals.renderers.content" />
+		<contentRenderer moduleType="view" path="homePortals.renderers.view" />
+		<contentRenderer moduleType="image" path="homePortals.renderers.image" />
+		<contentRenderer moduleType="navMenu" path="homePortals.renderers.navMenu" />
+		<contentRenderer moduleType="rss" path="homePortals.renderers.rss" />
+		<contentRenderer moduleType="text" path="homePortals.renderers.text" />
+		<contentRenderer moduleType="contentList" path="homePortals.renderers.contentList" />
+		<contentRenderer moduleType="resourceList" path="homePortals.renderers.resourceList" />
+		<contentRenderer moduleType="imageList" path="homePortals.renderers.imageList" />
+		<contentRenderer moduleType="resourceView" path="homePortals.renderers.resourceView" />
+		<contentRenderer moduleType="form" path="homePortals.renderers.form" />
 	</contentRenderers>
 	
 	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
