@@ -63,8 +63,12 @@
 			</table>
 			<cfif isBoolean(displayContent) and displayContent>
 				<hr />
-				<cfif tgtPath neq "" and tgtHREF neq "" and isimageFile(tgtPath)>
-					<img src="#tgtHREF#">
+				<cfif tgtPath neq "" and isimageFile(tgtPath)>
+					<cfif tgtPath neq expandPath(tgtHREF)>
+						<cfimage action="writeToBrowser" source="#tgtPath#">
+					<cfelse>
+						<img src="#tgtHREF#">
+					</cfif>
 				<cfelseif tgtPath neq "">
 					<cfset txt = oResBean.readFile()>
 					#txt#

@@ -126,6 +126,7 @@
 						<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
 						<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 						<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
+						<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
 					</cfif>
 					<p>
 						<div class="rl_itemTitle">
@@ -162,6 +163,7 @@
 							<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
 							<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 							<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
+							<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
 						</cfif>
 						<p>
 							<div class="rl_itemTitle">
