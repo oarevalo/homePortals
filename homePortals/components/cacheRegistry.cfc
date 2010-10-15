@@ -51,7 +51,7 @@
 
 		<cfif arguments.cacheName neq "">
 			<cflock name="cacheRegistryLock_#arguments.cacheName#" type="exclusive" timeout="10">
-				<cfset structDelete(application[variables.CACHE_REGISTRY_NAME], arguments.cacheName, false)>
+				<cfset getCache(arguments.cacheName).clear()>
 			</cflock>		
 		<cfelse>
 			<cflock name="cacheRegistryLock" type="exclusive" timeout="10">

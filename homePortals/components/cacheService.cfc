@@ -149,7 +149,19 @@
 
 	</cffunction>
 	
-
+	<!-------------------------------------->
+	<!--- hasItem                 	  --->
+	<!-------------------------------------->	
+	<cffunction name="hasItem" access="public" returntype="any" hint="Returns whether the item exists on the cache or not">
+		<cfargument name="key" type="string" required="true">
+		<cfreturn structKeyExists(variables.stData, arguments.key)
+					and
+					(
+						variables.stData[arguments.key].TTL eq 0 
+						or 
+						DateDiff("n", variables.stData[arguments.key].timestamp, now()) lt variables.stData[arguments.key].TTL
+					)>
+	</cffunction>
 	
 	<!-------------------------------------->
 	<!--- store                         	  --->
@@ -229,5 +241,11 @@
 		</cfif>
 	</cffunction>	
 		
+	<!-------------------------------------->
+	<!--- clear                        	  --->
+	<!-------------------------------------->	
+	<cffunction name="clear" access="public" returntype="void" hint="Removes all items from the cache">
+		<cfset init()>
+	</cffunction>	
 	
 </cfcomponent>

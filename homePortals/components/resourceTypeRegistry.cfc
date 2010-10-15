@@ -21,7 +21,6 @@
 				
 				if(structKeyExists(stResTypes[i],"name")) oResType.setName( stResTypes[i].name );
 				if(structKeyExists(stResTypes[i],"description") and stResTypes[i].description neq "") oResType.setDescription( stResTypes[i].description );
-				if(structKeyExists(stResTypes[i],"folderName") and stResTypes[i].folderName neq "") oResType.setFolderName( stResTypes[i].folderName );
 				if(structKeyExists(stResTypes[i],"resBeanPath") and stResTypes[i].resBeanPath neq "") oResType.setResBeanPath( stResTypes[i].resBeanPath );
 				if(structKeyExists(stResTypes[i],"fileTypes") and stResTypes[i].fileTypes neq "") oResType.setFileTypes( stResTypes[i].fileTypes );
 				

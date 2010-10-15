@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<homePortals version="3.1.646">
+<homePortals version="3.2.637">
 
 	<!-- base path for the HomePortals installation -->
 	<homePortalsPath>/homePortals/</homePortalsPath>
@@ -12,9 +12,6 @@
 
 	<!-- HomePortals page to load when no page has been provided -->
 	<defaultPage>default</defaultPage>
-
-	<!-- Event raised when a HomePortals page finishes loading -->
-	<initialEvent>Framework.onPageLoaded</initialEvent>
 
 	<!-- The maximum number of homeportals pages to cache at any given time -->
 	<pageCacheSize>50</pageCacheSize>
@@ -48,13 +45,17 @@
 	
 	<!-- The following are the different types of modules or content renderers that will be supported on a page -->
 	<contentRenderers>
-		<contentRenderer moduleType="content" path="homePortals.components.contentTagRenderers.content" />
-		<contentRenderer moduleType="view" path="homePortals.components.contentTagRenderers.view" />
-		<contentRenderer moduleType="image" path="homePortals.components.contentTagRenderers.image" />
-		<contentRenderer moduleType="navMenu" path="homePortals.components.contentTagRenderers.navMenu" />
-		<contentRenderer moduleType="rss" path="homePortals.components.contentTagRenderers.rss" />
-		<contentRenderer moduleType="text" path="homePortals.components.contentTagRenderers.text" />
-		<contentRenderer moduleType="contentList" path="homePortals.components.contentTagRenderers.contentList" />
+		<contentRenderer moduleType="content" path="homePortals.renderers.content" />
+		<contentRenderer moduleType="view" path="homePortals.renderers.view" />
+		<contentRenderer moduleType="image" path="homePortals.renderers.image" />
+		<contentRenderer moduleType="navMenu" path="homePortals.renderers.navMenu" />
+		<contentRenderer moduleType="rss" path="homePortals.renderers.rss" />
+		<contentRenderer moduleType="text" path="homePortals.renderers.text" />
+		<contentRenderer moduleType="contentList" path="homePortals.renderers.contentList" />
+		<contentRenderer moduleType="resourceList" path="homePortals.renderers.resourceList" />
+		<contentRenderer moduleType="imageList" path="homePortals.renderers.imageList" />
+		<contentRenderer moduleType="resourceView" path="homePortals.renderers.resourceView" />
+		<contentRenderer moduleType="form" path="homePortals.renderers.form" />
 	</contentRenderers>
 	
 	<!-- The following section is used to declare plugins to extend the functionality of HomePortals -->
@@ -65,20 +66,17 @@
 	<!-- This section declares the available resource types -->
 	<resourceTypes>
 		<resourceType name="content">
-			<folderName>Contents</folderName>
 			<description>Content resources are blocks of formatted text that can be reused across a site</description>
 			<fileTypes>htm,html</fileTypes>
 		</resourceType>
 						
 		<resourceType name="feed">
-			<folderName>Feeds</folderName>
 			<description>Feeds are either RSS or Atom feeds from external sources that you can use with feed-enabled modules to display their contents on your site</description>
 			<property name="rssurl" type="string" hint="Location of the source of the feed" label="Feed URL" />
 			<property name="htmlurl" type="string" hint="Location of the website associated with this feed" label="Website URL" />
 		</resourceType>
 		
 		<resourceType name="image">
-			<folderName>Images</folderName>
 			<description>This resource type is used to represent an image document</description>
 			<property name="label" type="string" hint="Image title" />
 			<property name="url" type="string" hint="An URL address associated to this image" />
@@ -94,6 +92,12 @@
 	
 	<!-- Additional resource library types  -->
 	<resourceLibraryTypes>
+		<resourceLibraryType prefix="file" path="homePortals.components.defaultResourceLibrary">
+		</resourceLibraryType>
+
+		<resourceLibraryType prefix="legacy" path="homePortals.components.legacyResourceLibrary">
+		</resourceLibraryType>
+		
 		<resourceLibraryType prefix="db" path="homePortals.components.dbResourceLibrary">
 			<!--
 			Optional properties:
@@ -112,5 +116,11 @@
 			-->
 		</resourceLibraryType>
 	</resourceLibraryTypes>
+	
+	<!-- this setting determines the default resourceLibraryType to use when not indicating explicitly via prefix -->
+	<defaultResourceLibraryType>file</defaultResourceLibraryType>
+
+	<!-- use this setting to provide a class that will be invoked whenever an error occurs while rendering a page -->
+	<errorHandlerClass></errorHandlerClass>
 	
 </homePortals>

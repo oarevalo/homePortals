@@ -1,25 +1,23 @@
 <cfcomponent output="false" hint="Main component for the HomePortals framework. This component provides the interface for the initialization of the entire application as well as the loading, parsing and rendering of pages">
 <!---
-/*
-	Copyright 2007 - Oscar Arevalo (http://www.oscararevalo.com)
+	homePortals
+	http://www.homeportals.net
 
     This file is part of HomePortals.
 
-    HomePortals is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HomePortals is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with HomePortals.  If not, see <http://www.gnu.org/licenses/>.
-
-*/ 
----->
+	Copyright 2007-2010 Oscar Arevalo
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+	http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.	
+--->
 	
 	<cfscript>
 		/// PUBLIC PROPERTIES ///
@@ -30,7 +28,8 @@
 		variables.hpEngineRoot = "/homePortals/";		// root directory for the homeportals engine
 		variables.appRoot = "";					// Root directory of the application as a relative URL
 		variables.oHomePortalsConfigBean = 0;	// bean to store config settings
-		variables.configFilePath = "#this.CONFIG_FILE_DIR#/#this.CONFIG_FILE_NAME#";  
+		variables.hpConfigFilePath = "#this.CONFIG_FILE_DIR#/#this.CONFIG_FILE_NAME#";
+		variables.configFilePath = variables.hpConfigFilePath;  
 												// path of the config file relative to the root of the application
 		
 		variables.oCatalog = 0;					// a handle to the resources catalog 
@@ -49,51 +48,96 @@
 	<!--------------------------------------->
 	<cffunction name="init" access="public" returntype="homePortals" hint="Constructor">
 		<cfargument name="appRoot" type="string" required="false" default="" hint="Root directory of the application as a relative URL">
+		<cfargument name="config" type="any" required="false" hint="Provides an explicit configuration to load. This can be a an instance of homePortalsConfigBean, an XML object or a string containing the configuration. If this parameter is missing, HomePortals will try to locate a config file in the app directory" />
 		<cfscript>
-			var pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 			var defaultConfigFilePath = "";
 			var start = getTickCount();
-			var hpContentRoot = "";
+			var userPlugins = []; 
+			var hpPlugins = []; 
+			var pluginLoader = 0; 
+			var userConfigBean = 0;
+			var i = 0;
 
 			// check that appRoot has the right format
 			if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";
-
 			variables.appRoot = arguments.appRoot;
 
 			// create object to store configuration settings
 			variables.oHomePortalsConfigBean = createObject("component", "homePortalsConfigBean").init();
 
 			// load default configuration settings
-			defaultConfigFilePath = getDirectoryFromPath(getCurrentTemplatePath()) & ".." & pathSeparator & this.CONFIG_FILE_DIR & pathSeparator & this.CONFIG_FILE_NAME;
-			variables.oHomePortalsConfigBean.load(defaultConfigFilePath);
-			hpContentRoot = variables.oHomePortalsConfigBean.getContentRoot();
+			defaultConfigFilePath = variables.hpEngineRoot & variables.hpConfigFilePath;
+			variables.oHomePortalsConfigBean.load(expandPath(defaultConfigFilePath));
+
+			// set the appRoot on the config bean so that it is globally accessible
+			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
 
 			// load configuration settings for the application (overrides specific settings)
-			if(arguments.appRoot neq "" and arguments.appRoot neq variables.hpEngineRoot) {
-				if(fileExists(expandPath(variables.appRoot & variables.configFilePath))) {
-					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
+			if(arguments.appRoot neq variables.hpEngineRoot) {
+
+				// create a config bean with the app configuration
+				userConfigBean = createObject("component", "homePortalsConfigBean").init();
+
+				if(structKeyExists(arguments,"config")) {
+					if(isXML(arguments.config) or isXMLDoc(arguments.config))
+						userConfigBean.loadXML(arguments.config);
+					else if(not isSimpleValue(arguments.config))
+						userConfigBean.loadXML(arguments.config.toXML());
+
+				} else if(fileExists(expandPath(variables.appRoot & variables.configFilePath))) {
+					userConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
+
 				} else if(fileExists(expandPath(variables.appRoot & this.CONFIG_FILE_NAME))) {
 					// we also handle the case in which the config is found at the app root level
 					variables.configFilePath = this.CONFIG_FILE_NAME;
-					variables.oHomePortalsConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
+					userConfigBean.load(expandPath(variables.appRoot & variables.configFilePath));
 				}
+
+				// set a default content root and for the app
+				if(userConfigBean.getContentRoot() eq "")
+					userConfigBean.setContentRoot(arguments.appRoot);
+	
+				// make sure we always have a resource library, defaulting to the application root
+				if(userConfigBean.getResourceLibraryPath() eq "")
+					userConfigBean.setResourceLibraryPath(arguments.appRoot);
+
+				// allow plugins to do any config changes they want
+				userPlugins = userConfigBean.getPlugins();
+				hpPlugins = oHomePortalsConfigBean.getPlugins();
+				if(arrayLen(userPlugins) gt 0 or arrayLen(hpPlugins) gt 0) {
+					pluginLoader = createObject("component","pluginManager").init(this);
+
+					for(i=1;i lte arrayLen(hpPlugins);i++) {
+						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path, hpPlugins[i].properties);
+					}
+					for(i=1;i lte arrayLen(userPlugins);i++) {
+						pluginLoader.registerPlugin(userPlugins[i].name, userPlugins[i].path, userPlugins[i].properties);
+					}
+					pluginLoader.notifyPlugins("configLoad", userConfigBean);
+				}
+
+				// now apply app configuration on top of the global config
+				variables.oHomePortalsConfigBean.loadXML(userConfigBean.toXML());
+
 			} else {
-				arguments.appRoot = variables.oHomePortalsConfigBean.getAppRoot();
-				if(right(arguments.appRoot,1) neq "/") arguments.appRoot = arguments.appRoot & "/";	//normalize approot if obtained from config
+				// set a default content root and for the app
+				if(variables.oHomePortalsConfigBean.getContentRoot() eq "")
+					variables.oHomePortalsConfigBean.setContentRoot(arguments.appRoot);
+	
+				// make sure we always have a resource library, defaulting to the application root
+				if(variables.oHomePortalsConfigBean.getResourceLibraryPath() eq "")
+					variables.oHomePortalsConfigBean.setResourceLibraryPath(arguments.appRoot);
+
+				// allow plugins to do any config changes they want
+				hpPlugins = variables.oHomePortalsConfigBean.getPlugins();
+				if(arrayLen(userPlugins) gt 0 or arrayLen(hpPlugins) gt 0) {
+					pluginLoader = createObject("component","pluginManager").init(this);
+					for(i=1;i lte arrayLen(hpPlugins);i++) {
+						pluginLoader.registerPlugin(hpPlugins[i].name, hpPlugins[i].path, hpPlugins[i].properties);
+					}
+					pluginLoader.notifyPlugins("configLoad", userConfigBean);
+				}
 			}
-
-			// set the appRoot to the given parameter, this way, we can get away without having a local config 
-			// and only pass the appRoot on the constructor
-			variables.oHomePortalsConfigBean.setAppRoot(arguments.appRoot);
-
-			// if the application has not overriden the default contentRoot in the config, 
-			// use the application root as content root
-			if(variables.oHomePortalsConfigBean.getContentRoot() eq hpContentRoot and arguments.appRoot neq variables.hpEngineRoot)
-				variables.oHomePortalsConfigBean.setContentRoot(arguments.appRoot);
-
-			// make sure we always have a resource library, defaulting to the application root
-			if(variables.oHomePortalsConfigBean.getResourceLibraryPath() eq "")
-				variables.oHomePortalsConfigBean.setResourceLibraryPath(arguments.appRoot);
 
 			// initialize environment with current config
 			initEnv();
@@ -136,11 +180,18 @@
 			var oCacheService = 0;
 			var ppClass = "";
 
+			// initialize cache registry
+			oCacheRegistry = createObject("component","cacheRegistry").init();
+			if(arguments.initPlugins) {
+				oCacheRegistry.flush();		// clear registry
+			}
+
 			// initialize resource library manager
 			variables.oResourceLibraryManager = CreateObject("Component","resourceLibraryManager").init(variables.oHomePortalsConfigBean);
 			
 			// initialize resource catalog
-			variables.oCatalog = CreateObject("Component","catalog").init(variables.oResourceLibraryManager);
+			variables.oCatalog = CreateObject("Component","catalog").init(variables.oHomePortalsConfigBean);
+			variables.oCatalog.setResourceLibraryManager(variables.oResourceLibraryManager);
 
 			// initialize page provider
 			variables.oPageProvider = createObject("component", variables.oHomePortalsConfigBean.getPageProviderClass() ).init(variables.oHomePortalsConfigBean);
@@ -148,27 +199,13 @@
 			// initialize page loader
 			variables.oPageLoader = createObject("component","pageLoader").init( variables.oPageProvider );
 
-			// initialize cache registry
-			oCacheRegistry = createObject("component","cacheRegistry").init();
-			if(arguments.initPlugins) {
-				oCacheRegistry.flush();		// clear registry
-			}
-
 			// crate page cache instance
 			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getPageCacheSize(), 
 																			variables.oHomePortalsConfigBean.getPageCacheTTL());
 			oCacheRegistry.register("hpPageCache", oCacheService);
 
-
-			// crate catalog cache instance
-			oCacheService = createObject("component","cacheService").init(variables.oHomePortalsConfigBean.getCatalogCacheSize(), 
-																			variables.oHomePortalsConfigBean.getCatalogCacheTTL());
-			oCacheRegistry.register("catalogCacheService", oCacheService);
-
-
 			// initialize template manager
 			variables.oTemplateManager = createObject("component","templateManager").init(variables.oHomePortalsConfigBean);
-
 						
 			// register and initialize plugins (this flag is to allow plugins to reinit the environment without getting into an infinite loop)
 			if(arguments.initPlugins) {

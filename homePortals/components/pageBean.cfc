@@ -2,7 +2,6 @@
 
 	<cfscript>
 		variables.DEFAULT_PAGE_TITLE = "";
-		variables.DEFAULT_PAGE_SKINID = "";
 		variables.DEFAULT_PAGE_TEMPLATE = "";
 		variables.DEFAULT_MODULE_TITLE = "";
 		variables.DEFAULT_MODULE_ICON = "";
@@ -14,16 +13,14 @@
 
 		variables.instance = structNew();
 		variables.instance.title = variables.DEFAULT_PAGE_TITLE;
-		variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
 		variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 		variables.instance.aStyles = ArrayNew(1);
 		variables.instance.aScripts = ArrayNew(1);
-		variables.instance.aEventListeners = ArrayNew(1);
 		variables.instance.aLayouts = ArrayNew(1);			// holds properties for layout sections
 		variables.instance.aModules = ArrayNew(1);		// holds modules		
 		variables.instance.stModuleIndex = structNew();	// an index of modules	
 		variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
-		variables.instance.stProperties = structNew();
+		variables.instance.stCustomElements = structNew(); // holds all custom element nodes
 	</cfscript>
 
 	<cffunction name="init" access="public" returntype="pageBean">
@@ -142,27 +139,7 @@
 						}
 						
 						break;
-							
-					// event handlers
-					case "eventListeners":
-						for(j=1;j lte ArrayLen(xmlNode.xmlChildren); j=j+1) {
-							if(xmlNode.xmlChildren[j].xmlName eq "event") {
-								xmlThisNode = xmlNode.xmlChildren[j];
-
-								args = structNew();
-								args.objectName = "";
-								args.eventName = "";
-								args.eventHandler = "";
-
-								if(StructKeyExists(xmlThisNode.xmlAttributes,"objectName")) args.objectName = xmlThisNode.xmlAttributes.objectName; 
-								if(StructKeyExists(xmlThisNode.xmlAttributes,"eventName")) args.eventName = xmlThisNode.xmlAttributes.eventName; 
-								if(StructKeyExists(xmlThisNode.xmlAttributes,"eventHandler")) args.eventHandler= xmlThisNode.xmlAttributes.eventHandler; 
-								
-								addEventListener(argumentCollection = args);
-							}
-						}
-						break;	
-						
+													
 					// meta tags
 					case "meta":
 						args = structNew();
@@ -174,17 +151,16 @@
 						
 						addMetaTag(argumentCollection = args);
 						break;	
-						
-					// skin	
-					case "skin":
-						setSkinID(xmlNode.xmlAttributes.id);
-						break;
-						
+												
 					// page template
 					case "pageTemplate":
 						setPageTemplate(trim(xmlNode.xmlText));
 						break;
 						
+					// everything else is a custom section
+					default:
+						setCustomElement( createCustomElementFromXML(xmlNode) );
+						break;
 				}
 			}		
 		</cfscript>
@@ -259,20 +235,6 @@
 				}
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
-			
-			// add event listeners
-			aTemp = getEventListeners();
-			if(arrayLen(aTemp) gt 0) {
-				xmlNode = xmlElemNew(xmlDoc,"eventListeners");
-				for(i=1;i lte arrayLen(aTemp);i=i+1) {
-					xmlNode2 = xmlElemNew(xmlDoc,"event");
-					xmlNode2.xmlAttributes["objectName"] = aTemp[i].objectName;
-					xmlNode2.xmlAttributes["eventName"] = aTemp[i].eventName;
-					xmlNode2.xmlAttributes["eventHandler"] = aTemp[i].eventHandler;
-					arrayAppend(xmlNode.xmlChildren, xmlNode2);
-				}
-				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
-			}
 
 			// add modules
 			aTemp = getModules();
@@ -336,22 +298,24 @@
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 			
-			// add skin
-			if(variables.instance.skinID neq variables.DEFAULT_PAGE_SKINID) {
-				xmlNode = xmlElemNew(xmlDoc,"skin");
-				xmlNode.xmlAttributes["id"] = variables.instance.skinID;
-				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
-			}
-
 			// add pagetemplate
 			if(variables.instance.pageTemplate neq variables.DEFAULT_PAGE_TEMPLATE) {
 				xmlNode = xmlElemNew(xmlDoc,"pageTemplate");
 				xmlNode.xmlText = variables.instance.pageTemplate;
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
+
+			// add custom elements
+			st = variables.instance.stCustomElements;
+			for(i in st) {
+				xmlNode = createXMLFromCustomElement(xmlDoc, st[i]);
+				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
+			}
+
 		</cfscript>
 		<cfreturn xmlDoc>
 	</cffunction>
+
 
 
 
@@ -466,52 +430,6 @@
 		<cfset variables.instance.aScripts = ArrayNew(1)>
 		<cfreturn this>
 	</cffunction>
-
-
-	<!---------------------------------------->
-	<!--- Event Listeners		           --->
-	<!---------------------------------------->	
-	<cffunction name="getEventListeners" access="public" returntype="array" hint="Returns an array with all event listeners on the page">
-		<cfreturn duplicate(variables.instance.aEventListeners)>
-	</cffunction>
-
-	<cffunction name="addEventListener" access="public" returnType="pageBean" hint="Adds an event listener to the page">
-		<cfargument name="objectName" type="string" required="true">
-		<cfargument name="eventName" type="string" required="true">
-		<cfargument name="eventHandler" type="string" required="true">
-		<cfset var st = structNew()>
-		<cfif arguments.objectName eq "" or arguments.eventName eq "" or arguments.eventHandler eq "">
-			<cfthrow message="An event listener must include object, event and event handler" type="homePortals.pageBean.invalidEventListener">
-		</cfif>
-		<cfset st.objectName = arguments.objectName>
-		<cfset st.eventName = arguments.eventName>
-		<cfset st.eventHandler = arguments.eventHandler>
-		<cfset ArrayAppend(variables.instance.aEventListeners, st)>
-		<cfreturn this>
-	</cffunction>
-
-	<cffunction name="removeEventListener" access="public" returnType="pageBean" hint="Removes the given event listener">
-		<cfargument name="objectName" type="string" required="true">
-		<cfargument name="eventName" type="string" required="true">
-		<cfargument name="eventHandler" type="string" required="true">
-		<cfset var i = 0>
-		<cfset var st = structNew()>
-
-		<cfloop from="1" to="#arrayLen(variables.instance.aEventListeners)#" index="i">
-			<cfset st = variables.instance.aEventListeners[i]>
-			<cfif st.objectName eq arguments.objectName and st.eventName eq arguments.eventName and st.eventHandler eq arguments.eventHandler>
-				<cfset arrayDeleteAt(variables.instance.aEventListeners, i)>
-				<cfreturn this>
-			</cfif>
-		</cfloop>
-		<cfreturn this>
-	</cffunction>	
-	
-	<cffunction name="removeAllEventListeners" access="public" returnType="pageBean" hint="removes all event listeners">
-		<cfset variables.instance.aEventListeners = arrayNew(1)>
-		<cfreturn this>
-	</cffunction>
-
 
 
 	<!---------------------------------------->
@@ -716,20 +634,6 @@
 
 
 	<!---------------------------------------->
-	<!--- SkinID				           --->
-	<!---------------------------------------->		
-	<cffunction name="getSkinID" access="public" returntype="string" hint="retrieves the ID of the skin used on this page">
-		<cfreturn variables.instance.skinID>
-	</cffunction>
-	
-	<cffunction name="setSkinID" access="public" returnType="pageBean" hint="sets the page skin">
-		<cfargument name="skinID" type="string" required="true">
-		<cfset variables.instance.skinID = arguments.skinID>
-		<cfreturn this>
-	</cffunction>
-
-
-	<!---------------------------------------->
 	<!--- Custom Properties		           --->
 	<!---------------------------------------->	
 	<cffunction name="getProperties" access="public" returntype="struct" hint="returns a struct with all custom properties">
@@ -766,6 +670,43 @@
 		<cfset structDelete(variables.instance.stProperties, arguments.name,false)>
 		<cfreturn this>
 	</cffunction>	
+
+
+	<!---------------------------------------->
+	<!--- Custom Elements		           --->
+	<!---------------------------------------->	
+	<cffunction name="newCustomElement" access="public" returnType="pageBean" hint="creates a simple new custom element and adds it to the page">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="value" type="string" required="true">
+		<cfset var elm = createObject("component","customElement").init(arguments.name, arguments.value)>
+		<cfset variables.instance.stCustomElements[arguments.name] = elm>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="setCustomElement" access="public" returnType="pageBean" hint="sets the value of a custom element">
+		<cfargument name="element" type="customElement" required="true">
+		<cfset variables.instance.stCustomElements[arguments.element.getName()] = arguments.element>
+		<cfreturn this>
+	</cffunction>
+
+	<cffunction name="hasCustomElement" access="public" returnType="boolean" hint="Returns true if a custom element with the given name exists">
+		<cfargument name="name" type="string" required="true">
+		<cfreturn structKeyExists(variables.instance.stCustomElements, arguments.name)>
+	</cffunction>
+
+	<cffunction name="getCustomElement" access="public" returnType="customElement" hint="Returns the requested custom element">
+		<cfargument name="name" type="string" required="true">
+		<cfif not hasCustomElement(arguments.name)>
+			<cfthrow message="Undefined element #arguments.name#" type="pageBean.undefinedCustomElement">
+		</cfif>
+		<cfreturn variables.instance.stCustomElements[arguments.name]>
+	</cffunction>
+
+	<cffunction name="removeCustomElement" access="public" returnType="pageBean" hint="Deletes a custom element and all of its properties and children">
+		<cfargument name="name" type="string" required="true">
+		<cfset structDelete(variables.instance.stCustomElements, arguments.name, false)>
+		<cfreturn this>
+	</cffunction>
 	
 
 
@@ -777,23 +718,69 @@
 	</cffunction>
 
 	<!---------------------------------------->
-	<!--- initPageProperties		       --->
+	<!--- Private Methods			       --->
 	<!---------------------------------------->	
 	<cffunction name="initPageProperties" access="private" returntype="void" hint="sets initial value for page properties">
 		<cfscript>
 			variables.instance = structNew();
 			variables.instance.title = variables.DEFAULT_PAGE_TITLE;
-			variables.instance.skinID = variables.DEFAULT_PAGE_SKINID;
 			variables.instance.pageTemplate = variables.DEFAULT_PAGE_TEMPLATE;
 			variables.instance.aStyles = ArrayNew(1);
 			variables.instance.aScripts = ArrayNew(1);
-			variables.instance.aEventListeners = ArrayNew(1);
 			variables.instance.aLayouts = ArrayNew(1);			// holds properties for layout sections
 			variables.instance.aModules = ArrayNew(1);		// holds modules		
 			variables.instance.stModuleIndex = structNew();	// an index of modules	
 			variables.instance.aMeta = ArrayNew(1);			// user-defined meta tags
 			variables.instance.stProperties = structNew();
+			variables.instance.stCustomElements = structNew();
 		</cfscript>	
+	</cffunction>
+
+	<cffunction name="createCustomElementFromXML" access="private" returntype="customElement">
+		<cfargument name="xmlNode" type="any" required="true">
+		<cfscript>
+			var element = 0;
+			var i = 0;
+			var xmlThisNode = 0;
+	
+			element = createObject("component","customElement").init(arguments.xmlNode.xmlName, trim(arguments.xmlNode.xmlText));
+
+			for(i in arguments.xmlNode.xmlAttributes) {
+				element.setProperty(i, arguments.xmlNode.xmlAttributes[i]);
+			}
+	
+			for(i=1;i lte ArrayLen(arguments.xmlNode.xmlChildren); i=i+1) {
+				xmlThisNode = arguments.xmlNode.xmlChildren[i];
+				element.addChild(createCustomElementFromXML(xmlThisNode));
+			}
+	
+			return element;
+		</cfscript>
+	</cffunction>
+	
+	<cffunction name="createXMLFromCustomElement" access="private" returntype="any">
+		<cfargument name="xmlDoc" type="any" required="true">
+		<cfargument name="element" type="customElement" required="true">
+		<cfscript>
+			var xmlNode = xmlElemNew(arguments.xmlDoc, element.getName());
+			var i = 0;
+			var items = 0;
+			
+			if(element.getValue() neq "")
+				xmlNode.xmlText = element.getValue();
+
+			items = element.getProperties();
+			for(i in items) {
+				xmlNode.xmlAttributes[items[i].name] = items[i].value;
+			}
+	
+			items = element.getChildren();
+			for(i=1;i lte ArrayLen(items); i=i+1) {
+				arrayAppend(xmlNode.xmlChildren, createXMLFromCustomElement(xmlDoc,items[i]));
+			}
+	
+			return xmlNode;
+		</cfscript>
 	</cffunction>
 
 

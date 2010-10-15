@@ -23,11 +23,15 @@
 		<cfscript>
 			variables.resourcesRoot = arguments.resourceLibraryPath;
 			variables.resourceTypeRegistry = arguments.resourceTypeRegistry;
-			variables.resLibID = mid(
-									arguments.resourceLibraryPath,
-									find("://",arguments.resourceLibraryPath)+3,
-									len(arguments.resourceLibraryPath)
-								);
+			variables.resLibID = arguments.resourceLibraryPath;
+
+			if(find("://",arguments.resourceLibraryPath)) {
+				variables.resLibID = mid(
+										arguments.resourceLibraryPath,
+										find("://",arguments.resourceLibraryPath)+3,
+										len(arguments.resourceLibraryPath)
+									);
+			}
 			
 			if(structKeyExists(arguments.configStruct,"dsn")) 
 				variables.dsn = arguments.configStruct.dsn;
@@ -361,11 +365,11 @@
 			}	
 			
 			if(listLen(arguments.fileName,"_") gte 3 
-					and listFirst(arguments.fileName,"_") eq rt.getFolderName()
+					and listFirst(arguments.fileName,"_") eq rb.getType()
 					and listGetAt(arguments.fileName,2,"_") eq rb.getPackage()) {
 				href = arguments.fileName;
 			} else {
-				href = rt.getFolderName() 
+				href = rb.getType() 
 						& "_" 
 						& rb.getPackage() 
 						& "_" 
@@ -407,7 +411,7 @@
 										& defaultExtension;
 			}	
 			
-			href = rt.getFolderName() 
+			href = rb.getType()
 					& "_" 
 					& rb.getPackage() 
 					& "_" 
@@ -501,7 +505,7 @@
 
 	<cffunction name="getResourceTableName" access="private" returntype="string">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfreturn variables.tblPrefix & arguments.resourceType.getFolderName()>
+		<cfreturn variables.tblPrefix & arguments.resourceType.getName()>
 	</cffunction>
 
 	<cffunction name="createResourceTable" access="private" returntype="void">
