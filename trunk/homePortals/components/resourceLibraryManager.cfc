@@ -6,7 +6,7 @@
 										.synchronizedList( 
 											createObject("java","java.util.ArrayList").init() 
 										);
-		variables.defaultResourceLibraryClass = "defaultResourceLibrary";
+		variables.defaultResourceLibraryType = "";
 		variables.customResLibTypes = structNew();
 		variables.appRoot = "";
 	</cfscript>
@@ -23,6 +23,9 @@
 			var aResLibs = arguments.config.getResourceLibraryPaths();
 			
 			variables.appRoot = arguments.config.getAppRoot();
+
+			// default reslib type
+			variables.defaultResourceLibraryType = arguments.config.getDefaultResourceLibraryType();
 
 			// create and populate the resourceTypeRegistry
 			variables.resourceTypeRegistry = createObject("component","resourceTypeRegistry").init( arguments.config );
@@ -128,21 +131,14 @@
 		<cfset var aResFull = ArrayNew(1)>
 		<cfset var aRes = ArrayNew(1)>
 		<cfset var i = 0>
-		<cfset var j = 0>
-		<cfset qryPackages = 0>
 
 		<cfif not getResourceTypeRegistry().hasResourceType(arguments.resourceType)>
 			<cfthrow message="Unknown resource type [#arguments.resourceType#]" type="homePortals.resourceLibraryManager.resourceTypeNotFound">
 		</cfif>
 		
 		<cfloop from="1" to="#arrayLen(aResLibs)#" index="i">
-			<cfset qryPackages = aResLibs[i].getResourcePackagesList(arguments.resourceType)>
-			<cfif listFind(valueList(qryPackages.name), arguments.packageName)>
-				<cfset aRes = aResLibs[i].getResourcesInPackage(arguments.resourceType, arguments.packageName)>
-				<cfloop from="1" to="#arrayLen(aRes)#" index="j">
-					<cfset arrayAppend(aResFull,aRes[j])>
-				</cfloop>
-			</cfif>
+			<cfset aRes = aResLibs[i].getResourcesInPackage(arguments.resourceType, arguments.packageName)>
+			<cfset aResFull.addAll(aRes)>
 		</cfloop>
 
 		<cfreturn aResFull>
@@ -169,21 +165,15 @@
 				<cfset resBean = aResLibs[i].getResource(resourceType = arguments.resourceType,
 														packageName = arguments.packageName,
 														resourceID = arguments.resourceID)>
-				
-				<!--- if we didnt get an error, then it means that the resource was found,
-					so lets return that one --->
 				<cfreturn resBean>
-
+				
 				<cfcatch type="homePortals.resourceLibrary.resourceNotFound">
-					<cfif i eq arrayLen(aResLibs)>
-						<!--- we are at the end of the libraries, so the resource is not in any of them --->
-						<cfrethrow>
-					<cfelse>
-						<!--- resource not here, keep looking --->
-					</cfif>
+					<!--- resource not here, keep looking --->
 				</cfcatch>
 			</cftry>
 		</cfloop>
+		
+		<cfthrow type="homePortals.resourceLibrary.resourceNotFound" message="Resource '#arguments.packageName#/#arguments.resourceID#' of type '#arguments.resourceType#' not found in any of the available libraries.">
 	</cffunction>
 
 	<!------------------------------------------------->
@@ -192,23 +182,22 @@
 	<cffunction name="getResourceLibraryClassByPath" access="private" returntype="struct" hint="returns a struct with info on the cfc of the resource library that corresponds to a given path">
 		<cfargument name="path" type="string" required="true">
 		<cfscript>
+			var resLibType = "";
 			var st = structNew();
+						
+			if(find("://",arguments.path)) 
+				resLibType = left(arguments.path,find("://",arguments.path)-1);
+			else
+				resLibType = variables.defaultResourceLibraryType;
 			
-			st.path = variables.defaultResourceLibraryClass;
-			st.prefix = "";
-			st.properties = structNew();
-			
-			if(find("://",arguments.path)) {
-				st.prefix = left(arguments.path,find("://",arguments.path)-1);
-				if(structKeyExists(variables.customResLibTypes,st.prefix)) {
-					st.path = variables.customResLibTypes[st.prefix].path;
-					st.properties = variables.customResLibTypes[st.prefix].properties;
-				} else {
-					st.path = st.prefix & "ResourceLibrary";
-				}
+			if(structKeyExists(variables.customResLibTypes,resLibType)) {
+				st.prefix = resLibType;
+				st.path = variables.customResLibTypes[resLibType].path;
+				st.properties = variables.customResLibTypes[resLibType].properties;
+				return st;
 			}
-			return st;
 		</cfscript>
+		<cfthrow message="Invalid resource library type" type="homePortals.resourceLibraryManager.invalidResourceLibraryType">
 	</cffunction>
 	
 	<!------------------------------------------------->

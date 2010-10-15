@@ -1,11 +1,16 @@
 <cfcomponent extends="homePortals.components.contentTagRenderer"
 			 hint="Inserts a block of HTML-formatted content into the page. Content can be located on the same server or retrieved from an external URL. Content can also be obtained from the resource library.">
 
-	<cfproperty name="resourceID" type="resource:content" required="false"  displayname="Resource ID" />
-	<cfproperty name="href" type="string" required="false" displayname="HREF" />
-	<cfproperty name="cache" default="false" type="boolean" required="false" displayname="Cache Content?" />
-	<cfproperty name="cacheTTL" type="numeric" required="false" displayname="Cache TTL" />
-
+	<cfproperty name="resourceID" type="resource:content" required="false" displayName="Resource ID" hint="ID of a resource of type 'content' to display." />
+	<cfproperty name="href" type="string" required="false" displayName="HREF" hint="Indicates the location of an external document. Can be either a full URL starting with http:// or a relative url for a resource located in the same server." />
+	
+	<!---
+		Optional attributes:
+			This renderer supports these additional attributes:
+			* resourceType: Indicates the type of resource to use when giving a resourceID. Defaults to 'content'
+			* cache: When using external content via href attribute, indicates whether to cache or not the content retrieved.
+			* cacheTTL: Time to cache external content.
+	--->
 	
 	<cfscript>
 		variables.HTTP_GET_TIMEOUT = 30;	// timeout for HTTP requests in content modules
@@ -35,7 +40,7 @@
 					oResBean = getPageRenderer()
 									.getHomePortals()
 									.getCatalog()
-									.getResourceNode(resourceType, resourceID);
+									.getResource(resourceType, resourceID);
 					
 					if(oResBean.targetFileExists()) {
 						tmpHTML = oResBean.readFile();
@@ -129,7 +134,7 @@
 			// define source of content (resource or external)
 			if(resourceID neq "") {
 				oCatalog = getPageRenderer().getHomePortals().getCatalog();
-				oResourceBean = oCatalog.getResourceNode(resourceType, resourceID);
+				oResourceBean = oCatalog.getResource(resourceType, resourceID);
 				if(oResourceBean.getHref() neq "") {
 					tmpHTML = oResourceBean.readFile();
 				}

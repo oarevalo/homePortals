@@ -2,7 +2,8 @@
 
 	<cfset variables.pluginsMap = structNew()>
 	<cfset variables.homePortals = 0>
-	<cfset variables.ALLOWED_EVENTS = "appInit,beforePageLoad,afterPageLoad">
+	<cfset variables.ALLOWED_EVENTS = "appInit,configLoad,beforePageLoad,afterPageLoad">
+	<cfset variables.DEFAULT_PLUGIN_ROOT = "homePortals.plugins.">
 
 	<cffunction name="init" access="public" returntype="pluginManager" hint="constructor">
 		<cfargument name="homePortals" type="homePortals" required="true">
@@ -52,8 +53,9 @@
 	<cffunction name="registerPlugin" access="public" returntype="void" hint="registers a plugin">
 		<cfargument name="pluginName" type="string" required="true">
 		<cfargument name="pluginPath" type="string" required="false" default="">
+		<cfargument name="pluginProperties" type="struct" required="false" default="#structNew()#">
 		<cfif arguments.pluginPath eq "">
-			<cfset arguments.pluginPath = "homePortals.plugins.#arguments.pluginName#.plugin" />
+			<cfset arguments.pluginPath = variables.DEFAULT_PLUGIN_ROOT & arguments.pluginName & ".plugin" />
 		</cfif>
 		<cfif left(arguments.pluginPath,1) eq ".">
 			<cfset arguments.pluginPath = variables.homePortals.getConfig().getAppRoot() & arguments.pluginPath>
@@ -63,7 +65,7 @@
 				<cfset arguments.pluginPath = right(arguments.pluginPath,len(arguments.pluginPath)-1)>
 			</cfif>
 		</cfif>
-		<cfset variables.pluginsMap[arguments.pluginName] = createObject("component", arguments.pluginPath).init(variables.homePortals)>
+		<cfset variables.pluginsMap[arguments.pluginName] = createObject("component", arguments.pluginPath).init(variables.homePortals, arguments.pluginName, arguments.pluginProperties)>
 	</cffunction>
 
 	<cffunction name="notifyPlugin" access="public" returntype="any" hint="notify a registered plugin that an event has taken place">

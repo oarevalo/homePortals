@@ -4,7 +4,7 @@
 		variables.stPage = StructNew();
 		variables.lstRenderedContent = ""; 		// list with the order in which the content tags are rendered
 		variables.homePortalsEngineDir = "/homePortals/";		// path to location of HomePortals engine
-		variables.errorTemplate = variables.homePortalsEngineDir & "/common/Templates/error.cfm";	// template to display when errors occur while rendering page components
+		variables.errorTemplate = variables.homePortalsEngineDir & "/includes/error.cfm";	// template to display when errors occur while rendering page components
 		variables.pageHREF = "";		// path to the current page
 		variables.oHomePortals = 0;		// homeportals instance
 		variables.oPage = 0;			// the page to render
@@ -77,7 +77,6 @@
 
 			// replace simple values
 			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_ONLOAD$", getBodyOnLoad(), "ALL");
 
 			// search and replace "Page Properties"
 			index = 1;
@@ -231,12 +230,9 @@
 		<cfset var i = 0>
 		<cfset var aStylesheets = variables.stPage.page.stylesheets>
 		<cfset var aScripts = variables.stPage.page.scripts>
-		<cfset var aEventListeners = variables.stPage.page.eventListeners>
 		<cfset var aMeta = variables.stPage.page.meta>
 		<cfset var moduleID = "">
 		<cfset var tmpHTML = "">
-		<cfset var tmpHTML2 = "">
-		<cfset var appRoot = getHomePortals().getConfig().getAppRoot()>
 		
 		<!--- Add user-defined meta tags --->
 		<cfloop from="1" to="#ArrayLen(aMeta)#" index="i">
@@ -255,37 +251,11 @@
 		<cfloop from="1" to="#ArrayLen(aStylesheets)#" index="i">
 			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#normalizePath(aStylesheets[i])#""/>">
 		</cfloop>
-		
-		<!--- Add page skin --->
-		<cfif variables.stPage.page.skinHREF neq "">
-			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#variables.stPage.page.skinHREF#""/>">
-		</cfif>
-		
+				
 		<!--- Include required and user-defined Javascript files --->
 		<cfloop from="1" to="#ArrayLen(aScripts)#" index="i">
 			<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
 		</cfloop>
-		
-		<!--- Process event listeners --->
-		<cfsavecontent variable="tmpHTML2">
-			<cfoutput>
-			<script type="text/javascript">
-				/*********** Set app root **********/
-				h_appRoot = "#jsStringFormat(appRoot)#";
-				h_pageHREF = "#jsStringFormat(variables.pageHREF)#";
-				
-				/*********** Raise events by modules *************/
-				function h_raiseEvent(objectName, eventName, args) {
-					<cfloop from="1" to="#ArrayLen(aEventListeners)#" index="i">
-						if(objectName=="#aEventListeners[i].objectName#" && eventName=="#aEventListeners[i].eventName#") {
-							try {#aEventListeners[i].eventHandler#(args);} catch(e) {alert(e);}
-						}
-					</cfloop>
-				}
-			</script>
-			</cfoutput>
-		</cfsavecontent>
-		<cfset tmpHTML = tmpHTML & tmpHTML2>
 		
 		<!--- Add html head code rendered by content tags --->
 		<cfloop list="#variables.lstRenderedContent#" index="moduleID">
@@ -305,14 +275,7 @@
 		 
 		<cfreturn tmpHTML>
 	</cffunction>
-	
-	<!--------------------------------------->
-	<!----  getBodyOnLoad				----->
-	<!--------------------------------------->
-	<cffunction name="getBodyOnLoad" access="public" returntype="string" output="false" hint="Returns the javascript statement to run on the onLoad attribute of the body tag">
-		<cfreturn getHomePortals().getConfig().getBodyOnLoad()>
-	</cffunction>	
-	
+		
 	<!--------------------------------------->
 	<!----  getPageHREF					----->
 	<!--------------------------------------->
@@ -361,14 +324,12 @@
 			variables.stPage.page.href = "";			// address of the page
 			variables.stPage.page.title = "";		// page title
 			variables.stPage.page.pageTemplate = "";		// page title
-			variables.stPage.page.eventListeners = arrayNew(1);
 			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
 
 			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
 			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
 			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
 			variables.stPage.page.modules = StructNew();		// holds modules
-			variables.stPage.page.skinHREF = "";				// holds the location of the page skin
 		</cfscript>
 	</cffunction>
 	
@@ -411,7 +372,6 @@
 			if(arguments.page.getPageTemplate() neq "")
 				variables.stPage.page.pageTemplate = arguments.page.getPageTemplate();		// page template
 
-			variables.stPage.page.eventListeners.addAll(arguments.page.getEventListeners());
 			variables.stPage.page.meta.addAll(arguments.page.getMetaTags());			// holds html meta tags
 
 			// scripts
@@ -448,13 +408,6 @@
 				if(not structKeyExists(variables.stPage.page.layout, tmp[i].type))
 					variables.stPage.page.layout[tmp[i].type] = ArrayNew(1);
 				ArrayAppend(variables.stPage.page.layout[tmp[i].type], tmp[i] );
-			}
-
-			
-			// skin
-			if(arguments.page.getSkinID() neq "" and getHomePortals().getResourceLibraryManager().hasResourceType("skin")) {
-				oResourceBean = getHomePortals().getCatalog().getResourceNode("skin", arguments.page.getSkinID());
-				variables.stPage.page.skinHREF = oResourceBean.getFullHref();
 			}
 
 						
@@ -523,6 +476,8 @@
 			var prop = "";
 			var token = "";
 			var stResult = "";
+			var errorContentBuffer = 0;
+			var errorHandlerClass = getHomePortals().getConfig().getErrorHandlerClass();
 			
 			// reset the content output buffer
 			resetPageContentBuffer();
@@ -565,10 +520,13 @@
 																	createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body)
 																);
 							} catch(any e) {
-								// show error
-								createObject("component","singleContentBuffer")
-									.init(stTagNode.id, variables.contentBuffer.body)
-									.set(e.message & e.detail);
+								// handle error
+								errorContentBuffer = createObject("component","singleContentBuffer").init(stTagNode.id, variables.contentBuffer.body);
+								
+								if(errorHandlerClass neq "")
+									createObject("component",errorHandlerClass).onContentRendererError(getHomePortals(), this, oModBean, errorContentBuffer, e);
+								else
+									errorContentBuffer.set(e.message & e.detail);
 							}
 
 							// keep an ordered list with all content tags rendered
