@@ -1,7 +1,7 @@
 <cfcomponent hint="This component implements a catalog to access the resource library using lazy loading of resources">
 
 	<cfscript>
-		variables.FIELD_LIST = "libpath,type,id,href,package,description,createdOn";
+		variables.FIELD_LIST = "libpath,type,id,href,package,description,createdOn,fullhref,fullpath";
 		variables.oResourceLibraryManager = 0;
 		variables.contentCacheServiceName = "catalogContentCacheService";
 		variables.indexCacheServiceName = "catalogIndexesCacheService";
@@ -251,6 +251,8 @@
 				querySetCell(qryIndex, "Description", stResourceBean.Description);
 				querySetCell(qryIndex, "libpath", stResourceBean.resourceLibrary.getPath());
 				querySetCell(qryIndex, "createdOn", stResourceBean.createdOn);
+				querySetCell(qryIndex, "fullhref", aResources[i].getFullHref());
+				querySetCell(qryIndex, "fullpath", aResources[i].getFullPath());
 
 				for(prop in stResourceBean.customProperties) {
 					if(listFindNoCase(customFldList,prop)) {
