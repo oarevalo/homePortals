@@ -30,22 +30,27 @@
 			if(imageID neq "") {
 				resBean = retrieveResource();
 				imgpath = resBean.getFullHref();
-				alt = resBean.getProperty("label");
-				label = resBean.getProperty("label");
-				link = resBean.getProperty("url");
+				if(label eq "") alt = resBean.getProperty("label");
+				if(label eq "") label = resBean.getProperty("label");
+				if(link eq "") link = resBean.getProperty("url");
 			} else {
 				imgpath = href;
 			}
 			
 			if(alt eq "") alt = getFileFromPath(imgPath);
-			if(link eq "$") link = imgpath;
+			link = replaceNoCase(link,"%src",imgPath,"ALL");
 			
-			tmpHTML = "<img src=""#imgpath#"" border=""0"" alt=""#htmlEditFormat(alt)#"" title=""#htmlEditFormat(alt)#""";
-			
-			if(width neq "") tmpHTML = tmpHTML & " width='#width#'";
-			if(height neq "") tmpHTML = tmpHTML & " height='#height#'";
-			tmpHTML = tmpHTML & ">";
-			
+
+			if(imgPath neq "") {
+				tmpHTML = "<img src=""#imgpath#"" border=""0"" alt=""#htmlEditFormat(alt)#"" title=""#htmlEditFormat(alt)#""";
+				
+				if(width neq "") tmpHTML = tmpHTML & " width='#width#'";
+				if(height neq "") tmpHTML = tmpHTML & " height='#height#'";
+				tmpHTML = tmpHTML & ">";
+			} else {
+				tmpHTML = "<b><em>No image set</em></b>";
+			}
+
 			if(link neq "") tmpHTML = "<a href='#link#'>" & tmpHTML & "</a>";
 			if(label neq "") tmpHTML = tmpHTML & "<div>" & label & "</div>";
 			
