@@ -182,10 +182,10 @@
 					<cfset stProps = request.oPageRenderer.getPage().getProperties()>
 					<cfloop collection="#stProps#" item="key">
 						<strong>&bull; #key#:</strong> 
-						<cfif isSimpleValue(stProps[key])>
-							'#stProps[key]#'<br />
+						<cfif isSimpleValue(stProps[key].value)>
+							#stProps[key].value#<br />
 						<cfelse>
-							<cfdump var="#stProps[key]#">
+							<cfdump var="#stProps[key].value#">
 						</cfif>
 					</cfloop>
 					<cfif structIsEmpty(stProps)>
