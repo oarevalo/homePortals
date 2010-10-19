@@ -36,8 +36,8 @@
 	<cfset variables.DEFAULT_PAGING_DELTA = 3>
 	<cfset variables.DEFAULT_TITLE_PROPERTY = "id">
 	<cfset variables.DEFAULT_SEARCH_FIELDS = "id,package,description">
-	<cfset variables.DEFAULT_SHOW_CREATEDATE = true>
-	<cfset variables.DEFAULT_SHOW_DESCRIPTION = true>
+	<cfset variables.DEFAULT_SHOW_CREATEDATE = false>
+	<cfset variables.DEFAULT_SHOW_DESCRIPTION = false>
 	<cfset variables.DEFAULT_SHOW_RESULTSCOUNT = true>
 
 	<cffunction name="renderContent" access="public" returntype="void" hint="sets the rendered output for the head and body into the corresponding content buffers">
@@ -62,7 +62,7 @@
 			if(groupBy neq "") orderBy = listAppend(groupBy,orderBy);
 		</cfscript>
 		<cfquery name="qryRes" dbtype="query" maxrows="#variables.MAX_ITEMS_TO_DISPLAY#">
-			SELECT id,description,createdOn,package,type, #itemTitle# as _title_prop_
+			SELECT id,description,createdOn,package,type,fullhref, #itemTitle# as title__prop
 					<cfif itemProperties neq "">,#itemProperties#</cfif>
 				FROM qryRes
 				WHERE (1=1)
@@ -96,6 +96,7 @@
 		<cfset var totalPages = 0>
 		<cfset var prevStart = 0>
 		<cfset var nextStart = 0>
+		<cfset var displayAsParagraphs = false>
 
 		<cfset var showIntro = getContentTag().getAttribute("showIntro",false)>
 		<cfset var itemHREF = getContentTag().getAttribute("itemHREF")>
@@ -118,6 +119,8 @@
 		<cfset pageNumber = int(startRow/itemsPerPage)+1>
 		<cfset prevStart = startRow-itemsPerPage>
 		<cfset nextStart = startRow+itemsPerPage>
+		
+		<cfset displayAsParagraphs = (showCreateDate or showDescription or itemProperties neq "")>
 
 		<cfsavecontent variable="tmpHTML">
 			<cfif groupBy eq "">
@@ -127,18 +130,19 @@
 						<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 						<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
 						<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
+						<cfset href = replaceNoCase(href,"%src",arguments.qryData.fullhref,"ALL")>
 					</cfif>
-					<p>
+					<cfif displayAsParagraphs><p></cfif>
 						<div class="rl_itemTitle">
 							<cfif href neq "">
-								<a href="#href#">#arguments.qrydata._title_prop_#</a>
+								<a href="#href#"><cfif displayAsParagraphs><b></cfif>#arguments.qrydata.title__prop#<cfif displayAsParagraphs></b></cfif></a>
 							<cfelse>
-								#arguments.qrydata._title_prop_# 
+								<cfif displayAsParagraphs><b></cfif>#arguments.qrydata.title__prop#<cfif displayAsParagraphs></b></cfif> 
 							</cfif>
 						</div>
 						<cfif showCreateDate and isDate(arguments.qryData.createdOn)>
 							<div class="rl_itemDate">
-								#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#
+								<small>#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#</small>
 							</div>
 						</cfif>
 						<cfif showDescription and arguments.qryData.description neq "">
@@ -153,7 +157,7 @@
 								</cfloop>
 							</div>
 						</cfif>
-					</p>
+					<cfif displayAsParagraphs></p></cfif>
 				</cfoutput>
 			<cfelse>
 				<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#" group="#groupBy#">
@@ -164,18 +168,19 @@
 							<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 							<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
 							<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
+							<cfset href = replaceNoCase(href,"%src",arguments.qryData.fullhref,"ALL")>
 						</cfif>
-						<p>
+						<cfif displayAsParagraphs><p></cfif>
 							<div class="rl_itemTitle">
 								<cfif href neq "">
-									<a href="#href#">#arguments.qrydata._title_prop_#</a>
+									<a href="#href#"><cfif displayAsParagraphs><b></cfif>#arguments.qrydata.title__prop#<cfif displayAsParagraphs></b></cfif></a>
 								<cfelse>
-									#arguments.qrydata._title_prop_# 
+									<cfif displayAsParagraphs><b></cfif>#arguments.qrydata.title__prop#<cfif displayAsParagraphs></b></cfif> 
 								</cfif>
 							</div>
 							<cfif showCreateDate and isDate(arguments.qryData.createdOn)>
 								<div class="rl_itemDate">
-									#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#
+									<small>#lsDateFormat(arguments.qryData.createdOn, variables.DATE_FORMAT_MASK)#</small>
 								</div>
 							</cfif>
 							<cfif showDescription and arguments.qryData.description neq "">
@@ -188,7 +193,7 @@
 									<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
 								</cfloop>
 							</cfif>
-						</p>
+						<cfif displayAsParagraphs></p></cfif>
 					</cfoutput>
 					<br />
 				</cfoutput>

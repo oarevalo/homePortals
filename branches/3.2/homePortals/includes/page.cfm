@@ -34,7 +34,7 @@
 
 	<cfscript>
 		if(structIsEmpty(context)) {
-			context = duplicate(context);
+			context = duplicate(form);
 			StructAppend(context, url);
 		}
 		

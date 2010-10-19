@@ -25,9 +25,9 @@
 	<cfset variables.DEFAULT_ITEMS_TO_DISPLAY = 10>
 	<cfset variables.DEFAULT_ORDER_BY = "id">
 	<cfset variables.DEFAULT_GROUP_BY = "">
-	<cfset variables.DEFAULT_PAGING_DELTA = 3>
+	<cfset variables.DEFAULT_PAGING_DELTA = 2>
 	<cfset variables.DEFAULT_SEARCH_FIELDS = "id,package,description">
-	<cfset variables.DEFAULT_SHOW_LABEL = true>
+	<cfset variables.DEFAULT_SHOW_LABEL = false>
 	<cfset variables.DEFAULT_SHOW_RESULTSCOUNT = true>
 	<cfset variables.DEFAULT_WIDTH = "100">
 	<cfset variables.DEFAULT_HEIGHT = "">
@@ -56,7 +56,7 @@
 		</cfscript>
 	
 		<cfquery name="qryRes" dbtype="query" maxrows="#variables.MAX_ITEMS_TO_DISPLAY#">
-			SELECT id,description,createdOn,package,type,label,url,href,libpath
+			SELECT id,description,createdOn,package,type,label,url,href,libpath,fullhref
 					<cfif itemProperties neq "">,#itemProperties#</cfif>
 				FROM qryRes
 				WHERE (1=1)
@@ -90,6 +90,7 @@
 		<cfset var totalPages = 0>
 		<cfset var prevStart = 0>
 		<cfset var nextStart = 0>
+		<cfset var label = "">
 
 		<cfset var itemHREF = getContentTag().getAttribute("itemHREF")>
 		<cfset var pagingHREF = getContentTag().getAttribute("pagingHREF")>
@@ -114,53 +115,68 @@
 		<cfset nextStart = startRow+itemsPerPage>
 
 		<cfsavecontent variable="tmpHTML">
+			<cfoutput>
 			<style type="text/css">
+				.rl_imageList {
+					float:left;
+				}
 				.rl_image {
 					margin-right:10px;
 					margin-bottom:10px;
-					<cfoutput>
-						<cfif width neq "">width:#width#px;</cfif>
-						<cfif height neq "">height:#height#px;</cfif>
-					</cfoutput>
+					float:left;
+					<cfif width neq "">width:#width#px;</cfif>
+					<cfif height neq "">height:#height#px;</cfif>
 				}
 				.rl_groupLabel {
 					font-weight:bold;
 					margin-bottom:8px;
 				}
+				.rl_imageLabel {
+					text-align:center;
+				}
 			</style>
-			<div class="rl_imageList" style="float:left;">
+			<div class="rl_imageList">
+			</cfoutput>
 				<cfif groupBy eq "">
 					<cfoutput query="arguments.qryData" startrow="#startRow#" maxrows="#itemsPerPage#">
 						<cfset href = "" />
+						<cfset label = "" />
 						<cfif itemHREF neq "">
 							<cfset href = replaceNoCase(itemHREF,"%id",urlEncodedFormat(arguments.qrydata.id),"ALL")>
 							<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 							<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
 							<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
-						<cfelse>
+							<cfset href = replaceNoCase(href,"%src",arguments.qryData.fullhref,"ALL")>
+						<cfelseif arguments.qryData.url neq "">
 							<cfset href = arguments.qryData.url />
+						<cfelseif directoryExists(expandPath(arguments.qryData.libpath))>
+							<cfset href = arguments.qryData.fullhref>
 						</cfif>
-						<div class="rl_image" style="float:left;">
+						<cfif arguments.qryData.label eq "">
+							<cfset label = getFileFromPath(arguments.qryData.href)>
+						</cfif>
+						<div class="rl_image">
 							#renderImage(arguments.qryData.id, arguments.qryData.package, arguments.qryData.label,
 											href,
 											arguments.qryData.libpath,
 											arguments.qryData.href)#
-							<cfif itemProperties neq "">
-								<br />
-								<cfif showLabel and arguments.qryData.label neq "">
-									<b>#arguments.qryData.label#</b><br />
-								</cfif>
-								<cfloop list="#itemProperties#" index="prop">
-									<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
-								</cfloop>
-							<cfelseif arguments.qryData.label neq "" and showLabel>
-								<br />
-								<cfif href neq "">
-									<a href="#href#">#arguments.qryData.label#</a>
-								<cfelse>
-									#arguments.qryData.label#
-								</cfif>
-								<br />
+							<cfif itemProperties neq "" or showLabel>
+								<div class="rl_imageLabel">
+									<cfif itemProperties neq "">
+										<cfif showLabel>
+											<small><b>#label#</b></small><br />
+										</cfif>
+										<cfloop list="#itemProperties#" index="prop">
+											<small><b>#prop#:</b> #arguments.qryData[prop]#</small><br />
+										</cfloop>
+									<cfelseif showLabel>
+										<cfif href neq "">
+											<small><a href="#href#">#label#</a></small>
+										<cfelse>
+											<small>#label#</small>
+										</cfif>
+									</cfif>
+								</div>
 							</cfif>
 						</div>
 					</cfoutput>
@@ -176,38 +192,42 @@
 							<cfset href = replaceNoCase(href,"%package",urlEncodedFormat(arguments.qrydata.package),"ALL")>
 							<cfset href = replaceNoCase(href,"%type",urlEncodedFormat(arguments.qrydata.type),"ALL")>
 							<cfset href = replaceNoCase(href,"%startRow",urlEncodedFormat(startRow),"ALL")>
-						<cfelse>
+							<cfset href = replaceNoCase(href,"%src",arguments.qryData.fullhref,"ALL")>
+						<cfelseif arguments.qryData.url neq "">
 							<cfset href = arguments.qryData.url />
+						<cfelseif directoryExists(expandPath(arguments.qryData.libpath))>
+							<cfset href = arguments.qryData.fullhref>
 						</cfif>
-						<div class="rl_image" style="float:left;">
+						<div class="rl_image">
 							#renderImage(arguments.qryData.id, arguments.qryData.package, arguments.qryData.label,
 											href,
 											arguments.qryData.libpath,
 											arguments.qryData.href)#
-							<cfif itemProperties neq "">
-								<br />
-								<cfif showLabel and arguments.qryData.label neq "">
-									<b>#arguments.qryData.label#</b><br />
-								</cfif>
-								<cfloop list="#itemProperties#" index="prop">
-									<strong>#prop#:</strong> #arguments.qryData[prop]#<br />
-								</cfloop>
-							<cfelseif arguments.qryData.label neq "" and showLabel>
-								<br />
-								<cfif href neq "">
-									<a href="#href#">#arguments.qryData.label#</a>
-								<cfelse>
-									#arguments.qryData.label#
-								</cfif>
-								<br />
+							<cfif itemProperties neq "" or showLabel>
+								<div class="rl_imageLabel">
+									<cfif itemProperties neq "">
+										<cfif showLabel>
+											<small><b>#label#</b></small><br />
+										</cfif>
+										<cfloop list="#itemProperties#" index="prop">
+											<small><b>#prop#:</b> #arguments.qryData[prop]#</small><br />
+										</cfloop>
+									<cfelseif showLabel>
+										<cfif href neq "">
+											<small><a href="#href#">#label#</a></small>
+										<cfelse>
+											<small>#label#</small>
+										</cfif>
+									</cfif>
+								</div>
 							</cfif>
 						</div>
 						</cfoutput>
 						<div style="clear:both;" />
 					</cfoutput>
 				</cfif>
-			</div>
 			<cfoutput>
+			</div>
 				<div class="rl_paging">
 					<cfif showResultsCount>
 						<b>
@@ -227,8 +247,8 @@
 						</cfif>
 	
 						<cfif prevStart gt 0>
-							<a href="#prevPageHREF#"><strong>Previous</strong></a> 
-							&nbsp;&nbsp;
+							<a href="#prevPageHREF#"><strong>&laquo;</strong></a> 
+							&nbsp;
 						</cfif>
 
 						<cfif max(pageNumber-pagingDelta,1) neq 1>
@@ -247,11 +267,11 @@
 						<cfif min(pageNumber+pagingDelta,totalPages) neq totalPages>
 							...						
 							<a href="#lastPageHREF#">#totalPages#</a> 
+							&nbsp;
 						</cfif>
 						
 						<cfif nextStart lte arguments.qryData.recordCount>
-							&nbsp;&nbsp;
-							<a href="#nextPageHREF#"><strong>Next</strong></a> 
+							<a href="#nextPageHREF#"><strong>&raquo;</strong></a> 
 						</cfif>
 					</cfif>
 				</div>
