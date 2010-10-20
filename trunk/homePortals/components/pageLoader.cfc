@@ -1,4 +1,4 @@
-<cfcomponent>
+<cfcomponent hint="The page loader is responsible for retrieving pages from a pageProvider and managing the caching strategy.">
 
 	<cfset variables.instance = structNew()>
 	<cfset variables.instance.pageProvider = 0>

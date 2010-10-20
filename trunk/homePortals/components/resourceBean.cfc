@@ -45,7 +45,7 @@
 		<cfreturn duplicate(variables.instance) />
 	</cffunction>
 	
-	<cffunction name="getHref" access="public" output="false" returntype="string">
+	<cffunction name="getHref" access="public" output="false" returntype="string" hint="Returns the internal location of the associated resource file (if any). Note that this location will not necessarily be a real filesystem or url path.">
 		<cfreturn variables.instance.Href />
 	</cffunction>
 	
@@ -55,11 +55,11 @@
 		<cfreturn this />
 	</cffunction>
 
-	<cffunction name="getType" access="public" output="false" returntype="string">
+	<cffunction name="getType" access="public" output="false" returntype="string" hint="Returns the resource type">
 		<cfreturn variables.instance.Type />
 	</cffunction>
 
-	<cffunction name="setType" access="public" output="false" returntype="resourceBean">
+	<cffunction name="setType" access="public" output="false" returntype="resourceBean" hint="Sets the resource type. The resource type should not be changed after the resource has been saved to the library.">
 		<cfargument name="Type" type="string" required="true" />
 		<cfset variables.instance.Type = arguments.Type />
 		<cfreturn this />
@@ -144,7 +144,7 @@
 	
 	
 	<!--- Target File Methods --->
-	<cffunction name="getFullHref" access="public" output="false" returntype="string">
+	<cffunction name="getFullHref" access="public" output="false" returntype="string" hint="Returns a web-accessible location for this resource">
 		<cfif isExternalTarget()>
 			<cfreturn getHref()>
 		<cfelse>
@@ -152,7 +152,7 @@
 		</cfif>
 	</cffunction>
 
-	<cffunction name="getFullPath" access="public" output="false" returntype="string">
+	<cffunction name="getFullPath" access="public" output="false" returntype="string" hint="If the resource can be reached through the file system, then returns the absolute path on the file system to the file associated with this resource">
 		<cfif isExternalTarget()>
 			<cfreturn "">
 		<cfelse>

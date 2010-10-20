@@ -226,7 +226,7 @@
 	<!--------------------------------------->
 	<!----  renderHTMLHeadCode			----->
 	<!--------------------------------------->
-	<cffunction name="renderHTMLHeadCode" access="public" returntype="string" output="false">
+	<cffunction name="renderHTMLHeadCode" access="public" returntype="string" output="false" hint="Returns the HTML code that should go in the head section of the document">
 		<cfset var i = 0>
 		<cfset var aStylesheets = variables.stPage.page.stylesheets>
 		<cfset var aScripts = variables.stPage.page.scripts>
@@ -307,7 +307,7 @@
 	<!---------------------------------------->
 	<!--- getParsedPageData				   --->
 	<!---------------------------------------->	
-	<cffunction name="getParsedPageData" access="public" returntype="struct" hint="This function a reference to the page contents after the page bean has been parsed. This allows to do low level modifications to the page structure without affecting the original bean">
+	<cffunction name="getParsedPageData" access="public" returntype="struct" hint="This function returns the page contents after the page bean has been parsed. This allows clients to do low level modifications to the page structure without affecting the original page bean">
 		<cfreturn variables.stPage.page>
 	</cffunction>	
 	

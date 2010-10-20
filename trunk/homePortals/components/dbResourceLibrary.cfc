@@ -1,4 +1,4 @@
-<cfcomponent implements="homePortals.components.resourceLibrary">
+<cfcomponent implements="homePortals.components.resourceLibrary" hint="Implements a resource library that stores resources in a database. The library creates a table for each resource type and each resource is stored as a row on the corresponding table for its type. Files associated with resources are still stored on the filesystem.">
 
 	<cfscript>
 		variables.dsn = "";

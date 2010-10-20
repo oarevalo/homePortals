@@ -1,4 +1,4 @@
-<cfcomponent>
+<cfcomponent hint="This component provides allows remote interaction with the homePortals application instance. To enable an application to be remotely accessed, create a component within the target application that extends this CFC and override the following variables as needed.">
 	<!---- 
 		homePortalsProxy.cfc 
 	

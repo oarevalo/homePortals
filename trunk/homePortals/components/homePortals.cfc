@@ -1,4 +1,4 @@
-<cfcomponent output="false" hint="Main component for the HomePortals framework. This component provides the interface for the initialization of the entire application as well as the loading, parsing and rendering of pages">
+<cfcomponent output="false" hint="Main component for the HomePortals framework. This component provides the interface for the initialization of the entire application as well as the loading, parsing and rendering of pages. This component contains the entire runtime environment for a HomePortals application. Upon initialization (via init()) the runtime environment will be bootstrapped and be ready to serve pages. This component is also used as an access point for all of the internal subsystems.">
 <!---
 	homePortals
 	http://www.homeportals.net
@@ -46,7 +46,7 @@
 	<!--------------------------------------->
 	<!----  init	 					----->
 	<!--------------------------------------->
-	<cffunction name="init" access="public" returntype="homePortals" hint="Constructor">
+	<cffunction name="init" access="public" returntype="homePortals" hint="Constructor. This method initializes the HomePortals application and runtime environment.">
 		<cfargument name="appRoot" type="string" required="false" default="" hint="Root directory of the application as a relative URL">
 		<cfargument name="config" type="any" required="false" hint="Provides an explicit configuration to load. This can be a an instance of homePortalsConfigBean, an XML object or a string containing the configuration. If this parameter is missing, HomePortals will try to locate a config file in the app directory" />
 		<cfscript>
@@ -339,35 +339,35 @@
 	<!--------------------------------------->
 	<!----  getPageProvider				----->
 	<!--------------------------------------->		
-	<cffunction name="getPageProvider" access="public" returntype="pageProvider">
+	<cffunction name="getPageProvider" access="public" returntype="pageProvider" hint="Returns a reference to the current pageProvider instance">
 		<cfreturn variables.oPageProvider>
 	</cffunction>
 
 	<!--------------------------------------->
 	<!----  getPluginManager			----->
 	<!--------------------------------------->		
-	<cffunction name="getPluginManager" access="public" returntype="pluginManager">
+	<cffunction name="getPluginManager" access="public" returntype="pluginManager" hint="Returns a reference to the current pluginManager instance">
 		<cfreturn variables.oPluginManager>
 	</cffunction>
 
 	<!--------------------------------------->
 	<!----  getResourceLibraryManager	----->
 	<!--------------------------------------->		
-	<cffunction name="getResourceLibraryManager" access="public" returntype="resourceLibraryManager">
+	<cffunction name="getResourceLibraryManager" access="public" returntype="resourceLibraryManager" hint="Returns a reference to the current resourceLibraryManager instance">
 		<cfreturn variables.oResourceLibraryManager>
 	</cffunction>
 
 	<!--------------------------------------->
 	<!----  getTemplateManager			----->
 	<!--------------------------------------->		
-	<cffunction name="getTemplateManager" access="public" returntype="templateManager">
+	<cffunction name="getTemplateManager" access="public" returntype="templateManager" hint="Returns a reference to the current templateManager instance">
 		<cfreturn variables.oTemplateManager>
 	</cffunction>
 
 	<!--------------------------------------->
 	<!----  getPageLoader				----->
 	<!--------------------------------------->		
-	<cffunction name="getPageLoader" access="public" returntype="pageLoader">
+	<cffunction name="getPageLoader" access="public" returntype="pageLoader" hint="Returns a reference to the homePortals pageLoader">
 		<cfreturn variables.oPageLoader>
 	</cffunction>	
 		
