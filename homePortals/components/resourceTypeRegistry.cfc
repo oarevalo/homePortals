@@ -38,7 +38,7 @@
 	<!------------------------------------------------->
 	<!--- registerResourceType                	   ---->
 	<!------------------------------------------------->
-	<cffunction name="registerResourceType" access="public" returntype="void">
+	<cffunction name="registerResourceType" access="public" returntype="void" hint="Adds a new resource type to the registry">
 		<cfargument name="resType" type="resourceType" required="true">
 		<cfset variables.stResourceTypes[arguments.resType.getName()] = resType>
 	</cffunction>

@@ -1,4 +1,4 @@
-<cfinterface>
+<cfinterface hint="Describes the behavior of the component that is responsible for storing and managing HomePortals pages. Pages should always be stored as a hierarchical tree (folders and nodes), however it is up to each implementation to figure out where and how pages are physically stored (filesystem, db, beads on an abacus, knots on a quipu, etc)">
 
 	<cffunction name="init" access="public" returntype="pageProvider" hint="constructor">
 		<cfargument name="config" type="homePortalsConfigBean" hint="main configuration bean for the application">
