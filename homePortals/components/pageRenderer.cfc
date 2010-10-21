@@ -310,6 +310,13 @@
 	<cffunction name="getParsedPageData" access="public" returntype="struct" hint="This function returns the page contents after the page bean has been parsed. This allows clients to do low level modifications to the page structure without affecting the original page bean">
 		<cfreturn variables.stPage.page>
 	</cffunction>	
+
+	<!---------------------------------------->
+	<!--- getContext					   --->
+	<!---------------------------------------->	
+	<cffunction name="getContext" access="public" returntype="struct" hint="This function returns the context object for this renderer">
+		<cfreturn variables.context>
+	</cffunction>	
 	
 	
 	<!----------  P R I V A T E    M E T H O D S    ----------------->
