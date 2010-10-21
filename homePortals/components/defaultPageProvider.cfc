@@ -1,4 +1,4 @@
-<cfcomponent implements="pageProvider">
+<cfcomponent implements="pageProvider" hint="This is the standard page provider. Pages are stored as XML files on the file system.">
 
 	<cfset variables.contentRoot = "">
 	<cfset variables.EXCLUDED_DIR_NAMES = "_res,.svn">

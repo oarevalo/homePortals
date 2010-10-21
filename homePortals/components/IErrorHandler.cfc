@@ -1,4 +1,4 @@
-<cfinterface hint="Describes a component that can be used to provide custom behavior for handling errors">
+<cfinterface hint="Describes a component that can be used to provide custom behavior for handling errors.">
 
 	<cffunction name="onContentRendererError" returntype="void" hint="Handles an error ocurred while processing a content renderer on a page">
 		<cfargument name="homePortals" type="homePortals.components.homePortals" required="true" hint="The homePortals engine">

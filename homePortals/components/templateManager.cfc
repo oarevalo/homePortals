@@ -6,7 +6,7 @@
 	<cfset variables.stRenderTemplatesCache = structNew()>
 	<cfset variables.appRoot = "">
 
-	<cffunction name="init" access="public" returntype="templateManager">
+	<cffunction name="init" access="public" returntype="templateManager" hint="Constructor">
 		<cfargument name="config" type="homePortalsConfigBean" required="true">
 		<cfset var st = arguments.config.getRenderTemplates()>
 		<cfset var rtName = "">
@@ -23,7 +23,7 @@
 		<cfreturn this>
 	</cffunction>
 
-	<cffunction name="setTemplate" access="public" returntype="void">
+	<cffunction name="setTemplate" access="public" returntype="void" hint="Registers a new template with the manager">
 		<cfargument name="name" type="string" required="true">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="href" type="string" required="true">
@@ -49,12 +49,12 @@
 										
 	</cffunction>
 
-	<cffunction name="getTemplates" access="public" returntype="struct">
+	<cffunction name="getTemplates" access="public" returntype="struct" hint="Returns a struct containing all registered templates of the given type">
 		<cfargument name="type" type="string" required="true">
 		<cfreturn duplicate(variables.instance.stTemplates[arguments.type])>
 	</cffunction>
 	
-	<cffunction name="getTemplate" access="public" returntype="struct">
+	<cffunction name="getTemplate" access="public" returntype="struct" hint="Returns a struct containing information about a specific template given its type and name.">
 		<cfargument name="type" type="string" required="true">
 		<cfargument name="name" type="string" required="true">
 		<cfset var st = structNew()>
@@ -66,16 +66,16 @@
 		<cfreturn st />
 	</cffunction>
 
-	<cffunction name="getDefaultTemplate" access="public" returntype="struct">
+	<cffunction name="getDefaultTemplate" access="public" returntype="struct" hint="Returns the default template for the given type. If no template has been flagged as default, then returns the first one defined for that type.">
 		<cfargument name="type" type="string" required="true">
 		<cfset var t = variables.instance.stTemplates[arguments.type]>
 		<cfset var td = variables.instance.stTemplateDefaults[arguments.type]>
 		<cfreturn duplicate(t[td])>
 	</cffunction>
 
-	<cffunction name="getTemplateBody" access="public" returntype="string" hint="returns the contents of a rendertemplate">
+	<cffunction name="getTemplateBody" access="public" returntype="string" hint="Returns the contents of the requested template. If name is missing or empty, then uses the default template for the given type. Template files are read only once whenever they are requested and then cached indefinetely for subsequent requests.">
 		<cfargument name="type" type="string" required="true">
-		<cfargument name="name" type="string" required="true">
+		<cfargument name="name" type="string" required="false" default="">
 		<cfset var key = "">	
 		<cfset var templateBody = "">
 		<cfset var st = structNew()>
@@ -102,7 +102,7 @@
 		<cfreturn templateBody>
 	</cffunction>
 
-	<cffunction name="getLayoutSections" access="public" returntype="string">
+	<cffunction name="getLayoutSections" access="public" returntype="string" hint="Returns a list with all the layout sections defined on the template with the given name. The template provided must be of type 'page'. If no template name is indicated then uses the default page template.">
 		<cfargument name="pageTemplate" type="string" required="false" default="">
 		<cfscript>
 			var index = 1;

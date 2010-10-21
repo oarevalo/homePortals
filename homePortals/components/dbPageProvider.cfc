@@ -1,4 +1,4 @@
-<cfcomponent implements="pageProvider">
+<cfcomponent implements="pageProvider" hint="Implements a page provider that stores page objects in a database. Pages are stored as rows on a single table. This provider can be configured (dsn, tablename, username, etc) via global page properties with the form pageProvider.db.* See documentation for specific values.">
 
 	<cfset variables.dsn = "">
 	<cfset variables.contentRoot = "">

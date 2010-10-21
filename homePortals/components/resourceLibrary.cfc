@@ -1,4 +1,4 @@
-<cfinterface>
+<cfinterface hint="Describes a component that is used to represent a collection of resources. Each implementation of a resource library defines the actual storage mechanism for the resources.">
 
 	<!------------------------------------------------->
 	<!--- init				                	   ---->
