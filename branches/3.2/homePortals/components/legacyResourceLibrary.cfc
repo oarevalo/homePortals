@@ -1,4 +1,4 @@
-<cfcomponent implements="resourceLibrary">
+<cfcomponent implements="resourceLibrary" hint="This component contains the implementation of the resource library used in HomePortals 3.1. This is a filesystem-based library in which all resource types are stored on their own subdirectories. Also, this library requires that all resources have a single package (no nested packages allowed). This provided for backwards compatibility for applications or plugins that are not ready to use the newer implementation of the default resource library.">
 
 	<cfscript>
 		variables.resourceDescriptorFile = "info.xml";

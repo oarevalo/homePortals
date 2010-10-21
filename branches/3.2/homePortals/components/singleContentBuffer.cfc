@@ -1,4 +1,4 @@
-<cfcomponent>
+<cfcomponent hint="This is a wrapper around a contentBuffer object that restricts access (read/write) to only one specific element in the buffer">
 
 	<cfset variables.instance = structNew()>
 	<cfset variables.instance.id = "">

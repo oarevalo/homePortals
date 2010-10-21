@@ -25,7 +25,7 @@
 	<cfset variables.DEFAULT_ITEMS_TO_DISPLAY = 10>
 	<cfset variables.DEFAULT_ORDER_BY = "id">
 	<cfset variables.DEFAULT_GROUP_BY = "">
-	<cfset variables.DEFAULT_PAGING_DELTA = 2>
+	<cfset variables.DEFAULT_PAGING_DELTA = 3>
 	<cfset variables.DEFAULT_SEARCH_FIELDS = "id,package,description">
 	<cfset variables.DEFAULT_SHOW_LABEL = false>
 	<cfset variables.DEFAULT_SHOW_RESULTSCOUNT = true>

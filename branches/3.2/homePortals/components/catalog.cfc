@@ -170,11 +170,11 @@
 	<!---------------------------------------->
 	<!--- cacheServices					   --->
 	<!---------------------------------------->	
-	<cffunction name="getContentCacheService" access="public" returntype="cacheService">
+	<cffunction name="getContentCacheService" access="public" returntype="cacheService" hint="Returns a reference to the cacheService object used to store individual resources">
 		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 		<cfreturn oCacheRegistry.getCache(variables.contentCacheServiceName)>
 	</cffunction> 
-	<cffunction name="getIndexCacheService" access="public" returntype="cacheService">
+	<cffunction name="getIndexCacheService" access="public" returntype="cacheService" hint="Returns a reference to the cacheService object used to store resource indexes">
 		<cfset var oCacheRegistry = createObject("component","homePortals.components.cacheRegistry").init()>
 		<cfreturn oCacheRegistry.getCache(variables.indexCacheServiceName)>
 	</cffunction> 

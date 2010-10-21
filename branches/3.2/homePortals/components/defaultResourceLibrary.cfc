@@ -1,4 +1,4 @@
-<cfcomponent implements="resourceLibrary">
+<cfcomponent implements="resourceLibrary" hint="This is the standard resource library implementation. Resources are stored on the filesystem. Each folder or subfolder is considered a package. Associated resource files are stored as regular files and for additional resource properties an index file (info.xml) is created on each package folder. When the info.xml file is missing, the library tries to infer the package contents by looking that the existing files on that folder. Packages can contain resources of different types.">
 
 	<cfscript>
 		variables.resourceDescriptorFile = "info.xml";

@@ -1,4 +1,4 @@
-<cfcomponent>
+<cfcomponent hint="This is a bean that represents a page object in HomePortals. This contains all the properties that describe a page. It also knows how to serialize a page as an XML object and how to inflate a page from its XML source.">
 
 	<cfscript>
 		variables.DEFAULT_PAGE_TITLE = "";

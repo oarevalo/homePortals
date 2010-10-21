@@ -1,4 +1,4 @@
-<cfcomponent>
+<cfcomponent hint="This is a container that represents a page element corresponding to a content renderer. Modules are each of the elements on the 'body' section of a page. Each module represents a unit/widget/renderer that should be displayed on the generated document. Note that this is only a container for properties, the actual behavior for each type of renderer is contained in a separate component.">
 	
 	<cfproperty name="id" type="string" required="true" displayname="ID" />
 	<cfproperty name="moduleType" type="string" required="true" displayname="Module Template" />
