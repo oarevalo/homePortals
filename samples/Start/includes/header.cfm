@@ -1,0 +1,160 @@
+<cfparam name="url._statusMessage" default="">
+
+<cfsilent>
+	<cfscript>
+		oHP = application.homePortals;
+		oAccountsService = oHP.getPluginManager().getPlugin("accounts").getAccountsService();
+		
+		currentPage = request.oPageRenderer.getPageHREF();
+
+		// create page object
+		request.oPage = request.oPageRenderer.getPage();
+
+		// get page owner
+		siteOwner = "";
+		pageAccess = "general";
+		if(request.oPage.hasProperty("owner")) siteOwner = request.oPage.getProperty("owner");
+		if(request.oPage.hasProperty("access")) pageAccess = request.oPage.getProperty("access");
+		
+		// create site object
+		request.oSite = oAccountsService.getSite(siteOwner);
+
+		// Get information on any currently logged-in user
+		oUserRegistry = createObject("Component","homePortals.components.userRegistry").init();
+		request.userInfo = oUserRegistry.getUserInfo();	// information about the logged-in user
+		bUserLoggedIn = (request.userInfo.userName neq "");
+		bIsOwner = (request.userInfo.userName eq siteOwner); 
+		
+		pageTitle = request.oPage.getTitle();
+		aLayoutRegions = request.oPage.getLayoutRegions();
+		siteTitle = request.oSite.getSiteTitle();	
+		aPages = request.oSite.getPages();
+
+		// make a js struct with page locations
+		lstLocations = "";
+		for(i=1;i lte arrayLen(aLayoutRegions);i++) {
+			tmp = "#aLayoutRegions[i].id#: { id:'#aLayoutRegions[i].id#', name:'#aLayoutRegions[i].name#', type:'#aLayoutRegions[i].type#', theClass:'#aLayoutRegions[i].class#'}";
+			lstLocations = listAppend(lstLocations, tmp);
+		}
+
+		// make a js struct with modules on this page
+		aModules = request.oPage.getModules();
+		lstModules = "";
+		for(i=1;i lte arrayLen(aModules);i++) {
+			lstModules = listAppend(lstModules, "'" & aModules[i].getid() & "'");
+		}
+	</cfscript>	
+</cfsilent>
+
+
+<!--- display site map --->	
+<cfoutput>
+	<!--- include css and javascript --->
+	<cfsavecontent variable="tmpHTML">
+		<script type="text/javascript">
+			// initialize control panel client
+			stLocations = {#lstLocations#};
+			stModules = [#lstModules#];
+			
+			var controlPanel = new controlPanelClient();
+			controlPanel.init("includes/controlPanelGateway.cfm", stLocations);
+			
+			<cfif bIsOwner>
+			// setup UI
+			jQuery(function() {
+				controlPanel.setStatusMessage("attaching module handles...",700);
+				for(var i=0;i<stModules.length;i++) {
+					jQuery("##"+stModules[i]+"_Head")
+						.addClass("cms-moduleHandleBar");
+				}
+
+				controlPanel.setStatusMessage("enabling drag and drop...",700);
+				for(loc in controlPanel.locations) {
+					jQuery("##"+controlPanel.locations[loc].id)
+						.addClass("cms-layoutRegion")
+				}
+
+				jQuery(".cms-layoutRegion").sortable({
+					connectWith: '.cms-layoutRegion',
+				    forcePlaceholderSize: true,
+				    placeholder: 'cms-layoutRegionPlaceHolder',
+				    opacity: 0.6,
+				    delay:100,
+				    distance:5,
+				    handle: '.cms-moduleHandleBar',
+				    tolerance: 'pointer',
+				    
+				    start: function(event,ui) {
+						jQuery(".cms-layoutRegion")
+							.addClass("cms-layoutRegionHighlighted");
+					},
+				    stop: function(event,ui) {
+						jQuery(".cms-layoutRegion")
+							.removeClass("cms-layoutRegionHighlighted");
+						controlPanel.updateLayout();
+					}
+				
+				});	
+				jQuery(".cms-layoutRegion").disableSelection();
+				attachModuleIcons();
+				attachLayoutHolders();
+			});
+			</cfif>
+		</script>
+	</cfsavecontent>
+	<cfhtmlhead text="#tmpHTML#">
+
+	<div id="navMenu" style="padding-top:5px;">
+		<div id="anchorAddContent" style="float:right;padding-right:10px;padding-top:3px;">
+			<cfif bIsOwner>
+				<a href="##" onclick="navCmdAddPage()"><img src="images/btnAddPage.gif" align="absmiddle" style="margin-left:5px;" border="0" alt="Add Page" title="Add Page"></a>
+				<a href="##" onclick="navCmdAddContent()"><img src="images/btnAddContent.gif" align="absmiddle" style="margin-left:5px;" alt="Add Content" title="Add Content" border="0"></a>
+				<a href="includes/logOff.cfm"><img src="images/btnLogOff.gif" align="absmiddle" style="margin-left:5px;" alt="Log Off" border="0" title="Log Off"></a>
+			<cfelse>
+				<form name="frmLogin" action="includes/processLogin.cfm" method="post">
+					User: <input type="text" name="username" value="" style="font-size:10px;width:100px;">
+					Password: <input type="password" name="password" value="" style="font-size:10px;width:100px;">
+					<input type="submit" value="Login" name="btnLogin" style="font-size:10px;">
+				</form>
+			</cfif>
+		</div>
+		<span id="siteMapTitle">
+			<span id="siteMapTitle_label" <cfif bIsOwner>onclick="controlPanel.rename('siteMapTitle','#siteTitle#','Site')"</cfif> title="Click to rename site">#siteTitle#</span>
+		</span>
+	</div>
+	<div id="navMenuTitles">
+		<cfif pageAccess eq "owner">
+			<img src="images/lock.png" 
+					alt="This is a private page" 
+					title="This is a private page" 
+					border="0" align="absbottom"
+					style="padding-left:5px;padding-bottom:2px;">		
+		</cfif>
+
+		<div id="siteMapStatusBar"></div>
+		
+		<cfloop from="1" to="#arrayLen(aPages)#" index="i">
+			<cfset thisPageHREF = "index.cfm?account=" & siteOwner & "&page=" & replace(aPages[i].href,".xml","")>
+			<cfset thisPageHREF = replace(thisPageHREF, "//", "/", "ALL")> <!--- get rid of duplicate forward slash (will cause problems for sites at webroot)--->
+			&nbsp;&nbsp;
+			<cfif aPages[i].href eq getFileFromPath(currentPage)>
+				<span id="pageTitle" title="Click to rename or delete page">
+					<span id="pageTitle_label" <cfif bIsOwner>onclick="controlPanel.rename('pageTitle','#pageTitle#','Page')"</cfif>>#pageTitle#</span>
+				</span>
+			<cfelse>
+				<a href="#thisPageHREF#" class="pageTitle">#aPages[i].title#</a>
+			</cfif>
+		</cfloop>
+	</div>
+
+	
+	<cfif url._statusMessage neq "">
+		<script>
+			controlPanel.setStatusMessage("#jsstringformat(url._statusMessage)#");
+			alert("#jsstringformat(url._statusMessage)#");
+		</script>
+	</cfif>
+	
+</cfoutput>
+
+

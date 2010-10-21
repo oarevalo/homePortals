@@ -1,0 +1,293 @@
+
+
+/* ************ Page Structure ************* */
+html{
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 11px;
+}
+body{
+	color: #333;
+	background:  url("../images/bg.gif");
+	margin:0px;
+	padding:0px;
+}
+th, td {
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 11px;
+}
+A:link, A:visited,  A:active, A.highlighted {
+	text-decoration: none;
+	font-size: 11px;
+	color:#333;
+}
+A:hover {
+	color: black;
+	text-decoration: underline;
+}
+h2 {
+	margin:0px;
+	padding:0px;
+}
+
+
+/* start IE stuff */
+/* if you need this to validate you need to use "if IE" statement in HTML */
+* html body
+	{
+	overflow-y: hidden;
+	}
+
+/* end IE stuff */	
+	
+#h_footer
+	{
+	position: fixed;
+	bottom: 0px;
+	left: 0px;
+	width: 100%;
+	height: 20px;
+	z-index:999;
+}
+
+#h_body_main {
+	width:100%;
+}
+/************************************** */
+
+/*********** CSS Styles for default appearance of all modules and sections ********/
+.Section {
+	border:0px;
+}
+.SectionTitle {
+	text-align: left;
+	padding:0px;
+	white-space:nowrap;
+	display:block;
+}
+.SectionTitleLabel {
+	font-weight:bold;
+	font-size:12px;
+	line-height:20px;
+	margin-left:5px;
+}
+.SectionBody {
+	display:block;
+}
+.SectionBodyRegion {
+	padding: 15px;
+}
+
+/************  Layout Sections  ********/
+.column { 
+	width:33%;
+}
+.row {
+	min-height:50px;
+	margin-left:210px;
+}
+.header {
+	padding:0px;
+	margin:5px;
+	border:0px;
+}
+.layoutSectionHolder {
+	font-size:1px;
+	border:1px dotted white;
+	height:1px;
+	#height:10px;	
+}
+/* ************************************* */ 
+	
+
+
+/* **********   Module Containers ******* */
+.Section {
+	margin: 5px;
+	border : 0px;
+	background-color: #fff;
+	z-index: 1;
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 11px;	
+	position:relative;
+	width:95%;
+	border-bottom:1px solid #ebebeb;
+}
+.SectionTitle {
+	background-color:#ebebeb;
+	color: #000;
+	border-top:1px dashed #ccc;
+	border-bottom:1px dashed #ccc;
+}
+.SectionTitleLabel {
+	font-size:10px !important;
+	font-weight:bold;
+	font-family:verdana;
+	
+}
+.SectionToolbar {
+	border:1px solid silver;
+	background-color:#fefcd8;
+	margin:0px;
+	color:#993300;
+	margin-top:10px;
+	padding:2px;
+	font-size:12px;
+}
+.SectionToolbar a {
+	color:#333333 !important;
+	font-weight:bold;
+	font-size:10px;
+}
+/************************************** */
+
+
+
+
+/******** Page Header ************ */
+#navMenu {
+	margin:0px;	
+	font-family:Arial, Helvetica, sans-serif;
+	background-color: #000;
+	margin-top: 0px;
+	border:0px;
+	color:#fff;
+	height:30px;
+	
+}
+#navMenuTitles {
+	background-color: #333;
+	border-top:1px solid white; 
+	border-bottom:1px solid black; 
+	padding-top:3px;
+	padding-bottom:2px;
+	color:#fff;
+	height:19px;
+	line-height:19px;
+}
+#navMenuActions {
+	background-color: #333;
+	border-top:1px solid white; 
+	border-bottom:1px solid black; 
+	padding-top:3px;
+	padding-bottom:3px;
+}
+#anchorAddContent {
+	font-size:10px;
+	
+}
+#anchorAddContent a {
+	font-weight:bold;
+}
+
+#siteMapStatusBar {
+	float:right;
+	margin-right:10px;
+	font-size:10px;
+	color:#fff;
+}
+
+#siteMapTitle {
+	font-size:16px;
+	font-family:arial;
+	font-weight:bold;
+	font-variant:small-caps;
+	margin:0px;
+	padding:0px;
+	color:#fff;
+	padding-left:10px;	
+}
+
+#pageFooter {
+	background-color: #333;
+	border-top:1px solid white; 
+	border-bottom:1px solid black; 
+	padding-top:3px;
+	padding-bottom:3px;
+	color:#fff;
+	text-align:center;
+	font-size:10px;
+}
+
+.pageTitle  {
+	font-size:13px;
+	font-family:arial;
+	font-weight:normal;
+	color:#fff !important;
+	line-height:16px;
+}
+#pageTitle {
+	background-color:#ebebeb;
+	border:1px solid silver;
+	padding:4px;
+	padding-left:10px;
+	padding-right:10px;
+	color:#000;
+	cursor:pointer !important;
+}	
+.inlineTextbox {
+	border:0px;
+	font-size:11px;
+	width:120px;
+}
+.inlineForm {
+	margin:0px;
+	padding:0px;
+	display:inline;
+}
+
+
+/********** content panel ***********/
+#cp_panelWindow {
+	position:absolute;
+	width:250px; 
+	height:200px;
+	color:black;
+	background-color:#fff;
+	border:1px solid #333;
+	padding:0px;
+	margin:0px;
+	font-size:10px;		
+	z-index:9999;
+	top:30px;
+	right:20px;
+}
+
+#cp_panelWindow table {
+	border-collapse:collapse;
+	width:100%;
+}
+#cp_sectionTitle {
+	background-color:#FFCC00;
+	height:18px;
+	border-bottom:1px solid #333;
+	padding:2px;
+	padding-left:5px;
+}
+#cp_content {
+	padding:5px;
+	height:165px;
+	width:240px; 
+	overflow:auto;
+}
+a.cp_tab,
+a.cp_tab:hover,
+a.cp_tab:link,
+a.cp_tab:active  {
+	width:56px;
+	height:20px;
+	display:block;
+	margin:0px;
+	padding:0px;
+	border:0px solid black;
+	float:left;
+	text-decoration:none;
+	margin-right:5px;
+}
+a#cp_tabFeeds {background:url(images/tab_feeds.gif) 0px 20px;}
+a#cp_tabFeeds.cp_tab:hover {background:url(images/tab_feeds.gif) 1px 1px;}
+a#cp_tabFeeds.cp_selectedTab  {background:url(images/tab_feeds.gif) 1px 1px;}
+
+a#cp_tabWidgets {background:url(images/tab_widgets.gif) 0px 20px;}
+a#cp_tabWidgets:hover {background:url(images/tab_widgets.gif) 0px 1px;}
+a#cp_tabWidgets.cp_selectedTab  {background:url(images/tab_widgets.gif) 0px 1px;}
+
