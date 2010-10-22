@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resLib type="module">
+	
+		<resource access="general" id="login" name="login/login">
+			<description>
+				Provides a login form to signing in to an account
+			</description>
+			<moduleInfo>
+				<authorName>Oscar Arevalo</authorName>
+				<authorEmail>oarevalo@gmail.com</authorEmail>
+				<authorURL>http://www.homeportals.com</authorURL>
+				<screenshot/>
+			</moduleInfo>
+		</resource>
+	
+</resLib>

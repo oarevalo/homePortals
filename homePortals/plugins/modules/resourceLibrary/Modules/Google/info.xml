@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resLib type="module">
+
+
+
+	<!-- ********   Google  ************ -->
+	<resource access="general" id="Google" name="Google/google">
+		<description>
+			Displays a form to search in Google.
+		</description>
+		<attributes>
+			<attribute description="Comma-delimited list of types of search to perform. Available values are: web,local,video,blog,news,book, and image" name="searchers" required="true" />
+			<attribute description="For local searches, enter the address or location where to search" label="Display Mode" name="localSearchCenterPoint" required="false" default="" />
+		</attributes>
+		<moduleInfo>
+			<authorName>Oscar Arevalo</authorName>
+			<authorEmail>oarevalo@gmail.com</authorEmail>
+			<authorURL>http://www.homeportals.com</authorURL>
+			<screenshot/>
+		</moduleInfo>
+	</resource>
+
+</resLib>
