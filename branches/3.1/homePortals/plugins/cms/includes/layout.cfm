@@ -1,0 +1,3 @@
+<cfoutput>
+	#arguments.html#
+</cfoutput>
