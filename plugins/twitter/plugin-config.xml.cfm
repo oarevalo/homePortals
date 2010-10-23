@@ -2,7 +2,7 @@
 <homePortals>
 
 	<contentRenderers>
-		<contentRenderer moduleType="twitter" path="homePortalsPlugins.twitter.twitter" />
+		<contentRenderer moduleType="twitter" path="{pluginCFCPath}.twitter" />
 	</contentRenderers>
 
 </homePortals>

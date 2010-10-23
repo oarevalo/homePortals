@@ -2,6 +2,13 @@
 
 	<cfset variables.oModuleProperties = 0>
 
+	<cffunction name="onConfigLoad" access="public" returntype="homePortals.components.homePortalsConfigBean" hint="this method is executed when the HomePortals configuration is being loaded and before the engine is fully initialized. This method should only be used to modify the current configBean.">
+		<cfargument name="eventArg" type="homePortals.components.homePortalsConfigBean" required="true" hint="the application-provided config bean">	
+		<!--- apply plugin configuration from the provided config file --->
+		<cfset loadConfigFile( getDirectoryFromPath(getcurrentTemplatePath()) & "plugin-config.xml.cfm" ) />
+		<cfreturn arguments.eventArg />
+	</cffunction>
+	
 	<cffunction name="onAppInit" access="public" returntype="void">
 		<cfscript>
 			var oConfig = getHomePortals().getConfig();
@@ -9,10 +16,6 @@
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
 			var oRSSService = 0;
-			var configPath = getDirectoryFromPath(getcurrentTemplatePath()) & "plugin-config.xml.cfm";
-
-			// load plugin config settings
-			oConfig.load(configPath);
 			
 			// add bundled resource library (if required)
 			if(getPluginSetting("loadBundledResourceLibrary")) {

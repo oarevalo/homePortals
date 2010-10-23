@@ -8,11 +8,7 @@ Instructions:
 
 1. Add the following to the <plugins> section of your application's homePortals-config.xml.cfm
 
-<plugin name="modules" path="homePortals.plugins.modules.plugin" />
+<plugin name="jquery" />
+<plugin name="modules" />
 
-
-2. create a file named gateway.cfm at the root level of your application 
-with the following contents:
-
-<cfinclude template="/homePortals/plugins/modules/gateway.cfm">
 

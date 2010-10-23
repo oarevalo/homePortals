@@ -481,7 +481,7 @@
 								}
 
 								// reload package
-				   				variables.homePortals.getCatalog().reloadPackage(resType,oResourceBean.getPackage());
+				   				variables.homePortals.getCatalog().index(resType,oResourceBean.getPackage());
 							}
 
 							// update module in page
@@ -518,7 +518,7 @@
 
 			<!--- check if user exists --->
 			<cftry>
-				<cfset resNode = oCatalog.getResourceNode("cmsUser",arguments.username,true)>
+				<cfset resNode = oCatalog.getResource("cmsUser","users/" &  arguments.username,true)>
 				<cfif resNode.getProperty("password") eq hash(arguments.password,'SHA','utf-8')>
 					<cfset oUserRegistry.setUserInfo( arguments.username, arguments.username, resNode )>
 				<cfelse>
@@ -579,7 +579,7 @@
 			
 			<!--- check if user exists --->
 			<cftry>
-				<cfset qry = oCatalog.getResourceNode("cmsUser",arguments.username,true)>
+				<cfset qry = oCatalog.getResource("cmsUser",arguments.username,true)>
 				<cfthrow message="The given username already exists. Please select a different one">
 				<cfcatch type="homePortals.catalog.resourceNotFound">
 					<!--- good, username not taken --->
@@ -596,7 +596,7 @@
 			<cfset oResNode.setProperty("password",hash(arguments.password,'SHA','utf-8'))>
 			<cfset defLib.saveResource(oResNode)>
 			
-			<cfset oCatalog.reloadPackage("cmsUser","users")>
+			<cfset oCatalog.index("cmsUser","users")>
 			
 			<cflocation url="#appRoot#?_statusMessage=User%20created" addToken="false">
 			<cfcatch type="any">
@@ -753,7 +753,7 @@
    				if(newPassword neq "") {
    					if(newPassword neq newPassword2) throw("Passwords do not match");
    					oCatalog = variables.homePortals.getCatalog();
-   					resNode = oCatalog.getResourceNode("cmsUser",getUserInfo().username,true);
+   					resNode = oCatalog.getResource("cmsUser",getUserInfo().username,true);
 					resNode.setProperty("password",hash(arguments.newPassword,'SHA','utf-8'));
    					defLib = resNode.getResourceLibrary();
    					defLib.saveResource(resNode);
@@ -888,7 +888,7 @@
 				}
 
 				// reload package
-				variables.homePortals.getCatalog().reloadPackage(resType,oResourceBean.getPackage());
+				variables.homePortals.getCatalog().index(resType,oResourceBean.getPackage());
 			}
    			</cfscript>
    			<script>
@@ -911,13 +911,13 @@
 			<cfscript>
 	   			validateOwner();
 				oCatalog = variables.homePortals.getCatalog();
-				oResourceBean = oCatalog.getResourceNode(arguments.resourceType, arguments.resourceID, true);
+				oResourceBean = oCatalog.getResource(arguments.resourceType, arguments.resourceID, true);
 
 				// delete resource
 				oResourceBean.getResourceLibrary().deleteResource(resourceID, resourceType, oResourceBean.getPackage());
 
 				// remove from catalog
-				oCatalog.deleteResourceNode(resourceType, resourceID);
+				oCatalog.index(resourceType, resourceID);
    			</cfscript>
    			<script>
   				window.location.replace("#variables.reloadPageHREF#");
@@ -1031,7 +1031,7 @@
 		<cfargument name="resourceType" type="string" required="yes">
 		<cfscript>
 			var oHP = variables.homePortals;
-			var qryResources = oHP.getCatalog().getResourcesByType(arguments.resourceType);
+			var qryResources = oHP.getCatalog().getIndex(arguments.resourceType);
 			return qryResources;
 		</cfscript>
 	</cffunction>
@@ -1051,6 +1051,9 @@
 				<cfset defLib = aLibs[i]>
 			</cfif>
 		</cfloop>
+		<cfif not defLibFound>
+			<cfthrow message="no default resource library found">
+		</cfif>
 		
 		<cfif not defLibFound and arrayLen(aLibs) gt 0>
 			<cfset defLib = aLibs[1]>

@@ -10,7 +10,7 @@
 	siteOwner = stUser.username;
 	
 	if(arguments.resourceID neq "") {
-		oResourceBean = this.controller.getHomePortals().getCatalog().getResourceNode(getResourceType(),arguments.resourceID);
+		oResourceBean = this.controller.getHomePortals().getCatalog().getResource(getResourceType(),arguments.resourceID);
 		description = oResourceBean.getDescription();
 		content = "";
 		contentLocation = oResourceBean.getFullHref();

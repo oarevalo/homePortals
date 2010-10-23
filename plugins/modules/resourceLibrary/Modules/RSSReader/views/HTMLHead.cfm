@@ -4,7 +4,7 @@
 <cfoutput>
 	<script>
 		#moduleID#.viewContent = function(id,rss,link) {
-			var l = $(id+"Link");
+			var l = $("##"+id+"Link");
 			if(l) l.style.fontWeight = "normal";	
 			
 			var args = {

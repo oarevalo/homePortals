@@ -65,7 +65,7 @@
 <cfoutput>
 	<div style="background-color:##ebebeb;border:1px solid silver;padding:5px;font-size:12px;">
 		Search: <input type="text" name="term" value="#term#" id="yt_term">
-		<input type="button" value="Go" onclick="#moduleID#.search({term:$('yt_term').value,mode:'search'})" style="padding:2px;">
+		<input type="button" value="Go" onclick="#moduleID#.search({term:$('##yt_term').val(),mode:'search'})" style="padding:2px;">
 		<br />
 		<a href="##" onclick="#moduleID#.search({mode:'listFeatured'})" <cfif mode eq "listFeatured">style="font-weight:bold;"</cfif>>Featured Videos</a>
 		&nbsp;|&nbsp;

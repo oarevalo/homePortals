@@ -18,7 +18,7 @@
 				<div style="margin:5px;"> 
 					<b>Search feeds:</b>
 					<input type="text" name="txtSearch" id="h_txtSearchFeed" value="#searchTerm#">
-					<input type="button" name="btnSearch" value="Search" onclick="#moduleID#.getView('contentList','cb_resourceList',{searchTerm:$('h_txtSearchFeed').value})">
+					<input type="button" name="btnSearch" value="Search" onclick="#moduleID#.getView('contentList','cb_resourceList',{searchTerm:$('##h_txtSearchFeed').val()})">
 				</div>
 			</div>
 		

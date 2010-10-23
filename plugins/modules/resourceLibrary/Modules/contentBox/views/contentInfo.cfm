@@ -17,7 +17,7 @@
 
 <cfif resourceID neq "">
 
-	<cfset oResourceBean = oHP.getCatalog().getResourceNode("content", resourceID)>
+	<cfset oResourceBean = oHP.getCatalog().getResource("content", resourceID)>
 	<cfset resHREF = oResourceBean.getHREF()>
 						
 	<cfoutput>

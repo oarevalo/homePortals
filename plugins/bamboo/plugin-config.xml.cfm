@@ -2,11 +2,11 @@
 <homePortals>
 	
 	<baseResources>
-		<resource href="/homePortalsPlugins/bamboo/style.css" type="style"/>
+		<resource href="{pluginPath}/style.css" type="style"/>
 	</baseResources>
 	<renderTemplates>
-		<renderTemplate name="page" type="page" default="true" href="/homePortalsPlugins/bamboo/page.html" />
-		<renderTemplate name="module" type="module" default="true" href="/homePortalsPlugins/bamboo/module.html" />
+		<renderTemplate name="page" type="page" default="true" href="{pluginPath}/page.html" />
+		<renderTemplate name="module" type="module" default="true" href="{pluginPath}/module.html" />
 	</renderTemplates>
 
 </homePortals>

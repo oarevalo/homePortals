@@ -20,10 +20,10 @@
 			var modulesResDir = "Modules";
 
 			if(moduleName neq "") {
-				modResBean = oHP.getResourceLibraryManager().getResource("module",listFirst(moduleName,"/"),listLast(moduleName,"/"));
+				modResBean = oHP.getCatalog().getResource("module",moduleName);
 				moduleName = modResBean.getResourceLibrary().getPath() & "/" & modulesResDir & "/" & moduleName;
 			} else if(moduleResID neq "") {
-				modResBean = oHP.getCatalog().getResourceNode("module",moduleResID);
+				modResBean = oHP.getCatalog().getResource("module",moduleResID);
 				moduleName = modResBean.getResourceLibrary().getPath() & "/" & modulesResDir & "/" & modResBean.getPackage() & "/" & modResBean.getID();
 			}
 

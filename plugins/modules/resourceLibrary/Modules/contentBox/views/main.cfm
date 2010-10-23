@@ -24,7 +24,7 @@
 	
 	// get the content entry from the catalog
 	try {
-		oResourceBean = this.controller.getHomePortals().getCatalog().getResourceNode(getResourceType(),resourceID);
+		oResourceBean = this.controller.getHomePortals().getCatalog().getResource(getResourceType(),resourceID);
 		
 	} catch(homePortals.catalog.resourceNotFound e) {
 		bContentFound = false;

@@ -41,7 +41,7 @@
 	<cfif bIsContentOwner and ArrayLen(aNotes) gt 1>
 		<div style="text-align:right;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid silver;">
 			<select name="selNotes" 
-					onclick="if(this.value!='' && this.value!=$('#moduleID#_frm').noteID.value) #moduleID#.doAction('setNoteID',{noteID:this.value})" 
+					onclick="if(this.value!='' && this.value!=$('###moduleID#_frm').noteID.value) #moduleID#.doAction('setNoteID',{noteID:this.value})" 
 					style="font-size:11px;border:1px solid silver;">
 				<option value="">--- Saved Notes ---</option>
 				<cfloop from="1" to="#ArrayLen(aNotes)#" index="i">
