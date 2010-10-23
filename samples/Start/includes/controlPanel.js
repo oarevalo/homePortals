@@ -237,7 +237,7 @@ function navCmdAddContent() {
 	if(controlPanel.isPanelOpen())
 		controlPanel.closePanel()
 	else
-		controlPanel.getView('AddFeed')
+		controlPanel.getView('AddWidget')
 }
 function navCmdDeletePage() {
 	controlPanel.deletePage(h_pageHREF);

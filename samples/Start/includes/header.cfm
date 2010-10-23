@@ -34,6 +34,15 @@
 		pageTitle = request.oPage.getTitle();
 		aLayoutRegions = request.oPage.getLayoutRegions();
 		
+		// if this page doesnt have any layout, it could be that we are inheriting the layout from a parent page
+		if(arrayLen(aLayoutRegions) eq 0) {
+			if(getPage().hasProperty("extends") and getPage().getProperty("extends") neq "") {
+				p = getParsedPageData();
+				for(tmp in p.layout) {
+					aLayoutRegions.addAll(p.layout[tmp]);
+				}
+			}
+		}
 
 		// make a js struct with page locations
 		lstLocations = "";

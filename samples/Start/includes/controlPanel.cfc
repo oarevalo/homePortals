@@ -76,9 +76,8 @@
 
 	<cffunction name="addModule" access="public" output="true">
 		<cfargument name="moduleID" type="string" required="yes">
-		<cfargument name="locationID" type="string" required="no" default="">
 		<cftry>
-			<cfset addModuleToPage(arguments.moduleID, arguments.locationID)>
+			<cfset addModuleToPage(arguments.moduleID, "left")>
 			<cfset savePage()>
 			
             <script>
@@ -266,7 +265,7 @@
 					stAttributes["title"] = arguments.feedTitle;
 				stAttributes["maxItems"] = 10;
 
-				addModuleToPage("rssReader", "", stAttributes);
+				addModuleToPage("rssReader", "left", stAttributes);
 				
 				savePage();
             </cfscript>

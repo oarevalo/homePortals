@@ -225,8 +225,8 @@ h2 {
 /********** content panel ***********/
 #cp_panelWindow {
 	position:absolute;
-	width:250px; 
-	height:200px;
+	width:300px; 
+	height:250px;
 	color:black;
 	background-color:#fff;
 	border:1px solid #333;
@@ -248,11 +248,14 @@ h2 {
 	border-bottom:1px solid #333;
 	padding:2px;
 	padding-left:5px;
+	font-weight:bold;
+	padding-top:5px;
+	font-size:13px;
 }
 #cp_content {
 	padding:5px;
-	height:165px;
-	width:240px; 
+	height:160px;
+	width:290px; 
 	overflow:auto;
 }
 a.cp_tab,
@@ -277,3 +280,12 @@ a#cp_tabWidgets {background:url(../images/tab_widgets.gif) 0px 20px;}
 a#cp_tabWidgets:hover {background:url(../images/tab_widgets.gif) 0px 1px;}
 a#cp_tabWidgets.cp_selectedTab  {background:url(../images/tab_widgets.gif) 0px 1px;}
 
+
+#sidePanelWidgetList div {
+	border-bottom:1px solid #ebebeb;
+	margin-bottom:2px;
+	list-style-type:none;
+	padding-left:20px;
+	height:18px;
+	line-height:18px;
+}
