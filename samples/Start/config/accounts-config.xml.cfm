@@ -4,6 +4,7 @@
 	<defaultAccount>default</defaultAccount>
 	<storageType>xml</storageType>
 	<dataRoot>/Start/content/data/</dataRoot>
-	<newPageTemplate>/Start/content/templates/blankPage.xml</newPageTemplate>
+	<newAccountTemplate>/Start/content/templates/blank.xml</newAccountTemplate>
+	<newPageTemplate>/Start/content/templates/blank.xml</newPageTemplate>
 </homePortalsAccounts>
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<layout>
+		<location class="column" id="h_location_column_1" name="left" type="column"/>
+		<location class="column" id="h_location_column_2" name="middle" type="column"/>
+		<location class="column" id="h_location_column_3" name="right" type="column"/>
+	</layout>
+</Page>

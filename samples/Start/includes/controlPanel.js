@@ -117,16 +117,14 @@ function controlPanelClient() {
 	// *****   Misc   ****** //
 	
 	function setStatusMessage(msg,timeout) {
-		jQuery("#cp_status_BodyRegion").html(msg);
-		jQuery("#siteMapStatusBar_BodyRegion").html(msg);
+		jQuery("#siteMapStatusBar").html(msg);
 
-		if(!timeout || timeout==null) timeout=4000;
+		if(!timeout || timeout==null) timeout=6000;
 		setTimeout('controlPanel.clearStatusMessage()',timeout);
 	}
 
 	function clearStatusMessage() {
-		jQuery("#cp_status_BodyRegion").empty();
-		jQuery("#siteMapStatusBar_BodyRegion").empty();
+		jQuery("#siteMapStatusBar").empty();
 	}
 		
     function updateLayout() {

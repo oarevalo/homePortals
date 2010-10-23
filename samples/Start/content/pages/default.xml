@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Page>
+	<title>Home</title>
+	<layout>
+		<location class="column" id="h_location_column_1" name="left" type="column"/>
+		<location  id="h_location_column_3" name="right" type="column"/>
+	</layout>
+	<body>
+		<text value="Hello!" title="Welcome" location="left" />
+		<form title="Create an Account" 
+				location="right"
+				elements="username,password|password,password2|password"
+				submitLabel="Register!"
+				action="includes/controlPanelGateway.cfm?method=doRegister&amp;_pageHREF=default" />
+	</body>
+</Page>

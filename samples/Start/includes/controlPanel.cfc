@@ -40,7 +40,10 @@
 			variables.pageHREF = arguments.pageHREF;
 				
 			variables.oPage = variables.homePortals.getPageProvider().load(variables.pageHREF);
-			variables.account = variables.oPage.getProperty("owner");
+			if(variables.oPage.hasProperty("owner"))	
+				variables.account = variables.oPage.getProperty("owner");
+			else
+				variables.account = "";
 			
 			variables.reloadPageHREF = buildLink(variables.account, variables.pageHREF);
 				
@@ -84,7 +87,7 @@
             </script>
 
             <cfcatch type="any">
-                <script>controlPanel.setStatusMessage("#jsstringformat( cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
             </cfcatch>   	
 		</cftry>
 	</cffunction>	
@@ -102,7 +105,7 @@
 				controlPanel.setStatusMessage("Module has been removed.");
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -130,7 +133,7 @@
 				window.location.replace('#newPageURL#');
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
 			</cfcatch>
 		</cftry>			
 	</cffunction>
@@ -149,7 +152,7 @@
 			</script>
 
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -166,7 +169,7 @@
 				controlPanel.setStatusMessage("Title changed.");
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -196,7 +199,7 @@
 			</script>
 
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -222,7 +225,7 @@
 				controlPanel.setStatusMessage("Layout changed.");
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -239,7 +242,7 @@
 				window.location.replace("#variables.reloadPageHREF#");
 			</script>
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -274,7 +277,60 @@
             </script>
 
 			<cfcatch type="any">
-				<script>controlPanel.setStatusMessage("#jsstringformat(cfcatch.Message)#");</script>
+				#renderErrorMsg(cfcatch)#
+			</cfcatch>
+		</cftry>
+	</cffunction>
+
+	<cffunction name="doLogin" access="public" returntype="void">
+		<cfargument name="username" type="string" required="true">
+		<cfargument name="password" type="string" required="true">
+		<cfset var qryAccount = 0>
+		<cftry>
+			<!--- check login --->
+			<cfset qryAccount = variables.accountsService.loginUser(arguments.username, hash(arguments.password))>
+			<cflocation url="../#buildLink(arguments.username)#" addtoken="false">
+					
+			<cfcatch type="homePortals.accounts.invalidLogin">
+				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=Invalid%20Login" addtoken="false">
+			</cfcatch>		
+			<cfcatch type="any">
+				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=#cfcatch.message#" addtoken="false">
+			</cfcatch>
+		</cftry>
+	</cffunction>
+
+	<cffunction name="doLogout" access="public" returntype="void">
+		<cfset variables.accountsService.logoutUser()>
+		<cflocation url="../index.cfm" addtoken="false">
+	</cffunction>
+
+	<cffunction name="doRegister" access="public" returntype="void">
+		<cfargument name="username" type="string" required="true">
+		<cfargument name="password" type="string" required="true">
+		<cfargument name="password2" type="string" required="true">
+		<cfargument name="firstname" type="string" required="false" default="">
+		<cfargument name="lastname" type="string" required="false" default="">
+		<cfargument name="email" type="string" required="false" default="">
+		<cftry>
+			<cfscript>
+				// validate form
+				if(username eq "") throw("The username cannot be empty. Please correct.","validation");
+				if(reFind("[^A-Za-z0-9_]",username)) throw("The selected username name is invalid","validation");
+				if(len(username) lt 5) throw("The workarea name must be at least 5 characters long","validation");
+				if(password eq "") throw("Password cannot be empty","validation");
+				if(len(password) lt 6) throw("Passwords must be at least 6 characters long","validation");
+				if(password neq password2) throw("The password confirmation does not match the selected passwords. Please correct.","validation");
+				
+				// create HomePortals account
+				accountID = accountsService.createAccount(username, hash(password), firstName, lastName, email);		
+								
+				// login to account
+				doLogin(username, password);
+			</cfscript>
+				
+			<cfcatch type="any">
+				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=#cfcatch.message#" addtoken="false">
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -317,7 +373,7 @@
 
 	<cffunction name="renderPage" access="private">
 		<cfargument name="html" default="" hint="contents">
-		<cfinclude template="layouts/controlPanelPage.cfm">
+		<cfinclude template="layout.cfm">
 	</cffunction>
 	
 	<cffunction name="savePage" access="private" hint="Stores a HomePortals page">
@@ -389,6 +445,16 @@
 		<cfreturn href>
 	</cffunction>	
 		
+	<cffunction name="renderErrorMsg" access="private" returnType="string">
+		<cfargument name="error" type="any" required="true">
+		<cfset var tmp = "">
+		<cfsavecontent variable="tmp">
+			<script>
+				<cfoutput>alert("#jsStringFormat(error.message)#");</cfoutput>
+			</script>
+		</cfsavecontent>
+		<cfreturn tmp>
+	</cffunction>
 
 
 	<!---****************************************************************--->
