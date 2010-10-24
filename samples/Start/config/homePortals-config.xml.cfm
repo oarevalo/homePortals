@@ -18,5 +18,8 @@
 	<renderTemplates>
 		<renderTemplate name="page" type="page" href="content/templates/page.htm" />
 	</renderTemplates>	
+	<pageProperties>
+		<property name="locale" value="en_US" />
+	</pageProperties>
 </homePortals>
 

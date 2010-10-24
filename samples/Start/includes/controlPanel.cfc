@@ -47,6 +47,8 @@
 			
 			variables.reloadPageHREF = buildLink(variables.account, variables.pageHREF);
 				
+			loadLocalisedStrings();	
+				
 			return this;
 		</cfscript>
 	</cffunction>
@@ -101,7 +103,7 @@
 			</cfscript>
 			<script>
 				controlPanel.removeModuleFromLayout('#arguments.moduleID#');
-				controlPanel.setStatusMessage("Module has been removed.");
+				controlPanel.setStatusMessage("#loc['messages.moduleRemoved']#");
 			</script>
 			<cfcatch type="any">
 				#renderErrorMsg(cfcatch)#
@@ -146,7 +148,7 @@
 				redirHREF = buildLink(variables.account);
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Deleting page from site...");
+				controlPanel.setStatusMessage("#loc['messages.pageDeleted']#");
 				window.location.replace('#redirHREF#');
 			</script>
 
@@ -165,7 +167,7 @@
 				savePage();
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Title changed.");
+				controlPanel.setStatusMessage("#loc['messages.titleChanged']#");
 			</script>
 			<cfcatch type="any">
 				#renderErrorMsg(cfcatch)#
@@ -178,7 +180,7 @@
 		<cftry>
 			<cfscript>
 				validateOwner();
-				if(arguments.pageName eq "") throw("The page title cannot be blank.");
+				if(arguments.pageName eq "") throw(loc['messages.pageNameCannotBeEmpty']);
 		
 				// rename the actual page 
 				variables.oPage.setTitle(arguments.pageName);
@@ -221,7 +223,7 @@
 				savePage();
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Layout changed.");
+				controlPanel.setStatusMessage("#loc['messages.layoutChanged']#");
 			</script>
 			<cfcatch type="any">
 				#renderErrorMsg(cfcatch)#
@@ -256,7 +258,7 @@
 		<cftry>
 			<cfscript>
 				validateOwner();
-				if(arguments.feedURL eq "") throw("The feed URL cannot be empty"); 
+				if(arguments.feedURL eq "") throw(loc['messages.feedCannotBeEmpty']); 
 
 				// build custom properties
 				stAttributes = structNew();
@@ -322,7 +324,7 @@
 				savePage();
 			</cfscript>
 			<script>
-				controlPanel.setStatusMessage("Layout changed.");
+				controlPanel.setStatusMessage("#loc['messages.layoutChanged']#");
 				window.location.replace("#variables.reloadPageHREF#");
 			</script>				
 			<cfcatch type="any">
@@ -341,10 +343,10 @@
 			<cflocation url="../#buildLink(arguments.username)#" addtoken="false">
 					
 			<cfcatch type="homePortals.accounts.invalidLogin">
-				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=Invalid%20Login" addtoken="false">
+				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=#urlEncodedFormat(loc['messages.invalidLogin'])#" addtoken="false">
 			</cfcatch>		
 			<cfcatch type="any">
-				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=#cfcatch.message#" addtoken="false">
+				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=#urlEncodedFormat(cfcatch.message)#" addtoken="false">
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -364,12 +366,11 @@
 		<cftry>
 			<cfscript>
 				// validate form
-				if(username eq "") throw("The username cannot be empty. Please correct.","validation");
-				if(reFind("[^A-Za-z0-9_]",username)) throw("The selected username name is invalid","validation");
-				if(len(username) lt 5) throw("The workarea name must be at least 5 characters long","validation");
-				if(password eq "") throw("Password cannot be empty","validation");
-				if(len(password) lt 6) throw("Passwords must be at least 6 characters long","validation");
-				if(password neq password2) throw("The password confirmation does not match the selected passwords. Please correct.","validation");
+				if(username eq "") throw(loc['messages.usernameCannotBeEmpty']);
+				if(reFind("[^A-Za-z0-9_]",username)) throw(loc['messages.usernameIsInvalid']);
+				if(password eq "") throw(loc['messages.passwordCannotBeEmpty']);
+				if(len(password) lt 6) throw(loc['messages.passwordTooShort']);
+				if(password neq password2) throw(loc['messages.passwordsDoNotMatch']);
 				
 				// create HomePortals account
 				accountID = accountsService.createAccount(username, hash(password), firstName, lastName, email);		
@@ -379,7 +380,7 @@
 			</cfscript>
 				
 			<cfcatch type="any">
-				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=#cfcatch.message#" addtoken="false">
+				<cflocation url="../#variables.reloadPageHREF#&_statusMessage=#urlEncodedFormat(cfcatch.message)#" addtoken="false">
 			</cfcatch>
 		</cftry>
 	</cffunction>
@@ -432,7 +433,7 @@
 
 	<cffunction name="validateOwner" access="private" hint="Throws an error if the current user is not the page owner" returntype="boolean">
 		<cfif Not getUserInfo().isOwner>
-			<cfthrow message="You must sign-in as the current page owner to access this feature." type="custom">
+			<cfthrow message="#loc['messages.mustBeOwner']#" type="custom">
 		<cfelse>
 			<cfreturn true> 
 		</cfif>
@@ -509,16 +510,20 @@
 		<cfargument name="fromCols" type="string" required="true">
 		<cfargument name="toCol" type="string" required="true">
 		<cfset var aModules = variables.oPage.getModules()>
-		
+		<cfset var module = 0>
 		<cfloop array="#aModules#" index="module">
 			<cfif listFindNoCase(fromCols,module.getLocation())>
 				<cfset module.setLocation(toCol)>
 				<cfset variables.oPage.setModule(module)>
 			</cfif>
 		</cfloop>
-		
 	</cffunction>				
 
+	<cffunction name="loadLocalisedStrings" access="private" returntype="void">
+		<cfset var locale = variables.homePortals.getConfig().getPageProperty("locale") />
+		<cfinclude template="../config/strings_#locale#.cfm" />
+		<cfset variables.loc = request.localised_strings />
+	</cffunction>
 
 	<!---****************************************************************--->
 	<!---                U T I L I T Y   M E T H O D S                   --->

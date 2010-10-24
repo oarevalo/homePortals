@@ -183,6 +183,10 @@ h2 {
 	padding-left:10px;	
 }
 
+#siteMapTitle a {
+	color:#ebebeb;
+}
+
 #pageFooter {
 	padding-top:3px;
 	padding-bottom:3px;

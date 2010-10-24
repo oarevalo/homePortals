@@ -1,15 +1,13 @@
-<cfparam name="arguments.href" default="">
-
 <cfset layouts = [
-			"One column",
-			"Two columns",
-			"Three columns",
-			"Two columns, narrow right",
-			"Two columns, narrow left"
+			loc['layouts.one_column'],
+			loc['layouts.two_columns'],
+			loc['layouts.three_columns'],
+			loc['layouts.two_cols_right'],
+			loc['layouts.two_cols_left']
 		]>
 
 <cfoutput>
-	<div style="margin:10px;border:1px solid ##ccc;">
+	<div style="margin:10px;border:1px solid ##ccc;padding:5px;">
 		<br />
 		<ul style="margin:0 auto;">
 			<cfloop from="1" to="#arrayLen(layouts)#" index="i">

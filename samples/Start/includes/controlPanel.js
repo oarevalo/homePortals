@@ -157,6 +157,8 @@ function controlPanelClient() {
 		d.html("<input type='text' id='" + fldID + "' value='" + title + "' class='inlineTextbox' onblur='" + func + "'>");
 		if(type!='Site')
 			d.html(d.html() + "<a href='#' onclick='navCmdDeletePage()'><img src='images/omit-page-orange.gif' border='0' align='absmiddle' alt='Click to delete page' title='click to delete page'></a>");
+		else
+			$("#"+fldID).focus();
 	}
 
 

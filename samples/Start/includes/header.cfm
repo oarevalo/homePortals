@@ -4,7 +4,6 @@
 	<cfscript>
 		oHP = application.homePortals;
 		oAccountsService = oHP.getPluginManager().getPlugin("accounts").getAccountsService();
-		
 		currentPage = request.oPageRenderer.getPageHREF();
 
 		// create page object
@@ -58,6 +57,11 @@
 			lstModules = listAppend(lstModules, "'" & aModules[i].getid() & "'");
 		}
 	</cfscript>	
+	
+	<!--- load localised strings --->
+	<cfset locale = oHP.getConfig().getPageProperty("locale") />
+	<cfinclude template="../config/strings_#locale#.cfm" />
+	<cfset loc = request.localised_strings />
 </cfsilent>
 
 
@@ -121,25 +125,33 @@
 	<div id="navMenu" style="padding-top:5px;">
 		<div id="anchorAddContent" style="float:right;padding-right:10px;padding-top:3px;">
 			<cfif bUserLoggedIn and bIsOwner>
-				<a href="##" onclick="navCmdAddPage()"><img src="images/btnAddPage.gif" align="absmiddle" style="margin-left:5px;" border="0" alt="Add Page" title="Add Page"></a>
-				<a href="##" onclick="navCmdAddContent()"><img src="images/btnAddContent.gif" align="absmiddle" style="margin-left:5px;" alt="Add Content" title="Add Content" border="0"></a>
-				<a href="##" onclick="navCmdSetLayout()"><img src="images/layout.png" align="absmiddle" style="width:13px;margin-left:5px;padding:3px;background-color:##fff;" alt="Change page layout" title="Change page layout" border="0"></a>
-				<a href="includes/controlPanelGateway.cfm?method=doLogout&_pageHREF=#currentPage#"><img src="images/btnLogOff.gif" align="absmiddle" style="margin-left:5px;" alt="Log Off" border="0" title="Log Off"></a>
+				<a href="##" title="#loc['header.addPage']#" onclick="navCmdAddPage()"><img src="images/btnAddPage.gif" align="absmiddle" style="margin-left:5px;"></a>
+				<a href="##" title="#loc['header.addContent']#" onclick="navCmdAddContent()"><img src="images/btnAddContent.gif" align="absmiddle" style="margin-left:5px;"></a>
+				<a href="##" title="#loc['header.changePageLayout']#" onclick="navCmdSetLayout()"><img src="images/layout.png" align="absmiddle" style="margin-left:5px;width:13px;padding:3px;background-color:##fff;"></a>
+				<a href="includes/controlPanelGateway.cfm?method=doLogout&_pageHREF=#currentPage#" title="#loc['header.logOff']#"><img src="images/btnLogOff.gif" align="absmiddle" style="margin-left:5px;"></a>
 			<cfelseif bUserLoggedIn>
-				<a href="index.cfm?account=#request.userInfo.userName#" style="color:##fff;">My Site</a>
-				<a href="includes/controlPanelGateway.cfm?method=doLogout&_pageHREF=#currentPage#"><img src="images/btnLogOff.gif" align="absmiddle" style="margin-left:5px;" alt="Log Off" border="0" title="Log Off"></a>
+				<a href="index.cfm?account=#request.userInfo.userName#" title="#loc['header.goToMySite']#"><img src="images/house.png" align="absmiddle" style="width:13px;margin-left:5px;padding:3px;background-color:##fff;"></a>
+				<a href="includes/controlPanelGateway.cfm?method=doLogout&_pageHREF=#currentPage#" title="#loc['header.logOff']#"><img src="images/btnLogOff.gif" align="absmiddle" style="margin-left:5px;"></a>
 			<cfelse>
 				<form name="frmLogin" action="includes/controlPanelGateway.cfm" method="post">
 					<input type="hidden" name="method" value="doLogin">
 					<input type="hidden" name="_pageHREF" value="#currentPage#">
-					User: <input type="text" name="username" value="" style="font-size:10px;width:100px;">
-					Password: <input type="password" name="password" value="" style="font-size:10px;width:100px;">
-					<input type="submit" value="Login" name="btnLogin" style="font-size:10px;">
+					#loc['header.username']#: <input type="text" name="username" value="" style="font-size:10px;width:100px;">
+					#loc['header.password']#: <input type="password" name="password" value="" style="font-size:10px;width:100px;">
+					<input type="submit" value="#loc['header.login']#" name="btnLogin" style="font-size:10px;">
 				</form>
 			</cfif>
 		</div>
 		<span id="siteMapTitle">
-			<span id="siteMapTitle_label" <cfif bUserLoggedIn and bIsOwner>onclick="controlPanel.rename('siteMapTitle','#siteTitle#','Site')" title="Click to rename site"</cfif>>#siteTitle#</span>
+			<cfif siteOwner neq "">
+				<a href="index.cfm">StartPage</a> ::
+			</cfif>
+			<span id="siteMapTitle_label" 
+					<cfif bUserLoggedIn and bIsOwner>
+						onclick="controlPanel.rename('siteMapTitle_label','#siteTitle#','Site')" 
+						title="#loc['header.clickToRenameSite']#"
+					</cfif>
+					>#siteTitle#</span>
 		</span>
 	</div>
 	<div id="navMenuTitles">
@@ -150,7 +162,7 @@
 			<cfset thisPageHREF = replace(thisPageHREF, "//", "/", "ALL")> <!--- get rid of duplicate forward slash (will cause problems for sites at webroot)--->
 			&nbsp;&nbsp;
 			<cfif aPages[i].href eq getFileFromPath(currentPage)>
-				<span id="pageTitle" <cfif bUserLoggedIn and bIsOwner>title="Click to rename or delete page"</cfif>>
+				<span id="pageTitle" <cfif bUserLoggedIn and bIsOwner>title="#loc['header.clickToRenamePage']#"</cfif>>
 					<span id="pageTitle_label" <cfif bUserLoggedIn and bIsOwner>onclick="controlPanel.rename('pageTitle','#pageTitle#','Page')"</cfif>>#pageTitle#</span>
 				</span>
 			<cfelse>
