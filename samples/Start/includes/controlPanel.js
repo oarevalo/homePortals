@@ -112,7 +112,9 @@ function controlPanelClient() {
 			h_callServer("setSiteTitle","siteMapStatusBar",{title:title});
 		}
 	}
-
+	function setPageLayout(numCols) {
+		h_callServer("setPageLayout","siteMapStatusBar",{numCols:numCols});
+	}
 
 	// *****   Misc   ****** //
 	
@@ -183,6 +185,7 @@ function controlPanelClient() {
 	controlPanelClient.prototype.removeModuleFromLayout = removeModuleFromLayout;
 	controlPanelClient.prototype.rename = rename;
 	controlPanelClient.prototype.togglePanel = togglePanel;
+	controlPanelClient.prototype.setPageLayout = setPageLayout;
 }
 
 
@@ -242,7 +245,12 @@ function navCmdAddContent() {
 function navCmdDeletePage() {
 	controlPanel.deletePage(h_pageHREF);
 }
-
+function navCmdSetLayout() {
+	if(controlPanel.isPanelOpen())
+		controlPanel.closePanel()
+	else
+		controlPanel.getView('SetLayout')
+}
 
 function h_callServer(method,sec,params,rcv) {
 	console.log("calling server: ["+method+"]["+sec+"]")

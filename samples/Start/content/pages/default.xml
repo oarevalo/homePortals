@@ -2,11 +2,15 @@
 <Page>
 	<title>Home</title>
 	<layout>
-		<location class="column" id="h_location_column_1" name="left" type="column"/>
-		<location  id="h_location_column_3" name="right" type="column"/>
+		<location class="column third" name="left" type="column"/>
+		<location class="column twoThirds " name="right" type="column"/>
 	</layout>
 	<body>
-		<text value="Hello!" title="Welcome" location="left" />
+		<content title="Welcome!" 
+				 location="left"
+				 resourceID="welcome"
+				 id="welcome_blurb" />
+				 
 		<form title="Create an Account" 
 				location="right"
 				elements="username,password|password,password2|password"

@@ -123,6 +123,7 @@
 			<cfif bUserLoggedIn and bIsOwner>
 				<a href="##" onclick="navCmdAddPage()"><img src="images/btnAddPage.gif" align="absmiddle" style="margin-left:5px;" border="0" alt="Add Page" title="Add Page"></a>
 				<a href="##" onclick="navCmdAddContent()"><img src="images/btnAddContent.gif" align="absmiddle" style="margin-left:5px;" alt="Add Content" title="Add Content" border="0"></a>
+				<a href="##" onclick="navCmdSetLayout()"><img src="images/layout.png" align="absmiddle" style="width:13px;margin-left:5px;padding:3px;background-color:##fff;" alt="Change page layout" title="Change page layout" border="0"></a>
 				<a href="includes/controlPanelGateway.cfm?method=doLogout&_pageHREF=#currentPage#"><img src="images/btnLogOff.gif" align="absmiddle" style="margin-left:5px;" alt="Log Off" border="0" title="Log Off"></a>
 			<cfelseif bUserLoggedIn>
 				<a href="index.cfm?account=#request.userInfo.userName#" style="color:##fff;">My Site</a>
@@ -138,7 +139,7 @@
 			</cfif>
 		</div>
 		<span id="siteMapTitle">
-			<span id="siteMapTitle_label" <cfif bUserLoggedIn and bIsOwner>onclick="controlPanel.rename('siteMapTitle','#siteTitle#','Site')"</cfif> title="Click to rename site">#siteTitle#</span>
+			<span id="siteMapTitle_label" <cfif bUserLoggedIn and bIsOwner>onclick="controlPanel.rename('siteMapTitle','#siteTitle#','Site')" title="Click to rename site"</cfif>>#siteTitle#</span>
 		</span>
 	</div>
 	<div id="navMenuTitles">

@@ -11,13 +11,8 @@ body{
 	margin:0px;
 	padding:0px;
 }
-th, td {
-	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
-	font-size: 11px;
-}
 A:link, A:visited,  A:active, A.highlighted {
 	text-decoration: none;
-	font-size: 11px;
 	color:#333;
 }
 A:hover {
@@ -42,76 +37,43 @@ h2 {
 }
 /************************************** */
 
+
 /*********** CSS Styles for default appearance of all modules and sections ********/
 .Section {
 	border:0px;
 	line-height:15px;
+	margin: 5px;
+	background-color: #fff;
+	z-index: 1;
+	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
+	font-size: 12px;	
+	position:relative;
+	width:95%;
+	border-bottom:1px solid #ebebeb;
 }
 .SectionTitle {
 	text-align: left;
 	padding:0px;
 	white-space:nowrap;
 	display:block;
+	background-color:#ebebeb;
+	color: #000;
+	border-bottom:1px dashed #ccc;
 }
 .SectionTitleLabel {
 	font-weight:bold;
 	font-size:12px;
 	line-height:20px;
 	margin-left:5px;
+	font-weight:bold;
+	font-family:verdana;
+	
 }
 .SectionBody {
 	display:block;
 }
 .SectionBodyRegion {
 	padding: 15px;
-}
-
-/************  Layout Sections  ********/
-.column { 
-	width:33%;
-}
-.row {
-	min-height:50px;
-	margin-left:210px;
-}
-.header {
-	padding:0px;
-	margin:5px;
-	border:0px;
-}
-.layoutSectionHolder {
-	font-size:1px;
-	border:1px dotted white;
-	height:1px;
-	#height:10px;	
-}
-/* ************************************* */ 
-	
-
-
-/* **********   Module Containers ******* */
-.Section {
-	margin: 5px;
-	border : 0px;
-	background-color: #fff;
-	z-index: 1;
-	font-family: Tahoma, Verdana, Arial, Helvetica, "Bitstream Vera Sans", sans-serif;
-	font-size: 11px;	
-	position:relative;
-	width:95%;
-	border-bottom:1px solid #ebebeb;
-}
-.SectionTitle {
-	background-color:#ebebeb;
-	color: #000;
-	border-top:1px dashed #ccc;
-	border-bottom:1px dashed #ccc;
-}
-.SectionTitleLabel {
-	font-size:10px !important;
-	font-weight:bold;
-	font-family:verdana;
-	
 }
 .SectionToolbar {
 	border:1px solid silver;
@@ -127,9 +89,44 @@ h2 {
 	font-weight:bold;
 	font-size:10px;
 }
-/************************************** */
 
 
+/************  Layout Sections  ********/
+.column { 
+}
+.whole {
+	width:900px;
+	font-size:16px;
+	line-height:24px;
+}
+.half {
+	width:450px;
+	font-size:14px;
+	line-height:18px;
+}
+.third {
+	width:300px;
+	font-size:12px;
+	line-height:16px;
+}
+.twoThirds {
+	width:600px;
+	font-size:16px;
+	line-height:24px;
+}
+.header {
+	padding:0px;
+	margin:5px;
+	border:0px;
+}
+.layoutSectionHolder {
+	font-size:1px;
+	border:1px dotted white;
+	height:1px;
+	#height:10px;	
+}
+/* ************************************* */ 
+	
 
 
 /******** Page Header ************ */
@@ -232,7 +229,7 @@ h2 {
 	border:1px solid #333;
 	padding:0px;
 	margin:0px;
-	font-size:10px;		
+	font-size:12px;		
 	z-index:9999;
 	top:30px;
 	right:20px;
@@ -288,4 +285,12 @@ a#cp_tabWidgets.cp_selectedTab  {background:url(../images/tab_widgets.gif) 0px 1
 	padding-left:20px;
 	height:18px;
 	line-height:18px;
+}
+
+#welcome_blurb {
+	line-height:24px;
+	font-size:16px;
+}
+#welcome_blurb p {
+	margin-bottom:10px;
 }

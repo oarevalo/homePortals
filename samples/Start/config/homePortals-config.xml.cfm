@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <homePortals>
 	<contentRoot>content/pages/</contentRoot>
-	<defaultPage></defaultPage>
+	<resourceLibraryPath>content/resources</resourceLibraryPath>
 	<plugins>
 		<plugin name="jquery"  />
 		<plugin name="accounts"  />

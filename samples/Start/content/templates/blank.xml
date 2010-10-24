@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Page owner="$ACCOUNT_NAME$" extends="base">
+<Page owner="$ACCOUNT_NAME$">
+	<layout>
+		<location class="column third" name="left" type="column"/>
+		<location class="column third" name="middle" type="column"/>
+		<location class="column third" name="right" type="column"/>
+	</layout>
 	<title>Start</title>
 </Page>
 

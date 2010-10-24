@@ -281,6 +281,56 @@
 		</cftry>
 	</cffunction>
 
+	<cffunction name="setPageLayout" access="public" output="true">
+		<cfargument name="numCols" default="" type="string">
+		<cfset var locType = "column">
+		<cftry>
+			<cfscript>
+				validateOwner();
+								
+	 			switch(min(arguments.numCols,5)) {
+	 				case 1:
+ 						moveModulesToCol("middle,right","left");
+						variables.oPage.removeAllLayoutRegions();
+	 					variables.oPage.addLayoutRegion("left",locType,"column whole");
+	 					break;
+	 				case 2:
+	 					moveModulesToCol("middle","left");
+						variables.oPage.removeAllLayoutRegions();
+	 					variables.oPage.addLayoutRegion("left",locType,"column half");
+	 					variables.oPage.addLayoutRegion("right",locType,"column half");
+	 					break;
+	 				case 3:
+						variables.oPage.removeAllLayoutRegions();
+	 					variables.oPage.addLayoutRegion("left",locType,"column third");
+	 					variables.oPage.addLayoutRegion("middle",locType,"column third");
+	 					variables.oPage.addLayoutRegion("right",locType,"column third");
+	 					break;
+	 				case 4:
+	 					moveModulesToCol("middle","left");
+						variables.oPage.removeAllLayoutRegions();
+	 					variables.oPage.addLayoutRegion("left",locType,"column twoThirds");
+	 					variables.oPage.addLayoutRegion("right",locType,"column third");
+	 					break;
+	 				case 5:
+	 					moveModulesToCol("middle","left");
+						variables.oPage.removeAllLayoutRegions();
+	 					variables.oPage.addLayoutRegion("left",locType,"column third");
+	 					variables.oPage.addLayoutRegion("right",locType,"column twoThirds");
+	 					break;
+	 			}
+				savePage();
+			</cfscript>
+			<script>
+				controlPanel.setStatusMessage("Layout changed.");
+				window.location.replace("#variables.reloadPageHREF#");
+			</script>				
+			<cfcatch type="any">
+				#renderErrorMsg(cfcatch)#
+			</cfcatch>
+		</cftry>
+	</cffunction>
+
 	<cffunction name="doLogin" access="public" returntype="void">
 		<cfargument name="username" type="string" required="true">
 		<cfargument name="password" type="string" required="true">
@@ -454,6 +504,20 @@
 		</cfsavecontent>
 		<cfreturn tmp>
 	</cffunction>
+
+	<cffunction name="moveModulesToCol" access="private" returntype="void">
+		<cfargument name="fromCols" type="string" required="true">
+		<cfargument name="toCol" type="string" required="true">
+		<cfset var aModules = variables.oPage.getModules()>
+		
+		<cfloop array="#aModules#" index="module">
+			<cfif listFindNoCase(fromCols,module.getLocation())>
+				<cfset module.setLocation(toCol)>
+				<cfset variables.oPage.setModule(module)>
+			</cfif>
+		</cfloop>
+		
+	</cffunction>				
 
 
 	<!---****************************************************************--->
