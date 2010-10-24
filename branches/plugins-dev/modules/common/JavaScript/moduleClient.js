@@ -56,7 +56,7 @@ function moduleClient() {
 		// this area is intended ONLY for status messages and javascript code,
 		// not for actual views
 		var actionOutputID = this.moduleID + "ActionOutput_BodyRegion";
-		if(!$(actionOutputID)) {
+		if($(actionOutputID).length==0) {
 			var tmpHTML = "<div id='" + actionOutputID + "' class='h_actionOutputMessage'></div>";
 			$("#"+this.moduleID+"_BodyRegion").prepend(tmpHTML);
 		}
