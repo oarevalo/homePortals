@@ -50,16 +50,16 @@
 			<div style="clear:both;"></div>
 		</div>
 
-		<iframe name="frmUpload" 
-				style="width:490px;height:400px;border:1px solid silver;margin:5px;background-color:##fff;overflow:auto;"
-				frameborder="false" 
-				src="#uploaderPath#?moduleID=#moduleID#&albumName=#arguments.albumName#&pageHREF=#pageHREF#&appRoot=#appRoot#"></iframe>
-
 		<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
 			<div style="margin:5px;"> 
 				<input type="button" name="btn1" onclick="#moduleID#.getPopupView('manager',{albumName:'#jsStringFormat(arguments.albumName)#'});" value="Return" style="font-size:11px;">
 			</div>
 		</div>	
+
+		<iframe name="frmUpload" 
+				style="width:480px;height:375px;border:1px solid silver;margin:5px;background-color:##fff;overflow:auto;"
+				frameborder="false" 
+				src="#uploaderPath#?moduleID=#moduleID#&albumName=#arguments.albumName#&pageHREF=#pageHREF#&appRoot=#appRoot#"></iframe>
 	</div>
 </div>		
 </cfoutput>	

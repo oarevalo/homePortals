@@ -44,6 +44,20 @@
 
 
 <cfoutput>
+<style type="text/css">
+	.tblPhotoAlbumMgr {
+		font-size:12px;
+		line-height:18px;
+	}
+	.tblPhotoAlbumMgr td  {
+		padding:3px;
+	}
+	.tblPhotoAlbumMgr th  {
+		padding:3px;
+		background-color:##e0e0e0;
+		border-bottom:1px solid black;
+	}
+</style>
 <div style="background-color:##f5f5f5;">
 	<div style="padding:0px;width:490px;">
 	
@@ -69,61 +83,61 @@
 			<div style="clear:both;"></div>
 		</div>
 
-		<form action="##" method="post" name="frmEditBox" style="margin:0px;padding:0px;">
-			<div style="width:490px;height:400px;border:1px solid silver;margin:5px;background-color:##fff;">
-				<cfif bIsNew>
-					<div style="margin:20px;">
+		<cfif Not bIsNew>
+			<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
+				<div style="margin:5px;"> 
+					<input type="button" name="btn1" onclick="#moduleID#.getPopupView('upload',{albumName:'#jsStringFormat(arguments.albumName)#'});" value="Upload Images" style="font-size:11px;">&nbsp;&nbsp;
+					<input type="button" name="btn2" onclick="if(confirm('Delete Album?')){#moduleID#.doAction('deleteAlbum',{albumName:'#jsStringFormat(arguments.albumName)#'});#moduleID#.closeWindow();}" value="Delete This Album"  style="font-size:11px;">&nbsp;&nbsp;
+	
+					<cfif ArrayLen(aAlbums) gt 1>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="checkbox" 
+								name="moduleDefault" 
+								<cfif arguments.albumName eq defAlbumName>checked</cfif>
+								onclick="#moduleID#.doAction('toggleDefaultAlbum',{albumName:'#JSStringFormat(arguments.albumName)#',state:this.checked})"
+								value="1"> 
+						<span style="font-size:9px;font-weight:bold;">
+							Use as default Album &nbsp;
+							 (<a href="##"  style="font-size:9px;" onclick="alert('Enable this option to have this content photo album displayed on the module by default')">Help</a>)
+						</span>
+					</cfif>
+				</div>
+			</div>	
+		</cfif>
+
+		<div style="width:480px;height:390px;border:1px solid silver;margin:5px;background-color:##fff;">
+			<cfif bIsNew>
+				<div style="margin:20px;">
+					<form action="##" method="post" name="frmEditBox" style="margin:0px;padding:0px;">
 						<p><b>Enter a name for your new photo album:</b></p><br>
 						<input type="text" name="albumName" value=""><br><br>
 						<p>
 							<input type="button" name="btnCreate" value="Create Album"
 									onclick="#moduleID#.doFormAction('createAlbum',this.form);#moduleID#.closeWindow();">
 						</p>
-					</div>
-				<cfelse>
-					<table width="100%" class="tblPhotoAlbumMgr">
-						<tr>
-							<th width="10">No.</th>
-							<th>Image</th>
-							<th width="50">Actions</th>
+					</form>
+				</div>
+			<cfelse>
+				<table width="100%" class="tblPhotoAlbumMgr">
+					<tr>
+						<th width="10">No.</th>
+						<th>Image</th>
+						<th width="50">Actions</th>
+					</tr>
+					<cfloop from="1" to="#arrayLen(myAlbum.xmlChildren)#" index="i">
+						<cfset tmpNode = myAlbum.xmlChildren[i]>
+						<tr <cfif i mod 2>style="background-color:##f7f7f7;"</cfif>>
+							<td align="right"><b>#i#.</b></td>
+							<td><a href="#dirPhotoAlbums#/#tmpNode.xmlAttributes.src#" target="_blank">#tmpNode.xmlAttributes.src#</td>
+							<td align="center"><a href="javascript:if(confirm('Delete Image?')){#moduleID#.doAction('deleteImage',{albumName:'#jsStringFormat(arguments.albumName)#',src:'#tmpNode.xmlAttributes.src#'});#moduleID#.closeWindow();}" title="Click to delete image"><img src="#imgRoot#/omit-page-orange.gif" alt="Delete" border="0" align="absmiddle"></a></td>
 						</tr>
-						<cfloop from="1" to="#arrayLen(myAlbum.xmlChildren)#" index="i">
-							<cfset tmpNode = myAlbum.xmlChildren[i]>
-							<tr <cfif i mod 2>style="background-color:##f7f7f7;"</cfif>>
-								<td align="right"><b>#i#.</b></td>
-								<td><a href="#dirPhotoAlbums#/#tmpNode.xmlAttributes.src#" target="_blank">#tmpNode.xmlAttributes.src#</td>
-								<td align="center"><a href="javascript:if(confirm('Delete Image?')){#moduleID#.doAction('deleteImage',{albumName:'#jsStringFormat(arguments.albumName)#',src:'#tmpNode.xmlAttributes.src#'});#moduleID#.closeWindow();}"><img src="#imgRoot#/omit-page-orange.gif" alt="Delete" border="0"></a></td>
-							</tr>
-						</cfloop>
-						<cfif arrayLen(myAlbum.xmlChildren) eq 0>
-							<tr><td colspan="3"><em>Album is empty</em></td></tr>
-						</cfif>
-					</table>
-				</cfif>
-			</div>
-		</form>
-		
-		<div style="margin:5px;text-align:left;background-color:##ebebeb;border:1px solid silver;">
-			<div style="margin:5px;"> 
-				<cfif Not bIsNew>
-					<input type="button" name="btn1" onclick="#moduleID#.getPopupView('upload',{albumName:'#jsStringFormat(arguments.albumName)#'});" value="Upload Images" style="font-size:11px;">&nbsp;&nbsp;
-					<input type="button" name="btn2" onclick="if(confirm('Delete Album?')){#moduleID#.doAction('deleteAlbum',{albumName:'#jsStringFormat(arguments.albumName)#'});#moduleID#.closeWindow();}" value="Delete This Album"  style="font-size:11px;">&nbsp;&nbsp;
-	
-					&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="checkbox" 
-							name="moduleDefault" 
-							<cfif arguments.albumName eq defAlbumName>checked</cfif>
-							onclick="#moduleID#.doAction('toggleDefaultAlbum',{albumName:'#JSStringFormat(arguments.albumName)#',state:this.checked})"
-							value="1"> 
-					<span style="font-size:9px;font-weight:bold;">
-						Set as default Album &nbsp;
-						 (<a href="##"  style="font-size:9px;" onclick="alert('Enable this option to have this content photo album displayed on the module by default')">Help</a>)
-					</span>
-				<cfelse>
-					<a href="##" onclick="#moduleID#.closeWindow();"><strong>Close</strong></a>
-				</cfif>
-			</div>
-		</div>	
+					</cfloop>
+					<cfif arrayLen(myAlbum.xmlChildren) eq 0>
+						<tr><td colspan="3"><em>Album is empty</em></td></tr>
+					</cfif>
+				</table>
+			</cfif>
+		</div>
 	</div>
 </div>		
 

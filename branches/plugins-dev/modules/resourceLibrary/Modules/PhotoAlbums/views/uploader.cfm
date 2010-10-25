@@ -18,10 +18,6 @@
 					line-height:18px;
 					border:1px solid ##ccc;
 				}
-				form {
-					width:80%;
-					text-align:center;
-				}
 			</style>
 		</head>
 		<body>
@@ -31,8 +27,9 @@
 				<input type="hidden" name="view" value="processUpload">
 				<input type="hidden" name="albumName" value="#albumName#">
 				<input type="hidden" name="pageHREF" value="#pageHREF#">
-				<span style="font-size:11px;font-family:verdana;">Select images:</span>
+				Select one or more images to upload:<br />
 				<input id="my_file_element" type="file" name="file_1" >
+				<br />
 				<input type="submit" value="Upload">
 			</form>
 			Selected Files:

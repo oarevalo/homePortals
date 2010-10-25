@@ -158,9 +158,6 @@
 		</cfscript>
 		<cfsavecontent variable="tmpScript">
 			#moduleID#.getView();
-			if(confirm("Reload page?")) {
-				window.location.href='index.cfm?currentHome=#pageHREF#&refresh=true';
-			}
 		</cfsavecontent>
 		<cfset this.controller.setScript(tmpScript)>
 	</cffunction>
@@ -209,7 +206,9 @@
 
 			imgObj = CreateObject("component", "tmt.tmt_img");
 			if(cffile.contentSubType eq "png") imgObj.init("png");
+
 			imgObj.resize(expandPath(tmpsrc), expandPath(tmptgt), 100);
+			imgObj.resize(expandPath(tmpsrc), expandPath(tmpsrc), 640);
 
 			// update photoAlbum content store
 			for(i=1;i lte ArrayLen(xmlDoc.xmlRoot.xmlChildren);i=i+1) {
