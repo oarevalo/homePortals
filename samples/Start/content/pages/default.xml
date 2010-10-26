@@ -11,10 +11,14 @@
 				 resourceID="welcome"
 				 id="welcome_blurb" />
 				 
-		<form title="Create an Account" 
+		<form title="Register" 
 				location="right"
-				elements="username,password|password,password2|password"
+				elements="Username,password|Password,Password2|password,Email"
 				submitLabel="Register!"
 				action="includes/controlPanelGateway.cfm?method=doRegister&amp;_pageHREF=default" />
+				
+		<view title="Members"
+				location="right"
+				href="includes/members.cfm" />
 	</body>
 </Page>
