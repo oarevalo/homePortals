@@ -221,28 +221,21 @@
 	<!----  load			 			----->
 	<!--------------------------------------->
 	<cffunction name="load" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page">
-		<cfargument name="path" type="string" required="false" default="" hint="Path in the content root for the page to load. This argument is mutually exclusive with all the rest">
-		<cfargument name="pageObj" type="pageBean" required="false" hint="Instance of a pageBean object to load. This argument is mutually exclusive with all the rest">
+		<cfargument name="page" type="any" required="true" hint="The page to load. This can be a page path, an xml string, an xml object or a page bean">
+		<cfargument name="pageHREF" type="string" required="false" default="" hint="A optional client-defined key or identifier for the page. This is only used when the page argument is not the page path">
 		<cfscript>
-			var pagePath = "";
-			
-			// no arguments, so get the overall default page
-			if(arguments.path eq "" and not structKeyExists(arguments,"pageObj"))
-				pagePath = getConfig().getDefaultPage();
-			
-			// check mutually exclusive arguments
-			if(pagePath neq "") {
-				return loadPage(pagePath);			
-			
-			} else {
-				if(arguments.path neq "") {
-					return loadPage(arguments.path);
-									
-				} else if(structKeyExists(arguments,"pageObj"))
-					return loadPageBean(arguments.pageObj);
-			}
-			
-			throw("No page to load","homePortals.noDefaultPageFound");
+			// if path is an xml object, then assume it is the xml of a page,
+			// if path is any other object, then assume it is a pagebean
+			// if path is an xml string, then its the xml of a page
+			// any other, assume its the path of a page
+			if(isXMLDoc(arguments.page))
+				return loadPageXML(arguments.page, arguments.pageHREF);
+			else if(not isSimpleValue(arguments.page))
+				return loadPageBean(arguments.page, arguments.pageHREF);
+			else if(isXml(arguments.page))
+				return loadPageXML(arguments.page, arguments.pageHREF);
+			else
+				return loadPage(arguments.page);
 		</cfscript>
 	</cffunction>
 			
@@ -299,7 +292,18 @@
 			return oPageRenderer;
 		</cfscript>
 	</cffunction>	
-	
+
+	<!--------------------------------------->
+	<!----  loadPageXML					----->
+	<!--------------------------------------->
+	<cffunction name="loadPageXML" access="public" returntype="pageRenderer" hint="Loads and parses a HomePortals page. This method accepts an xml string or xml object.">
+		<cfargument name="pageXML" type="xml" required="true" hint="the page to load">
+		<cfargument name="pageHREF" type="string" required="false" default="" hint="A optional client-defined key or identifier for the page. If empty uses a unique identifier for the page bean instance">
+		<cfscript>
+			var page = createObject("component","pageBean").init(arguments.pageXML);
+			return loadPageBean(page, arguments.pageHREF);
+		</cfscript>
+	</cffunction>		
 	
 	<!--------------------------------------->
 	<!----  getConfig					----->
