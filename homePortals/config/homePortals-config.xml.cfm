@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<homePortals version="3.2.729">
+<homePortals version="3.2.748">
 
 	<!-- base path for the HomePortals installation -->
 	<homePortalsPath>/homePortals/</homePortalsPath>
