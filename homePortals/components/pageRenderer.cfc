@@ -249,12 +249,20 @@
 			
 		<!--- Include basic and user-defined CSS styles --->
 		<cfloop from="1" to="#ArrayLen(aStylesheets)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#normalizePath(aStylesheets[i])#""/>">
+			<cfif structKeyExists(variables.stPage.page.stylesheetBlocks, aStylesheets[i])>
+				<cfset tmpHTML = tmpHTML & "<style type=""text/css"">" & variables.stPage.page.stylesheetBlocks[aStylesheets[i]] & "</style>">">
+			<cfelse>
+				<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#normalizePath(aStylesheets[i])#""/>">
+			</cfif>
 		</cfloop>
 				
 		<!--- Include required and user-defined Javascript files --->
 		<cfloop from="1" to="#ArrayLen(aScripts)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
+			<cfif structKeyExists(variables.stPage.page.scriptBlocks, aScripts[i])>
+				<cfset tmpHTML = tmpHTML & "<script type=""text/javascript"">" & variables.stPage.page.scriptBlocks[aScripts[i]] & "</script>">">
+			<cfelse>
+				<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
+			</cfif>
 		</cfloop>
 		
 		<!--- Add html head code rendered by content tags --->
@@ -334,7 +342,9 @@
 			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
 
 			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
+			variables.stPage.page.stylesheetBlocks = StructNew();	// holds locations of css code blocks
 			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
+			variables.stPage.page.scriptBlocks = StructNew();	// holds locations of js code blocks
 			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
 			variables.stPage.page.modules = StructNew();		// holds modules
 		</cfscript>
@@ -389,7 +399,10 @@
 			}
 			tmp = arguments.page.getScripts();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				if(not variables.stPage.page.scripts.contains( tmp[i] )) {
+				if(arguments.page.getScriptBlock(tmp[i]) neq "") {
+					ArrayAppend(variables.stPage.page.scripts, tmp[i]);
+					variables.stPage.page.scriptBlocks[tmp[i]] = arguments.page.getScriptBlock(tmp[i]);
+				} else if(not variables.stPage.page.scripts.contains( tmp[i] )) {
 					ArrayAppend(variables.stPage.page.scripts, tmp[i]);
 				}
 			}
@@ -403,7 +416,10 @@
 			}
 			tmp = arguments.page.getStylesheets();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				if(not variables.stPage.page.stylesheets.contains( tmp[i] )) {
+				if(arguments.page.getStylesheetBlock(tmp[i]) neq "") {
+					ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
+					variables.stPage.page.stylesheetBlocks[tmp[i]] = arguments.page.getStylesheetBlock(tmp[i]);
+				} else if(not variables.stPage.page.stylesheets.contains( tmp[i] )) {
 					ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
 				}
 			}
