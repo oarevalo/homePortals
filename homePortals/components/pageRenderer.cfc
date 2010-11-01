@@ -60,7 +60,9 @@
 			if(not structIsEmpty(arguments.context)) {
 				// make sure we cleanup the context for html sneakyness!!
 				for(arg1 in arguments.context) {
-					arguments.context[arg1] = reReplace(arguments.context[arg1],"<[^>]*>","","ALL");
+					if(isSimpleValue(arguments.context[arg1])) {
+						arguments.context[arg1] = reReplace(arguments.context[arg1],"<[^>]*>","","ALL");
+					}
 				}
 				variables.context = arguments.context;
 			}
