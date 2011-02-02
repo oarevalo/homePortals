@@ -63,7 +63,7 @@
 			var prop = "";
 			var defaultPath = "/" & replace(getDirectoryFromPath(replaceNoCase(getcurrentTemplatePath(), expandPath("/"), "")),"\","/","ALL");
 			var defaultCFCPath = mid(replace(defaultPath,"/",".","ALL"),2,len(replace(defaultPath,"/",".","ALL"))-2);
-			var pluginCFCPath = getProperty("pluginCFCPath", defaultCFCPath)
+			var pluginCFCPath = getProperty("pluginCFCPath", defaultCFCPath);
 
 			// load config file
 			configXMLDoc = fileRead(arguments.configPath,"utf-8");
