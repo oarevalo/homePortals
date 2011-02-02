@@ -327,7 +327,15 @@
 	<cffunction name="getContext" access="public" returntype="struct" hint="This function returns the context object for this renderer">
 		<cfreturn variables.context>
 	</cffunction>	
-	
+
+	<!---------------------------------------->
+	<!--- setContext					   --->
+	<!---------------------------------------->	
+	<cffunction name="setContext" access="public" returntype="void" hint="This function sets the context object for this renderer">
+		<cfargument name="pageContext" type="struct" required="true">
+		<cfset variables.context = pageContext>
+	</cffunction>	
+		
 	
 	<!----------  P R I V A T E    M E T H O D S    ----------------->
 
