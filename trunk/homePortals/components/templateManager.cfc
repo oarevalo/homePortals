@@ -5,6 +5,17 @@
 	<cfset variables.instance.stTemplateDefaults = structNew()>
 	<cfset variables.stRenderTemplatesCache = structNew()>
 	<cfset variables.appRoot = "">
+	<cfset variables.tokenExprMap = {
+							pageTitle = "\$PAGE_TITLE\$",
+							htmlHead = "\$PAGE_HTMLHEAD\$",
+							pageProperty = "\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$",
+							customSection = "\$PAGE_CUSTOMSECTION\[""([A-Za-z0-9_]*)""]\$",
+							layoutSection = "\$PAGE_LAYOUTSECTION\[""([A-Za-z0-9_]*)""\]\[""([A-Za-z0-9_]*)""\]\$",
+							moduleIcon = "$MODULE_ICON$",
+							moduleProperty = "\$MODULE_([A-Za-z0-9_]*)\$",
+							moduleContent = "$MODULE_CONTENT$",
+							contextToken = "\$?{([A-Za-z0-9_]*)}"
+						}>
 
 	<cffunction name="init" access="public" returntype="templateManager" hint="Constructor">
 		<cfargument name="config" type="homePortalsConfigBean" required="true">
@@ -29,6 +40,7 @@
 		<cfargument name="href" type="string" required="true">
 		<cfargument name="description" type="string" required="false" default="">
 		<cfargument name="isDefault" type="boolean" required="false" default="false">
+		<cfargument name="useHTTP" type="boolean" required="false" default="false">
 		
 		<cfif not structKeyExists(variables.instance.stTemplates, arguments.type)>
 			<cfset variables.instance.stTemplates[arguments.type] = structNew()>
@@ -39,7 +51,8 @@
 																					type = arguments.type,
 																					href = arguments.href,
 																					description = arguments.description,
-																					isDefault = arguments.isdefault
+																					isDefault = arguments.isdefault,
+																					useHTTP = arguments.useHTTP
 																				}>
 	
 		<!--- set default template for type --->																				
@@ -79,6 +92,7 @@
 		<cfset var key = "">	
 		<cfset var templateBody = "">
 		<cfset var st = structNew()>
+		<cfset var tmp = "">
 			
 		<cfif arguments.name eq "">
 			<cfset st = getDefaultTemplate(arguments.type)>
@@ -89,7 +103,20 @@
 		<cfset key = arguments.type & "-" & arguments.name>	
 			
 		<cfif Not StructKeyExists(variables.stRenderTemplatesCache, key)>
-			<cfif left(st.href,1) neq "/">
+			<cfif left(st.href,4) eq "http">
+				<cfhttp url="#st.href#" result="tmp" resolveurl="true" />
+				<cfset templateBody = tmp.fileContent>
+			<cfelseif st.useHTTP>
+				<cfscript>
+					if(cgi.server_port_secure) tmpHREF = "https://"; else tmpHREF = "http://";
+					tmpHREF = tmpHREF & cgi.server_name;
+					if(cgi.server_port neq 80) tmpHREF = tmpHREF & ":" & cgi.server_port;
+					if(left(st.href,1) neq "/") tmpHREF = tmpHREF & variables.appRoot;
+					tmpHREF = tmpHREF & st.href;
+				</cfscript>
+				<cfhttp url="#tmpHREF#" result="tmp" />
+				<cfset templateBody = tmp.fileContent>
+			<cfelseif left(st.href,1) neq "/">
 				<cffile action="read" file="#expandPath(variables.appRoot & st.href)#" variable="templateBody">
 			<cfelse>
 				<cffile action="read" file="#expandPath(st.href)#" variable="templateBody">
@@ -120,12 +147,15 @@
 			renderTemplateBody = getTemplateBody("page", arguments.pageTemplate);
 
 			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_LAYOUTSECTION\[""([A-Za-z0-9_]*)""\]\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase(variables.tokenExprMap.layoutSection, renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
 					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
-					arg2 = mid(renderTemplateBody,stResult.pos[3],stResult.len[3]);
+					if(arrayLen(stResult.pos) gt 2)
+						arg2 = mid(renderTemplateBody,stResult.pos[3],stResult.len[3]);
+					else
+						arg2 = "";
 					lstSections = listAppend(lstSections,arg1);
 					index = stResult.pos[1] + stResult.len[1];
 				} else {
@@ -135,6 +165,15 @@
 			
 			return lstSections;
 		</cfscript>
+	</cffunction>
+
+	<cffunction name="getTokenExprMap" access="public" returntype="struct" hint="Returns a key-value map containing all regular expressions used to match tokens on a template">
+		<cfreturn variables.tokenExprMap />
+	</cffunction>
+
+	<cffunction name="setTokenExprMap" access="public" returntype="void" hint="Use this to override the default key-value map containing all regular expressions used to match tokens on a template">
+		<cfargument name="data" type="struct" required="true">
+		<cfset variables.tokenExprMap = arguments.data>
 	</cffunction>
 	
 </cfcomponent>

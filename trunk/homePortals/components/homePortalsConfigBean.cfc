@@ -147,11 +147,15 @@
 																			type = thisKey,
 																			href = xmlNode.xmlChildren[j].xmlAttributes.href,
 																			description = trim(xmlNode.xmlChildren[j].xmlText),
-																			isDefault = false
+																			isDefault = false,
+																			useHTTP = false
 																		};
 						
 						if(structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"default")) 
 							variables.stConfig.renderTemplates[thisKey][key].isDefault = xmlNode.xmlChildren[j].xmlAttributes.default;
+
+						if(structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"useHTTP")) 
+							variables.stConfig.renderTemplates[thisKey][key].useHTTP = xmlNode.xmlChildren[j].xmlAttributes.useHTTP;
 					}
 
 				} else if(xmlNode.xmlName eq "contentRenderers") {
@@ -394,6 +398,8 @@
 						tmpXmlNode.xmlAttributes["href"] = variables.stConfig.renderTemplates[key][thisKey].href;
 						if(isBoolean(variables.stConfig.renderTemplates[key][thisKey].isDefault) and variables.stConfig.renderTemplates[key][thisKey].isDefault)
 							tmpXmlNode.xmlAttributes["default"] = variables.stConfig.renderTemplates[key][thisKey].isDefault;
+						if(isBoolean(variables.stConfig.renderTemplates[key][thisKey].useHTTP) and variables.stConfig.renderTemplates[key][thisKey].useHTTP)
+							tmpXmlNode.xmlAttributes["useHTTP"] = variables.stConfig.renderTemplates[key][thisKey].useHTTP;
 						tmpXmlNode.xmlText = variables.stConfig.renderTemplates[key][thisKey].description;
 						ArrayAppend(xmlConfigDoc.xmlRoot.renderTemplates.xmlChildren, tmpXmlNode );
 					}
@@ -859,6 +865,7 @@
 		<cfargument name="href" type="string" required="true">
 		<cfargument name="description" type="string" required="false" default="">
 		<cfargument name="isDefault" type="boolean" required="false" default="false">
+		<cfargument name="useHTTP" type="boolean" required="false" default="false">
 		
 		<cfif not structKeyExists(variables.stConfig.renderTemplates, arguments.type)>
 			<cfset variables.stConfig.renderTemplates[arguments.type] = structNew()>
@@ -868,7 +875,8 @@
 																						type = arguments.type,
 																						href = arguments.href,
 																						description = arguments.description,
-																						isDefault = arguments.isdefault
+																						isDefault = arguments.isdefault,
+																						useHTTP = arguments.useHTTP
 																					}>
 		<cfreturn this>
 	</cffunction>
