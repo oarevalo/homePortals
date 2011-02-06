@@ -15,6 +15,10 @@
 		variables.contentBuffer.body = 0;
 		
 		variables.context = {};		// the context is a key-value map of values to replace at rendering time on the body section
+
+		variables.tokenExprMap = {};   // used to store a key-value map of the expressions that define the tokens used for replacement
+	
+		variables.customPageRendererProperty = "homeportals.customPageRenderer";	// this is the name of the property used to indicate that a page needs to use a custom renderer
 	</cfscript>
 
 	<!--------------------------------------->
@@ -35,15 +39,29 @@
 		<cfset loadPage(arguments.pageHREF, arguments.page)>
 		<cfset injectGlobalPageProperties()>
 		
+		<cfset variables.tokenExprMap = getHomePortals().getTemplateManager().getTokenExprMap()>
+		
 		<cfset variables.stTimers.init = getTickCount()-start>
 		<cfreturn this>
 	</cffunction>
+
 
 	<!--------------------------------------->
 	<!----  renderPage					----->
 	<!--------------------------------------->
 	<cffunction name="renderPage" access="public" output="false" hint="Renders the entire page using the render template." returntype="string">
 		<cfargument name="context" type="struct" required="false" hint="The context object" default="#structNew()#">
+		<cfargument name="template" type="string" required="false" hint="Use this to override the page template used for this page." default="">
+		<cfset var elements = renderPageElements(argumentCollection = arguments)>
+		<cfreturn elements.html>
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  renderPageElements			----->
+	<!--------------------------------------->
+	<cffunction name="renderPageElements" access="public" output="false" hint="Renders the current page. Returns a struct with the generated output as well as the output for all the different elements of the page (title,custom sections,layout regions,etc)" returntype="struct">
+		<cfargument name="context" type="struct" required="false" hint="The context object" default="#structNew()#">
+		<cfargument name="template" type="string" required="false" hint="Use this to override the page template used for this page." default="">
 		<cfscript>
 			var renderTemplateBody = "";
 			var index = 1;
@@ -55,40 +73,50 @@
 			var rendered = "";
 			var start = getTickCount();
 			var pageTemplate = variables.stPage.page.pageTemplate;
+			var	hasCustomRenderer = false;
+			var customRenderer = 0;
+			var renderedElements = {};
 
 			// store the context object
-			if(not structIsEmpty(arguments.context)) {
-				// make sure we cleanup the context for html sneakyness!!
-				for(arg1 in arguments.context) {
-					arguments.context[arg1] = reReplace(arguments.context[arg1],"<[^>]*>","","ALL");
-				}
-				variables.context = arguments.context;
-			}
+			setContext(arguments.context);
 
 			// pre-render output of all content tags on page		
 			processContentTags();
+
+			if(arguments.template neq "") pageTemplate = arguments.template;
+
+			// check if we need to use a custom page renderer
+			if(getPage().hasProperty(variables.customPageRendererProperty) and getPage().getProperty(variables.customPageRendererProperty) neq "") {
+				hasCustomRenderer = true;
+				customRenderer = createObject("component",getPage().getProperty(variables.customPageRendererProperty)).init(this);
+			}
 
 			// get the render template for the full page
 			renderTemplateBody = getHomePortals().getTemplateManager().getTemplateBody("page", pageTemplate);
 
 			// replace page title
-			tmp = htmlEditFormat(variables.stPage.page.title);
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_TITLE$", resolveContextTokens(tmp), "ALL");
+			if(hasCustomRenderer) rendered = customRenderer.renderTitle(); else rendered = renderTitle();
+			renderTemplateBody = reReplace(renderTemplateBody, variables.tokenExprMap.pageTitle, rendered, "ALL");
+			renderedElements.title = rendered;
 
 			// replace simple values
-			renderTemplateBody = replace(renderTemplateBody, "$PAGE_HTMLHEAD$", renderHTMLHeadCode(), "ALL");
+			if(hasCustomRenderer) rendered = customRenderer.renderHTMLHeadCode(); else rendered = renderHTMLHeadCode();
+			renderTemplateBody = reReplace(renderTemplateBody, variables.tokenExprMap.htmlHead, rendered, "ALL");
+			renderedElements.htmlHead = rendered;
 
 			// search and replace "Page Properties"
 			index = 1;
 			finished = false;
+			renderedElements.properties = {};
 			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase(variables.tokenExprMap.pageProperty, renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
 					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
-					rendered = resolveContextTokens("{" & arg1 & "}");;
+					rendered = resolveContextTokens("{" & arg1 & "}");
 					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					renderedElements.properties[token] = rendered;
 					
 					index = stResult.pos[1] + len(rendered);
 				} else {
@@ -99,15 +127,17 @@
 			// search and replace "Custom Sections"
 			index = 1;
 			finished = false;
+			renderedElements.customSections = {};
 			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_CUSTOMSECTION\[""([A-Za-z0-9_]*)""]\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase(variables.tokenExprMap.customSection, renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
 					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
-					rendered = renderCustomSection(arg1);
-					
+					if(hasCustomRenderer) rendered = customRenderer.renderCustomSection(arg1); else rendered = renderCustomSection(arg1);
+
 					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					renderedElements.customSections[arg1] = rendered;
 					
 					index = stResult.pos[1] + len(rendered);
 				} else {
@@ -118,16 +148,21 @@
 			// search and replace "Layout Sections"
 			index = 1;
 			finished = false;
+			renderedElements.layoutSections = {};
 			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_LAYOUTSECTION\[""([A-Za-z0-9_]*)""\]\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase(variables.tokenExprMap.layoutSection, renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
 					arg1 = mid(renderTemplateBody,stResult.pos[2],stResult.len[2]);
-					arg2 = mid(renderTemplateBody,stResult.pos[3],stResult.len[3]);
-					rendered = renderLayoutSection(arg1, arg2);
+					if(arrayLen(stResult.pos) gt 2)
+						arg2 = mid(renderTemplateBody,stResult.pos[3],stResult.len[3]);
+					else
+						arg2 = "";
+					if(hasCustomRenderer) rendered = customRenderer.renderLayoutSection(arg1,arg2); else rendered = renderLayoutSection(arg1,arg2);
 						
 					renderTemplateBody = replace(renderTemplateBody, token, rendered, "ALL");
+					renderedElements.layoutSections[arg1] = rendered;
 					
 					index = stResult.pos[1] + len(rendered);
 				} else {
@@ -135,11 +170,23 @@
 				}
 			}
 			
+			// this is the final page contents
+			renderedElements.html = renderTemplateBody;
+
+			// clear the context
+			setContext(structNew());
+
 			variables.stTimers.renderPage = getTickCount()-start;
 			
-			return renderTemplateBody;	
+			return renderedElements;	
 		</cfscript>
-	
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  renderTitle					----->
+	<!--------------------------------------->
+	<cffunction name="renderTitle" access="public" output="false" returntype="string" hint="Renders the page title">
+		<cfreturn resolveContextTokens( htmlEditFormat(variables.stPage.page.title) )>
 	</cffunction>
 	
 	<!--------------------------------------->
@@ -249,12 +296,20 @@
 			
 		<!--- Include basic and user-defined CSS styles --->
 		<cfloop from="1" to="#ArrayLen(aStylesheets)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#normalizePath(aStylesheets[i])#""/>">
+			<cfif structKeyExists(variables.stPage.page.stylesheetBlocks, aStylesheets[i])>
+				<cfset tmpHTML = tmpHTML & "<style type=""text/css"">" & variables.stPage.page.stylesheetBlocks[aStylesheets[i]] & "</style>">">
+			<cfelse>
+				<cfset tmpHTML = tmpHTML & "<link rel=""stylesheet"" type=""text/css"" href=""#normalizePath(aStylesheets[i])#""/>">
+			</cfif>
 		</cfloop>
 				
 		<!--- Include required and user-defined Javascript files --->
 		<cfloop from="1" to="#ArrayLen(aScripts)#" index="i">
-			<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
+			<cfif structKeyExists(variables.stPage.page.scriptBlocks, aScripts[i])>
+				<cfset tmpHTML = tmpHTML & "<script type=""text/javascript"">" & variables.stPage.page.scriptBlocks[aScripts[i]] & "</script>">">
+			<cfelse>
+				<cfset tmpHTML = tmpHTML & "<script src=""#normalizePath(aScripts[i])#"" type=""text/javascript""></script>">
+			</cfif>
 		</cfloop>
 		
 		<!--- Add html head code rendered by content tags --->
@@ -317,7 +372,25 @@
 	<cffunction name="getContext" access="public" returntype="struct" hint="This function returns the context object for this renderer">
 		<cfreturn variables.context>
 	</cffunction>	
-	
+
+	<!---------------------------------------->
+	<!--- setContext					   --->
+	<!---------------------------------------->	
+	<cffunction name="setContext" access="public" returntype="void" hint="This function sets the context object for this renderer">
+		<cfargument name="context" type="struct" required="true">
+		<cfscript>
+			if(not structIsEmpty(arguments.context)) {
+				// make sure we cleanup the context for html sneakyness!!
+				for(arg1 in arguments.context) {
+					if(isSimpleValue(arguments.context[arg1])) {
+						arguments.context[arg1] = reReplace(arguments.context[arg1],"<[^>]*>","","ALL");
+					}
+				}
+			}
+			variables.context = arguments.context;
+		</cfscript>
+	</cffunction>	
+
 	
 	<!----------  P R I V A T E    M E T H O D S    ----------------->
 
@@ -334,7 +407,9 @@
 			variables.stPage.page.meta = arrayNew(1);			// holds html meta tags
 
 			variables.stPage.page.stylesheets = ArrayNew(1);	// holds locations of css files
+			variables.stPage.page.stylesheetBlocks = StructNew();	// holds locations of css code blocks
 			variables.stPage.page.scripts = ArrayNew(1);		// holds locations of javascript files
+			variables.stPage.page.scriptBlocks = StructNew();	// holds locations of js code blocks
 			variables.stPage.page.layout = StructNew();			// holds properties for layout sections
 			variables.stPage.page.modules = StructNew();		// holds modules
 		</cfscript>
@@ -389,7 +464,10 @@
 			}
 			tmp = arguments.page.getScripts();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				if(not variables.stPage.page.scripts.contains( tmp[i] )) {
+				if(arguments.page.getScriptBlock(tmp[i]) neq "") {
+					ArrayAppend(variables.stPage.page.scripts, tmp[i]);
+					variables.stPage.page.scriptBlocks[tmp[i]] = arguments.page.getScriptBlock(tmp[i]);
+				} else if(not variables.stPage.page.scripts.contains( tmp[i] )) {
 					ArrayAppend(variables.stPage.page.scripts, tmp[i]);
 				}
 			}
@@ -403,7 +481,10 @@
 			}
 			tmp = arguments.page.getStylesheets();
 			for(i=1;i lte ArrayLen(tmp);i=i+1) {
-				if(not variables.stPage.page.stylesheets.contains( tmp[i] )) {
+				if(arguments.page.getStylesheetBlock(tmp[i]) neq "") {
+					ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
+					variables.stPage.page.stylesheetBlocks[tmp[i]] = arguments.page.getStylesheetBlock(tmp[i]);
+				} else if(not variables.stPage.page.stylesheets.contains( tmp[i] )) {
 					ArrayAppend(variables.stPage.page.stylesheets, tmp[i]);
 				}
 			}
@@ -587,13 +668,13 @@
 			renderTemplateBody = tm.getTemplateBody("module",renderTemplate);	
 
 			// replace module icon token
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_ICON$", tmpIconURL, "ALL");
+			renderTemplateBody = replace(renderTemplateBody, variables.tokenExprMap.moduleIcon, tmpIconURL, "ALL");
 
 			// search and replace generic module attributes
 			index = 1;
 			finished = false;
 			while(Not finished) {
-				stResult = reFindNoCase("\$MODULE_([A-Za-z0-9_]*)\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase(variables.tokenExprMap.moduleProperty, renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
@@ -623,7 +704,7 @@
 			index = 1;
 			finished = false;
 			while(Not finished) {
-				stResult = reFindNoCase("\$PAGE_PROPERTY\[""([A-Za-z0-9_]*)""\]\$", renderTemplateBody, index, true);
+				stResult = reFindNoCase(variables.tokenExprMap.pageProperty, renderTemplateBody, index, true);
 				if(stResult.len[1] gt 0) {
 					// match found
 					token = mid(renderTemplateBody,stResult.pos[1],stResult.len[1]);
@@ -643,7 +724,7 @@
 			}
 			
 			// replace content token
-			renderTemplateBody = replace(renderTemplateBody, "$MODULE_CONTENT$", variables.contentBuffer.body.get(id),  "ALL");	
+			renderTemplateBody = replace(renderTemplateBody, variables.tokenExprMap.moduleContent, variables.contentBuffer.body.get(id),  "ALL");	
 		</cfscript>
 		<cfreturn renderTemplateBody>
 	</cffunction>
@@ -704,7 +785,7 @@
 			var rendered = "";
 
 			while(Not finished) {
-				stResult = reFindNoCase("\$?{([A-Za-z0-9_]*)}",rtn,index,true);
+				stResult = reFindNoCase(variables.tokenExprMap.contextToken,rtn,index,true);
 	
 				if(stResult.len[1] gt 0) {
 					token = mid(rtn,stResult.pos[1],stResult.len[1]);

@@ -72,12 +72,17 @@
 						
 					// stylesheets
 					case "stylesheet":
-						addStylesheet(xmlNode.xmlAttributes.Href);
+					case "style":
+						args.href = "";
+						if(structKeyExists(xmlNode.xmlAttributes,"href")) args.href = xmlNode.xmlAttributes.Href;
+						addStylesheet(args.href, xmlNode.xmlText);
 						break;
 						
 					// script
 					case "script":
-						addScript(xmlNode.xmlAttributes.src);
+						args.src = "";
+						if(structKeyExists(xmlNode.xmlAttributes,"src")) args.src = xmlNode.xmlAttributes.src;
+						addScript(args.src, xmlNode.xmlText);
 						break;
 				
 					// layout
@@ -208,7 +213,10 @@
 			aTemp = getStylesheets();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
 				xmlNode = xmlElemNew(xmlDoc,"stylesheet");
-				xmlNode.xmlAttributes["href"] = aTemp[i];
+				if(getStylesheetBlock(aTemp[i]) neq "") 
+					xmlNode.xmlText = getStylesheetBlock(aTemp[i]);
+				else
+					xmlNode.xmlAttributes["href"] = aTemp[i];
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 
@@ -216,7 +224,10 @@
 			aTemp = getScripts();
 			for(i=1;i lte arrayLen(aTemp);i=i+1) {
 				xmlNode = xmlElemNew(xmlDoc,"script");
-				xmlNode.xmlAttributes["src"] = aTemp[i];
+				if(getScriptBlock(aTemp[i]) neq "") 
+					xmlNode.xmlText = getScriptBlock(aTemp[i]);
+				else
+					xmlNode.xmlAttributes["src"] = aTemp[i];
 				arrayAppend(xmlDoc.xmlRoot.xmlChildren, xmlNode);
 			}
 			
@@ -352,13 +363,25 @@
 	<!--- Stylesheets			           --->
 	<!---------------------------------------->			
 	<cffunction name="getStylesheets" access="public" returntype="array" hint="returns an array with all stylesheets on the page">
-		<cfreturn duplicate(variables.instance.aStyles)>
+		<cfset var items = arrayNew(1)>
+		<cfset var item = 0>
+		<cfloop array="#variables.instance.aStyles#" index="item">
+			<cfset arrayAppend(items,item.href)>
+		</cfloop>
+		<cfreturn items>
 	</cffunction>
 
 	<cffunction name="addStylesheet" access="public" returnType="pageBean" hint="adds a stylesheet to the page">
 		<cfargument name="href" type="string" required="true">
+		<cfargument name="body" type="string" required="false" default="">
+		<cfset var item = []>
+		<cfif arguments.href eq "">
+			<cfset arguments.href = "##" & arrayLen(variables.instance.aStyles)+1>
+		</cfif>
 		<cfif not hasStylesheet(arguments.href)>
-			<cfset arrayAppend(variables.instance.aStyles, arguments.href)>
+			<cfset item = {href = arguments.href,
+							body = arguments.body}>
+			<cfset arrayAppend(variables.instance.aStyles, item)>
 		</cfif>
 		<cfreturn this>
 	</cffunction>
@@ -366,7 +389,7 @@
 	<cffunction name="hasStylesheet" access="public" returnType="boolean" hint="checks if the page is already using a given stylesheet">
 		<cfargument name="href" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aStyles)#" index="i">
-			<cfif variables.instance.aStyles[i] eq arguments.href>
+			<cfif variables.instance.aStyles[i].href eq arguments.href>
 				<cfreturn true>
 			</cfif>
 		</cfloop>
@@ -376,7 +399,7 @@
 	<cffunction name="removeStylesheet" access="public" returnType="pageBean" hint="removes a stylesheet from the page">
 		<cfargument name="href" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aStyles)#" index="i">
-			<cfif variables.instance.aStyles[i] eq arguments.href>
+			<cfif variables.instance.aStyles[i].href eq arguments.href>
 				<cfset arrayDeleteAt(variables.instance.aStyles, i)>
 				<cfreturn this>
 			</cfif>
@@ -389,18 +412,40 @@
 		<cfreturn this>
 	</cffunction>
 	
+	<cffunction name="getStylesheetBlock" access="public" returnType="string" hint="Retrieves an in-page css block">
+		<cfargument name="href" type="string" required="true">
+		<cfloop from="1" to="#arrayLen(variables.instance.aStyles)#" index="i">
+			<cfif variables.instance.aStyles[i].href eq arguments.href>
+				<cfreturn variables.instance.aStyles[i].body>
+			</cfif>
+		</cfloop>
+		<cfreturn "">
+	</cffunction>	
+
 
 	<!---------------------------------------->
 	<!--- Scripts				           --->
 	<!---------------------------------------->	
 	<cffunction name="getScripts" access="public" returntype="array" hint="returns an array with all script files referenced on the page">
-		<cfreturn duplicate(variables.instance.aScripts)>
+		<cfset var items = arrayNew(1)>
+		<cfset var item = 0>
+		<cfloop array="#variables.instance.aScripts#" index="item">
+			<cfset arrayAppend(items,item.src)>
+		</cfloop>
+		<cfreturn items>
 	</cffunction>
 
 	<cffunction name="addScript" access="public" returnType="pageBean" hint="adds a script reference to the page">
 		<cfargument name="src" type="string" required="true">
+		<cfargument name="body" type="string" required="false" default="">
+		<cfset var item = []>
+		<cfif arguments.src eq "">
+			<cfset arguments.src = "##" & arrayLen(variables.instance.aScripts)+1>
+		</cfif>
 		<cfif not hasScript(arguments.src)>
-			<cfset arrayAppend(variables.instance.aScripts, arguments.src)>
+			<cfset item = {src = arguments.src,
+							body = arguments.body}>
+			<cfset arrayAppend(variables.instance.aScripts, item)>
 		</cfif>
 		<cfreturn this>
 	</cffunction>
@@ -408,7 +453,7 @@
 	<cffunction name="hasScript" access="public" returnType="boolean" hint="checks if the page is already using a given script">
 		<cfargument name="src" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aScripts)#" index="i">
-			<cfif variables.instance.aScripts[i] eq arguments.src>
+			<cfif variables.instance.aScripts[i].src eq arguments.src>
 				<cfreturn true>
 			</cfif>
 		</cfloop>
@@ -418,7 +463,7 @@
 	<cffunction name="removeScript" access="public" returnType="pageBean" hint="removes a script from the page">
 		<cfargument name="src" type="string" required="true">
 		<cfloop from="1" to="#arrayLen(variables.instance.aScripts)#" index="i">
-			<cfif variables.instance.aScripts[i] eq arguments.src>
+			<cfif variables.instance.aScripts[i].src eq arguments.src>
 				<cfset arrayDeleteAt(variables.instance.aScripts, i)>
 				<cfreturn this>
 			</cfif>
@@ -430,6 +475,16 @@
 		<cfset variables.instance.aScripts = ArrayNew(1)>
 		<cfreturn this>
 	</cffunction>
+
+	<cffunction name="getScriptBlock" access="public" returnType="string" hint="Retrieves an in-page javascript block">
+		<cfargument name="src" type="string" required="true">
+		<cfloop from="1" to="#arrayLen(variables.instance.aScripts)#" index="i">
+			<cfif variables.instance.aScripts[i].src eq arguments.src>
+				<cfreturn variables.instance.aScripts[i].body>
+			</cfif>
+		</cfloop>
+		<cfreturn "">
+	</cffunction>	
 
 
 	<!---------------------------------------->
