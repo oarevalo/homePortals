@@ -298,7 +298,7 @@
 		<cfquery name="qry" dbtype="query">
 			SELECT *
 				FROM arguments.query
-				WHERE #arguments.fieldName# = <cfqueryparam cfsqltype="#arguments.fieldType#" value="#arguments.fieldValue#">
+				WHERE #arguments.fieldName# #arguments.condition# <cfqueryparam cfsqltype="#arguments.fieldType#" value="#arguments.fieldValue#">
 		</cfquery>
 		<cfreturn qry />
 	</cffunction>
