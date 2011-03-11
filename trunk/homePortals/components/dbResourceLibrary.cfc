@@ -249,12 +249,13 @@
 								</cfcase>
 								<cfcase value="createdOn">
 									<!--- ignore this one --->
+									createdOn = createdOn
 								</cfcase>
 								<cfdefaultcase>
 									#fld# = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getProperty(fld)#">
 								</cfdefaultcase>
 							</cfswitch>
-							<cfif fld neq listlast(lstFields) and fld neq "createdOn">,</cfif>
+							<cfif fld neq listlast(lstFields)>,</cfif>
 						</cfloop>
 					WHERE package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getPackage()#">
 						AND id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getID()#"> 
@@ -461,10 +462,16 @@
 		<cfargument name="resourceType" type="any" required="true">
 		<cfset var tblName = getResourceTableName(arguments.resourceType)>
 		<cfset var qry = 0>
-		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
-			SELECT DISTINCT package
-				FROM #tblName#
-		</cfquery>				
+
+		<cfif !resourceTableExists(arguments.resourceType)>
+			<cfset qry = queryNew("package")>
+		<cfelse>
+			<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
+				SELECT DISTINCT package
+					FROM #tblName#
+			</cfquery>			
+		</cfif>
+			
 		<cfreturn listToArray(valueList(qry.package))>
 	</cffunction>
 
@@ -477,30 +484,38 @@
 		<cfset var qry = 0>
 		<cfset var tableName = getResourceTableName(rt)>
 		<cfset var lstFields = getResourceTableColumnList(rt)>
-
-		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
-			SELECT #lstFields#
-				FROM #tableName#
-				<cfif arguments.packageName neq "">
-					WHERE package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.packageName#">
+	
+		<cfif !resourceTableExists(rt)>
+			<cfset qry = queryNew(lstFields)>
+		<cfelse>
+			<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
+				SELECT #lstFields#
+					FROM #tableName#
+					WHERE 1 = 1
+						<cfif arguments.packageName neq "">
+							AND package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.packageName#">
+						</cfif>
 						<cfif arguments.resourceID neq "">
 							AND id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resourceID#"> 
 						</cfif>
-				</cfif>
-		</cfquery>				
+			</cfquery>				
+		</cfif>
 
 		<cfreturn qry>
 	</cffunction>
 
 	<cffunction name="getResourceTableColumnList" access="private" returntype="string">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfset var lstBaseFields = "id,package,href,description,createdOn">
+		<cfset var lstFields = "id,package,href,description,createdOn">
 		<cfset var lstPropFields = "">
 		<cfset var rtProps = arguments.resourceType.getProperties()>
 		<cfloop collection="#rtProps#" item="prop">
 			<cfset lstPropFields = listAppend(lstPropFields,prop)>
 		</cfloop>
-		<cfreturn listAppend(lstBaseFields,lstPropFields)>
+		<cfif lstPropFields neq "">
+			<cfset lstFields = listAppend(lstFields, lstPropFields)>
+		</cfif>
+		<cfreturn lstFields>
 	</cffunction>
 
 	<cffunction name="getResourceTableName" access="private" returntype="string">
