@@ -52,6 +52,11 @@
 			stInfo.path = qry.path;
 			stInfo.exists = (qry.isFolder eq 0 and qry.recordCount gt 0);
 			
+			if(qry.recordCount eq 0) {
+				stInfo.lastModified = "1/1/1800";
+				stInfo.createdOn = "1/1/1800";
+			}
+
 			return stInfo;
 		</cfscript>
 	</cffunction>
