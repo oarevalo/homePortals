@@ -213,7 +213,7 @@
 					qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, qryPackages.name[i]);
 				}
 			} else {
-				qryIndex = filterQuery(qryIndex,"package",arguments.packageName,"cf_sql_varchar","!=");
+				qryIndex = filterQuery(qryIndex,"package",arguments.packageName,"cf_sql_varchar","<>");
 				qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, arguments.packageName);
 			}
 
