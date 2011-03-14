@@ -159,7 +159,7 @@
 				if(not indexCache.hasItem(arguments.resourceType))
 					index(arguments.resourceType, arguments.packageName);
 				qry = indexCache.retrieve(arguments.resourceType);
-				qry = filterQuery(qry,"package",arguments.packageName);
+				qry = filterQuery(qry,"package",arguments.packageName,"cf_sql_varchar","LIKE");
 			}
 			
 			return qry;
@@ -213,7 +213,7 @@
 					qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, qryPackages.name[i]);
 				}
 			} else {
-				qryIndex = filterQuery(qryIndex,"package",arguments.packageName,"cf_sql_varchar","<>");
+				qryIndex = filterQuery(qryIndex,"package",arguments.packageName,"cf_sql_varchar","NOT LIKE");
 				qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, arguments.packageName);
 			}
 
