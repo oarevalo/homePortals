@@ -290,7 +290,7 @@
 		
 		<!--- remove resource file --->
 		<cfif resourceFileExists(resBean)>
-			<cfset removeFile(getResourceFilePath(resBean))>
+			<cffile action="delete" file="#getResourceFilePath(resBean)#">
 		</cfif>
 	</cffunction>	
 
@@ -620,6 +620,11 @@
 		</cfswitch>
 	</cffunction>
 
+	<cffunction name="removeFile" access="private" hint="deletes a file">
+		<cfargument name="path" type="string" hint="full path to file">
+		<cffile action="delete" file="#arguments.path#">
+	</cffunction>	
+	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 
