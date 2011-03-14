@@ -113,6 +113,14 @@
 		<cfset var qry = queryFromResourceTable(arguments.resourceType, arguments.packageName)>
 		<cfset var oResourceBean = 0>
 		<cfset var aResBeans = arrayNew(1)>
+		<cfset var prop = "">
+
+		<!--- an empty package means resources at the root level, so we pass a dummy value so that 
+			empty package is not interpreted as all packages --->
+		<cfif arguments.packageName eq "">
+			<cfset arguments.packageName = "_ROOT_">
+		</cfif>
+		<cfset qry = queryFromResourceTable(arguments.resourceType, arguments.packageName)>
 
 		<cfloop query="qry">
 			<cfset oResourceBean = getNewResource(arguments.resourceType)>
@@ -124,7 +132,7 @@
 				<cfset oResourceBean.setCreatedOn(qry.createdOn)>
 			</cfif>
 			<cfloop collection="#rtProps#" item="prop">
-				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop])>
+				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop][currentRow])>
 			</cfloop>
 			<cfset arrayAppend(aResBeans, oResourceBean)>
 		</cfloop>
@@ -222,7 +230,7 @@
 									<cfqueryparam cfsqltype="cf_sql_timestamp" value="#rb.getCreatedOn()#">
 								</cfcase>
 								<cfdefaultcase>
-									<cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getProperty(fld)#">
+									<cfqueryparam cfsqltype="cf_sql_longvarchar" value="#rb.getProperty(fld)#">
 								</cfdefaultcase>
 							</cfswitch>
 							<cfif fld neq listlast(lstFields)>,</cfif>
@@ -492,7 +500,9 @@
 				SELECT #lstFields#
 					FROM #tableName#
 					WHERE 1 = 1
-						<cfif arguments.packageName neq "">
+						<cfif arguments.packageName eq "_ROOT_">
+							AND package = <cfqueryparam cfsqltype="cf_sql_varchar" value="">
+						<cfelseif arguments.packageName neq "">
 							AND package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.packageName#">
 						</cfif>
 						<cfif arguments.resourceID neq "">
@@ -525,8 +535,8 @@
 
 	<cffunction name="createResourceTable" access="private" returntype="void">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfset var tableName = getResourceTableName(rt)>
-		<cfset var lstFields = getResourceTableColumnList(rt)>
+		<cfset var tableName = getResourceTableName(arguments.resourceType)>
+		<cfset var lstFields = getResourceTableColumnList(arguments.resourceType)>
 		<cfset var qry = 0>
 		<cfset var fld = "">
 
