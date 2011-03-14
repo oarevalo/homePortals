@@ -279,12 +279,19 @@
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="package" type="string" required="true">
 		<cfset var tableName = getResourceTableName( getResourceTypeRegistry().getResourceType(arguments.resourceType) )>
+		<cfset var resBean = getResource(arguments.resourceType, arguments.package, arguments.id)>
+		
 		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#" maxrows="1">
 			DELETE
 				FROM #tableName#
 				WHERE package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.package#">
 					AND id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.id#"> 
 		</cfquery>		
+		
+		<!--- remove resource file --->
+		<cfif resourceFileExists(resBean)>
+			<cfset removeFile(getResourceFilePath(resBean))>
+		</cfif>
 	</cffunction>	
 
 	<!------------------------------------------------->
