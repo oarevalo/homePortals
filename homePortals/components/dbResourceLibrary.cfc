@@ -162,7 +162,7 @@
 				<cfset oResourceBean.setCreatedOn(qry.createdOn)>
 			</cfif>
 			<cfloop collection="#rtProps#" item="prop">
-				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop])>
+				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop][1])>
 			</cfloop>
 		<cfelse>
 			<cfthrow message="The requested resource [#arguments.packageName#][#arguments.resourceID#] was not found"
