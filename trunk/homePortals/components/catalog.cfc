@@ -160,6 +160,13 @@
 					index(arguments.resourceType, arguments.packageName);
 				qry = indexCache.retrieve(arguments.resourceType);
 				qry = filterQuery(qry,"package",arguments.packageName,"cf_sql_varchar","LIKE");
+				if(qry.recordCount eq 0) {
+					// package not found in cache, it is possible that pkg exists but has not been cached yet
+					// so lets index again this package
+					index(arguments.resourceType, arguments.packageName);
+					qry = indexCache.retrieve(arguments.resourceType);
+					qry = filterQuery(qry,"package",arguments.packageName,"cf_sql_varchar","LIKE");
+				}
 			}
 			
 			return qry;
