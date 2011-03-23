@@ -58,7 +58,7 @@ function moduleClient() {
 		var actionOutputID = this.moduleID + "ActionOutput_BodyRegion";
 		if($(actionOutputID).length==0) {
 			var tmpHTML = "<div id='" + actionOutputID + "' class='h_actionOutputMessage'></div>";
-			$("#"+this.moduleID+"_BodyRegion").prepend(tmpHTML);
+			$("#"+this.moduleID+"_Body").prepend(tmpHTML);
 		}
 
 		// call server-side method
@@ -82,7 +82,9 @@ function moduleClient() {
 	}
 
 	function clearActionOutput() {
-		$("#"+this.moduleID+"ActionOutput_BodyRegion").remove();
+		$("#"+this.moduleID+"ActionOutput_BodyRegion").fadeOut('slow', function() {
+			$(this).remove();
+		});
 	}
 
 
@@ -120,7 +122,10 @@ function moduleClient() {
 	}
 
 	function setMessage(msg) {
-		$("#" + this.moduleID + "ActionOutput_BodyRegion").html(msg);
+		var status = $("#" + this.moduleID + "ActionOutput_BodyRegion");
+		var newpos = status.offset();
+		status.html(msg);
+		window.scrollTo(newpos.left, newpos.top);
 	}
 
 	function raiseEvent(eventName, args) {
