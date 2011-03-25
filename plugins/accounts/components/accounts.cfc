@@ -5,6 +5,7 @@
 		variables.oHomePortals = 0;	// reference to the application instance
 		variables.clientDAOPath = "homePortals.plugins.accounts.components.db."; // here is where the DAO objects are located
 		variables.oDataProvider = 0;	// provides access to account data storage
+		variables.pageAccessLevels = {GENERAL = "general", OWNER = "owner", FRIEND = "friend"};
 	</cfscript>
 
 	<!--------------------------------------->
@@ -281,13 +282,10 @@
 			var oUserRegistry = 0;
 			var stUserInfo = 0;
 			var oFriendsService = 0;
-			var accessLevel = "general";
-			var owner = "";
+			var accessLevel = getPageAccess( arguments.page );
+			var owner = getPageOwner( arguments.page );
 
-			if(arguments.page.hasProperty("access")) accessLevel = arguments.page.getProperty("access");
-			if(arguments.page.hasProperty("owner")) owner = arguments.page.getProperty("owner");
-			
-			if(accessLevel eq "friend" or accessLevel eq "owner") {
+			if(accessLevel eq pageAccessLevels.FRIEND or accessLevel eq pageAccessLevels.OWNER) {
 				// access to this page is restricted, so we must
 				// check who is the current user
 				oUserRegistry = createObject("component","homePortals.components.userRegistry").init();
@@ -302,11 +300,11 @@
 					return;
 
 				// validate owner-only page
-				if(accessLevel eq "owner") 
+				if(accessLevel eq pageAccessLevels.OWNER) 
 					throw("Access to this page is restricted to the page owner.","","homePortals.engine.unauthorizedAccess");	
 					
 				// check that user is friend	
-				if(accessLevel eq "friend") {
+				if(accessLevel eq pageAccessLevels.FRIEND) {
 					
 					// check if current friend is a friend of the owner
 					oFriendsService = getFriendsService();
@@ -320,7 +318,43 @@
 		</cfscript>
 	</cffunction>
 
+	<!--------------------------------------->
+	<!----  setPageAccess		    ----->
+	<!--------------------------------------->
+	<cffunction name="setPageAccess" access="public" returntype="void" hint="Sets the level of access to a page">
+		<cfargument name="page" type="homePortals.components.pageBean" required="true">
+		<cfargument name="accessType" type="string" required="true">
+		<cfscript>
+			if(!structKeyExists(pageAccessLevels, arguments.accessType)) {
+				throw("The access type is invalid. Valid types are: general, friend and owner.","","homePortals.engine.invalidAccessType");			
+			}
+			arguments.page.setProperty("access", arguments.accessType);
+		</cfscript>
+	</cffunction>
 
+	<!--------------------------------------->
+	<!----  getPageAccess		    ----->
+	<!--------------------------------------->
+	<cffunction name="getPageAccess" access="public" returntype="string" hint="Returns the level of access to a page">
+		<cfargument name="page" type="homePortals.components.pageBean" required="true">
+		<cfscript>
+			var accessLevel = pageAccessLevels.GENERAL;
+			if(arguments.page.hasProperty("access")) accessLevel = arguments.page.getProperty("access");
+			return accessLevel;
+		</cfscript>
+	</cffunction>
+
+	<!--------------------------------------->
+	<!----  getPageOwner		    ----->
+	<!--------------------------------------->
+	<cffunction name="getPageOwner" access="public" returntype="string" hint="Returns the owner of a page">
+		<cfargument name="page" type="homePortals.components.pageBean" required="true">
+		<cfscript>
+			var owner = "";
+			if(arguments.page.hasProperty("owner")) owner = arguments.page.getProperty("owner");
+			return owner;
+		</cfscript>
+	</cffunction>
 
 	<!--------------------------------------->
 	<!----  getFriendsService  			----->

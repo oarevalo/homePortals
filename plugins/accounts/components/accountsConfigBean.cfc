@@ -1,7 +1,7 @@
 <cfcomponent displayname="accountsConfigBean" hint="A bean to store the HomePortals accounts configuration. Configuration is per-application">
 
 	<cfset variables.stConfig = StructNew()>
-	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,storageType,datasource,username,password,dbtype,dataRoot">
+	<cfset variables.configKeys = "accountsRoot,newAccountTemplate,newPageTemplate,storageType,datasource,username,password,dbtype,dataRoot,siteIndexableProperties">
 
 	<cffunction name="init" access="public" returntype="accountsConfigBean">
 		<cfargument name="configFilePath" type="string" required="false" default="" 
@@ -122,6 +122,9 @@
 		<cfreturn variables.stConfig.dataRoot>
 	</cffunction>
 	
+	<cffunction name="getSiteIndexableProperties" access="public" returntype="string">
+		<cfreturn variables.stConfig.siteIndexableProperties>
+	</cffunction>
 	
 
 	<!--- Setters --->
@@ -173,6 +176,11 @@
 	<cffunction name="setDataRoot" access="public" returntype="void">
 		<cfargument name="data" type="string" required="true">
 		<cfset variables.stConfig.dataRoot = arguments.data>
+	</cffunction>
+
+	<cffunction name="setSiteIndexableProperties" access="public" returntype="string">
+		<cfargument name="data" type="string" required="true">
+		<cfset variables.stConfig.siteIndexableProperties = arguments.data>
 	</cffunction>
 
 

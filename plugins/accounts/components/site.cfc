@@ -527,6 +527,8 @@
 		<cfset var oDAO = getSitesDAO()>
 		<cfset var qryAccountInfo = getAccountsService().getAccountByName( getOwner() )>
 		<cfset var defaultPage = "">
+		<cfset var indexableProperties = getAccountsService().getConfig().getSiteIndexableProperties()>
+		<cfset var prop = "">
 
 		<!--- check that there is a corresponding account --->
 		<cfif qryAccountInfo.recordCount eq 0>
@@ -569,6 +571,15 @@
 				<cfset st.href = qryPages.name>	
 				<cfset st.title = oPage.getTitle()>
 				<cfset st.linkPath = "">
+				<cfset st.access = getAccountsService().getPageAccess(oPage)>
+				
+				<cfloop list="#indexableProperties#" index="prop">
+					<cfif oPage.hasProperty(prop)>
+						<cfset st[prop] = oPage.getProperty(prop)>
+					<cfelse>
+						<cfset st[prop] = "">
+					</cfif>
+				</cfloop>
 	
 				<cfset arrayAppend(aPages, st)>
 			</cfif>
@@ -586,6 +597,15 @@
 				<cfset st.href = qryPages.name>	
 				<cfset st.title = oPage.getTitle()>
 				<cfset st.linkPath = qryPages.linkPath>
+				<cfset st.access = getAccountsService().getPageAccess(oPage)>
+
+				<cfloop list="#indexableProperties#" index="prop">
+					<cfif oPage.hasProperty(prop)>
+						<cfset st[prop] = oPage.getProperty(prop)>
+					<cfelse>
+						<cfset st[prop] = "">
+					</cfif>
+				</cfloop>
 	
 				<cfset arrayAppend(aPages, st)>
 			</cfloop>
