@@ -12,7 +12,6 @@
 	<cffunction name="onAppInit" access="public" returntype="void">
 		<cfscript>
 			var oConfig = getHomePortals().getConfig();
-			var oConfigBeanStore = 0;
 			var oCacheRegistry = 0;
 			var oCacheService = 0;
 			var oRSSService = 0;
@@ -39,24 +38,6 @@
 			// (there is no need to register the service with the registry since it registers itself)
 			oRSSService = createObject("component","homePortals.plugins.modules.components.RSSService").init(oConfig.getCatalogCacheSize(), 
 																		oConfig.getCatalogCacheTTL());
-
-			// clear all stored pages/module contexts (configbeans)
-			oConfigBeanStore = createObject("component","homePortals.plugins.modules.components.configBeanStore").init();
-			oConfigBeanStore.flushAll();
-		</cfscript>
-	</cffunction>
-
-	<cffunction name="onAfterPageLoad" access="public" returntype="homePortals.components.pageRenderer" hint="this method is executed right before the call to loadPage() returns.">
-		<cfargument name="eventArg" type="homePortals.components.pageRenderer" required="true" hint="a pageRenderer object intialized for the requested page">	
-		<cfscript>
-			var pageHREF = arguments.eventArg.getPageHREF();
-			var oConfigBeanStore = 0;
-			
-			// clear persistent storage for module data
-			oConfigBeanStore = createObject("component","homePortals.plugins.modules.components.configBeanStore").init();
-			oConfigBeanStore.flushByPageHREF(pageHREF);
-			
-			return arguments.eventArg;
 		</cfscript>
 	</cffunction>
 

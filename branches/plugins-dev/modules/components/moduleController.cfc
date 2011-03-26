@@ -19,12 +19,13 @@
 	<!---------------------------------------->
 	<!--- init		                       --->
 	<!---------------------------------------->		
-	<cffunction name="init" access="public" 
+	<cffunction name="init" access="public" returnType="moduleController"
 				hint="This is the constructor. It is responsible for instantiating the module and configuring it properly.">
-		<cfargument name="pageHREF" required="true">
-		<cfargument name="moduleID" required="true">
-		<cfargument name="moduleClassLocation" required="false" default="">
-		<cfargument name="modulePageSettings" required="false" default="0">
+		<cfargument name="pageHREF" required="true" hint="Location of the containing page">
+		<cfargument name="pageBean" type="homePortals.components.pageBean" required="true" hint="This is the page containing the module">
+		<cfargument name="moduleID" type="string" required="true" hint="The ID of the module on the page">
+		<cfargument name="moduleClassLocation" type="string" required="true" hint="The location of the cfc that implements the module resource">
+		<cfargument name="modulePageSettings" required="true">
 		<cfargument name="isFirstInClass" required="false" type="boolean" default="false">
 		<cfargument name="execMode" required="false" type="string" default="local" hint="Could be 'local' or 'remote', depending on under which context is being executed.">
 		<cfargument name="homePortals" type="homePortals.components.homePortals" required="true" hint="reference to homeportals environment">
@@ -32,7 +33,6 @@
 		<cfscript>
 			var contentStoreID = "";
 			var moduleName = "";
-			var myConfigBeanStore = createObject("component", "configBeanStore").init();
 			var tmpModuleRoot = "";
 			var oModuleProperties = 0;
 			var csStorePath = "";
@@ -48,48 +48,33 @@
 			variables.isFirstInClass = arguments.isFirstInClass;
 			variables.execMode  = arguments.execMode;
 			variables.oHomePortals = arguments.homePortals;
+			variables.oPage = arguments.pageBean;
 
 			// create configBeans
 			variables.oModuleConfigBean = createObject("component", "moduleConfigBean");
 			variables.oContentStoreConfigBean = createObject("component", "contentStoreConfigBean");
 			
-			// this will be used to identify the contentStoreConfigBean on the configBeanStore
-			contentStoreID = variables.moduleID & "_CS";
-
 			// derive the relative path to the module directory from the module cfc location
 			if(arguments.moduleClassLocation neq "") {
 				tmpModuleRoot = listDeleteAt(arguments.moduleClassLocation, listLen(arguments.moduleClassLocation,"."), ".");
 				tmpModuleRoot = "/" & replace(tmpModuleRoot,".","/","all") & "/";
 			}
 
-			// get the moduleConfigBean from the configBeanStore
-			if(myConfigBeanStore.exists(variables.pageHREF, variables.moduleID)) {
-				variables.oModuleConfigBean = myConfigBeanStore.load(variables.pageHREF, variables.moduleID, variables.oModuleConfigBean);
-			} else {
-				variables.oModuleConfigBean.setPageSettings(arguments.modulePageSettings);
-				variables.oModuleConfigBean.setPageHREF(arguments.modulePageSettings["_page"].href);
-				variables.oModuleConfigBean.setModuleClassLocation(arguments.moduleClassLocation);
-				variables.oModuleConfigBean.setModuleRoot(tmpModuleRoot);
-				myConfigBeanStore.save(variables.pageHREF, variables.moduleID, variables.oModuleConfigBean);
-			}
+			// create the moduleConfigBean 
+			variables.oModuleConfigBean.setPageSettings(arguments.modulePageSettings);
+			variables.oModuleConfigBean.setPageHREF(arguments.pageHREF);
+			variables.oModuleConfigBean.setModuleClassLocation(arguments.moduleClassLocation);
+			variables.oModuleConfigBean.setModuleRoot(tmpModuleRoot);
 
 			// build the path where the modules will store their data 
 			csStorePath = variables.oHomePortals.getPluginManager().getPlugin("modules").getPluginSetting("accountsDataPath");
 			csStorePath = replace(csStorePath,"{appRoot}",variables.oHomePortals.getConfig().getAppRoot());
-			
+		
 			// set the accounts root and the page owner on the content store
 			variables.oContentStoreConfigBean.setAccountsRoot( csStorePath );
-			variables.oContentStoreConfigBean.setOwner( variables.oModuleConfigBean.getPageSetting("_page").owner );
-
-		
-			// check if the contentStoreConfigBean is already on the configBeanStore, otherwise add it
-			if(myConfigBeanStore.exists(variables.pageHREF, contentStoreID)) {
-				variables.oContentStoreConfigBean = myConfigBeanStore.load(variables.pageHREF, contentStoreID, variables.oContentStoreConfigBean);
-			} else {
-				myConfigBeanStore.save(variables.pageHREF, contentStoreID, variables.oContentStoreConfigBean);
-			}
-
-			
+			if(arguments.pageBean.hasProperty("owner"))
+				variables.oContentStoreConfigBean.setOwner( arguments.pageBean.getProperty("owner") );
+					
 			// get module properties for this module (if any). Do this only on the first run of the module
 			if(arguments.execMode eq "local") {
 				oModuleProperties = getHomePortals().getPluginManager().getPlugin("modules").getModuleProperties();
@@ -102,19 +87,13 @@
 				}
 			}
 
-			// if this is a remote call, then get the module class location from the config bean
-			if(arguments.execMode eq "remote") {
-				arguments.moduleClassLocation = variables.oModuleConfigBean.getModuleClassLocation();
-			}
-			
+		
 			// instantiate and initialize the module
 			variables.oModule = createObject("component", arguments.moduleClassLocation);
 			variables.oModule.controller = this;
 			variables.oModule.init();
 			
-			// save any changes to the configBeans since the module init code may have made some changes
-			myConfigBeanStore.save(variables.pageHREF, variables.moduleID, variables.oModuleConfigBean);
-			myConfigBeanStore.save(variables.pageHREF, contentStoreID, variables.oContentStoreConfigBean);
+			return this;
 		</cfscript>
 	</cffunction>
 	
@@ -182,7 +161,11 @@
 		<cfset stRet = oUserRegistry.getUserInfo()>
 
 		<!--- add additional information about the page owner --->
-		<cfset stRet.owner = variables.oModuleConfigBean.getPageSetting("_page").owner>
+		<cfif variables.oPage.hasProperty("owner")>
+			<cfset stRet.owner = variables.oPage.getProperty("owner")>
+		<cfelse>
+			<cfset stRet.owner = "">
+		</cfif>
 		<cfset stRet.isOwner = stRet.username neq "" and (stRet.owner eq stRet.username)>
 		
 		<cfreturn stRet>
@@ -333,7 +316,6 @@
 			var href = cfg.getPageHREF();
 			var id = getModuleID();
 			var oPage = 0;
-			var oConfigBeanStore = 0;
 			var tmpField = "";
 			var stSettings = structNew();
 			var oModule = 0;
@@ -352,10 +334,6 @@
 			}	
 			oModule.init(stModule);	
 			oPage.setModule(oModule);
-
-			// save changes in configBean store
-			oConfigBeanStore = createObject("component", "configBeanStore").init();
-			oConfigBeanStore.save(variables.pageHREF, id, cfg);
 
 			// save page
 			oPageProvider.save(href, oPage);
