@@ -293,7 +293,7 @@
 				
 				// if not user logged in, then get out
 				if(stUserInfo.userID eq "")
-					throw("Access to this page is restricted. Please sign-in to validate access","","homePortals.engine.unauthorizedAccess");	
+					_throw("Access to this page is restricted. Please sign-in to validate access","homePortals.engine.unauthorizedAccess");	
 
 				// if logged in is the owner, then we are good
 				if(stUserInfo.userName eq owner) 
@@ -301,7 +301,7 @@
 
 				// validate owner-only page
 				if(accessLevel eq pageAccessLevels.OWNER) 
-					throw("Access to this page is restricted to the page owner.","","homePortals.engine.unauthorizedAccess");	
+					_throw("Access to this page is restricted to the page owner.","homePortals.engine.unauthorizedAccess");	
 					
 				// check that user is friend	
 				if(accessLevel eq pageAccessLevels.FRIEND) {
@@ -310,7 +310,7 @@
 					oFriendsService = getFriendsService();
 					
 					if( not oFriendsService.isFriend(owner, stUserInfo.username) ) {
-						throw("You must be a friend of the owner to access this page.","","homePortals.engine.unauthorizedAccess");	
+						_throw("You must be a friend of the owner to access this page.","homePortals.engine.unauthorizedAccess");	
 					}
 				
 				}	
@@ -326,7 +326,7 @@
 		<cfargument name="accessType" type="string" required="true">
 		<cfscript>
 			if(!structKeyExists(pageAccessLevels, arguments.accessType)) {
-				throw("The access type is invalid. Valid types are: general, friend and owner.","","homePortals.engine.invalidAccessType");			
+				_throw("The access type is invalid. Valid types are: general, friend and owner.","homePortals.engine.invalidAccessType");			
 			}
 			arguments.page.setProperty("access", arguments.accessType);
 		</cfscript>
@@ -470,7 +470,7 @@
 
 			// check that dataprovider exists
 			if(not fileExists(expandPath("/homePortals/plugins/accounts/components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc")))
-				throw("Accounts storage type [#storageType#] is not supported","","homePortals.accounts.invalidStorageType");
+				_throw("Accounts storage type [#storageType#] is not supported","homePortals.accounts.invalidStorageType");
 					
 			// create config		
 			oConfigBean = createObject("component", pkgPath & storageType & "DataProviderConfigBean").init();
@@ -574,10 +574,10 @@
 		<cfabort>
 	</cffunction>
 		
-	<cffunction name="throw" access="private" hint="facade for cfthrow">
+	<cffunction name="_throw" access="private" hint="facade for cfthrow">
 		<cfargument name="message" type="string">
+		<cfargument name="type" type="string"> 
 		<cfargument name="detail" type="string" default=""> 
-		<cfargument name="type" type="string" default="custom"> 
 		<cfthrow message="#arguments.message#" detail="#arguments.detail#" type="#arguments.type#">
 	</cffunction>
 
