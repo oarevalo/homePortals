@@ -17,6 +17,7 @@
 			variables.stConfig.password = "";
 			variables.stConfig.dbtype = "";
 			variables.stConfig.dataRoot = "";
+			variables.stConfig.siteIndexableProperties = "";
 						
 			// if a config path is given, then load the config from the given file
 			if(arguments.configFilePath neq "") {
