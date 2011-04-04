@@ -499,7 +499,7 @@
 	<!--- P R I V A T E     M E T H O D S  --->
 	<!---------------------------------------->
 
-	<cffunction name="getPageProvider" access="private" returntype="homePortals.components.pageProvider" hint="Retrieves an instance of the pageProvider object responsible for page persistance">
+	<cffunction name="getPageProvider" access="private" returntype="any" hint="Retrieves an instance of the pageProvider object responsible for page persistance">
 		<cfreturn getAccountsService().getHomePortals().getPageProvider()>
 	</cffunction>
 	
