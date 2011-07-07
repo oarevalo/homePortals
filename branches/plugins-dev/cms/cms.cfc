@@ -434,7 +434,7 @@
 	   						} else {
 	   							oResourceBean = variables.homePortals
 	   														.getCatalog()
-	   														.getResourceNode(resType, resourceID, true);
+	   														.getResource(resType, resourceID, true);
 								doUpdateResource = true;
 	   						}
 
@@ -843,7 +843,7 @@
 				} else {
 					oResourceBean = variables.homePortals
 												.getCatalog()
-												.getResourceNode(resType, resourceID, true);
+												.getResource(resType, resourceID, true);
 				}
 
 				for(arg in arguments) {
