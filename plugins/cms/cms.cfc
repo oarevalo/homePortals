@@ -434,7 +434,7 @@
 	   						} else {
 	   							oResourceBean = variables.homePortals
 	   														.getCatalog()
-	   														.getResourceNode(resType, resourceID, true);
+	   														.getResource(resType, resourceID, true);
 								doUpdateResource = true;
 	   						}
 
@@ -525,7 +525,7 @@
 					<cfthrow message="Invalid username/password">
 				</cfif>
 
-				<cfcatch type="homePortals.catalog.resourceNotFound">
+				<cfcatch type="homePortals.resourceLibrary.resourceNotFound">
 					<cfthrow message="Invalid username/password">
 				</cfcatch>
 			</cftry>
@@ -581,7 +581,7 @@
 			<cftry>
 				<cfset qry = oCatalog.getResource("cmsUser",arguments.username,true)>
 				<cfthrow message="The given username already exists. Please select a different one">
-				<cfcatch type="homePortals.catalog.resourceNotFound">
+				<cfcatch type="homePortals.resourceLibrary.resourceNotFound">
 					<!--- good, username not taken --->
 				</cfcatch>
 			</cftry>
@@ -843,7 +843,7 @@
 				} else {
 					oResourceBean = variables.homePortals
 												.getCatalog()
-												.getResourceNode(resType, resourceID, true);
+												.getResource(resType, resourceID, true);
 				}
 
 				for(arg in arguments) {
