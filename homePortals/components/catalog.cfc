@@ -64,13 +64,13 @@
 			resourceID = arguments.id;
 			
 			// allow resources to be identified by "packageName/resourceID" notation.
-			if(listLen(arguments.id,delimChar) gt 1) {
-				package = listDeleteAt(arguments.id, listLen(arguments.id, delimChar), delimChar);
-				resourceID = listLast(arguments.id, delimChar);
+			if(listLen(resourceID,delimChar) gt 1) {
+				package = listDeleteAt(resourceID, listLen(resourceID, delimChar), delimChar);
+				resourceID = listLast(resourceID, delimChar);
 			}
 
 			// build the key used for storing item in cache
-			cacheKey = "//" & arguments.type & "/" & arguments.id;
+			cacheKey = "//" & arguments.type & "/" & resourceID;
 			
 			// try to read item from cache
 			if(not loadFromSource) {
