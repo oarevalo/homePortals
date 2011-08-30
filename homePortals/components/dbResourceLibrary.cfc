@@ -113,6 +113,14 @@
 		<cfset var qry = queryFromResourceTable(arguments.resourceType, arguments.packageName)>
 		<cfset var oResourceBean = 0>
 		<cfset var aResBeans = arrayNew(1)>
+		<cfset var prop = "">
+
+		<!--- an empty package means resources at the root level, so we pass a dummy value so that 
+			empty package is not interpreted as all packages --->
+		<cfif arguments.packageName eq "">
+			<cfset arguments.packageName = "_ROOT_">
+		</cfif>
+		<cfset qry = queryFromResourceTable(arguments.resourceType, arguments.packageName)>
 
 		<cfloop query="qry">
 			<cfset oResourceBean = getNewResource(arguments.resourceType)>
@@ -124,7 +132,7 @@
 				<cfset oResourceBean.setCreatedOn(qry.createdOn)>
 			</cfif>
 			<cfloop collection="#rtProps#" item="prop">
-				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop])>
+				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop][currentRow])>
 			</cfloop>
 			<cfset arrayAppend(aResBeans, oResourceBean)>
 		</cfloop>
@@ -154,7 +162,7 @@
 				<cfset oResourceBean.setCreatedOn(qry.createdOn)>
 			</cfif>
 			<cfloop collection="#rtProps#" item="prop">
-				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop])>
+				<cfset oResourceBean.setProperty(rtProps[prop].name, qry[prop][1])>
 			</cfloop>
 		<cfelse>
 			<cfthrow message="The requested resource [#arguments.packageName#][#arguments.resourceID#] was not found"
@@ -222,7 +230,7 @@
 									<cfqueryparam cfsqltype="cf_sql_timestamp" value="#rb.getCreatedOn()#">
 								</cfcase>
 								<cfdefaultcase>
-									<cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getProperty(fld)#">
+									<cfqueryparam cfsqltype="cf_sql_longvarchar" value="#rb.getProperty(fld)#">
 								</cfdefaultcase>
 							</cfswitch>
 							<cfif fld neq listlast(lstFields)>,</cfif>
@@ -249,12 +257,13 @@
 								</cfcase>
 								<cfcase value="createdOn">
 									<!--- ignore this one --->
+									createdOn = createdOn
 								</cfcase>
 								<cfdefaultcase>
 									#fld# = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getProperty(fld)#">
 								</cfdefaultcase>
 							</cfswitch>
-							<cfif fld neq listlast(lstFields) and fld neq "createdOn">,</cfif>
+							<cfif fld neq listlast(lstFields)>,</cfif>
 						</cfloop>
 					WHERE package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getPackage()#">
 						AND id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#rb.getID()#"> 
@@ -270,12 +279,19 @@
 		<cfargument name="resourceType" type="string" required="true">
 		<cfargument name="package" type="string" required="true">
 		<cfset var tableName = getResourceTableName( getResourceTypeRegistry().getResourceType(arguments.resourceType) )>
+		<cfset var resBean = getResource(arguments.resourceType, arguments.package, arguments.id)>
+		
 		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#" maxrows="1">
 			DELETE
 				FROM #tableName#
 				WHERE package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.package#">
 					AND id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.id#"> 
 		</cfquery>		
+		
+		<!--- remove resource file --->
+		<cfif resourceFileExists(resBean)>
+			<cffile action="delete" file="#getResourceFilePath(resBean)#">
+		</cfif>
 	</cffunction>	
 
 	<!------------------------------------------------->
@@ -461,10 +477,16 @@
 		<cfargument name="resourceType" type="any" required="true">
 		<cfset var tblName = getResourceTableName(arguments.resourceType)>
 		<cfset var qry = 0>
-		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
-			SELECT DISTINCT package
-				FROM #tblName#
-		</cfquery>				
+
+		<cfif !resourceTableExists(arguments.resourceType)>
+			<cfset qry = queryNew("package")>
+		<cfelse>
+			<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
+				SELECT DISTINCT package
+					FROM #tblName#
+			</cfquery>			
+		</cfif>
+			
 		<cfreturn listToArray(valueList(qry.package))>
 	</cffunction>
 
@@ -477,30 +499,40 @@
 		<cfset var qry = 0>
 		<cfset var tableName = getResourceTableName(rt)>
 		<cfset var lstFields = getResourceTableColumnList(rt)>
-
-		<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
-			SELECT #lstFields#
-				FROM #tableName#
-				<cfif arguments.packageName neq "">
-					WHERE package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.packageName#">
+	
+		<cfif !resourceTableExists(rt)>
+			<cfset qry = queryNew(lstFields)>
+		<cfelse>
+			<cfquery name="qry" datasource="#variables.dsn#" username="#variables.username#" password="#variables.password#">
+				SELECT #lstFields#
+					FROM #tableName#
+					WHERE 1 = 1
+						<cfif arguments.packageName eq "_ROOT_">
+							AND package = <cfqueryparam cfsqltype="cf_sql_varchar" value="">
+						<cfelseif arguments.packageName neq "">
+							AND package = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.packageName#">
+						</cfif>
 						<cfif arguments.resourceID neq "">
 							AND id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.resourceID#"> 
 						</cfif>
-				</cfif>
-		</cfquery>				
+			</cfquery>				
+		</cfif>
 
 		<cfreturn qry>
 	</cffunction>
 
 	<cffunction name="getResourceTableColumnList" access="private" returntype="string">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfset var lstBaseFields = "id,package,href,description,createdOn">
+		<cfset var lstFields = "id,package,href,description,createdOn">
 		<cfset var lstPropFields = "">
 		<cfset var rtProps = arguments.resourceType.getProperties()>
 		<cfloop collection="#rtProps#" item="prop">
 			<cfset lstPropFields = listAppend(lstPropFields,prop)>
 		</cfloop>
-		<cfreturn listAppend(lstBaseFields,lstPropFields)>
+		<cfif lstPropFields neq "">
+			<cfset lstFields = listAppend(lstFields, lstPropFields)>
+		</cfif>
+		<cfreturn lstFields>
 	</cffunction>
 
 	<cffunction name="getResourceTableName" access="private" returntype="string">
@@ -510,8 +542,8 @@
 
 	<cffunction name="createResourceTable" access="private" returntype="void">
 		<cfargument name="resourceType" type="any" required="true">
-		<cfset var tableName = getResourceTableName(rt)>
-		<cfset var lstFields = getResourceTableColumnList(rt)>
+		<cfset var tableName = getResourceTableName(arguments.resourceType)>
+		<cfset var lstFields = getResourceTableColumnList(arguments.resourceType)>
 		<cfset var qry = 0>
 		<cfset var fld = "">
 
@@ -588,6 +620,11 @@
 		</cfswitch>
 	</cffunction>
 
+	<cffunction name="removeFile" access="private" hint="deletes a file">
+		<cfargument name="path" type="string" hint="full path to file">
+		<cffile action="delete" file="#arguments.path#">
+	</cffunction>	
+	
 	<cffunction name="throw" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 

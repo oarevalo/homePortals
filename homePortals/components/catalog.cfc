@@ -64,13 +64,13 @@
 			resourceID = arguments.id;
 			
 			// allow resources to be identified by "packageName/resourceID" notation.
-			if(listLen(arguments.id,delimChar) gt 1) {
-				package = listDeleteAt(arguments.id, listLen(arguments.id, delimChar), delimChar);
-				resourceID = listLast(arguments.id, delimChar);
+			if(listLen(resourceID,delimChar) gt 1) {
+				package = listDeleteAt(resourceID, listLen(resourceID, delimChar), delimChar);
+				resourceID = listLast(resourceID, delimChar);
 			}
 
 			// build the key used for storing item in cache
-			cacheKey = "//" & arguments.type & "/" & arguments.id;
+			cacheKey = "//" & arguments.type & "/" & resourceID;
 			
 			// try to read item from cache
 			if(not loadFromSource) {
@@ -159,7 +159,14 @@
 				if(not indexCache.hasItem(arguments.resourceType))
 					index(arguments.resourceType, arguments.packageName);
 				qry = indexCache.retrieve(arguments.resourceType);
-				qry = filterQuery(qry,"package",arguments.packageName);
+				qry = filterQuery(qry,"package",arguments.packageName,"cf_sql_varchar","LIKE");
+				if(qry.recordCount eq 0) {
+					// package not found in cache, it is possible that pkg exists but has not been cached yet
+					// so lets index again this package
+					index(arguments.resourceType, arguments.packageName);
+					qry = indexCache.retrieve(arguments.resourceType);
+					qry = filterQuery(qry,"package",arguments.packageName,"cf_sql_varchar","LIKE");
+				}
 			}
 			
 			return qry;
@@ -213,7 +220,7 @@
 					qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, qryPackages.name[i]);
 				}
 			} else {
-				qryIndex = filterQuery(qryIndex,"package",arguments.packageName,"cf_sql_varchar","!=");
+				qryIndex = filterQuery(qryIndex,"package",arguments.packageName,"cf_sql_varchar","NOT LIKE");
 				qryIndex = addResourcesFromPackage(qryIndex, arguments.resourceType, arguments.packageName);
 			}
 
@@ -298,7 +305,7 @@
 		<cfquery name="qry" dbtype="query">
 			SELECT *
 				FROM arguments.query
-				WHERE #arguments.fieldName# = <cfqueryparam cfsqltype="#arguments.fieldType#" value="#arguments.fieldValue#">
+				WHERE #arguments.fieldName# #arguments.condition# <cfqueryparam cfsqltype="#arguments.fieldType#" value="#arguments.fieldValue#">
 		</cfquery>
 		<cfreturn qry />
 	</cffunction>
