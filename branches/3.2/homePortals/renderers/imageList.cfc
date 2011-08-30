@@ -56,7 +56,7 @@
 		</cfscript>
 	
 		<cfquery name="qryRes" dbtype="query" maxrows="#variables.MAX_ITEMS_TO_DISPLAY#">
-			SELECT id,description,createdOn,package,type,label,url,href,libpath,fullhref
+			SELECT id,description,createdOn,package,type,label,url,href,libpath,fullhref,fullpath
 					<cfif itemProperties neq "">,#itemProperties#</cfif>
 				FROM qryRes
 				WHERE (1=1)
@@ -134,6 +134,9 @@
 				.rl_imageLabel {
 					text-align:center;
 				}
+				.rl_paging {
+					clear:both;
+				}
 			</style>
 			<div class="rl_imageList">
 			</cfoutput>
@@ -158,7 +161,7 @@
 						<div class="rl_image">
 							#renderImage(arguments.qryData.id, arguments.qryData.package, arguments.qryData.label,
 											href,
-											arguments.qryData.libpath,
+											arguments.qryData.fullpath,
 											arguments.qryData.href)#
 							<cfif itemProperties neq "" or showLabel>
 								<div class="rl_imageLabel">
@@ -201,7 +204,7 @@
 						<div class="rl_image">
 							#renderImage(arguments.qryData.id, arguments.qryData.package, arguments.qryData.label,
 											href,
-											arguments.qryData.libpath,
+											arguments.qryData.fullpath,
 											arguments.qryData.href)#
 							<cfif itemProperties neq "" or showLabel>
 								<div class="rl_imageLabel">
@@ -285,7 +288,7 @@
 		<cfargument name="package" type="string" required="true">
 		<cfargument name="label" type="string" required="true">
 		<cfargument name="linkHREF" type="string" required="true">
-		<cfargument name="libPath" type="string" required="true">
+		<cfargument name="fullpath" type="string" required="true">
 		<cfargument name="resPath" type="string" required="true">
 		<cfscript>
 			var tmpHTML = "";
@@ -294,7 +297,7 @@
 			var thumbnails = getContentTag().getAttribute("thumbnails", variables.DEFAULT_CREATE_THUMBNAILS);
 			var thumbnailsPath = getContentTag().getAttribute("thumbnailsPath", variables.DEFAULT_THUMBS_PATH);
 			var thmbPath = getHomePortals().getConfig().getAppRoot() & thumbnailsPath;
-			var srcPath = arguments.libPath & "/" & arguments.resPath;
+			var srcPath = arguments.fullpath;
 			var tgtPath = srcPath;
 			var tgtFileName = hash(srcPath & width & height);
 		//	uncomment the following line to have the thumbnails created with a more meaningful name if you want
