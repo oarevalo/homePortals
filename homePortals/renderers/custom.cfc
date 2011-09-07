@@ -125,7 +125,7 @@
 					<cfif arg2 eq "">
 						<cfreturn resourceID>
 					<cfelse>
-						<cfset oResourceBean = oCatalog.getResourceNode(resourceType, resourceID)>
+						<cfset oResourceBean = oCatalog.getResource(resourceType, resourceID)>
 						<cfset stProps = oResourceBean.getProperties()>
 						<cfset stMemento = oResourceBean.getMemento()>
 
