@@ -342,7 +342,12 @@
 	<!----  getPage					----->
 	<!--------------------------------------->
 	<cffunction name="getPage" access="public" returntype="pageBean" output="false" hint="Returns the current page">
-		<cfreturn variables.oPage>
+		<cfargument name="duplicate" type="boolean" required="false" default="false" hint="Returns a duplicate object instead of the returning the same reference">
+		<cfif arguments.duplicate>
+			<cfreturn duplicate(variables.oPage)>
+		<cfelse>
+			<cfreturn variables.oPage>
+		</cfif>
 	</cffunction>
 	
 	<!---------------------------------------->
