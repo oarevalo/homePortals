@@ -681,7 +681,26 @@
 		</cfloop>
 		<cfreturn this>
 	</cffunction>	
-	
+
+	<cffunction name="setMetaTag" access="public" returnType="pageBean" hint="adds a user-defined meta tag to the page">
+		<cfargument name="name" type="string" required="true">
+		<cfargument name="content" type="string" required="true">
+		<cfset var i = 0>
+		<cfset var st = structNew()>
+		<cfif arguments.name eq "">
+			<cfthrow message="A meta tag must include a non-blank name" type="homePortals.pageBean.invalidMetaTag">
+		</cfif>
+		<cfloop from="1" to="#arrayLen(variables.instance.aMeta)#" index="i">
+			<cfset st = variables.instance.aMeta[i]>
+			<cfif st.name eq arguments.name>
+				<cfset variables.instance.aMeta[i].content = arguments.content>
+				<cfreturn this>
+			</cfif>
+		</cfloop>
+		<cfset addMetaTag(arguments.name,arguments.content)>
+		<cfreturn this>
+	</cffunction>	
+		
 	<cffunction name="removeAllMetaTags" access="public" returnType="pageBean" hint="removes all user-defined meta tags">
 		<cfset variables.instance.aMeta = arrayNew(1)>
 		<cfreturn this>
