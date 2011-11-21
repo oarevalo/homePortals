@@ -79,7 +79,7 @@
 				userConfigBean = createObject("component", "homePortalsConfigBean").init();
 
 				if(structKeyExists(arguments,"config")) {
-					if(isXML(arguments.config) or isXMLDoc(arguments.config))
+					if(isSimpleValue(arguments.config) and isXML(arguments.config) or isXMLDoc(arguments.config))
 						userConfigBean.loadXML(arguments.config);
 					else if(not isSimpleValue(arguments.config))
 						userConfigBean.loadXML(arguments.config.toXML());
