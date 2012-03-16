@@ -1,1 +1,0 @@
-<link rel="stylesheet" type="text/css" href="/homePortals/plugins/modules/resourceLibrary/Modules/PhotoAlbums/lighterbox2/lighterbox2.css" /> 
