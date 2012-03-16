@@ -8,6 +8,20 @@
 		<cfreturn arguments.eventArg />
 	</cffunction>
 
+	<cffunction name="onAppInit" access="public" returntype="void">
+		<cfscript>
+			var oConfig = getHomePortals().getConfig();
+			
+			// add bundled resource library (if required)
+			if(getPluginSetting("loadBundledResourceLibrary")) {
+				oConfig.addResourceLibraryPath( getPluginSetting("bundledReosurceLibraryPath") );
+			}
+
+			// reinitialize environment to include new settings
+			getHomePortals().initEnv(false);
+		</cfscript>
+	</cffunction>
+	
 	<cffunction name="onAfterPageLoad" access="public" returntype="homePortals.components.pageRenderer" hint="this method is executed right before the call to loadPage() returns.">
 		<cfargument name="eventArg" type="homePortals.components.pageRenderer" required="true" hint="a pageRenderer object intialized for the requested page">	
 		<cfscript>
@@ -33,4 +47,16 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="getPluginSetting" access="public" returntype="string">
+		<cfargument name="settingName" type="string" required="true">
+		<cfset var propValue = "">
+		<cfset var stProps = getHomePortals().getConfig().getPageProperties()>
+		<cfif structKeyExists(stProps,"plugins.skins." & arguments.settingName)>
+			<cfset propValue = stProps["plugins.skins." & arguments.settingName]>
+		<cfelseif structKeyExists(stProps,"plugins.skins.defaults." & arguments.settingName)>
+			<cfset propValue = stProps["plugins.skins.defaults." & arguments.settingName]>
+		</cfif>
+		<cfreturn propValue>
+	</cffunction>
+	
 </cfcomponent>

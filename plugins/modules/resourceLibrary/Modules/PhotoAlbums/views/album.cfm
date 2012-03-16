@@ -68,10 +68,11 @@
 	
 	<cfif bIsContentOwner>
 		<div class="SectionToolbar">
-			<a href="javascript:#moduleID#.getPopupView('manager')"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle" alt="Mange Images"></a>
+			<a href="javascript:#moduleID#.getPopupView('manager')"><img src="#imgRoot#/edit-page-yellow.gif" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getPopupView('manager')"><strong>Manager</strong></a>
 			&nbsp;&nbsp;
 			&nbsp;&nbsp;
+			<a href="javascript:#moduleID#.getView()"><img src="#imgRoot#/arrow_refresh.png" border="0" align="absmiddle"></a>
 			<a href="javascript:#moduleID#.getView()"><strong>Refresh Album</strong></a>
 		</div>
 	</cfif>

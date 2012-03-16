@@ -8,9 +8,9 @@
 		</resourceType>
 	</resourceTypes>
 	
-	<!-- Directories where HomePortals will look for resources  -->
-	<resourceLibraryPaths>
-		<resourceLibraryPath>legacy://{pluginPath}/resourceLibrary/</resourceLibraryPath>
-	</resourceLibraryPaths>
-	
+	<pageProperties>
+		<property name="plugins.skins.defaults.bundledReosurceLibraryPath" value="legacy://{pluginPath}/resourceLibrary/" />
+		<property name="plugins.skins.defaults.loadBundledResourceLibrary" value="true" />
+	</pageProperties>
+		
 </homePortals>

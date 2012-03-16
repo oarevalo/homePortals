@@ -25,8 +25,10 @@ function h_setLoadingImg(secID) {
 		else if (document.body) clientHeight = document.body.clientHeight;
 		
 		var d = document.getElementById("h_loading");
-		d.style.left = ((clientWidth/2)-70) + "px";
-		d.style.top = ((clientHeight/2)-100) + "px";
+		if(d) {
+			d.style.left = ((clientWidth/2)-70) + "px";
+			d.style.top = ((clientHeight/2)-100) + "px";
+		}
 	}
 }
 function h_clearLoadingImg() {

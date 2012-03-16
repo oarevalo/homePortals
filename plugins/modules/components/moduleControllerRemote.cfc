@@ -10,20 +10,51 @@
 		<cfargument name="pageHREF" type="any" required="true">
 		<cfargument name="moduleID" type="any" required="true">
 		<cfargument name="homePortals" type="homePortals.components.homePortals" required="true" hint="homeportals application instance">
-		
 		<cfscript>
-			var myConfigBeanStore = createObject("component", "configBeanStore").init();
+			var hp = arguments.homePortals;
+			var mc = 0;
+			var moduleClass = "";
+			var moduleInfoNode = {};
+			var pageBean = 0;
+			var moduleBean = 0;
+			var modulesResDir = "Modules";
 			
-			// verify that the session still exists before initializing the module controller
-			if(myConfigBeanStore.exists(arguments.pageHREF, arguments.moduleID)) {
-				variables.oModuleController = createObject("component","moduleController");
-				variables.oModuleController.init(pageHREF = arguments.pageHREF,
-												moduleID = arguments.moduleID,
-												execMode = 'remote',
-												homePortals = arguments.homePortals);
-			} else {
-				throwAppTimedOut();
+			// load container page (do it through the loader so that we can bypass plugins)
+			pageBean = hp.getPageLoader().load(arguments.pageHREF);	
+			
+			// get the container modulebean
+			moduleBean = pageBean.getModule(arguments.moduleID);
+			
+			// reconstruct the location of the module resource class
+			if(moduleBean.hasProperty("name") and moduleBean.getProperty("name") neq "") {
+				modResBean = hp.getCatalog().getResource("module", moduleBean.getProperty("name"));
+				moduleClass = modResBean.getResourceLibrary().getPath() & "/" & modulesResDir & "/" & moduleBean.getProperty("name");
+
+			} else if(moduleBean.hasProperty("moduleID") and moduleBean.getProperty("moduleID") neq "") {
+				modResBean = oHP.getCatalog().getResource("module", moduleBean.getProperty("moduleID"));
+				moduleClass = modResBean.getResourceLibrary().getPath() & "/" & modulesResDir & "/" & modResBean.getPackage() & "/" & modResBean.getID();
 			}
+			
+			// convert the moduleName into a dot notation path
+			moduleClass = replace(moduleClass,"/",".","ALL");
+			moduleClass = replace(moduleClass,"..",".","ALL");
+			if(left(moduleClass,1) eq ".") moduleClass = right(moduleClass, len(moduleClass)-1);
+
+			// build a struct with module info
+			moduleInfoNode = moduleBean.toStruct();
+			moduleInfoNode["name"] = modResBean.getPackage() & "/" & modResBean.getID();
+			
+			// initialize module controller
+			mc = createObject("component","moduleController").init(pageHREF = arguments.pageHREF,
+																									pageBean = pageBean,
+																									moduleID = arguments.moduleID,
+																									moduleClassLocation = moduleClass,
+																									modulePageSettings = moduleInfoNode,
+																									isFirstInClass = false,
+																									execMode = 'remote',
+																									homePortals = hp);
+			
+			variables.oModuleController = mc;
 			
 			return this;
 		</cfscript>

@@ -38,22 +38,17 @@
 			// add information about the page to moduleNode
 			moduleNode = getContentTag().getModuleBean().toStruct();
 			moduleNode["name"] = modResBean.getPackage() & "/" & modResBean.getID();
-			moduleNode["_page"] = structNew();
-			moduleNode["_page"].href =  getPageRenderer().getPageHREF();
-			if(getPageRenderer().getPage().hasProperty("owner")) 
-				moduleNode["_page"].owner = getPageRenderer().getPage().getProperty("owner");
-			else
-				moduleNode["_page"].owner = "";
 			
 			// instantiate module controller and call constructor
-			oModuleController = createObject("component","homePortals.plugins.modules.components.moduleController");
-			oModuleController.init(getPageRenderer().getPageHREF(), 
-									moduleID, 
-									moduleName, 
-									moduleNode, 
-									bIsFirstInClass, 
-									"local", 
-									getPageRenderer().getHomePortals());
+			oModuleController = createObject("component","homePortals.plugins.modules.components.moduleController")
+												.init(getPageRenderer().getPageHREF(), 
+														getPageRenderer().getPage(),
+														moduleID, 
+														moduleName, 
+														moduleNode, 
+														bIsFirstInClass, 
+														"local", 
+														getPageRenderer().getHomePortals());
 
 			// render html content
 			arguments.headContentBuffer.append( oModuleController.renderClientInit() );
