@@ -72,7 +72,7 @@
 					createStorageDoc();
 					saveStorageDoc();
 				} else {
-					throw("The given storage document does not exist. Please provide the URL of an existing storage location. Requested document was #tmpURL#");
+					throwException("The given storage document does not exist. Please provide the URL of an existing storage location. Requested document was #tmpURL#");
 				}
 			}
 			
@@ -228,7 +228,7 @@
 	<!---------------------------------------->
 	<!--- throw                            --->
 	<!---------------------------------------->
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string" required="yes">
 		<cfthrow message="#arguments.message#">
 	</cffunction>

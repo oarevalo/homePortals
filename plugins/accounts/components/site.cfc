@@ -16,7 +16,7 @@
 		<cfargument name="owner" type="string" required="true" hint="The owner of the site to load. this is the name of a homeportals account">
 		<cfargument name="accounts" type="accounts" required="true" hint="This is a reference to the Accounts object">
 		<cfscript>
-			if(arguments.owner eq "") throw("Page owner is missing or blank","homePortals.site.pageOwnerMissing");
+			if(arguments.owner eq "") throwException("Page owner is missing or blank","homePortals.site.pageOwnerMissing");
 			
 			setAccountsService( arguments.accounts );
 			setOwner( arguments.owner );
@@ -111,7 +111,7 @@
 			var pageIndex = 0;
 			
 			if(isLinkedPage(arguments.oldPageName)) 
-				throw("A linked page cannot be modified from within a site", "homePortals.site.notAllowed");
+				throwException("A linked page cannot be modified from within a site", "homePortals.site.notAllowed");
 				
 			// get the location of the page (this will also check for existence)
 			href = getPageHREF(arguments.oldPageName);
@@ -144,7 +144,7 @@
 
 			// find page in site
 			pageIndex = getPageIndex(arguments.pageName);
-			if(pageIndex eq 0) throw("Page not found in site.","homePortals.site.pageNotFound");
+			if(pageIndex eq 0) throwException("Page not found in site.","homePortals.site.pageNotFound");
 			
 			// if not page title is given then get the actual title from the page
 			// this allows to have a different title on the site than on the page
@@ -266,7 +266,7 @@
 
 			// check that pagename is not empty 
 			if(arguments.pageName eq "") 
-				throw("Please enter a name for the new page","homePortals.site.pageNameMissing");
+				throwException("Please enter a name for the new page","homePortals.site.pageNameMissing");
 
 			// make sure directory structure exists
 			create( getOwner(), getAccountsService() );
@@ -384,8 +384,8 @@
 			var aPages = getPages();
 			
 			// check that pagename is not empty 
-			if(arguments.pageName eq "") throw("Please enter a name for the new page","homePortals.site.pageNameMissing");
-			if(arguments.pageHREF eq "") throw("Please the path of the page to link","homePortals.site.pagePathMissing");
+			if(arguments.pageName eq "") throwException("Please enter a name for the new page","homePortals.site.pageNameMissing");
+			if(arguments.pageHREF eq "") throwException("Please the path of the page to link","homePortals.site.pagePathMissing");
 
 			// check if the page is already linked to this site
 			getLinkedPagesDAO().search();
@@ -482,11 +482,11 @@
 			if(arguments.checkIfExists) {
 				// check if page exists on site
 				pageIndex = getPageIndex(arguments.pageName);
-				if(pageIndex eq 0) throw("Page not found in site [#arguments.pageName#].","homePortals.site.pageNotFound");
+				if(pageIndex eq 0) throwException("Page not found in site [#arguments.pageName#].","homePortals.site.pageNotFound");
 
 				// check if page exists on file system
 				if(not getPageProvider().pageExists(href))
-					throw("Page not found in storage [#href#].","homePortals.site.pageNotFound");
+					throwException("Page not found in storage [#href#].","homePortals.site.pageNotFound");
 			}
 
 			// create page location
@@ -646,7 +646,7 @@
 	<!--- U T I L I T Y     M E T H O D S  --->
 	<!---------------------------------------->
 
-	<cffunction name="throw" access="private" hint="Facade for cfthrow">
+	<cffunction name="throwException" access="private" hint="Facade for cfthrow">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" required="false" default="homePortals.site.error">
 		<cfthrow  message="#arguments.message#" type="#arguments.type#">

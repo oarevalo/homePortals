@@ -25,7 +25,7 @@
 	
 	// make sure user is the owner
 	if(Not bIsBlogOwner)
-		throw("You must be signed-in as the owner of this page in order to add or modify blog postings.");
+		throwException("You must be signed-in as the owner of this page in order to add or modify blog postings.");
 
 	stEntry = StructNew();
 	if(arrayLen(aEntries) eq 0) {

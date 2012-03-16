@@ -25,7 +25,7 @@
 	if(arguments.rss neq "") rssURL = arguments.rss;
 
 	// get requested post
-	if(rssURL eq "") throw("<em>No RSS provided.</em>");
+	if(rssURL eq "") throwException("<em>No RSS provided.</em>");
 	feed = oRSSReaderService.getRSS(rssURL);
 	myFeedNode = oRSSReaderService.getRSSPost(rssURL, arguments.link);
 		

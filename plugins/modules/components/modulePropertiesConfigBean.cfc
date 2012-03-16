@@ -27,7 +27,7 @@
 		
 			// read configuration file
 			if(Not fileExists(arguments.configFilePath))
-				throw("Configuration file not found [#configFilePath#]","","homePortals.modulePropertiesConfigBean.configFileNotFound");
+				throwException("Configuration file not found [#configFilePath#]","","homePortals.modulePropertiesConfigBean.configFileNotFound");
 			else
 				xmlConfigDoc = xmlParse(arguments.configFilePath);
 							
@@ -145,7 +145,7 @@
 		<cfreturn qry>
 	</cffunction>
 
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 
 		<cfargument name="type" type="string" default="custom"> 

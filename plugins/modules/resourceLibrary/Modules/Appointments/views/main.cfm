@@ -58,7 +58,7 @@
 				break;
 			}
 			default: {
-				throw("view type not recognized");
+				throwException("view type not recognized");
 			}
 		}
 			

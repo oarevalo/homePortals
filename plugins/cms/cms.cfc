@@ -203,7 +203,7 @@
 				
 				// check if this is the site's homepage
 				if(variables.homePortals.getConfig().getDefaultPage() eq arguments.pageHREF) {
-					throw("This is page is set as the site's Homepage. Cannot delete.");
+					throwException("This is page is set as the site's Homepage. Cannot delete.");
 				}
 				
 				variables.homePortals.getPageProvider().delete(arguments.pageHREF);
@@ -270,7 +270,7 @@
 		<cftry>
 			<cfscript>
 				validateOwner();
-				if(arguments.pageName eq "") throw("The page title cannot be blank.");
+				if(arguments.pageName eq "") throwException("The page title cannot be blank.");
 		
 				// rename the actual page 
 				variables.homePortals.getPageProvider().move(variables.pageHREF, arguments.pageName);
@@ -471,7 +471,7 @@
 									pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 									path = getTempFile(getTempDirectory(),"cmsPluginFileUpload");
 									stFileInfo = fileUpload(arguments[resPrefix & "_file"], path);
-									if(not stFileInfo.fileWasSaved)	throw("File upload failed");
+									if(not stFileInfo.fileWasSaved)	throwException("File upload failed");
 									path = stFileInfo.serverDirectory & pathSeparator & stFileInfo.serverFile;
 					
 									oResourceBean.getResourceLibrary().addResourceFile(oResourceBean, 
@@ -666,7 +666,7 @@
 		   				numLocs = 1;
    					}
    				}
-   				if(locType eq "") throw("Location not found");
+   				if(locType eq "") throwException("Location not found");
 
    				for(i=1;i lte arrayLen(locs);i++) {
    					if(locs[i].type eq locType and locs[i].name neq arguments.locationName) {
@@ -678,7 +678,7 @@
 					oPage.removeLayoutRegion(arguments.locationName);
 					savePage();
 				} else {
-					throw("You cannot delete all containers for a given region type");
+					throwException("You cannot delete all containers for a given region type");
 				}
    			</cfscript>			
    			<script>
@@ -702,9 +702,9 @@
 				pp = variables.homePortals.getPageProvider();
 				name = trim(name);
    				
-   				if(name eq "") throw("Folder name cannot be blank");
+   				if(name eq "") throwException("Folder name cannot be blank");
 				if(pp.folderExists(parent & "/" & name))
-					throw("You are trying to create a folder that already exists");
+					throwException("You are trying to create a folder that already exists");
 			
 				pp.createFolder(parent,name);
    			</cfscript>			
@@ -751,7 +751,7 @@
    				
    				// check if we need to change password
    				if(newPassword neq "") {
-   					if(newPassword neq newPassword2) throw("Passwords do not match");
+   					if(newPassword neq newPassword2) throwException("Passwords do not match");
    					oCatalog = variables.homePortals.getCatalog();
    					resNode = oCatalog.getResource("cmsUser",getUserInfo().username,true);
 					resNode.setProperty("password",hash(arguments.newPassword,'SHA','utf-8'));
@@ -763,7 +763,7 @@
    				if(arguments.defaultPage neq variables.homePortals.getConfig().getDefaultPage()) {
    					// check that we are using an existing page
    					if(not variables.homePortals.getPageProvider().pageExists(arguments.defaultPage)) {
-   						throw("The page entered as homepage does not exist. Please use an existing page");
+   						throwException("The page entered as homepage does not exist. Please use an existing page");
    					}
    					
    					// set homepage
@@ -878,7 +878,7 @@
 					pathSeparator =  createObject("java","java.lang.System").getProperty("file.separator");
 					path = getTempFile(getTempDirectory(),"cmsPluginFileUpload");
 					stFileInfo = fileUpload(arguments[resPrefix & "_file"], path);
-					if(not stFileInfo.fileWasSaved)	throw("File upload failed");
+					if(not stFileInfo.fileWasSaved)	throwException("File upload failed");
 					path = stFileInfo.serverDirectory & pathSeparator & stFileInfo.serverFile;
 	
 					oResourceBean.getResourceLibrary().addResourceFile(oResourceBean, 
@@ -993,7 +993,7 @@
 	<!---------------------------------------->
 	<!--- throw                            --->
 	<!---------------------------------------->
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string" required="yes">
 		<cfthrow message="#arguments.message#">
 	</cffunction>

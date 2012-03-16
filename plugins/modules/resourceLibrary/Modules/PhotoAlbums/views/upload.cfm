@@ -15,7 +15,7 @@
 		
 	// check if current user is owner
 	bIsContentOwner = (stUser.username eq myContentStore.getOwner());
-	if(not bIsContentOwner) throw("You must be signed-in and be the owner of this page to make changes.");
+	if(not bIsContentOwner) throwException("You must be signed-in and be the owner of this page to make changes.");
 
 	// get all photo albums
 	aAlbums = xmlSearch(xmlDoc,"//photoAlbum");

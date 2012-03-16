@@ -45,7 +45,7 @@
 
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 			
 			if(arguments.noteID eq "") arguments.noteID eq "CURRENT";
@@ -87,7 +87,7 @@
 
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 		
 			tmpNode = xmlDoc.xmlRoot;

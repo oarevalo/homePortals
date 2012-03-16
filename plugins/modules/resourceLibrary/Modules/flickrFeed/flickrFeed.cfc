@@ -60,9 +60,9 @@
 				if(xmlDoc.xmlRoot.xmlAttributes.stat eq "ok")
 					rtn = xmlDoc.xmlRoot.user.xmlAttributes.id;
 				else
-					throw("#xmlDoc.xmlRoot.err.xmlAttributes.msg#");
+					throwException("#xmlDoc.xmlRoot.err.xmlAttributes.msg#");
 			} else {
-				throw("Something happened while checking for user id. Status Code: #cfhttp.StatusCode#");
+				throwException("Something happened while checking for user id. Status Code: #cfhttp.StatusCode#");
 			}
 		</cfscript>
 			

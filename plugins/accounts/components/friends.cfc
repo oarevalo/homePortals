@@ -115,11 +115,11 @@
 					
 			// check if the frienship exists 
 			if(isFriend(arguments.sender, arguments.recipient))
-				throw("#arguments.sender# and #arguments.recipient# are already friends","homeportals.friends.friendshipExists");
+				throwException("#arguments.sender# and #arguments.recipient# are already friends","homeportals.friends.friendshipExists");
 
 			// check if the frienship request exists 
 			if(hasFriendRequest(arguments.sender, arguments.recipient) or hasFriendRequest(arguments.recipient, arguments.sender))
-				throw("The is already a frdiendship request between #arguments.sender# and #arguments.recipient#","homeportals.friends.alreadyInvited");
+				throwException("The is already a frdiendship request between #arguments.sender# and #arguments.recipient#","homeportals.friends.alreadyInvited");
 			
 			// add friendship request
 			dao.save(accountName = arguments.sender,
@@ -172,7 +172,7 @@
 
 			// check that dataprovider exists
 			if(not fileExists(expandPath("/homePortals/plugins/accounts/components/lib/DAOFactory/" & storageType & "DataProviderConfigBean.cfc")))
-				throw("Accounts storage type [#storageType#] is not supported","","homePortals.accounts.invalidStorageType");
+				throwException("Accounts storage type [#storageType#] is not supported","","homePortals.accounts.invalidStorageType");
 					
 			// create config		
 			oConfigBean = createObject("component", pkgPath & storageType & "DataProviderConfigBean").init();
@@ -202,7 +202,7 @@
 		<cfreturn oDAO>
 	</cffunction>	
 				
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="custom"> 
 		<cfthrow message="#arguments.message#" type="#arguments.type#">

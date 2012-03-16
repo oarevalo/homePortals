@@ -28,7 +28,7 @@
 	<!---------------------------------------->
 	<!--- throw			                   --->
 	<!---------------------------------------->		
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string" required="false" default="">
 		<cfargument name="detail" type="string" required="false" default="">
 		<cfargument name="type" type="string" required="false" default="custom">

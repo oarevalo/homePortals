@@ -52,7 +52,7 @@
 		<cfset var resID = "">
 				
 		<cfscript>
-			if(arguments.body eq "") throw("The content body cannot be empty"); 
+			if(arguments.body eq "") throwException("The content body cannot be empty"); 
 
 			// get owner
 			stUser = this.controller.getUserInfo();
@@ -99,7 +99,7 @@
 		<cfset var stUser = structNew()>
 		
 		<cfscript>
-			if(arguments.resourceID eq "") throw("Select a resource to delete.");
+			if(arguments.resourceID eq "") throwException("Select a resource to delete.");
 
 			// get owner
 			stUser = this.controller.getUserInfo();

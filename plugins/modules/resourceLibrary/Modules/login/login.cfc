@@ -116,7 +116,7 @@ Also processes cookie logins.
 	<!---------------------------------------->
 	<!--- throw                            --->
 	<!---------------------------------------->
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string" required="yes">
 		<cfthrow message="#arguments.message#">
 	</cffunction>

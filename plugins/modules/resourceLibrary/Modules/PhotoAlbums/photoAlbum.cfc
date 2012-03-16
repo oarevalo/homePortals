@@ -28,7 +28,7 @@
 					
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 
 			// create new photoAlbum 
@@ -65,7 +65,7 @@
 
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 
 			// delete photoAlbum 
@@ -112,7 +112,7 @@
 					
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 
 			// delete image
@@ -189,7 +189,7 @@
 					
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 		</cfscript>
 		

@@ -38,9 +38,9 @@
 			var csStorePath = "";
 		
 			// validate the module info
-			if(arguments.pageHREF eq "") throw("Page HREF cannot be blank","homePortals.moduleController.missingPageHREF");
-			if(arguments.moduleID eq "") throw("Module ID cannot be blank","homePortals.moduleController.missingModuleID");
-			if(arguments.moduleClassLocation eq "" and arguments.execMode eq "local") throw("Module class location cannot be blank","homePortals.moduleController.missingModuleClassLocation");
+			if(arguments.pageHREF eq "") throwException("Page HREF cannot be blank","homePortals.moduleController.missingPageHREF");
+			if(arguments.moduleID eq "") throwException("Module ID cannot be blank","homePortals.moduleController.missingModuleID");
+			if(arguments.moduleClassLocation eq "" and arguments.execMode eq "local") throwException("Module class location cannot be blank","homePortals.moduleController.missingModuleClassLocation");
 		
 			// initialize instance variables
 			variables.pageHREF = arguments.pageHREF;
@@ -195,7 +195,7 @@
 		<cfargument name="APIObjectName" type="string" required="true">
 		<cfscript>
 			var o = 0;
-			if(findoneof("/\",arguments.APIObjectName)) throw("Invalid API object name");
+			if(findoneof("/\",arguments.APIObjectName)) throwException("Invalid API object name");
 			o = createObject("component", "homePortals.components." & arguments.APIObjectName);
 		</cfscript>
 		<cfreturn o>
@@ -549,7 +549,7 @@
 	<!---------------------------------------->
 	<!--- throw                            --->
 	<!---------------------------------------->
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string" required="yes">
 		<cfargument name="type" type="string" required="no" default="homePortals.moduleController.exception">
 		<cfthrow message="#arguments.message#" type="#arguments.type#">

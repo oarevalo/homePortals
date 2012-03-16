@@ -32,15 +32,15 @@
 			var tmpDate = 0;
 
 			// validate form
-			if(arguments.time eq "" and arguments.subject eq "") throw("Both time and subject cannot be empty");
-			if(arguments.date eq "") throw("Please enter the date of the appointment");
+			if(arguments.time eq "" and arguments.subject eq "") throwException("Both time and subject cannot be empty");
+			if(arguments.date eq "") throwException("Please enter the date of the appointment");
 			
 			// check for recognized values of date and time
 			if(arguments.date eq "today") arguments.date = now();
 			if(arguments.date eq "tomorrow") arguments.date = dateAdd("d",1,now());
 			if(arguments.date eq "yesterday") arguments.date = dateAdd("d",-1,now());
 			
-			if(Not isDate(arguments.date)) throw("Please enter a valid date");
+			if(Not isDate(arguments.date)) throwException("Please enter a valid date");
 			
 			// parse date
 			tmpDate = dateFormat(arguments.date,"mm/dd/yyyy");
@@ -52,7 +52,7 @@
 	
 			// check that we are updating the blog from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("Only the owner can make changes.");
+				throwException("Only the owner can make changes.");
 			}
 		
 			aUpdateNode = xmlSearch(xmlDoc, "//item[@id='#arguments.id#']");
@@ -106,7 +106,7 @@
 	
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 	
 			tmpNode = xmlDoc.xmlRoot;

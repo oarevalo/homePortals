@@ -53,7 +53,7 @@
 				if(listLen(a,"_") gt 1 and listFirst(a,"_") eq "outputName") {
 					argName = listRest(a,"_");
 					if(arguments[a] neq "") {
-						if(listlen(arguments[a]," ") gt 1) throw("Output argument names cannot contain spaces");
+						if(listlen(arguments[a]," ") gt 1) throwException("Output argument names cannot contain spaces");
 						cfg.setPageSetting("outputs_#argName#", arguments["outputExpr_#argName#"]);
 						lstArgs = listAppend(lstArgs,argName);
 					} else {

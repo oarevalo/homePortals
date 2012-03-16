@@ -62,7 +62,7 @@
 
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 				
 			// make sure the <body> node exists
@@ -110,7 +110,7 @@
 
 			// check that we are updating the content store from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("You must be signed-in and be the owner of this page to make changes.");
+				throwException("You must be signed-in and be the owner of this page to make changes.");
 			}
 		
 			if(arguments.index lte arrayLen(xmlDoc.xmlRoot.body.xmlChildren))
@@ -176,7 +176,7 @@
 			tmpURL = cfg.getPageSetting("url");
 			
 			if(left(tmpURL,4) eq "http") {
-				throw("Remote documents cannot be modified.");
+				throwException("Remote documents cannot be modified.");
 			}
 			
 			cs_cfg.setURL(tmpURL);

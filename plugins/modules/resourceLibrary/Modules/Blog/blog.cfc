@@ -51,13 +51,13 @@
 
 			// check that we are updating the blog from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("Only the owner of this blog can make changes.");
+				throwException("Only the owner of this blog can make changes.");
 			}
 		
 			// check if we find the entry the caller say we are updating
 			aUpdateNode = xmlSearch(xmlDoc, "//entry[created='#arguments.created#']");
 
-			if(content eq "") throw("Entry content cannot be empty");
+			if(content eq "") throwException("Entry content cannot be empty");
 
 			if(arguments.created eq "" or arrayLen(aUpdateNode) eq 0) {
 				// create new node
@@ -114,7 +114,7 @@
 
 			// check that we are updating the blog from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("Only the owner of this blog can make changes.");
+				throwException("Only the owner of this blog can make changes.");
 			}
 		
 			tmpNode = xmlDoc.blog;
@@ -199,7 +199,7 @@
 
 			// check that we are updating the blog from the owners page
 			if(this.controller.getUserInfo().username neq myContentStore.getOwner()) {
-				throw("Only the owner of this blog can make changes.");
+				throwException("Only the owner of this blog can make changes.");
 			}
 		
 			if(Not isDefined("xmlDoc.xmlRoot.description"))

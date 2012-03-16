@@ -91,8 +91,8 @@ History:
 		<cfset var siteOwner = "">
 				
 		<cfscript>
-			if(arguments.rssURL eq "") throw("The feed URL cannot be empty"); 
-			if(arguments.feedName eq "") throw("The feed title cannot be empty"); 
+			if(arguments.rssURL eq "") throwException("The feed URL cannot be empty"); 
+			if(arguments.feedName eq "") throwException("The feed title cannot be empty"); 
 
 			if(left(arguments.rssURL,4) neq "http") arguments.rssURL = "http://" & arguments.rssURL;
 
@@ -134,7 +134,7 @@ History:
 		<cfset var stUser = structNew()>
 		
 		<cfscript>
-			if(arguments.feedID eq "") throw("The feed ID cannot be empty.");
+			if(arguments.feedID eq "") throwException("The feed ID cannot be empty.");
 
 			// get owner
 			stUser = this.controller.getUserInfo();

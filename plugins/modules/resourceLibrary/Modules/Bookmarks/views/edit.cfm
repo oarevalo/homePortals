@@ -30,7 +30,7 @@
 	}
 
 	if(not bIsContentOwner) 
-		throw("Only the owner of this bookmarks list is allowed to make changes to it."); 
+		throwException("Only the owner of this bookmarks list is allowed to make changes to it."); 
 
 	// create description for each item 
 	stHelp = StructNew();
