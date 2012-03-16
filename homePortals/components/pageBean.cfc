@@ -46,7 +46,7 @@
 			else if(isXMLDoc(arguments.pageXML))
 				xmlDoc = arguments.pageXML;
 			else
-				throw("Invalid argument. Argument must be either an xml string or an xml object","homePortals.pageBean.invalidArgument");
+				throwException("Invalid argument. Argument must be either an xml string or an xml object","homePortals.pageBean.invalidArgument");
 				
 
 			// initialize default page properties
@@ -579,7 +579,7 @@
 		<cfscript>
 			arguments.moduleBean = normalizeModule(arguments.moduleBean, arguments.location);
 			if(structKeyExists(variables.instance.stModuleIndex, arguments.moduleBean.getID()))
-				throw("Module ID already in use","homePortals.pageBean.duplicateModuleID");
+				throwException("Module ID already in use","homePortals.pageBean.duplicateModuleID");
 			arrayAppend(variables.instance.aModules, arguments.moduleBean);
 			indexModules();
 			return this;
@@ -635,13 +635,13 @@
 			/* validate required fields */
 
 			if(arguments.moduleBean.getID() eq "") 
-				throw("Module ID cannot be empty","homePortals.pageBean.blankModuleID");
+				throwException("Module ID cannot be empty","homePortals.pageBean.blankModuleID");
 				
 		//	if(arguments.moduleBean.getLocation() eq "") 
-		//		throw("Module location cannot be empty","homePortals.pageBean.blankModuleLocation");
+		//		throwException("Module location cannot be empty","homePortals.pageBean.blankModuleLocation");
 				
 			if(arguments.moduleBean.getModuleType() eq "") 
-				throw("Module type cannot be empty","homePortals.pageBean.missingModuleType");
+				throwException("Module type cannot be empty","homePortals.pageBean.missingModuleType");
 
 			return arguments.moduleBean;
 		</cfscript>
@@ -870,7 +870,7 @@
 		<Cfabort>
 	</cffunction>
 	
-	<cffunction name="throw" access="private" hint="facade for cfthrow" returntype="void">
+	<cffunction name="throwException" access="private" hint="facade for cfthrow" returntype="void">
 		<cfargument name="message" type="string" required="true">
 		<cfargument name="type" type="string" required="true"> 
 		<cfthrow message="#arguments.message#" type="#arguments.type#">

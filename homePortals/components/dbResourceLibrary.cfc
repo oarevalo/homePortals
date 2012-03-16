@@ -186,14 +186,14 @@
 			var tableName = "";
 
 			// validate bean			
-			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
-			if(rb.getType() eq "") throw("No resource type has been specified for the resource","homePortals.resourceLibrary.validation");
-			if(rb.getPackage() eq "") throw("No package has been specified for the resource","homePortals.resourceLibrary.validation");
+			if(rb.getID() eq "") throwException("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
+			if(rb.getType() eq "") throwException("No resource type has been specified for the resource","homePortals.resourceLibrary.validation");
+			if(rb.getPackage() eq "") throwException("No package has been specified for the resource","homePortals.resourceLibrary.validation");
 
 			rt = reg.getResourceType(resType); // resource type object
 			tableName = getResourceTableName(rt);
 			lstFields = getResourceTableColumnList(rt);
-			if(not reg.hasResourceType(resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
+			if(not reg.hasResourceType(resType)) throwException("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
 		
 			// make sure resource table exists
 			if(!resourceTableExists(rt))
@@ -625,7 +625,7 @@
 		<cffile action="delete" file="#arguments.path#">
 	</cffunction>	
 	
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 
 		<cfthrow message="#arguments.message#" type="#arguments.type#">

@@ -344,7 +344,7 @@
 	<!---------------------------------------->
 	<!--- P R I V A T E     M E T H O D S  --->
 	<!---------------------------------------->	
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" required="false" default="homePortals.page.exception">
 		<cfthrow  message="#arguments.message#" type="#arguments.type#">
