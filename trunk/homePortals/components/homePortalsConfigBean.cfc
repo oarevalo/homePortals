@@ -58,7 +58,7 @@
 			
 			// read configuration file
 			if(Not fileExists(arguments.configFilePath))
-				throw("Configuration file not found [#configFilePath#]","","homePortals.config.configFileNotFound");
+				throwException("Configuration file not found [#configFilePath#]","","homePortals.config.configFileNotFound");
 			else
 				xmlConfigDoc = xmlParse(arguments.configFilePath);
 
@@ -81,7 +81,7 @@
 			else if(isXMLDoc(arguments.configXML))
 				xmlConfigDoc = arguments.configXML;
 			else
-				throw("Invalid argument. Argument must be either an xml string or an xml object","homePortals.homePortalsConfigBean.invalidArgument");
+				throwException("Invalid argument. Argument must be either an xml string or an xml object","homePortals.homePortalsConfigBean.invalidArgument");
 
 
 			// get version
@@ -106,7 +106,7 @@
 						if(xmlThisNode.xmlName eq "resource") {
 							// make sure we have a type attribute
 							if(Not structKeyExists(xmlThisNode.xmlAttributes,"type"))
-								throw("HomePortals config file is malformed. Missing TYPE attribute for baseResource","","homePortals.config.configFileNotValid");
+								throwException("HomePortals config file is malformed. Missing TYPE attribute for baseResource","","homePortals.config.configFileNotValid");
 
 							// store baseresources indexed by type
 							if(Not structKeyExists(variables.stConfig.resources, xmlThisNode.xmlAttributes.type)) {
@@ -130,11 +130,11 @@
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"name"))
-							throw("HomePortals config file is malformed. Missing 'name' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
+							throwException("HomePortals config file is malformed. Missing 'name' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"type"))
-							throw("HomePortals config file is malformed. Missing 'type' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
+							throwException("HomePortals config file is malformed. Missing 'type' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"href"))
-							throw("HomePortals config file is malformed. Missing 'href' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
+							throwException("HomePortals config file is malformed. Missing 'href' attribute for element 'renderTemplate'","","homePortals.config.configFileNotValid");
 						
 						key = xmlNode.xmlChildren[j].xmlAttributes.name;
 						thisKey = xmlNode.xmlChildren[j].xmlAttributes.type;
@@ -168,9 +168,9 @@
 					for(j=1;j lte ArrayLen(xmlNode.xmlChildren);j=j+1) {
 
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"moduleType"))
-							throw("HomePortals config file is malformed. Missing 'moduleType' attribute for element 'contentRenderer'","","homePortals.config.configFileNotValid");
+							throwException("HomePortals config file is malformed. Missing 'moduleType' attribute for element 'contentRenderer'","","homePortals.config.configFileNotValid");
 						if(Not structKeyExists(xmlNode.xmlChildren[j].xmlAttributes,"path"))
-							throw("HomePortals config file is malformed. Missing 'path' attribute for element 'contentRenderer'","","homePortals.config.configFileNotValid");
+							throwException("HomePortals config file is malformed. Missing 'path' attribute for element 'contentRenderer'","","homePortals.config.configFileNotValid");
 
 						variables.stConfig.contentRenderers[ xmlNode.xmlChildren[j].xmlAttributes.moduleType ] = xmlNode.xmlChildren[j].xmlAttributes.path;
 					}
@@ -191,7 +191,7 @@
 						stTemp.properties = structNew();
 
 						if(Not structKeyExists(xmlThisNode.xmlAttributes,"name"))
-							throw("HomePortals config file is malformed. Missing 'name' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
+							throwException("HomePortals config file is malformed. Missing 'name' attribute for element 'plugin'","","homePortals.config.configFileNotValid");
 						else
 							stTemp.name = xmlThisNode.xmlAttributes.name;
 
@@ -222,7 +222,7 @@
 						if(xmlThisNode.xmlName eq "resourceType") {
 
 							if(Not structKeyExists(xmlThisNode.xmlAttributes,"name"))
-								throw("HomePortals config file is malformed. Missing 'name' attribute for element 'resourceType'","","homePortals.config.configFileNotValid");
+								throwException("HomePortals config file is malformed. Missing 'name' attribute for element 'resourceType'","","homePortals.config.configFileNotValid");
 
 							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ] = structNew();
 							variables.stConfig.resourceTypes[ xmlThisNode.xmlAttributes.name ].name = xmlThisNode.xmlAttributes.name;
@@ -283,9 +283,9 @@
 						if(xmlThisNode.xmlName eq "resourceLibraryType") {
 							
 							if(Not structKeyExists(xmlThisNode.xmlAttributes,"prefix"))
-								throw("HomePortals config file is malformed. Missing 'prefix' attribute for element 'resourceLibraryType'","","homePortals.config.configFileNotValid");
+								throwException("HomePortals config file is malformed. Missing 'prefix' attribute for element 'resourceLibraryType'","","homePortals.config.configFileNotValid");
 							if(Not structKeyExists(xmlThisNode.xmlAttributes,"path"))
-								throw("HomePortals config file is malformed. Missing 'path' attribute for element 'resourceLibraryType'","","homePortals.config.configFileNotValid");
+								throwException("HomePortals config file is malformed. Missing 'path' attribute for element 'resourceLibraryType'","","homePortals.config.configFileNotValid");
 							
 							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ] = structNew();
 							variables.stConfig.resourceLibraryTypes[ xmlThisNode.xmlAttributes.prefix ].prefix = xmlThisNode.xmlAttributes.prefix;
@@ -1177,7 +1177,7 @@
 		<cfreturn this>
 	</cffunction>	
 
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 
 		<cfargument name="type" type="string" default="custom"> 

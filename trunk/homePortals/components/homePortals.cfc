@@ -395,7 +395,7 @@
 		<cfabort>
 	</cffunction>
 		
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="detail" type="string" default=""> 
 		<cfargument name="type" type="string" default="custom"> 

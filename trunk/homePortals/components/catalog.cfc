@@ -275,7 +275,7 @@
 
 	<!--- * * * *     U T I L I T Y     M E T H O D S   * * * * 	   --->	
 	
-	<cffunction name="throw" access="private" returntype="void" hint="facade for cfthrow">
+	<cffunction name="throwException" access="private" returntype="void" hint="facade for cfthrow">
 		<cfargument name="message" type="string" required="false" default="">
 		<cfargument name="type" type="string" required="false" default="">
 		<cfthrow message="#arguments.message#" type="#arguments.type#">

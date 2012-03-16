@@ -166,7 +166,7 @@
 			var qry = 0;
 			
 			// check that resourceID is not empty
-			if(arguments.resourceID eq "") throw("Resource ID cannot be blank","HomePortals.resourceLibrary.blankResourceID");
+			if(arguments.resourceID eq "") throwException("Resource ID cannot be blank","HomePortals.resourceLibrary.blankResourceID");
 			
 			// if there is no package, then we need to look in all packages
 			if(arguments.packageName eq "") {
@@ -181,7 +181,7 @@
 						}
 					}
 				}
-				throw("The requested resource [#arguments.packageName#][#arguments.resourceID#] was not found",
+				throwException("The requested resource [#arguments.packageName#][#arguments.resourceID#] was not found",
 						"homePortals.resourceLibrary.resourceNotFound");
 			}
 			
@@ -217,7 +217,7 @@
 			}
 			
 			if( isSimpleValue(oResourceBean) ) {
-				throw("The requested resource [#arguments.packageName#][#arguments.resourceID#] was not found",
+				throwException("The requested resource [#arguments.packageName#][#arguments.resourceID#] was not found",
 						"homePortals.resourceLibrary.resourceNotFound");
 			}
 
@@ -246,10 +246,10 @@
 			var isNew = true;
 		
 			// validate bean			
-			if(rb.getID() eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
-			if(rb.getType() eq "") throw("No resource type has been specified for the resource","homePortals.resourceLibrary.validation");
-			if(rb.getPackage() eq "") throw("No package has been specified for the resource","homePortals.resourceLibrary.validation");
-			if(not reg.hasResourceType(resType)) throw("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
+			if(rb.getID() eq "") throwException("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
+			if(rb.getType() eq "") throwException("No resource type has been specified for the resource","homePortals.resourceLibrary.validation");
+			if(rb.getPackage() eq "") throwException("No package has been specified for the resource","homePortals.resourceLibrary.validation");
+			if(not reg.hasResourceType(resType)) throwException("The resource type is invalid or not supported","homePortals.resourceLibrary.invalidResourceType");
 			
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( rb.getType(), rb.getPackage() );
@@ -326,9 +326,9 @@
 			var resType = reg.getResourceType(arguments.resourceType);
 			var defaultExtension = listFirst(resType.getFileTypes());
 			
-			if(arguments.id eq "") throw("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
-			if(arguments.package eq "") throw("No folder has been specified","homePortals.resourceLibrary.validation");
-			if(not reg.hasResourceType(arguments.resourceType)) throw("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
+			if(arguments.id eq "") throwException("The ID of the resource cannot be empty","homePortals.resourceLibrary.validation");
+			if(arguments.package eq "") throwException("No folder has been specified","homePortals.resourceLibrary.validation");
+			if(not reg.hasResourceType(arguments.resourceType)) throwException("The resource type is invalid","homePortals.resourceLibrary.invalidResourceType");
 
 			// get location of descriptor file
 			infoHREF = getResourceDescriptorFilePath( arguments.resourceType, arguments.package  );
@@ -766,7 +766,7 @@
 		<cfdirectory action="delete" directory="#ExpandPath(arguments.path)#" recurse="true">
 	</cffunction>
 							
-	<cffunction name="throw" access="private">
+	<cffunction name="throwException" access="private">
 		<cfargument name="message" type="string">
 		<cfargument name="type" type="string" default="homePortals.resourceLibrary.exception"> 
 		<cfthrow message="#arguments.message#" type="#arguments.type#">
