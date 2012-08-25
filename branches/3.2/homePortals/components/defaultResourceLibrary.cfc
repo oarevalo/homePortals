@@ -246,7 +246,6 @@
 				// create file descriptor
 				xmlDoc = xmlNew();
 				xmlDoc.xmlRoot = xmlElemNew(xmlDoc, "resLib");
-				xmlDoc.xmlRoot.xmlAttributes["type"] = rb.getType();
 				
 				// check if there are already resources in this package
 				// that can be inferred from the directory contents
@@ -494,32 +493,40 @@
 			var xmlDescriptorDoc = 0;
 			var i = 0;
 			var xpath = "";
-			var oResourceBean = 0; 
 			var aResBeans = arrayNew(1); 
-			var aNodes = arrayNew(1);
+			var lst = "";
 
 			// read resource descriptor
 			infoHREF = getResourceDescriptorFilePath(arguments.resourceType, arguments.packageName);
 			xmlDescriptorDoc = xmlParse(infoHREF);
-			
+
 			if(arguments.resourceID neq "") {
-				xpath = "//resLib[@type='#arguments.resourceType#']/resource[@id='#arguments.resourceID#']";
+				// search for resource by ID directly (will only look for matching type/id)
+				xpath = "//resLib/resource[@id='#arguments.resourceID#'][@type='#arguments.resourceType#']";
+				aResBeans = loadResourcesFromXMLPath(xmlDescriptorDoc, xpath, packageName, resourceType);
+				if(!arrayLen(aResBeans)) {
+					// see if the type was indicated at the root node level
+					xpath = "//resLib[@type='#arguments.resourceType#']/resource[@id='#arguments.resourceID#']";
+					aResBeans = loadResourcesFromXMLPath(xmlDescriptorDoc, xpath, packageName, resourceType);
+				}
 			} else {
+				// load all resources on this descriptor.
+				xpath = "//resLib/resource[@type='#arguments.resourceType#']";
+				aResBeans = loadResourcesFromXMLPath(xmlDescriptorDoc, xpath, packageName, resourceType);
+				for(i=1;i lte arrayLen(aResBeans);i++) {
+					lst = listAppend(lst, aResBeans[i].getID());
+				}
+
+				// this is in case the type was declared on the root node but not on each resource node (the old way)
 				xpath = "//resLib[@type='#arguments.resourceType#']/resource";
+				var tmp = loadResourcesFromXMLPath(xmlDescriptorDoc, xpath, packageName, resourceType);
+				for(i=1;i lte arrayLen(tmp);i++) {
+					if(not listFindNoCase(lst,tmp[i].getID())) {
+						arrayAppend(aResBeans, tmp[i]);
+					}
+				}
 			}
-			
-			aNodes = xmlSearch(xmlDescriptorDoc, xpath);
-			
-			for(i=1;i lte ArrayLen(aNodes);i=i+1) {
-				oResourceBean = getNewResource(arguments.resourceType);
 
-				loadResourceFromXMLNode( oResourceBean, aNodes[i] );
-				oResourceBean.setPackage( arguments.packageName );
-
-				// add resource bean to returning array
-				arrayAppend(aResBeans, oResourceBean);
-			}
-			
 			return aResBeans;
 		</cfscript>
 	</cffunction>
@@ -555,15 +562,50 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="loadResourceFromXMLNode" access="public" output="false" returntype="void" hint="populates the a resource bean instance from an xml node from a resource descriptor file">
-		<cfargument name="resourceBean" type="any" hint="The resource to load" required="true" />
-		<cfargument name="resourceNode" type="XML" hint="XML node from a descriptor document that represents the resource" required="true" />
+	<cffunction name="loadResourcesFromXMLPath" access="private" returntype="Array">
+		<cfargument name="xmlDescriptorDoc" type="xml" required="true" hint="an xml object with a directory of resources">
+		<cfargument name="xmlPath" type="string" required="true" hint="the path of resources to load">
+		<cfargument name="packageName" type="string" required="true" hint="Name of the package to search">
+		<cfargument name="resourceType" type="string" required="true" hint="Type of resource to search">
 		<cfscript>
-			var resBean = arguments.resourceBean;
+			var bean = 0;
+			var beans = [];
+			var nodes = xmlSearch(xmlDescriptorDoc, xmlPath);
+
+			for(var i=1;i lte ArrayLen(nodes);i=i+1) {
+				bean = loadResourceFromXMLNode( nodes[i], arguments.resourceType );
+				bean.setPackage( arguments.packageName );
+
+				// add resource bean to returning array (only if the type matches)
+				if(bean.getType() eq arguments.resourceType)
+					arrayAppend(beans, bean);
+			}
+			
+			return beans;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="loadResourceFromXMLNode" access="private" output="false" returntype="any" hint="populates the a resource bean instance from an xml node from a resource descriptor file">
+		<cfargument name="resourceNode" type="xml" hint="XML node from a descriptor document that represents the resource" required="true" />
+		<cfargument name="defaultResourceType" type="string" hint="the resource type to use in case is not explicitly defined on the node" />
+		<cfscript>
+			var resBean = 0;
 			var xmlNode = arguments.resourceNode;
 			var i = 0;
 			var stSrc = 0;
 			var stTgt = 0;
+			var type = "";
+			
+			// define the resource type
+			if(structKeyExists(xmlNode.xmlAttributes,"type")) 
+				type = xmlNode.xmlAttributes.type;
+			if(type eq "" and defaultResourceType neq "")
+				type = defaultResourceType;
+			if(type eq "")
+				throw(message="Invalid resource type");
+				
+			// create the new resource bean
+			resBean = getNewResource(type);
 
 			// populate bean
 			resBean.setID(xmlNode.xmlAttributes.id);
@@ -592,7 +634,8 @@
 			if(structKeyExists(resBean,"loadFromXMLNode")) {
 				resBean.loadFromXMLNode(xmlNode);		
 			}
-						
+			
+			return resBean;	
 		</cfscript>
 	</cffunction>
 
@@ -614,6 +657,7 @@
 				xmlNode.xmlAttributes["id"] = resBean.getID();
 				xmlNode.xmlAttributes["HREF"] = resBean.getHREF();
 				xmlNode.xmlAttributes["createdOn"] = resBean.getCreatedOn();
+				xmlNode.xmlAttributes["type"] = resBean.getType();
 	
 				if(resBean.getDescription() neq "") {
 					xmlNode2 = xmlElemNew(arguments.xmlDoc, "description");
