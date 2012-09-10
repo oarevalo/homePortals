@@ -415,7 +415,7 @@
 				arguments.fileName = rb.getID();
 			}
 
-			if(listLen(arguments.fileName,".") eq 0
+			if(listLen(arguments.fileName,".") lte 1
 					and defaultExtension neq "") {
 				arguments.fileName  = arguments.fileName 
 										& "." 
